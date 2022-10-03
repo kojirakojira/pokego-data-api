@@ -52,12 +52,12 @@ public class PokemonSearchService {
 		} else if (goPokedexList.size() == 0) {
 
 			// 1件もヒットしなかった場合、すごく曖昧に検索する。
-			if (transName.length() <= 10) {
+			if (transName.length() <= 20) {
 				goPokedexList = searchFuzzy(transName);
 				result.setMaybe(true);
 			} else {
 				// なんかDBに負荷がかかりそうだから文字数が多いときは検索させない。
-				result.setMessage("10文字を超えた場合は、あいまい検索しません。");
+				result.setMessage("20文字を超えた場合は、あいまい検索しません。");
 			}
 
 		}

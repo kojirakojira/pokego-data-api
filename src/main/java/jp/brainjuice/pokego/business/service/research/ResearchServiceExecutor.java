@@ -78,7 +78,7 @@ public class ResearchServiceExecutor<T extends Response> {
 
 			}
 		} else {
-			throw new BadRequestException();
+			throw new BadRequestException(MessageFormat.format("id:{0}, name: {1}", req.getId(), req.getName()));
 		}
 	}
 
