@@ -8,9 +8,8 @@ package jp.brainjuice.pokego.utils;
  */
 public class BjConfigEnum {
 
-	public enum Es {
-		/** Elasticsearchにおけるワンピースセリフインデックスのドキュメントのidの接頭辞 */
-		one_piece_line_index,
+	public enum System {
+		SPRING_PROFILES_ACTIVE /** 環境変数 **/
 	}
 
 	public enum admin {

@@ -100,7 +100,7 @@ public class ScpResearchController {
 	 * INPUT：
 	 * <ul>
 	 *   <li>id or name</li>
-	 *   <li>league("sl","gl","hl","ul","ml")</li>
+	 *   <li>league = ("sl","gl","hl","ul","ml")</li>
 	 * </ul>
 	 *
 	 * @param scpRankListReq

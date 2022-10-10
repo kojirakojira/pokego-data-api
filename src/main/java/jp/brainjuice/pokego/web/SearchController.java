@@ -14,6 +14,8 @@ import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.research.PlResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
+import jp.brainjuice.pokego.cache.dao.PageViewRedisRepository;
+import jp.brainjuice.pokego.cache.dao.entity.PageViewInfo;
 import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.PlRequest;
@@ -29,6 +31,9 @@ public class SearchController {
 	private GoConvertService goConvertService;
 
 	private PokemonSearchService pokemonSearchService;
+
+	@Autowired
+	PageViewRedisRepository pageViewInfoRepository;
 
 	@Autowired
 	public SearchController(
@@ -68,6 +73,18 @@ public class SearchController {
 		plResRse.execute(plReq, plRes, plResearchService);
 		return plRes;
 	}
+
+	@GetMapping("/test")
+	public String test() {
+
+		PageViewInfo pvi = new PageViewInfo("page", "ip", null);
+		pageViewInfoRepository.save(pvi);
+
+		return pageViewInfoRepository.findAll().toString();
+	}
+
+
+
 
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {

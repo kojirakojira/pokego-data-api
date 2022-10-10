@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.web;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -132,7 +134,7 @@ public class CpResearchController {
 
 
 	@GetMapping("/raid")
-	public RaidResponse raid(@Validated RaidRequest raidReq) throws BadRequestException {
+	public RaidResponse raid(@Validated RaidRequest raidReq, HttpServletRequest req) throws BadRequestException {
 
 		RaidResponse raidRes = new RaidResponse();
 		raidResRse.execute(raidReq, raidRes, raidResearchService);
