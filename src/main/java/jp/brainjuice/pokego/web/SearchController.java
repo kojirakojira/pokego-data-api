@@ -16,13 +16,14 @@ import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.cache.dao.PageViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageViewInfo;
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.PlRequest;
 import jp.brainjuice.pokego.web.form.res.research.PlResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class SearchController {
 
 	private PlResearchService plResearchService;
@@ -89,14 +90,14 @@ public class SearchController {
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {
 		String errMsg = "不正なアクセスです。";
-		LogUtils.getLog(this).error(errMsg, e);
+		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exception(Exception e) {
 		String errMsg = "処理中に想定外の問題が発生しました。";
-		LogUtils.getLog(this).error(errMsg, e);
+		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

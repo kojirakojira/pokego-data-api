@@ -14,9 +14,10 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class GoConvertService {
 
 	private PokedexRepository pokedexRepository;
@@ -38,7 +39,7 @@ public class GoConvertService {
 	@EventListener(ApplicationReadyEvent.class)
 	public void init() {
 		insertGoPokedexAll();
-		LogUtils.getLog(this).info("GoPokedex table generated!!");
+		log.info("GoPokedex table generated!!");
 	}
 
 	/**

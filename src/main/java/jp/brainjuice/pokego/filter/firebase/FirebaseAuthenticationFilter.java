@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 
 import jp.brainjuice.pokego.filter.firebase.exception.FirebaseAuthenticationException;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -28,6 +28,7 @@ import jp.brainjuice.pokego.filter.log.LogUtils;
  * @author amuka
  *
  */
+@Slf4j
 public class FirebaseAuthenticationFilter implements Filter {
 
 	public FirebaseAuthenticationFilter() {
@@ -44,7 +45,7 @@ public class FirebaseAuthenticationFilter implements Filter {
 
 			FirebaseApp.initializeApp(options);
 		} catch (IOException e) {
-			LogUtils.getLog(this).error("Failed to initialize firebase settings.", e);
+			log.error("Failed to initialize firebase settings.", e);
 		}
 
 	}
@@ -68,7 +69,7 @@ public class FirebaseAuthenticationFilter implements Filter {
 
 		} catch (Exception e) {
 			// エラー時は/errorFilterにぶん投げてハンドリングする
-			LogUtils.getLog(this).error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			RequestDispatcher rd = req.getRequestDispatcher("/errorFilter?exception=" + e.getClass().getName());
 			try {
 				rd.forward(req, res);

@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.BjJwtUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -15,6 +15,7 @@ import jp.brainjuice.pokego.utils.BjJwtUtils;
  * @author amuka
  *
  */
+@Slf4j
 public class BrainJuiceInterceptor implements HandlerInterceptor {
 
 	private static final String UID = "UID:";
@@ -34,9 +35,9 @@ public class BrainJuiceInterceptor implements HandlerInterceptor {
 		String tokenUserId = BjJwtUtils.getTokenUserId(req);
 		String logMsg = START + UID + tokenUserId + SEMICOLON + REQ_PATH + req.getRequestURI();
 		if (!"/home".equals(req.getRequestURI())) {
-			LogUtils.getLog(this).info(logMsg);
+			log.info(logMsg);
 		} else {
-			LogUtils.getLog(this).debug(logMsg);
+			log.debug(logMsg);
 
 		}
 
@@ -50,9 +51,9 @@ public class BrainJuiceInterceptor implements HandlerInterceptor {
 		String tokenUserId = BjJwtUtils.getTokenUserId(req);
 		String logMsg = END + UID + tokenUserId + SEMICOLON + REQ_PATH + req.getRequestURI();
 		if (!"/home".equals(req.getRequestURI())) {
-			LogUtils.getLog(this).info(logMsg);
+			log.info(logMsg);
 		} else {
-			LogUtils.getLog(this).debug(logMsg);
+			log.debug(logMsg);
 
 		}
 	}

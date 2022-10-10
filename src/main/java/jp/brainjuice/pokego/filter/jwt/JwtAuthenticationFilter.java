@@ -15,13 +15,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import io.jsonwebtoken.Jwts;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class JwtAuthenticationFilter  extends BasicAuthenticationFilter {
 
 	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
-		LogUtils.getLog(this).info("JwtAuthorizationFilter Initialize...");
+		log.info("JwtAuthorizationFilter Initialize...");
 	}
 
 	@Override
@@ -47,7 +48,7 @@ public class JwtAuthenticationFilter  extends BasicAuthenticationFilter {
 			chain.doFilter(req, res);
 		} catch (Exception e) {
 			// エラー時は/errorFilterにぶん投げてハンドリングする
-			LogUtils.getLog(this).error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			RequestDispatcher rd = req.getRequestDispatcher("/errorFilter?exception=" + e.getClass().getName());
 			rd.forward(req, res);
 			return;

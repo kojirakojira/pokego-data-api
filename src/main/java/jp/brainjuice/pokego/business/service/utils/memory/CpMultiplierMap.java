@@ -10,10 +10,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Component
+@Slf4j
 public class CpMultiplierMap extends HashMap<String, Double> {
 
 	@PostConstruct
@@ -29,9 +30,9 @@ public class CpMultiplierMap extends HashMap<String, Double> {
 			Yaml yaml = new Yaml();
 			this.putAll(yaml.loadAs(reader, CpMultiplierMap.class));
 
-			LogUtils.getLog(this).info("CpMultiplierMap generated!!");
+			log.info("CpMultiplierMap generated!!");
 		} catch (Exception e) {
-			LogUtils.getLog(this).error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

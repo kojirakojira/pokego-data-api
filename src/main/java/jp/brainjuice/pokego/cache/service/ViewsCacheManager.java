@@ -17,10 +17,11 @@ import jp.brainjuice.pokego.cache.dao.entity.PokemonViewInfo;
 import jp.brainjuice.pokego.cache.inmemory.TempTopicPokemonList;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempInfo;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
+@Slf4j
 public class ViewsCacheManager {
 
 	private ViewTempList viewTempList;
@@ -70,7 +71,7 @@ public class ViewsCacheManager {
 	@Scheduled(initialDelay = 600000, fixedDelay = 900000)
 	public void sendViewInfo() {
 
-		LogUtils.getLog(this).info(SCHEDULE_MESSAGE_START);
+		log.info(SCHEDULE_MESSAGE_START);
 
 		// 集計対象の閲覧情報の取得
 		ArrayList<ViewTempInfo> aggregateTargetList = viewTempList.getAggregateTargetList();
@@ -90,7 +91,7 @@ public class ViewsCacheManager {
 		// ポケモン
 		pokemonViewRedisRepository.saveAll(pokemonViewInfoList);
 
-		LogUtils.getLog(this).info(MessageFormat.format(SCHEDULE_MESSAGE_END, pageViewInfoList, pokemonViewInfoList));
+		log.info(MessageFormat.format(SCHEDULE_MESSAGE_END, pageViewInfoList, pokemonViewInfoList));
 
 	}
 

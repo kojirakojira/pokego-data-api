@@ -20,12 +20,13 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.BjConfigEnum;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableCaching
 @EnableRedisRepositories
+@Slf4j
 public class CacheConfig {
 
 	@Value("${redis.env.url}")
@@ -94,13 +95,13 @@ public class CacheConfig {
 		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
 		// 本番環境でのみクラスターモード
 		if ("production".equals(env)) {
-			LogUtils.getLog(this).info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
+			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
 			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
 			clusterConfiguration.clusterNode(host, port);
 			clusterConfiguration.setPassword(password);
 			factory = new LettuceConnectionFactory(clusterConfiguration);
 		} else {
-			LogUtils.getLog(this).info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
+			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
 			RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
 			conf.setHostName(host);
 			conf.setPort(port);

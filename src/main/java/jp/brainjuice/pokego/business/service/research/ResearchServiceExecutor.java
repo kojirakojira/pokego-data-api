@@ -14,12 +14,13 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.Request;
 import jp.brainjuice.pokego.web.form.res.Response;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class ResearchServiceExecutor<T extends Response> {
 
 	private GoPokedexRepository goPokedexRepository;
@@ -110,7 +111,7 @@ public class ResearchServiceExecutor<T extends Response> {
 			try {
 				iv.getParamsMap().put(field.getName(), field.get(req));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				LogUtils.getLog(this).warn(MessageFormat.format(
+				log.warn(MessageFormat.format(
 						"Failed to get field [{1}] of class name [{0}].", req.getClass().getName(), field.getName()));
 			}
 		}

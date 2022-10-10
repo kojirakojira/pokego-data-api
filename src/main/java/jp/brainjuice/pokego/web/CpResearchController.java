@@ -16,7 +16,6 @@ import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchServi
 import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
@@ -26,9 +25,11 @@ import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class CpResearchController {
 
 	private CpResearchService cpResearchService;
@@ -144,14 +145,14 @@ public class CpResearchController {
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {
 		String errMsg = "不正なアクセスです。";
-		LogUtils.getLog(this).error(errMsg, e);
+		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exception(Exception e) {
 		String errMsg = "処理中に想定外の問題が発生しました。";
-		LogUtils.getLog(this).error(errMsg, e);
+		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

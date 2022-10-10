@@ -10,10 +10,11 @@ import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Component
+@Slf4j
 public class PokemonList extends ArrayList<String> {
 
 	private PokedexRepository pokedexRepository;
@@ -30,10 +31,10 @@ public class PokemonList extends ArrayList<String> {
 			List<Pokedex> pokedexList = pokedexRepository.findAll();
 			pokedexList.forEach(p -> add(p.getName()));
 
-			LogUtils.getLog(this).debug("PokemonList: " + this.toString());
-			LogUtils.getLog(this).info("PokemonList generated!!");
+			log.debug("PokemonList: " + this.toString());
+			log.info("PokemonList generated!!");
 		} catch (Exception e) {
-			LogUtils.getLog(this).error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

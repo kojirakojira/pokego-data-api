@@ -8,11 +8,12 @@ import java.util.ListIterator;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.cache.dao.entity.PokemonViewInfo;
-import jp.brainjuice.pokego.filter.log.LogUtils;
 import jp.brainjuice.pokego.utils.BjUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Component
+@Slf4j
 public class TempTopicPokemonList extends ArrayList<PokemonViewInfo> {
 
 	private static int COUNT_PERIOD = 3;
@@ -55,7 +56,7 @@ public class TempTopicPokemonList extends ArrayList<PokemonViewInfo> {
 
 		} catch (Exception e) {
 			// 例外が発生した場合、無視する
-			LogUtils.getLog(this).error("Processing failure.", e);
+			log.error("Processing failure.", e);
 		}
 	}
 

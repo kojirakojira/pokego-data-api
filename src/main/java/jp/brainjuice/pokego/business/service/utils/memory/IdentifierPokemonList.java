@@ -14,10 +14,11 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Component
+@Slf4j
 public class IdentifierPokemonList extends ArrayList<String> {
 
 	private PokedexRepository pokedexRepository;
@@ -48,7 +49,7 @@ public class IdentifierPokemonList extends ArrayList<String> {
 					// 原作→GOの単純変換でCPが4000を超えるポケモン
 					add(p.getPokedexId());
 
-					LogUtils.getLog(this).debug(MessageFormat.format("{0}({1}):CP{2}", p.getName(), p.getRemarks(), cp));
+					log.debug(MessageFormat.format("{0}({1}):CP{2}", p.getName(), p.getRemarks(), cp));
 				}
 			}
 		});
@@ -74,8 +75,8 @@ public class IdentifierPokemonList extends ArrayList<String> {
 			});
 		});
 
-		LogUtils.getLog(this).info("Identifier pokemon list: " + outputList.toString());
-		LogUtils.getLog(this).info("IdentifierPokemonList generated!!");
+		log.info("Identifier pokemon list: " + outputList.toString());
+		log.info("IdentifierPokemonList generated!!");
 
 	}
 }
