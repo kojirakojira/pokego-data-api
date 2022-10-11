@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableCaching
 @EnableRedisRepositories
 @Slf4j
-public class CacheConfig {
+public class RedisConfig {
 
 	@Value("${redis.env.url}")
 	private String envUrl;

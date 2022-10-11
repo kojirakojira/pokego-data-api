@@ -14,8 +14,7 @@ import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.research.PlResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
-import jp.brainjuice.pokego.cache.dao.PageViewRedisRepository;
-import jp.brainjuice.pokego.cache.dao.entity.PageViewInfo;
+import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.PlRequest;
 import jp.brainjuice.pokego.web.form.res.research.PlResponse;
@@ -34,7 +33,7 @@ public class SearchController {
 	private PokemonSearchService pokemonSearchService;
 
 	@Autowired
-	PageViewRedisRepository pageViewInfoRepository;
+	PageTempViewRedisRepository pageViewInfoRepository;
 
 	@Autowired
 	public SearchController(
@@ -78,8 +77,6 @@ public class SearchController {
 	@GetMapping("/test")
 	public String test() {
 
-		PageViewInfo pvi = new PageViewInfo("page", "ip", null);
-		pageViewInfoRepository.save(pvi);
 
 		return pageViewInfoRepository.findAll().toString();
 	}
