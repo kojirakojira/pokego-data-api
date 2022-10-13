@@ -13,12 +13,15 @@ import com.ibm.icu.text.Transliterator;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 
 @Service
 public class PokemonSearchService {
 
 	private GoPokedexRepository goPokedexRepository;
+
+	private PokemonGoUtils pokemonGoUtils;
 
 	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
 	private Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
@@ -27,8 +30,11 @@ public class PokemonSearchService {
 	private Transliterator transHiraToKana = Transliterator.getInstance("Hiragana-Katakana");
 
 	@Autowired
-	public PokemonSearchService(GoPokedexRepository goPokedexRepository) {
+	public PokemonSearchService(
+			GoPokedexRepository goPokedexRepository,
+			PokemonGoUtils pokemonGoUtils) {
 		this.goPokedexRepository = goPokedexRepository;
+		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	@Transactional(readOnly = true, isolation=Isolation.READ_UNCOMMITTED)
@@ -54,10 +60,11 @@ public class PokemonSearchService {
 				goPokedexList = searchFuzzy(transName);
 				result.setMaybe(true);
 			} else {
-				// なんかDBに負荷がかかりそうだから文字数が多いときは検索させない。
+				// なんか負荷がかかりそうだから文字数が多いときは検索させない。
 				result.setMessage("20文字を超えた場合は、あいまい検索しません。");
 			}
 
+			pokemonGoUtils.appendRemarks(goPokedexList);
 		}
 
 		result.setUnique(false);
@@ -77,7 +84,7 @@ public class PokemonSearchService {
 		// 2文字単位で分割する。
 		List<String> nameList = toFuzzyNameList(transName);
 		// 検索
-		return goPokedexRepository.findAll(nameList);
+		return goPokedexRepository.findByNameIn(nameList);
 
 	}
 

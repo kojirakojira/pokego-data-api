@@ -24,7 +24,7 @@ import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ポケモン情報をTSVから取得し、メモリに保持します。<br>
+ * ポケモン情報をTSVから取得し、メモリに保持し管理するRepositoryです。<br>
  * Spring Data Jpaに近い仕様を目指してますが、ほぼハリボテです。
  *
  * @author saibabanagchampa
@@ -39,8 +39,8 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	private static final String MSG_METHOD_INVOKE_ERROR = "カラム名の指定、もしくはデータの型に誤りがあります。行番号:{0}, 列番号:{1}";
 	private static final String MSG_INDEX_ERRPR = "列の個数が一致しませんでした。行番号:{0}, 列番号:{1}";
 
-	private static final String FILE_NAME = "pokemon.tsv";
-	private static final String TAB = "\t";
+	private static final String FILE_NAME = "pokemon.csv";
+	private static final String SEPARATOR = ",";
 
 	/**
 	 * すべてのPokdexを取得します。
@@ -65,7 +65,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
 		for (Pokedex p: pokedexes) {
 			if (pokedexId.equals(p.getPokedexId())) {
-				pokedexOp = Optional.of(p);
+				pokedexOp = Optional.of(p.clone());
 				break;
 			}
 		}
@@ -115,7 +115,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
 		// メソッド名のリストを作成する。csvファイルの1行目はカラム名（キャメルケース）
 		ArrayList<String> setterList = new ArrayList<String>();
-		for (String col: rowList.get(0).split(TAB)) {
+		for (String col: rowList.get(0).split(SEPARATOR, -1)) {
 			String methodName = "set" + col.substring(0, 1).toUpperCase() + col.substring(1);
 			setterList.add(methodName);
 		}
@@ -127,7 +127,13 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 				Pokedex pokedex = new Pokedex();
 
 				// Pokedexに各項目を設定する。
-				String[] colArr = rowList.get(y).split("\t");
+				String[] colArr = rowList.get(y).split(SEPARATOR, -1); // 末尾の空文字を除去しない。
+				if (colArr.length != setterList.size()) {
+					// 1行目と対象の行が一致していない場合
+					x = colArr.length;
+					throw new ArrayIndexOutOfBoundsException();
+				}
+
 				for (x = 0; x < colArr.length; x++) {
 					// セッターを実行
 					invokeSetter(pokedex, colArr[x], setterList.get(x));
@@ -136,11 +142,10 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 				pokedexList.add(pokedex);
 			}
 		} catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-
-			log.error(MessageFormat.format(MSG_METHOD_INVOKE_ERROR, y, x));
+			log.error(MessageFormat.format(MSG_METHOD_INVOKE_ERROR, y + 1, x));
 			throw e;
 		} catch (ArrayIndexOutOfBoundsException e) {
-			log.error(MessageFormat.format(MSG_INDEX_ERRPR, y, x));
+			log.error(MessageFormat.format(MSG_INDEX_ERRPR, y + 1, x));
 			throw e;
 		}
 

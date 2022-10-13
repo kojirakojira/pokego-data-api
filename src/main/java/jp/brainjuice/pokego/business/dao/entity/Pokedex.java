@@ -1,15 +1,19 @@
 package jp.brainjuice.pokego.business.dao.entity;
 
+import java.io.Serializable;
+
 import javax.annotation.Nonnull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pokedex {
+@Slf4j
+public class Pokedex implements Serializable, Cloneable {
 
 	/** 図鑑No(4) + 亜種フラグ(1) + 連番(2) */
 	private String pokedexId;
@@ -44,4 +48,14 @@ public class Pokedex {
 
 	/** 備考 */
 	private String remarks;
+
+	public Pokedex clone() {
+		Pokedex pokedex = null;
+		try {
+			pokedex = (Pokedex) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.");
+		}
+		return pokedex;
+	}
 }
