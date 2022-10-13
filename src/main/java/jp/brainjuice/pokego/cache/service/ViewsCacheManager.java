@@ -46,8 +46,8 @@ public class ViewsCacheManager {
 
 	private TopicPageList topicPageList;
 
-	private static final String START_MSG_SCHEDULE = "Start sending ViewInfo(page, pokemon).";
-	private static final String END_MSG_SCHEDULE = "End sending ViewInfo(page. pokemon).";
+	private static final String START_MSG_SCHEDULE = "Start ViewInfo(page, pokemon) schedule.";
+	private static final String END_MSG_SCHEDULE = "End ViewInfo(page. pokemon) schedule.";
 
 	private static final String START_MSG_INCR_VIEWS_COUNT_INFO = "Start incr ViewsCount.";
 	private static final String END_MSG_INCR_VIEWS_COUNT_INFO = "End incr ViewsCount. page:{0}, pokemon:{1}";

@@ -38,6 +38,9 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	private static final String VIEW_REMOVE_END_LOG_REMOVED = "removed!!";
 	private static final String VIEW_REMOVE_END_LOG_NOT_REMOVED = "Not removed.";
 
+	private static final String RTN_LIST_LOG = "rtnList: {0}";
+	private static final String VIEW_TEMP_LIST_LOG = "ViewTempList: {0}";
+
 	/** 連打抑止の期間 */
 	private static final int MINUTE_5 = 5;
 
@@ -64,28 +67,29 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 		Date before = beforeTime(MINUTE_5);
 
 		// 5分前よりも未来に同じアクセス（同じページ、図鑑№、IP）が存在しているかを確認する(連打防止)
-		boolean flg = false;
+		boolean existsFlg = false;
 		for (ListIterator<ViewTempInfo> ite = listIterator(size()); ite.hasPrevious();) {
 			ViewTempInfo vti = ite.previous();
 
 			// 5分前より過去になったらループ中断
 			if (before.after(vti.getTime())) {
+				existsFlg = true;
 				break;
 			}
 
 			// ページ、図鑑№、IPアドレスが一致している場合
-			if (vti.getIp().equals(page) && vti.getPokedexId().equals(pokedexId) && vti.getPage().equals(page)) {
-				flg = true;
+			if (vti.getPage().equals(page) && vti.getPokedexId().equals(pokedexId) && vti.getIp().equals(ip)) {
+				existsFlg = true;
 				break;
 			}
 		}
 
-		if (!flg) {
+		if (!existsFlg) {
 			// 過去5分以内に対象のユーザが同じページを閲覧していない場合、追加する。
 			add(new ViewTempInfo(page, pokedexId, ip, BjUtils.now()));
 		}
 
-		log.info(MessageFormat.format(VIEW_ADD_END_LOG, flg ? VIEW_ADD_END_LOG_NOT_ADDED : VIEW_ADD_END_LOG_ADDED));
+		log.info(MessageFormat.format(VIEW_ADD_END_LOG, existsFlg ? VIEW_ADD_END_LOG_NOT_ADDED : VIEW_ADD_END_LOG_ADDED));
 	}
 
 	/**
@@ -129,7 +133,10 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 			rtnList = new ArrayList<ViewTempInfo>();
 		}
 
-		log.info(MessageFormat.format(VIEW_REMOVE_END_LOG, flg ? VIEW_REMOVE_END_LOG_REMOVED : VIEW_REMOVE_END_LOG_NOT_REMOVED));
+		log.info(MessageFormat.format(RTN_LIST_LOG, rtnList.toString()));
+		log.info(MessageFormat.format(VIEW_TEMP_LIST_LOG, toString()));
+		log.info(MessageFormat.format(
+				VIEW_REMOVE_END_LOG, flg ? VIEW_REMOVE_END_LOG_REMOVED : VIEW_REMOVE_END_LOG_NOT_REMOVED));
 
 		return rtnList;
 	}
