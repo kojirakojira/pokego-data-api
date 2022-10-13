@@ -63,7 +63,7 @@ public class ResearchServiceExecutor<T extends Response> {
 			Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(req.getId());
 
 			if (!goPokedexOp.isPresent()) {
-				res.setSuccess(false);
+				res.setSuccess(true);
 				res.setMessage("存在しないIDです。");
 				return;
 			}

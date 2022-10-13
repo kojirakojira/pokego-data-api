@@ -5,12 +5,12 @@ server:
   # フロント側のorigin（区切り文字:"|"）
   client.origin: localhost:3000|brainjuice-app-staging.herokuapp.com|brainjuice.jp
   
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/pokemon
-    username: postgres
-    password: password
-    driverClassName: org.postgresql.Driver
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/pokemon
+#    username: postgres
+#    password: password
+#    driverClassName: org.postgresql.Driver
 
 #spring:
 #  datasource:
@@ -30,6 +30,9 @@ logging:
     root: INFO
     org:
       springframework.web.client.RestTemplate: INFO
+#      hibernate:
+#        SQL: INFO
+#        type.descriptor.sql.BasicBinder: INFO
 
 # Redis
 redis:

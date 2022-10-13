@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ibm.icu.text.Transliterator;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.GoPokedexSpecification;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 
@@ -78,18 +76,8 @@ public class PokemonSearchService {
 
 		// 2文字単位で分割する。
 		List<String> nameList = toFuzzyNameList(transName);
-
-		GoPokedexSpecification<GoPokedex> goPokeSpec = new GoPokedexSpecification<GoPokedex>();
-
-		// name like '%あい%' or name like '%いう%' or ...と連結させていく。
-		Specification<GoPokedex> spec = null;
-		for (int i = 0; i < nameList.size(); i++) {
-			spec = goPokeSpec.nameContains(nameList.get(i));
-			spec = spec.or(spec);
-		}
-
 		// 検索
-		return goPokedexRepository.findAll(Specification.where(spec));
+		return goPokedexRepository.findAll(nameList);
 
 	}
 

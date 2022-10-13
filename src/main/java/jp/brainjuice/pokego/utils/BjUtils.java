@@ -161,4 +161,18 @@ public final class BjUtils {
 		ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
 		return Date.from(zonedDateTime.toInstant());
 	}
+
+	/**
+	 * 引数が空文字またはnullの場合、空文字に置き換えます。
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static String replaceEmpty(String value) {
+
+		if (StringUtils.isEmpty(value)) {
+			return "";
+		}
+		return value;
+	}
 }

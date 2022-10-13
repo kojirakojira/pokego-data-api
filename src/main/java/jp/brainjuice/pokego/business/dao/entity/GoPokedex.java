@@ -1,25 +1,20 @@
 package jp.brainjuice.pokego.business.dao.entity;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
+import org.springframework.data.redis.core.RedisHash;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name="go_pokedex")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RedisHash(value = "goPokedex")
 public class GoPokedex {
 
 	/** 図鑑No(4) + 亜種フラグ(1) + 連番(2) */
-	@Id
-	@Column(name="pokedex_id")
 	private String pokedexId;
 
 	/** ポケモン */
