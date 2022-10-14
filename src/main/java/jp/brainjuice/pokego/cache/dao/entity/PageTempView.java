@@ -18,13 +18,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @RedisHash(value = "pageTempView", timeToLive = 10800L)
-public class PageTempView {
+public class PageTempView implements TempView {
 
 	/** id = (page + UUID) */
 	@Id
 	private String id;
-	/** =SearchPattern */
-	private String page;
+	/** =page =SearchPattern */
+	private String key;
 	private String ip;
 	private Date viewTime;
 }

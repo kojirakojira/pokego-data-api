@@ -7,8 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TopicPage {
 
-	private String pokedexId;
-	private String name;
+	private String page;
 	private String image;
 	private int count;
 }

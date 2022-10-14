@@ -1,15 +1,17 @@
 package jp.brainjuice.pokego.cache.inmemory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.cache.inmemory.data.TopicPokemon;
-import lombok.extern.slf4j.Slf4j;
+import jp.brainjuice.pokego.cache.inmemory.data.TopicPage;
 
 
 @Component
-@Slf4j
-public class TopicPageList extends ArrayList<TopicPokemon> {
+public class TopicPageList extends ArrayList<TopicPage> {
 
+	public TopicPageList() {
+		super(Collections.synchronizedList(new ArrayList<TopicPage>()));
+	}
 }

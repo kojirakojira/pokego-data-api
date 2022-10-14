@@ -46,6 +46,20 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 		return new ArrayList<>((Collection<? extends GoPokedex>) goPokedexes);
 	}
 
+	@Override
+	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
+		List<GoPokedex> goPokedexList = new ArrayList<GoPokedex>();
+		ids.forEach(id -> {
+			for (GoPokedex gp: goPokedexes) {
+				if (id.equals(gp.getPokedexId())) {
+					goPokedexList.add(gp.clone());
+					break;
+				}
+			}
+		});
+		return goPokedexList;
+	}
+
 	/**
 	 * 部分一致で検索します。<br>
 	 * イメージ： WHERE name LIKE '%name%'
@@ -82,15 +96,6 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	public boolean existsById(String id) {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
 	}
 
 	/**

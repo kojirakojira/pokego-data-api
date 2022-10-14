@@ -18,12 +18,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @RedisHash(value = "pokemonTempView", timeToLive = 10800L)
-public class PokemonTempView {
+public class PokemonTempView implements TempView {
 
 	/** id = (pokedexId + UUID) */
 	@Id
 	private String id;
-	private String pokedexId;
+	/** =pokedexId */
+	private String key;
 	private String ip;
 	private Date viewTime;
 }
