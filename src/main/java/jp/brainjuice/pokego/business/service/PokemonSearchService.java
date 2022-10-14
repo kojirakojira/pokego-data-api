@@ -1,13 +1,12 @@
 package jp.brainjuice.pokego.business.service;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ibm.icu.text.Transliterator;
 
@@ -29,6 +28,10 @@ public class PokemonSearchService {
 	/** ひらがな→カタカナ */
 	private Transliterator transHiraToKana = Transliterator.getInstance("Hiragana-Katakana");
 
+	private static final String MSG_RESULTS = "{0}件のポケモンがヒットしました！";
+
+	private static final String MSG_NO_RESULTS = "該当するポケモンがいませんでした。";
+
 	@Autowired
 	public PokemonSearchService(
 			GoPokedexRepository goPokedexRepository,
@@ -37,7 +40,6 @@ public class PokemonSearchService {
 		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
-	@Transactional(readOnly = true, isolation=Isolation.READ_UNCOMMITTED)
 	public PokemonSearchResult search(String name) {
 
 		PokemonSearchResult result = new PokemonSearchResult();
@@ -46,17 +48,14 @@ public class PokemonSearchService {
 		transName = transAnyNFKC.transliterate(name);
 		transName = transHiraToKana.transliterate(transName);
 
+		// 検索
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByNameIn(Arrays.asList(transName, "メガ" + transName));
 
-		if (goPokedexList.size() == 1) {
-			// 1件のみヒットした場合
-			result.setUnique(true);
-			result.setGoPokedex(goPokedexList.get(0));
-			return result;
-		} else if (goPokedexList.size() == 0) {
+		// 1件もヒットしなかった場合
+		if (goPokedexList.isEmpty()) {
 
-			// 1件もヒットしなかった場合、すごく曖昧に検索する。
 			if (transName.length() <= 20) {
+				// すごく曖昧に検索する。
 				goPokedexList = searchFuzzy(transName);
 				result.setMaybe(true);
 			} else {
@@ -64,10 +63,15 @@ public class PokemonSearchService {
 				result.setMessage("20文字を超えた場合は、あいまい検索しません。");
 			}
 
-			pokemonGoUtils.appendRemarks(goPokedexList);
 		}
 
-		result.setUnique(false);
+		// メッセージのセット
+		result.setMessage(goPokedexList.isEmpty() ? MSG_NO_RESULTS : MessageFormat.format(MSG_RESULTS, goPokedexList.size()));
+
+		// 1件のみヒットした場合はuniqueをtrueにする。
+		result.setUnique(goPokedexList.size() == 1);
+
+		pokemonGoUtils.appendRemarks(goPokedexList);
 		result.setGoPokedexList(goPokedexList);
 
 		return result;
