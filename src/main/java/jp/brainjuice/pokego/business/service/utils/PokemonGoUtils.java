@@ -540,6 +540,12 @@ public class PokemonGoUtils {
 
 	}
 
+	/**
+	 * 名前に備考を連結させます。remarksが空文字の場合は何もしません。<br>
+	 * format: name + "(" + remarks + ")"
+	 *
+	 * @param goPokedexes
+	 */
 	public void appendRemarks(Iterable<GoPokedex> goPokedexes) {
 		goPokedexes.forEach(gp -> {
 			appendRemarks(gp);
