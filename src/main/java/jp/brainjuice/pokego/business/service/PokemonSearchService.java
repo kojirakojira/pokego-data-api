@@ -68,8 +68,11 @@ public class PokemonSearchService {
 		// メッセージのセット
 		result.setMessage(goPokedexList.isEmpty() ? MSG_NO_RESULTS : MessageFormat.format(MSG_RESULTS, goPokedexList.size()));
 
-		// 1件のみヒットした場合はuniqueをtrueにする。
-		result.setUnique(goPokedexList.size() == 1);
+		// 1件のみヒットした場合
+		if (goPokedexList.size() == 1) {
+			result.setGoPokedex(goPokedexList.get(0));
+			result.setUnique(true);
+		}
 
 		pokemonGoUtils.appendRemarks(goPokedexList);
 		result.setGoPokedexList(goPokedexList);

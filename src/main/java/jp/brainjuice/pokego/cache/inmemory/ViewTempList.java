@@ -33,13 +33,13 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	private static final String VIEW_ADD_END_LOG_ADDED = "Added!!";
 	private static final String VIEW_ADD_END_LOG_NOT_ADDED = "Not added.";
 
-	private static final String VIEW_REMOVE_START_LOG = "Start remove ViewTempList.";
-	private static final String VIEW_REMOVE_END_LOG = "End remove ViewTempList. ({0})";
+	private static final String VIEW_REMOVE_START_LOG = "> Start remove ViewTempList.";
+	private static final String VIEW_REMOVE_END_LOG = "> End remove ViewTempList. ({0})";
 	private static final String VIEW_REMOVE_END_LOG_REMOVED = "removed!!";
 	private static final String VIEW_REMOVE_END_LOG_NOT_REMOVED = "Not removed.";
 
-	private static final String RTN_LIST_LOG = "rtnList: {0}";
-	private static final String VIEW_TEMP_LIST_LOG = "ViewTempList: {0}";
+	private static final String RTN_LIST_LOG = "> > rtnList: {0}";
+	private static final String VIEW_TEMP_LIST_LOG = "> > ViewTempList: {0}";
 
 	/** 連打抑止の期間 */
 	private static final int MINUTE_5 = 5;
@@ -116,7 +116,7 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 		// リストは時間順に並んでいる
 		for (int i = size - 1; i >= 0; i--) {
 			if (before.after(get(i).getTime())) {
-				idx = i;
+				idx = i + 1;
 				flg = true;
 				break;
 			}

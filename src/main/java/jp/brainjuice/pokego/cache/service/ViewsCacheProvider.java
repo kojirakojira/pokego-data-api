@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.cache.service;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.aspectj.lang.JoinPoint;
@@ -61,6 +63,21 @@ public class ViewsCacheProvider {
 		ViewTempList viewsTempList = viewsCacheManager.getViewsTempList();
 		viewsTempList.add(page, pokedexId, ip);
 
+	}
+
+
+	public Map<String, Integer> findPageViewsAll() {
+
+		Map<String, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
+		System.out.println(rtnMap);
+		return rtnMap;
+	}
+
+	public Map<String, Integer> findPokemonViewsAll() {
+
+		Map<String, Integer> rtnMap = viewsCacheManager.findPokemonViewsAll();
+		System.out.println(rtnMap);
+		return rtnMap;
 	}
 
 

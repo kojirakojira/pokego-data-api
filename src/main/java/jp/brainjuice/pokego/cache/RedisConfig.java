@@ -19,6 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import jp.brainjuice.pokego.utils.BjConfigEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +85,7 @@ public class RedisConfig {
 //    }
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() throws URISyntaxException {
+    public LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
 		String envRedisUrl = System.getenv(envUrl);
 		URI uri = new URI(envRedisUrl);
 
@@ -112,19 +114,6 @@ public class RedisConfig {
 		return factory;
     }
 
-    /**
-     * Integer用RedisTemplateをDIに登録
-     *
-     * @param lettuceConnectionFactory
-     * @return
-     */
-	@Bean
-	public RedisTemplate<String, Integer> integerRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
-        RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<String, Integer>();
-        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
-        return redisTemplate;
-	}
-
 	/**
 	 * Object用RedisTemplateをDIに登録
 	 *
@@ -135,6 +124,12 @@ public class RedisConfig {
 	public RedisTemplate<String, Object> objectRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+        //
+        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setValueSerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        redisTemplate.setHashValueSerializer(stringSerializer);
         return redisTemplate;
 	}
 
