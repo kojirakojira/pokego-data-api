@@ -27,7 +27,12 @@ import jp.brainjuice.pokego.cache.inmemory.ViewTempInfo;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
 import lombok.extern.slf4j.Slf4j;
 
-
+/**
+ * 閲覧情報を管理するためのクラスです。
+ *
+ * @author saibabanagchampa
+ *
+ */
 @Component
 @Slf4j
 public class ViewsCacheManager {
@@ -61,6 +66,11 @@ public class ViewsCacheManager {
 		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
 	}
 
+	/**
+	 * ページごとの閲覧数をRedisサーバからすべて取得します。
+	 *
+	 * @return
+	 */
 	Map<String, Integer> findPageViewsAll() {
 
 		// キーの一覧を取得する(command="keys pageViews:*")
@@ -71,6 +81,11 @@ public class ViewsCacheManager {
 		return rtnMap;
 	}
 
+	/**
+	 * ポケモンごとの閲覧数をRedisサーバからすべて取得します。
+	 *
+	 * @return
+	 */
 	Map<String, Integer> findPokemonViewsAll() {
 
 		// キーの一覧を取得する(command="keys pokemonViews:*")
@@ -81,15 +96,22 @@ public class ViewsCacheManager {
 		return rtnMap;
 	}
 
+	/**
+	 * Keyの一覧をもとにRedisサーバからValueを取得します。
+	 *
+	 * @param pageViewKeys
+	 * @return
+	 */
 	private Map<String, Integer> getViewsMap(Set<String> pageViewKeys) {
 
 		Map<String, Integer> rtnMap = new HashMap<String, Integer>();
 
-		// キーのリスト（順番を担保）
+		// Keyのリスト（順番を担保）
 		ArrayList<String> keyList = new ArrayList<String>(pageViewKeys);
-		// キーのリスト（multiGetはコレクションの順番ごとに取得される。返却値の型はArrayList。）
+		// Valueのリスト（multiGetはコレクションの順番ごとに取得される。返却値の型はArrayList。）
 		List<String> views = redisTemplate.opsForValue().multiGet(pageViewKeys);
 
+		// 順番ごとに2つのリストをループさせMapを作成する。
 		for (int i = 0; i < keyList.size(); i++) {
 			rtnMap.put(keyList.get(i), Integer.parseInt(views.get(i)));
 		}

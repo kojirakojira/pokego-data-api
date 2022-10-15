@@ -25,6 +25,12 @@ import jp.brainjuice.pokego.cache.inmemory.data.TopicPage;
 import jp.brainjuice.pokego.cache.inmemory.data.TopicPokemon;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 話題の○○のリストを管理するクラスです。
+ *
+ * @author saibabanagchampa
+ *
+ */
 @Component
 @Slf4j
 public class TopicListManager {
@@ -84,7 +90,7 @@ public class TopicListManager {
 
 
 	/**
-	 * TopicPageのリストを取得します。<br>
+	 * TopicPageのリストを生成します。<br>
 	 * 閲覧数の降順で取得します。
 	 *
 	 * @return
@@ -113,7 +119,7 @@ public class TopicListManager {
 	}
 
 	/**
-	 * TopicPokemonのリストを取得します。<br>
+	 * TopicPokemonのリストを生成します。<br>
 	 * 閲覧数の降順で取得します。
 	 *
 	 * @return

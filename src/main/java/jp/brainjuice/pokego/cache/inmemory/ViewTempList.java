@@ -16,7 +16,7 @@ import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 閲覧数を一時的にメモリで保持するクラス<br>
+ * 閲覧情報を一時的にメモリで保持するクラス<br>
  * ※Iteratorを使用する場合はsynchronizedさせる必要があります。<br>
  * ※連打抑止は、APサーバ単位ごとに機能します。
  *

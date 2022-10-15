@@ -16,7 +16,13 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
 
-
+/**
+ * 閲覧情報にアクセスするためのプロバイダクラスです。
+ *
+ * @author saibabanagchampa
+ * @see ViewsCacheManager
+ *
+ */
 @Service
 @Aspect
 public class ViewsCacheProvider {
@@ -65,7 +71,11 @@ public class ViewsCacheProvider {
 
 	}
 
-
+	/**
+	 * ページごとの閲覧数をRedisサーバからすべて取得します。
+	 *
+	 * @return
+	 */
 	public Map<String, Integer> findPageViewsAll() {
 
 		Map<String, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
@@ -73,6 +83,11 @@ public class ViewsCacheProvider {
 		return rtnMap;
 	}
 
+	/**
+	 * ポケモンごとの閲覧数をRedisサーバからすべて取得します。
+	 *
+	 * @return
+	 */
 	public Map<String, Integer> findPokemonViewsAll() {
 
 		Map<String, Integer> rtnMap = viewsCacheManager.findPokemonViewsAll();
