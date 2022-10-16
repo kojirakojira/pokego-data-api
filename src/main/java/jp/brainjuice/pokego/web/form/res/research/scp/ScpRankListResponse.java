@@ -16,4 +16,5 @@ import lombok.NoArgsConstructor;
 public class ScpRankListResponse extends Response {
 
 	private ArrayList<ScpRank> scpRankList;
+	private String league;
 }

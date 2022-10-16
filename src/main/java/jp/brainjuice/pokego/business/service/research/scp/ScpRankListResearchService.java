@@ -25,10 +25,16 @@ public class ScpRankListResearchService implements ResearchService<ScpRankListRe
 	@Override
 	public void exec(IndividialValue iv, ScpRankListResponse res) {
 
+		// leagueを取得
+		String league = (String) iv.getParamsMap().get(ScpRankCulculator.LEAGUE);
+		// scpRankListを生成
 		ArrayList<ScpRank> scpRankList = scpRankCulculator.getSummary(
 				iv.getGoPokedex(),
-				(String) iv.getParamsMap().get(ScpRankCulculator.LEAGUE));
+				league);
+
+		// レスポンスのセット
 		res.setScpRankList(scpRankList);
+		res.setLeague(league);
 
 		res.setMessage("成功！！");
 	}
