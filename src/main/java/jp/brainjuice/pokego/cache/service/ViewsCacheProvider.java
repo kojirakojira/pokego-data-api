@@ -79,7 +79,6 @@ public class ViewsCacheProvider {
 	public Map<String, Integer> findPageViewsAll() {
 
 		Map<String, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
-		System.out.println(rtnMap);
 		return rtnMap;
 	}
 
@@ -91,7 +90,6 @@ public class ViewsCacheProvider {
 	public Map<String, Integer> findPokemonViewsAll() {
 
 		Map<String, Integer> rtnMap = viewsCacheManager.findPokemonViewsAll();
-		System.out.println(rtnMap);
 		return rtnMap;
 	}
 

@@ -1,8 +1,9 @@
 package jp.brainjuice.pokego.cache.dao.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public interface TempView {
+public interface TempView extends Serializable {
 
 	public String getId();
 	public void setId(String id);

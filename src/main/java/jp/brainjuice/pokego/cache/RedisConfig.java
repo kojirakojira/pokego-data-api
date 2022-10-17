@@ -8,6 +8,7 @@ import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -15,6 +16,8 @@ import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisKeyExpiredEvent;
+import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -22,12 +25,13 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import jp.brainjuice.pokego.cache.dao.entity.TempView;
 import jp.brainjuice.pokego.utils.BjConfigEnum;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableCaching
-@EnableRedisRepositories
+@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
 @Slf4j
 public class RedisConfig {
 
@@ -112,6 +116,19 @@ public class RedisConfig {
 		}
 
 		return factory;
+    }
+
+    /**
+     * 期限切れのTempViewを除去するイベントリスナー（らしい）
+     *
+     * @return
+     */
+    @Bean
+    public ApplicationListener<RedisKeyExpiredEvent<TempView>> eventListener() {
+    	return event -> {
+    		log.info(String.format("Received expire event for key=%s with value %s.",
+    				new String(event.getSource()), event.getValue()));
+    	};
     }
 
 	/**

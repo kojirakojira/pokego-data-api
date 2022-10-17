@@ -14,8 +14,9 @@ import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.research.PlResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
-import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
-import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
+import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
+import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
+import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.PlRequest;
 import jp.brainjuice.pokego.web.form.res.research.PlResponse;
@@ -33,17 +34,14 @@ public class SearchController {
 
 	private PokemonSearchService pokemonSearchService;
 
-	@Autowired
-	private ViewsCacheProvider viewsCacheProvider;
-
-	@Autowired
-	PageTempViewRedisRepository pageViewInfoRepository;
+	private TopicListProvider topicListProvider;
 
 	@Autowired
 	public SearchController(
 			PlResearchService plResearchService, ResearchServiceExecutor<PlResponse> plResRse,
 			GoConvertService goConvertService,
-			PokemonSearchService pokemonSearchService) {
+			PokemonSearchService pokemonSearchService,
+			TopicListProvider topicListProvider) {
 		// PL算出
 		this.plResearchService = plResearchService;
 		this.plResRse = plResRse;
@@ -51,6 +49,8 @@ public class SearchController {
 		this.goConvertService = goConvertService;
 		// 検索
 		this.pokemonSearchService = pokemonSearchService;
+
+		this.topicListProvider = topicListProvider;
 	}
 
 	@GetMapping("/go")
@@ -78,12 +78,23 @@ public class SearchController {
 		return plRes;
 	}
 
-	@GetMapping("/test")
-	public String test() {
+	@GetMapping("/topicPage")
+	public TopicPageList topicPage() {
 
-		viewsCacheProvider.findPageViewsAll();
-		viewsCacheProvider.findPokemonViewsAll();
-		return null;
+		return topicListProvider.getTopicPageList();
+	}
+
+	@GetMapping("/topicPokemon")
+	public TopicPokemonList topicPokemon() {
+
+		return topicListProvider.getTopicPokemonList();
+	}
+
+	@GetMapping("/updateTopicList")
+	public String updateTopicList() {
+
+		topicListProvider.updateTopicList();
+		return "成功！";
 	}
 
 	@ExceptionHandler(BadRequestException.class)
