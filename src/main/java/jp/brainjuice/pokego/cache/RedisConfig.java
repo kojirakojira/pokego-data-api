@@ -8,29 +8,23 @@ import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisKeyExpiredEvent;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import jp.brainjuice.pokego.cache.dao.entity.TempView;
-import jp.brainjuice.pokego.utils.BjConfigEnum;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableCaching
-@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
+//@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
 @Slf4j
 public class RedisConfig {
 
@@ -97,21 +91,21 @@ public class RedisConfig {
 		String password = uri.getUserInfo().split(":", 2)[1];
 
 		LettuceConnectionFactory factory;
-		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
+//		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
 		// 本番環境でのみクラスターモード
 //		if ("production".equals(env)) {
-//			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
 //			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
 //			clusterConfiguration.clusterNode(host, port);
 //			clusterConfiguration.setPassword(password);
 //			factory = new LettuceConnectionFactory(clusterConfiguration);
+//			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
 //		} else {
-		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
 		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
 		conf.setHostName(host);
 		conf.setPort(port);
 		conf.setPassword(password);
 		factory = new LettuceConnectionFactory(conf);
+		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
 //		}
 
 		return factory;
@@ -122,13 +116,13 @@ public class RedisConfig {
      *
      * @return
      */
-    @Bean
-    public ApplicationListener<RedisKeyExpiredEvent<TempView>> eventListener() {
-    	return event -> {
-    		log.info(String.format("Received expire event for key=%s with value %s.",
-    				new String(event.getSource()), event.getValue()));
-    	};
-    }
+//    @Bean
+//    public ApplicationListener<RedisKeyExpiredEvent<TempView>> eventListener() {
+//    	return event -> {
+//    		log.info(String.format("Received expire event for key=%s with value %s.",
+//    				new String(event.getSource()), event.getValue()));
+//    	};
+//    }
 
 	/**
 	 * Object用RedisTemplateをDIに登録
