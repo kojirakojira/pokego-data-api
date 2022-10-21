@@ -25,7 +25,7 @@ jwt.uuid: 00855fa1-4320-5cfb-0396-597a06af3ff2
 
 # ロギング
 logging:
-  config: classpath:logback/logback-develop.xml
+  config: classpath:logback/logback-production.xml
   level:
     root: INFO
     org:

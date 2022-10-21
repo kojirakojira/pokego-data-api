@@ -3,7 +3,7 @@
 #  name: API
 #  port: ${PORT:8080}
 #  # フロント側のorigin（区切り文字:"|"）
-#  client.origin: localhost:3000|brainjuice-app-staging.herokuapp.com|brainjuice.jp
+#  client.origin: pokego-data-cl.herokuapp.com|pokego.brainjuice.jp
 #  
 ##spring:
 ##  datasource:
@@ -25,7 +25,7 @@
 #
 ## ロギング
 #logging:
-#  config: classpath:logback/logback-develop.xml
+#  config: classpath:logback/logback-staging.xml
 #  level:
 #    root: INFO
 #    org:
