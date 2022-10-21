@@ -53,6 +53,11 @@ public class SearchController {
 		this.topicListProvider = topicListProvider;
 	}
 
+	@GetMapping("/home")
+	public String home() {
+		return "pokego-api server is running!!";
+	}
+
 	@GetMapping("/go")
 	public String go(String id) {
 
