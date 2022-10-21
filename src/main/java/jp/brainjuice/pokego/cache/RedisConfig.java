@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -100,20 +99,20 @@ public class RedisConfig {
 		LettuceConnectionFactory factory;
 		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
 		// 本番環境でのみクラスターモード
-		if ("production".equals(env)) {
-			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
-			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-			clusterConfiguration.clusterNode(host, port);
-			clusterConfiguration.setPassword(password);
-			factory = new LettuceConnectionFactory(clusterConfiguration);
-		} else {
-			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
-			RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-			conf.setHostName(host);
-			conf.setPort(port);
-			conf.setPassword(password);
-			factory = new LettuceConnectionFactory(conf);
-		}
+//		if ("production".equals(env)) {
+//			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
+//			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+//			clusterConfiguration.clusterNode(host, port);
+//			clusterConfiguration.setPassword(password);
+//			factory = new LettuceConnectionFactory(clusterConfiguration);
+//		} else {
+		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
+		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
+		conf.setHostName(host);
+		conf.setPort(port);
+		conf.setPassword(password);
+		factory = new LettuceConnectionFactory(conf);
+//		}
 
 		return factory;
     }
