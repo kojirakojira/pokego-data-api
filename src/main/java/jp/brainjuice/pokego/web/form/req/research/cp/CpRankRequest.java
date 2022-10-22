@@ -5,7 +5,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import jp.brainjuice.pokego.web.form.req.Request;
+import jp.brainjuice.pokego.web.form.req.research.RequestImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
-public class CpRankRequest extends Request {
+public class CpRankRequest extends RequestImpl {
 
 //	private String id;
 //	private String name;

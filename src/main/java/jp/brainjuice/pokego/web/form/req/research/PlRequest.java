@@ -3,13 +3,12 @@ package jp.brainjuice.pokego.web.form.req.research;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import jp.brainjuice.pokego.web.form.req.Request;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class PlRequest extends Request {
+public class PlRequest extends RequestImpl {
 
 //	private String id;
 //	private String name;
