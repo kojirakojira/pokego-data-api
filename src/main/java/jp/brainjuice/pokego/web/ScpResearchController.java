@@ -1,5 +1,8 @@
 package jp.brainjuice.pokego.web;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,8 @@ import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankMaxMinResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankResearchService;
+import jp.brainjuice.pokego.business.service.utils.InputCheckService;
+import jp.brainjuice.pokego.business.service.utils.dto.CheckInfo;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankMaxMinRequest;
@@ -36,12 +41,15 @@ public class ScpResearchController {
 	private ScpRankListResearchService scpRankListResearchService;
 	private ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse;
 
+	private InputCheckService inputCheckService;
+
 
 	@Autowired
 	public ScpResearchController(
 			ScpRankResearchService scpRankResearchService, ResearchServiceExecutor<ScpRankResponse> scpRankResRse,
 			ScpRankMaxMinResearchService scpRankMaxMinResearchService, ResearchServiceExecutor<ScpRankMaxMinResponse> scpRankMaxMinResRse,
-			ScpRankListResearchService scpRankListResearchService, ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse) {
+			ScpRankListResearchService scpRankListResearchService, ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse,
+			InputCheckService inputCheckService) {
 		// SCPランク算出
 		this.scpRankResearchService = scpRankResearchService;
 		this.scpRankResRse = scpRankResRse;
@@ -51,6 +59,8 @@ public class ScpResearchController {
 		// SCPランク一覧取得
 		this.scpRankListResearchService = scpRankListResearchService;
 		this.scpRankListResRse = scpRankListResRse;
+		// 入力チェック
+		this.inputCheckService = inputCheckService;
 	}
 
 	/**
@@ -70,6 +80,18 @@ public class ScpResearchController {
 	public ScpRankResponse scpRank(@Validated ScpRankRequest scpRankReq) throws BadRequestException {
 
 		ScpRankResponse scpRankRes = new ScpRankResponse();
+
+		List<CheckInfo> checkList = new ArrayList<>();
+		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.min, 0, scpRankReq.getIva().intValue()));
+		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.max, 15, scpRankReq.getIva().intValue()));
+		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.min, 0, scpRankReq.getIvd().intValue()));
+		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.max, 15, scpRankReq.getIvd().intValue()));
+		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.min, 0, scpRankReq.getIvh().intValue()));
+		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.max, 15, scpRankReq.getIvh().intValue()));
+		if (!inputCheckService.exec(checkList, scpRankRes)) {
+			return scpRankRes;
+		}
+
 		scpRankResRse.execute(scpRankReq, scpRankRes, scpRankResearchService);
 		return scpRankRes;
 	}
