@@ -79,11 +79,13 @@ public class PokemonUtils {
 	 */
 	public int convGoHp(int hp, String name) {
 
-		double baseHp = baseHp(hp);
+		// 小数点以下切り捨て
+		double baseHp = Math.floor(baseHp(hp));
 
-		baseHp = isIdentifierPokemon(name) ? baseHp * 0.91 : baseHp;
+		// 個体値が高い個体の補正後は四捨五入
+		baseHp = isIdentifierPokemon(name) ? Math.round(baseHp * 0.91) : baseHp;
 
-		return (int) Math.floor(baseHp);
+		return (int) baseHp;
 	}
 
 	/**
