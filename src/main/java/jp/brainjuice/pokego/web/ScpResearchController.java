@@ -77,7 +77,7 @@ public class ScpResearchController {
 	 * @throws BadRequestException
 	 */
 	@GetMapping("/scpRank")
-	public ScpRankResponse scpRank(@Validated ScpRankRequest scpRankReq) throws BadRequestException {
+	public ScpRankResponse scpRank(ScpRankRequest scpRankReq) throws BadRequestException {
 
 		ScpRankResponse scpRankRes = new ScpRankResponse();
 
