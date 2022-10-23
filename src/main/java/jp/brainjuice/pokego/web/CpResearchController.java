@@ -14,16 +14,19 @@ import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
+import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.utils.InputCheckService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
+import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
+import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +47,9 @@ public class CpResearchController {
 	private RaidResearchService raidResearchService;
 	private ResearchServiceExecutor<RaidResponse> raidResRse;
 
+	private FRTaskResearchService fRTaskResearchService;
+	private ResearchServiceExecutor<FRTaskResponse> fRTaskResRse;
+
 	private InputCheckService inputCheckService;
 
 	@Autowired
@@ -51,7 +57,8 @@ public class CpResearchController {
 			CpResearchService cpResearchService, ResearchServiceExecutor<CpResponse> cpResRse,
 			CpRankResearchService cpRankResearchService, ResearchServiceExecutor<CpRankResponse> cpRankResRse,
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
-			ResearchServiceExecutor<RaidResponse> raidResRse, RaidResearchService raidResearchService,
+			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
+			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			InputCheckService inputCheckService) {
 		// CP算出
 		this.cpResearchService = cpResearchService;
@@ -65,6 +72,9 @@ public class CpResearchController {
 		// レイドボスCP算出
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
+		// フィールドリサーチCP算出
+		this.fRTaskResearchService = fRTaskResearchService;
+		this.fRTaskResRse = fRTaskResRse;
 		// 入力チェック
 		this.inputCheckService = inputCheckService;
 	}
@@ -145,7 +155,14 @@ public class CpResearchController {
 		return cpRankListRes;
 	}
 
-
+	/**
+	 * レイドボスのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
 	@GetMapping("/raid")
 	public RaidResponse raid(RaidRequest raidReq, HttpServletRequest req) throws Exception {
 
@@ -154,6 +171,24 @@ public class CpResearchController {
 		RaidResponse raidRes = new RaidResponse();
 		raidResRse.execute(raidReq, raidRes, raidResearchService);
 		return raidRes;
+	}
+
+	/**
+	 * フィールドリサーチタスクのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/fRTask")
+	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq, HttpServletRequest req) throws Exception {
+
+		inputCheckService.validation(fRTaskReq);
+
+		FRTaskResponse fRTaskRes = new FRTaskResponse();
+		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
+		return fRTaskRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)
