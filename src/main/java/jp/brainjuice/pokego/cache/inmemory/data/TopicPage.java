@@ -16,9 +16,11 @@ public class TopicPage {
 	 */
 	public enum PageName {
 
-        raid("レイドボスのCP検索"),
-        scpRankList("PvP順位一覧"),
-        scpRankMaxMin ("PvP最高(最低)順位個体値"),;
+		raid("レイドボスのCP検索"),
+		scpRankList("PvP順位一覧"),
+		scpRankMaxMin ("PvP最高(最低)順位個体値"),
+		scpRank ("PvP順位"),
+		fRTask ("フィールドリサーチCP"),;
 
 		@Getter
 		private final String text;
