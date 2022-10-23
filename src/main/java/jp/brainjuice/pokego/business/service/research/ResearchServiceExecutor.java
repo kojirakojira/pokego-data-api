@@ -76,8 +76,9 @@ public class ResearchServiceExecutor<T extends Response> {
 
 			if (psr.isUnique()) {
 				research(psr.getGoPokedex(), req, res, researchService);
-
 			}
+
+			res.setSuccess(true);
 		} else {
 			throw new BadRequestException(MessageFormat.format("id:{0}, name: {1}", req.getId(), req.getName()));
 		}

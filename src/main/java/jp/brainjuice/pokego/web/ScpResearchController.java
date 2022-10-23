@@ -1,12 +1,8 @@
 package jp.brainjuice.pokego.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +13,6 @@ import jp.brainjuice.pokego.business.service.research.scp.ScpRankListResearchSer
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankMaxMinResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankResearchService;
 import jp.brainjuice.pokego.business.service.utils.InputCheckService;
-import jp.brainjuice.pokego.business.service.utils.dto.CheckInfo;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankMaxMinRequest;
@@ -42,7 +37,6 @@ public class ScpResearchController {
 	private ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse;
 
 	private InputCheckService inputCheckService;
-
 
 	@Autowired
 	public ScpResearchController(
@@ -74,24 +68,14 @@ public class ScpResearchController {
 	 *
 	 * @param scpRequest
 	 * @return
-	 * @throws BadRequestException
+	 * @throws Exception
 	 */
 	@GetMapping("/scpRank")
-	public ScpRankResponse scpRank(ScpRankRequest scpRankReq) throws BadRequestException {
+	public ScpRankResponse scpRank(ScpRankRequest scpRankReq) throws Exception {
+
+		inputCheckService.validation(scpRankReq);
 
 		ScpRankResponse scpRankRes = new ScpRankResponse();
-
-		List<CheckInfo> checkList = new ArrayList<>();
-		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.min, 0, scpRankReq.getIva().intValue()));
-		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.max, 15, scpRankReq.getIva().intValue()));
-		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.min, 0, scpRankReq.getIvd().intValue()));
-		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.max, 15, scpRankReq.getIvd().intValue()));
-		checkList.add(new CheckInfo("攻撃", InputCheckService.CheckPattern.min, 0, scpRankReq.getIvh().intValue()));
-		checkList.add(new CheckInfo("防御", InputCheckService.CheckPattern.max, 15, scpRankReq.getIvh().intValue()));
-		if (!inputCheckService.exec(checkList, scpRankRes)) {
-			return scpRankRes;
-		}
-
 		scpRankResRse.execute(scpRankReq, scpRankRes, scpRankResearchService);
 		return scpRankRes;
 	}
@@ -107,10 +91,12 @@ public class ScpResearchController {
 	 *
 	 * @param scpRequest
 	 * @return
-	 * @throws BadRequestException
+	 * @throws Exception
 	 */
 	@GetMapping("/scpRankMaxMin")
-	public ScpRankMaxMinResponse scpRankMaxMin(@Validated ScpRankMaxMinRequest scpMaxMinReq) throws BadRequestException {
+	public ScpRankMaxMinResponse scpRankMaxMin(ScpRankMaxMinRequest scpMaxMinReq) throws Exception {
+
+		inputCheckService.validation(scpMaxMinReq);
 
 		ScpRankMaxMinResponse scpRankMaxMinRes = new ScpRankMaxMinResponse();
 		scpRankMaxMinResRse.execute(scpMaxMinReq, scpRankMaxMinRes, scpRankMaxMinResearchService);
@@ -128,10 +114,12 @@ public class ScpResearchController {
 	 *
 	 * @param scpRankListReq
 	 * @return
-	 * @throws BadRequestException
+	 * @throws Exception
 	 */
 	@GetMapping("/scpRankList")
-	public ScpRankListResponse scpRankList(@Validated ScpRankListRequest scpRankListReq) throws BadRequestException {
+	public ScpRankListResponse scpRankList(ScpRankListRequest scpRankListReq) throws Exception {
+
+		inputCheckService.validation(scpRankListReq);
 
 		ScpRankListResponse scpRankListRes = new ScpRankListResponse();
 		scpRankListResRse.execute(scpRankListReq, scpRankListRes, scpRankListResearchService);

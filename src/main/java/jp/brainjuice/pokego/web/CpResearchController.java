@@ -16,6 +16,7 @@ import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchServi
 import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
+import jp.brainjuice.pokego.business.service.utils.InputCheckService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
@@ -44,12 +45,15 @@ public class CpResearchController {
 	private RaidResearchService raidResearchService;
 	private ResearchServiceExecutor<RaidResponse> raidResRse;
 
+	private InputCheckService inputCheckService;
+
 	@Autowired
 	public CpResearchController(
 			CpResearchService cpResearchService, ResearchServiceExecutor<CpResponse> cpResRse,
 			CpRankResearchService cpRankResearchService, ResearchServiceExecutor<CpRankResponse> cpRankResRse,
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
-			ResearchServiceExecutor<RaidResponse> raidResRse, RaidResearchService raidResearchService) {
+			ResearchServiceExecutor<RaidResponse> raidResRse, RaidResearchService raidResearchService,
+			InputCheckService inputCheckService) {
 		// CP算出
 		this.cpResearchService = cpResearchService;
 		this.cpResRse = cpResRse;
@@ -62,6 +66,8 @@ public class CpResearchController {
 		// レイドボスCP算出
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
+		// 入力チェック
+		this.inputCheckService = inputCheckService;
 	}
 
 	/**
@@ -77,9 +83,12 @@ public class CpResearchController {
 	 *
 	 * @param cpReq
 	 * @return
+	 * @throws Exception
 	 */
 	@GetMapping("/cp")
-	public CpResponse cp(@Validated CpRequest cpReq) throws BadRequestException {
+	public CpResponse cp(@Validated CpRequest cpReq) throws Exception {
+
+		inputCheckService.validation(cpReq);
 
 		CpResponse cpRes = new CpResponse();
 		cpResRse.execute(cpReq, cpRes, cpResearchService);
@@ -99,10 +108,12 @@ public class CpResearchController {
 	 *
 	 * @param cpRankReq
 	 * @return
-	 * @throws BadRequestException
+	 * @throws Exception
 	 */
 	@GetMapping("/cpRank")
-	public CpRankResponse cpRank(@Validated CpRankRequest cpRankReq) throws BadRequestException {
+	public CpRankResponse cpRank(CpRankRequest cpRankReq) throws Exception {
+
+		inputCheckService.validation(cpRankReq);
 
 		CpRankResponse cpRankRes = new CpRankResponse();
 		cpRankResRse.execute(cpRankReq, cpRankRes, cpRankResearchService);
@@ -123,10 +134,12 @@ public class CpResearchController {
 	 *
 	 * @param cpRankListReq
 	 * @return
-	 * @throws BadRequestException
+	 * @throws Exception
 	 */
 	@GetMapping("/cpRankList")
-	public CpRankListResponse cpRankList(@Validated CpRankListRequest cpRankListReq) throws BadRequestException {
+	public CpRankListResponse cpRankList(CpRankListRequest cpRankListReq) throws Exception {
+
+		inputCheckService.validation(cpRankListReq);
 
 		CpRankListResponse cpRankListRes = new CpRankListResponse();
 		cpRankListResRse.execute(cpRankListReq, cpRankListRes, cpRankListResearchService);
@@ -135,7 +148,9 @@ public class CpResearchController {
 
 
 	@GetMapping("/raid")
-	public RaidResponse raid(@Validated RaidRequest raidReq, HttpServletRequest req) throws BadRequestException {
+	public RaidResponse raid(RaidRequest raidReq, HttpServletRequest req) throws Exception {
+
+		inputCheckService.validation(raidReq);
 
 		RaidResponse raidRes = new RaidResponse();
 		raidResRse.execute(raidReq, raidRes, raidResearchService);
