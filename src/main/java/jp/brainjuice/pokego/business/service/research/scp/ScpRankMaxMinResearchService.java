@@ -42,7 +42,7 @@ public class ScpRankMaxMinResearchService implements ResearchService<ScpRankMaxM
 			res.setScpMlRankMin(mlList.get(mlList.size() - 1));
 		}
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

@@ -33,7 +33,7 @@ public class CpResearchService implements ResearchService<CpResponse> {
 
 		cpResponse.setCp(cp);
 
-		cpResponse.setMessage("成功！！");
+		cpResponse.setMessage("");
 	}
 
 }

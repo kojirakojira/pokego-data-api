@@ -36,7 +36,7 @@ public class ScpRankListResearchService implements ResearchService<ScpRankListRe
 		res.setScpRankList(scpRankList);
 		res.setLeague(league);
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

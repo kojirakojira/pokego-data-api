@@ -40,7 +40,7 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 		res.setWbMaxCp(pokemonGoUtils.culcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL_WB));
 		res.setWbMinCp(pokemonGoUtils.culcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL_WB));
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

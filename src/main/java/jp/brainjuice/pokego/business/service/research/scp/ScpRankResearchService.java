@@ -45,7 +45,7 @@ public class ScpRankResearchService implements ResearchService<ScpRankResponse> 
 			}
 		});
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

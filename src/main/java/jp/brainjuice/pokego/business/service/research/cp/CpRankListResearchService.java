@@ -26,7 +26,7 @@ public class CpRankListResearchService implements ResearchService<CpRankListResp
 		ArrayList<CpRank> cpRankList = pokemonGoUtils.getBaseCpRankList(iv.getGoPokedex());
 		res.setCpRankList(cpRankList);
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

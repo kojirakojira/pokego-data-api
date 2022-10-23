@@ -40,7 +40,7 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 		res.setWbMaxCp(pokemonGoUtils.culcCp(goPokedex, FR_MAX_IV, FR_MAX_IV, FR_MAX_IV, FR_PL_WB));
 		res.setWbMinCp(pokemonGoUtils.culcCp(goPokedex, FR_MIN_IV, FR_MIN_IV, FR_MIN_IV, FR_PL_WB));
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 	}
 
 }

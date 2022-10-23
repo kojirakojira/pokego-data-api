@@ -29,7 +29,7 @@ public class CpRankResearchService implements ResearchService<CpRankResponse> {
 				iv.getIvh());
 		res.setCpRank(cpRank);
 
-		res.setMessage("成功！！");
+		res.setMessage("");
 
 	}
 
