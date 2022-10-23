@@ -250,9 +250,10 @@ public class PokemonUtils {
 	}
 
 	/**
-	 * 原作の種族値からポケモンGOのPL40の場合のCPを求めます。<br>
+	 * 原作の種族値からポケモンGOのPL50.5の場合のCPを求めます。<br>
 	 * これは、ポケモンGOの基礎となる種族値です。<br>
-	 * （このCPが4000を超えるかどうかが、個体値補正の基準になります。）
+	 * （このCPが4000を超えるかどうかが、種族値補正の基準になります。）<br>
+	 * TODO: 個体値ALL0かつ、PL50.5	の時にCP4000以上だと実装に準拠する。が、謎だから正しいか確認したい。
 	 *
 	 * @param attack
 	 * @param defense
@@ -262,10 +263,10 @@ public class PokemonUtils {
 	 */
 	public int culcBaseCpFromMain(Pokedex pokedex) {
 
-		return pokemonGoUtils.culcBaseCp(
+		return pokemonGoUtils.culcCp(
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed()),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed()),
-				convGoHp(pokedex.getHp()));
+				convGoHp(pokedex.getHp()), "50.5");
 	}
 
 	/**
