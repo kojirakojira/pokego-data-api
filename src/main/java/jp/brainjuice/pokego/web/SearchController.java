@@ -3,7 +3,6 @@ package jp.brainjuice.pokego.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,25 +75,41 @@ public class SearchController {
 	}
 
 	@GetMapping("/pl")
-	public PlResponse pl(@Validated PlRequest plReq) throws BadRequestException {
+	public PlResponse pl(PlRequest plReq) throws BadRequestException {
 
 		PlResponse plRes = new PlResponse();
 		plResRse.execute(plReq, plRes, plResearchService);
 		return plRes;
 	}
 
+
+	/**
+	 * 話題のページ取得用API
+	 *
+	 * @return
+	 */
 	@GetMapping("/topicPage")
 	public TopicPageList topicPage() {
 
 		return topicListProvider.getTopicPageList();
 	}
 
+	/**
+	 * 話題のポケモン取得用API
+	 *
+	 * @return
+	 */
 	@GetMapping("/topicPokemon")
 	public TopicPokemonList topicPokemon() {
 
 		return topicListProvider.getTopicPokemonList();
 	}
 
+	/**
+	 * 話題の○○一覧を強制的に更新するAPI
+	 *
+	 * @return
+	 */
 	@GetMapping("/updateTopicList")
 	public String updateTopicList() {
 
