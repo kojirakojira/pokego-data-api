@@ -46,6 +46,18 @@ public class Pokedex implements Serializable, Cloneable {
 	@Nonnull
 	private int speed;
 
+	/** タイプ１ */
+	@Nonnull
+	private String type1;
+
+	/** タイプ２ */
+	@Nonnull
+	private String type2;
+
+	/** 実装フラグ */
+	@Nonnull
+	private boolean implFlg;
+
 	/** 備考 */
 	private String remarks;
 
