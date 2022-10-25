@@ -204,7 +204,12 @@ public class ScpRankCulculator {
 			if (o1.getSp() < o2.getSp()) {
 				return 1;
 			} else if (o1.getSp() == o2.getSp()) {
-				return 0;
+				// ステ積が一致する場合は、CPでの降順
+				if (o1.getCp() < o2.getCp()) {
+					return 1;
+				} else {
+					return -1;
+				}
 			} else {
 				return -1;
 			}
