@@ -81,6 +81,22 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	}
 
 	/**
+	 * 実装フラグで絞り込んだGoPokedexを取得します。
+	 *
+	 * @param flg
+	 * @return
+	 */
+	public List<GoPokedex> findByImplFlg(boolean flg) {
+		List<GoPokedex> goPokedexList = new ArrayList<>();
+		goPokedexes.forEach(gp -> {
+			if (gp.isImplFlg() == flg) {
+				goPokedexList.add(gp.clone());
+			}
+		});
+		return goPokedexList;
+	}
+
+	/**
 	 * @deprecated 未実装
 	 */
 	@Override

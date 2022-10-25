@@ -54,6 +54,9 @@ public class PokemonUtils {
 		goPokedex.setDefense(defense);
 		goPokedex.setHp(hp);
 		goPokedex.setRemarks(pokedex.getRemarks());
+		goPokedex.setType1(pokedex.getType1());
+		goPokedex.setType2(pokedex.getType2());
+		goPokedex.setImplFlg(pokedex.isImplFlg());
 
 		return goPokedex;
 	}

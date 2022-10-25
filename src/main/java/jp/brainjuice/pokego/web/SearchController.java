@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.UnimplPokemonService;
 import jp.brainjuice.pokego.business.service.research.PlResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
@@ -35,12 +36,15 @@ public class SearchController {
 
 	private TopicListProvider topicListProvider;
 
+	private UnimplPokemonService unimplPokemonService;
+
 	@Autowired
 	public SearchController(
 			PlResearchService plResearchService, ResearchServiceExecutor<PlResponse> plResRse,
 			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
-			TopicListProvider topicListProvider) {
+			TopicListProvider topicListProvider,
+			UnimplPokemonService unimplPokemonService) {
 		// PL算出
 		this.plResearchService = plResearchService;
 		this.plResRse = plResRse;
@@ -50,6 +54,8 @@ public class SearchController {
 		this.pokemonSearchService = pokemonSearchService;
 
 		this.topicListProvider = topicListProvider;
+
+		this.unimplPokemonService = unimplPokemonService;
 	}
 
 	@GetMapping("/home")

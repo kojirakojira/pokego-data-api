@@ -38,7 +38,20 @@ public class GoPokedex implements Serializable, Cloneable {
 	private String image;
 
 	/** 備考 */
+	@Nonnull
 	private String remarks;
+
+	/** タイプ１ */
+	@Nonnull
+	private String type1;
+
+	/** タイプ２ */
+	@Nonnull
+	private String type2;
+
+	/** 実装フラグ */
+	@Nonnull
+	private boolean implFlg;
 
 	public GoPokedex clone() {
 		GoPokedex goPokedex = null;
