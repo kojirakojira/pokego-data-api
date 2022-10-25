@@ -12,6 +12,7 @@ import com.ibm.icu.text.MessageFormat;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
@@ -27,12 +28,16 @@ public class ResearchServiceExecutor<T extends Response> {
 
 	private PokemonSearchService pokemonSearchService;
 
+	private PokemonGoUtils pokemonGoUtils;
+
 	@Autowired
 	public ResearchServiceExecutor(
 			GoPokedexRepository goPokedexRepository,
-			PokemonSearchService pokemonSearchService) {
+			PokemonSearchService pokemonSearchService,
+			PokemonGoUtils pokemonGoUtils) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonSearchService = pokemonSearchService;
+		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	/**
@@ -121,6 +126,7 @@ public class ResearchServiceExecutor<T extends Response> {
 		researchService.exec(iv, res);
 
 		// 図鑑№、ポケモンのセット
+		pokemonGoUtils.appendRemarks(goPokedex);
 		res.setPokedexId(goPokedex.getPokedexId());
 		res.setName(goPokedex.getName());
 
