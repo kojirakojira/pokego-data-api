@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.web.form.req.research.cp;
 
 import javax.validation.constraints.NotNull;
 
-import jp.brainjuice.pokego.web.form.req.research.RequestImpl;
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequestImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class CpRequest extends RequestImpl {
+public class CpRequest extends ResearchRequestImpl {
 
 //	private String id;
 //	private String name;

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class PlRequest extends RequestImpl {
+public class PlRequest extends ResearchRequestImpl {
 
 //	private String id;
 //	private String name;

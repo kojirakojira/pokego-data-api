@@ -17,8 +17,8 @@ import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.service.utils.dto.CheckItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.Request;
-import jp.brainjuice.pokego.web.form.res.Response;
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -52,7 +52,7 @@ public class InputCheckService {
 	 * @return
 	 * @throws Exception
 	 */
-	public void validation(Request req) throws Exception {
+	public void validation(ResearchRequest req) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		CheckItem checkItem = new CheckItem(); // インスタンスを使いまわす。
@@ -87,7 +87,7 @@ public class InputCheckService {
 		}
 	}
 
-	public boolean exec(List<CheckItem> checkList, Response res) {
+	public boolean exec(List<CheckItem> checkList, ResearchResponse res) {
 
 		String msg = null;
 		try {

@@ -1,6 +1,12 @@
-package jp.brainjuice.pokego.web.form.req;
+package jp.brainjuice.pokego.web.form.req.research;
 
-public interface Request {
+/**
+ * ResearchSearviceExecutorを使用してポケモン情報の検索をする場合に継承するインタフェースです。
+ *
+ * @author saibabanagchampa
+ *
+ */
+public interface ResearchRequest {
 
 	public String getId();
 	public void setId(String id);

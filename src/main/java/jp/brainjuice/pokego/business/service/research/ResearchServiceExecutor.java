@@ -16,13 +16,13 @@ import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.Request;
-import jp.brainjuice.pokego.web.form.res.Response;
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class ResearchServiceExecutor<T extends Response> {
+public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 	private GoPokedexRepository goPokedexRepository;
 
@@ -62,7 +62,7 @@ public class ResearchServiceExecutor<T extends Response> {
 	 * @param researchService
 	 * @throws BadRequestException
 	 */
-	public void execute(Request req, T res, ResearchService<T> researchService) throws BadRequestException {
+	public void execute(ResearchRequest req, T res, ResearchService<T> researchService) throws BadRequestException {
 
 		if (req.getId() != null) {
 			Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(req.getId());
@@ -99,7 +99,7 @@ public class ResearchServiceExecutor<T extends Response> {
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 */
-	private void research(GoPokedex goPokedex, Request req, T res, ResearchService<T> researchService) {
+	private void research(GoPokedex goPokedex, ResearchRequest req, T res, ResearchService<T> researchService) {
 
 
 		// 個体値をセットする。（GoPokedexだけ必須。）

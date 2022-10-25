@@ -1,7 +1,7 @@
 package jp.brainjuice.pokego.web.form.res.research.scp;
 
-import jp.brainjuice.pokego.web.form.res.Response;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScpRankResponse extends Response {
+public class ScpRankResponse extends ResearchResponse {
 
 	/** スーパーリーグpvp順位 */
 	private ScpRank scpSlRank;

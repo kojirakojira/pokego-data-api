@@ -1,10 +1,9 @@
 package jp.brainjuice.pokego.web.form.req.research;
 
-import jp.brainjuice.pokego.web.form.req.Request;
 import lombok.Data;
 
 @Data
-public abstract class RequestImpl implements Request {
+public abstract class ResearchRequestImpl implements ResearchRequest {
 
 	private String id;
 	private String name;

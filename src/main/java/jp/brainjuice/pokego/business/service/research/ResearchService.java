@@ -1,7 +1,7 @@
 package jp.brainjuice.pokego.business.service.research;
 
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.web.form.res.Response;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 
 /**
  * ポケモン1体の個体値、CP等を調べるときに使用するインターフェースです。
@@ -10,7 +10,7 @@ import jp.brainjuice.pokego.web.form.res.Response;
  *
  * @param <T>
  */
-public interface ResearchService<T extends Response> {
+public interface ResearchService<T extends ResearchResponse> {
 
 	/**
 	 * 実行します。

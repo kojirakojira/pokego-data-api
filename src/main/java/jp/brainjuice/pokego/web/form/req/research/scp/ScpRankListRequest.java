@@ -3,7 +3,7 @@ package jp.brainjuice.pokego.web.form.req.research.scp;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import jp.brainjuice.pokego.web.form.req.research.RequestImpl;
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequestImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScpRankListRequest extends RequestImpl {
+public class ScpRankListRequest extends ResearchRequestImpl {
 
 //	private String id;
 //	private String name;
