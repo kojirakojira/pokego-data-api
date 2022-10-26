@@ -220,8 +220,12 @@ public class ViewsCacheManager {
 		aggregateTargetList.forEach(vti -> {
 			// キーを一意にする。
 			String uniqueId = UUID.randomUUID().toString();
-			pageTempViewList.add(new PageTempView(vti.getPage() + uniqueId, vti.getPage(), vti.getIp(), vti.getTime()));
-			pokemonTempViewList.add(new PokemonTempView(vti.getPokedexId() + uniqueId, vti.getPokedexId(), vti.getIp(), vti.getTime()));
+			if (vti.getPage() != null) {
+				pageTempViewList.add(new PageTempView(vti.getPage() + uniqueId, vti.getPage(), vti.getIp(), vti.getTime()));
+			}
+			if (vti.getPokedexId() != null) {
+				pokemonTempViewList.add(new PokemonTempView(vti.getPokedexId() + uniqueId, vti.getPokedexId(), vti.getIp(), vti.getTime()));
+			}
 		});
 
 		pageTempViewRedisRepository.saveAll(pageTempViewList);
