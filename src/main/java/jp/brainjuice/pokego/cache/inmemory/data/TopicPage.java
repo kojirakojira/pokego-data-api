@@ -17,10 +17,12 @@ public class TopicPage {
 	public enum PageName {
 
 		raid("レイドボスCP"),
-		fRTask ("フィールドリサーチCP"),
+		fRTask("フィールドリサーチCP"),
+		scpRank("PvP順位"),
 		scpRankList("PvP順位一覧"),
-		scpRankMaxMin ("PvP最高(最低)順位"),
-		scpRank ("PvP順位"),;
+		scpRankMaxMin("PvP最高(最低)順位"),
+		race("種族値検索"),
+		unimplPokemon("未実装ポケモン一覧"),;
 
 		@Getter
 		private final String text;

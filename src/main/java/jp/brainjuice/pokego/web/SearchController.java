@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
 import jp.brainjuice.pokego.business.service.research.PlResearchService;
+import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
@@ -19,7 +22,11 @@ import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.PlRequest;
+import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
+import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
+import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 import jp.brainjuice.pokego.web.form.res.research.PlResponse;
+import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -29,6 +36,9 @@ public class SearchController {
 
 	private PlResearchService plResearchService;
 	private ResearchServiceExecutor<PlResponse> plResRse;
+
+	private RaceResearchService raceResearchService;
+	private ResearchServiceExecutor<RaceResponse> raceResRse;
 
 	private GoConvertService goConvertService;
 
@@ -41,6 +51,7 @@ public class SearchController {
 	@Autowired
 	public SearchController(
 			PlResearchService plResearchService, ResearchServiceExecutor<PlResponse> plResRse,
+			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
@@ -48,6 +59,9 @@ public class SearchController {
 		// PL算出
 		this.plResearchService = plResearchService;
 		this.plResRse = plResRse;
+		// 種族値取得
+		this.raceResearchService = raceResearchService;
+		this.raceResRse = raceResRse;
 
 		this.goConvertService = goConvertService;
 		// 検索
@@ -88,6 +102,14 @@ public class SearchController {
 		return plRes;
 	}
 
+	@GetMapping("/race")
+	public RaceResponse race(RaceRequest raceReq) throws BadRequestException {
+
+		RaceResponse raceRes = new RaceResponse();
+		raceResRse.execute(raceReq, raceRes, raceResearchService);
+		return raceRes;
+	}
+
 
 	/**
 	 * 話題のページ取得用API
@@ -121,6 +143,18 @@ public class SearchController {
 
 		topicListProvider.updateTopicList();
 		return "成功！";
+	}
+
+	@GetMapping("/unimplPokemon")
+	public UnimplPokemonResponse unimplPokemon() {
+
+		UnimplPokemonResponse res = new UnimplPokemonResponse();
+		List<SimpPokemon> simpPokemonList = unimplPokemonService.getUnimplementedPokemonList();
+		res.setUnimplList(simpPokemonList);
+		res.setSuccess(true);
+		res.setMessage("");
+
+		return res;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

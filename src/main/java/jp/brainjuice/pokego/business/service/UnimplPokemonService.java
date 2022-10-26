@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,19 +8,48 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
+import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
+import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
+import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 
 @Service
 public class UnimplPokemonService {
 
 	private GoPokedexRepository goPokedexRepository;
 
+	private ViewsCacheProvider viewsCacheProvider;
+
+	private PokemonGoUtils pokemonGoUtils;
+
+	private GenNameMap genNameMap;
+
 	@Autowired
-	public UnimplPokemonService(GoPokedexRepository goPokedexRepository) {
+	public UnimplPokemonService(
+			GoPokedexRepository goPokedexRepository,
+			ViewsCacheProvider viewsCacheProvider,
+			PokemonGoUtils pokemonGoUtils,
+			GenNameMap genNameMap) {
 		this.goPokedexRepository = goPokedexRepository;
+		this.viewsCacheProvider = viewsCacheProvider;
+		this.pokemonGoUtils = pokemonGoUtils;
+		this.genNameMap = genNameMap;
 	}
 
-	public List<GoPokedex> getUnimplementedPokemonList() {
+	public List<SimpPokemon> getUnimplementedPokemonList() {
+
+		List<SimpPokemon> simpPokemonList = new ArrayList<>();
+
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByImplFlg(false);
-		return goPokedexList;
+
+		// nameにremarksを連結
+		pokemonGoUtils.appendRemarks(goPokedexList);
+		goPokedexList.forEach(gp -> {
+			simpPokemonList.add(new SimpPokemon(gp.getPokedexId(), gp.getName(), gp.getImage(), genNameMap.get(gp.getGen())));
+		});
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+		return simpPokemonList;
 	}
 }
