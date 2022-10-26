@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeList;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,17 +40,22 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	private List<Pokedex> pokedexes;
 
 	private TypeList typeList;
+	private GenNameMap genNameMap;
 
 	private static final String MSG_METHOD_INVOKE_ERROR = "カラム名の指定、もしくはデータの型に誤りがあります。行番号:{0}, 列番号:{1}";
 	private static final String MSG_INDEX_ERRPR = "列の個数が一致しませんでした。行番号:{0}, 列番号:{1}";
 	private static final String MSG_INVALID_TYPE_ERROR = "タイプの指定に誤りがあります。{0}";
+	private static final String MSG_INVALID_GEN_ERROR = "世代の指定に誤りがあります。{0}";
 
 	private static final String FILE_NAME = "pokemon.csv";
 	private static final String SEPARATOR = ",";
 
 	@Autowired
-	public PokedexRepository(TypeList typeList) {
+	public PokedexRepository(
+			TypeList typeList,
+			GenNameMap genNameMap) {
 		this.typeList = typeList;
+		this.genNameMap = genNameMap;
 	}
 
 	/**
@@ -195,8 +201,10 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
 			pokedexes = convPokedexList(rowList);
 
-			// タイプをチェックする。
+			// タイプが正しい値かをチェックする。
 			checkType(pokedexes);
+			// 世代が正しい値かチェックする。
+			checkGen(pokedexes);
 
 			log.info("Pokedex table generated!!");
 		} catch (PokemonDataInitException e) {
@@ -302,6 +310,23 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 			if (!p.getType2().isEmpty() && !typeList.contains(p.getType2())) {
 				// タイプ２が空でないかつ、タイプリストにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_TYPE_ERROR, p.toString()));
+			}
+		}
+	}
+
+	/**
+	 * 世代の設定が正しいか確認します。<br>
+	 * 正しくない場合はPokemonDataInitExceptionをスローします。
+	 *
+	 * @param pokedexList
+	 * @return
+	 */
+	private void checkGen(List<Pokedex> pokedexList) throws PokemonDataInitException {
+
+		for (Pokedex p: pokedexList) {
+			if (!genNameMap.containsKey(p.getGen())) {
+				// 世代が世代マップにない場合
+				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_GEN_ERROR, p.toString()));
 			}
 		}
 	}
