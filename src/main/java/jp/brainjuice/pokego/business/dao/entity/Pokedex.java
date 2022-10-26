@@ -46,6 +46,9 @@ public class Pokedex implements Serializable, Cloneable {
 	@Nonnull
 	private int speed;
 
+	/** 備考 */
+	private String remarks;
+
 	/** タイプ１ */
 	@Nonnull
 	private String type1;
@@ -54,12 +57,13 @@ public class Pokedex implements Serializable, Cloneable {
 	@Nonnull
 	private String type2;
 
+	/** 世代 */
+	@Nonnull
+	private String gen;
+
 	/** 実装フラグ */
 	@Nonnull
 	private boolean implFlg;
-
-	/** 備考 */
-	private String remarks;
 
 	public Pokedex clone() {
 		Pokedex pokedex = null;

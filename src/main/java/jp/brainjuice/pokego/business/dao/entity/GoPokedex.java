@@ -49,6 +49,10 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Nonnull
 	private String type2;
 
+	/** 世代 */
+	@Nonnull
+	private String gen;
+
 	/** 実装フラグ */
 	@Nonnull
 	private boolean implFlg;
