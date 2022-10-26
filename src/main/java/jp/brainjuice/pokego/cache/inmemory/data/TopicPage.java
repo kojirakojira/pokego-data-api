@@ -22,6 +22,7 @@ public class TopicPage {
 		scpRankList("PvP順位一覧"),
 		scpRankMaxMin("PvP最高(最低)順位"),
 		race("種族値検索"),
+		plList("PLごとのCP一覧"),
 		unimplPokemon("未実装ポケモン一覧"),;
 
 		@Getter

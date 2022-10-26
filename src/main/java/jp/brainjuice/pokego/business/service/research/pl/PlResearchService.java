@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.research;
+package jp.brainjuice.pokego.business.service.research.pl;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonEnum;
-import jp.brainjuice.pokego.web.form.res.research.PlResponse;
+import jp.brainjuice.pokego.web.form.res.research.pl.PlResponse;
 
 @Service
 public class PlResearchService implements ResearchService<PlResponse> {

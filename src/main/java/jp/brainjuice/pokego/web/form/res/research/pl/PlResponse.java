@@ -1,6 +1,7 @@
-package jp.brainjuice.pokego.web.form.res.research;
+package jp.brainjuice.pokego.web.form.res.research.pl;
 
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

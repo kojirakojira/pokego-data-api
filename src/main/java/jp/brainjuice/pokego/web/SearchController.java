@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
-import jp.brainjuice.pokego.business.service.research.PlResearchService;
 import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
@@ -21,11 +20,9 @@ import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.research.PlRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
-import jp.brainjuice.pokego.web.form.res.research.PlResponse;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,9 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 @Slf4j
 public class SearchController {
-
-	private PlResearchService plResearchService;
-	private ResearchServiceExecutor<PlResponse> plResRse;
 
 	private RaceResearchService raceResearchService;
 	private ResearchServiceExecutor<RaceResponse> raceResRse;
@@ -50,15 +44,11 @@ public class SearchController {
 
 	@Autowired
 	public SearchController(
-			PlResearchService plResearchService, ResearchServiceExecutor<PlResponse> plResRse,
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService) {
-		// PL算出
-		this.plResearchService = plResearchService;
-		this.plResRse = plResRse;
 		// 種族値取得
 		this.raceResearchService = raceResearchService;
 		this.raceResRse = raceResRse;
@@ -94,14 +84,13 @@ public class SearchController {
 		return pokemonSearchService.search(name);
 	}
 
-	@GetMapping("/pl")
-	public PlResponse pl(PlRequest plReq) throws BadRequestException {
-
-		PlResponse plRes = new PlResponse();
-		plResRse.execute(plReq, plRes, plResearchService);
-		return plRes;
-	}
-
+	/**
+	 * 種族値検索用API
+	 *
+	 * @param raceReq
+	 * @return
+	 * @throws BadRequestException
+	 */
 	@GetMapping("/race")
 	public RaceResponse race(RaceRequest raceReq) throws BadRequestException {
 
@@ -145,6 +134,11 @@ public class SearchController {
 		return "成功！";
 	}
 
+	/**
+	 * 未実装ポケモン一覧取得用API
+	 *
+	 * @return
+	 */
 	@GetMapping("/unimplPokemon")
 	public UnimplPokemonResponse unimplPokemon() {
 

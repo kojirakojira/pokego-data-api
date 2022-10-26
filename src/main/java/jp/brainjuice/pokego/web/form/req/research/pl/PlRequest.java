@@ -1,8 +1,9 @@
-package jp.brainjuice.pokego.web.form.req.research;
+package jp.brainjuice.pokego.web.form.req.research.pl;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequestImpl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
