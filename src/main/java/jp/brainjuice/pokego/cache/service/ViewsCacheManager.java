@@ -168,12 +168,14 @@ public class ViewsCacheManager {
 
 		// Mapのvalueに持つSetに閲覧情報を追加する関数。カリー化（引数 => (Map<String, Set<ViewTempInfo>>, String, ViewTempInfo)）
 		Function<Map<String, Set<ViewTempInfo>>, Function<String, Consumer<ViewTempInfo>>> addSetFunc = (map) -> (key) -> (value) -> {
-			if (map.containsKey(key)) {
-				map.get(key).add(value);
-			} else {
-				Set<ViewTempInfo> viewSet = new HashSet<>();
-				viewSet.add(value);
-				map.put(key, viewSet);
+			if (key != null) {
+				if (map.containsKey(key)) {
+					map.get(key).add(value);
+				} else {
+					Set<ViewTempInfo> viewSet = new HashSet<>();
+					viewSet.add(value);
+					map.put(key, viewSet);
+				}
 			}
 		};
 

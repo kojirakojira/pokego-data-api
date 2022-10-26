@@ -78,7 +78,10 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 			}
 
 			// ページ、図鑑№、IPアドレスが一致している場合
-			if (vti.getPage().equals(page) && vti.getPokedexId().equals(pokedexId) && vti.getIp().equals(ip)) {
+			// ※図鑑Noがnullの場合は照合せずに、図鑑Noは一致しているものとする。
+			if (vti.getPage().equals(page)
+					&& (vti.getPokedexId() == null || pokedexId == null || vti.getPokedexId().equals(pokedexId))
+					&& vti.getIp().equals(ip)) {
 				existsFlg = true;
 				break;
 			}
