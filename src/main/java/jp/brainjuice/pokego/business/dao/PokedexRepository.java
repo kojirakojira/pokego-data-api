@@ -22,7 +22,7 @@ import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeList;
+import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
 	private List<Pokedex> pokedexes;
 
-	private TypeList typeList;
+	private TypeMap typeMap;
 	private GenNameMap genNameMap;
 
 	private static final String MSG_METHOD_INVOKE_ERROR = "カラム名の指定、もしくはデータの型に誤りがあります。行番号:{0}, 列番号:{1}";
@@ -52,9 +52,9 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
 	@Autowired
 	public PokedexRepository(
-			TypeList typeList,
+			TypeMap typeMap,
 			GenNameMap genNameMap) {
-		this.typeList = typeList;
+		this.typeMap = typeMap;
 		this.genNameMap = genNameMap;
 	}
 
@@ -303,11 +303,11 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	private void checkType(List<Pokedex> pokedexList) throws PokemonDataInitException {
 
 		for (Pokedex p: pokedexList) {
-			if (!typeList.contains(p.getType1())) {
+			if (!typeMap.containsKey(p.getType1())) {
 				// タイプ１がタイプリストにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_TYPE_ERROR, p.toString()));
 			}
-			if (!p.getType2().isEmpty() && !typeList.contains(p.getType2())) {
+			if (!p.getType2().isEmpty() && !typeMap.containsKey(p.getType2())) {
 				// タイプ２が空でないかつ、タイプリストにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_TYPE_ERROR, p.toString()));
 			}

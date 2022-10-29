@@ -1,7 +1,8 @@
 package jp.brainjuice.pokego.business.service.utils.memory;
 
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class TypeList extends ArrayList<String> {
+public class TypeMap extends HashMap<String, Map<String, Integer>> {
 
 	@PostConstruct
 	public void init() {
@@ -24,13 +25,13 @@ public class TypeList extends ArrayList<String> {
 		InputStreamReader reader;
 		try {
 			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:config/type-list.yml");
+			Resource resource = resourceLoader.getResource("classpath:config/type-map.yml");
 			reader = new InputStreamReader(resource.getInputStream());
 
 			Yaml yaml = new Yaml();
-			this.addAll(yaml.loadAs(reader, TypeList.class));
+			this.putAll(yaml.loadAs(reader, TypeMap.class));
 
-			log.info("TypeList generated!!");
+			log.info("TypeMap generated!!");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
