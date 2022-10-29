@@ -31,7 +31,7 @@ public class GenNameMap extends HashMap<String, String> {
 	 */
 	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init() {
+	public void init() throws PokemonDataInitException {
 
 		DefaultResourceLoader resourceLoader;
 		InputStreamReader reader;
@@ -43,8 +43,9 @@ public class GenNameMap extends HashMap<String, String> {
 			Yaml yaml = new Yaml();
 			this.putAll(yaml.loadAs(reader, Map.class));
 
+			log.info("GenNameMap generated!!");
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			throw new PokemonDataInitException(e);
 		}
 	}
 }

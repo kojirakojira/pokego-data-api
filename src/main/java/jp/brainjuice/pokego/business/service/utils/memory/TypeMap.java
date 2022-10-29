@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TypeMap extends HashMap<String, Map<String, Integer>> {
 
 	@PostConstruct
-	public void init() {
+	public void init() throws PokemonDataInitException {
 
 		DefaultResourceLoader resourceLoader;
 		InputStreamReader reader;
@@ -33,7 +34,7 @@ public class TypeMap extends HashMap<String, Map<String, Integer>> {
 
 			log.info("TypeMap generated!!");
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			throw new PokemonDataInitException(e);
 		}
 	}
 }

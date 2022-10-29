@@ -11,4 +11,17 @@ public class RaceResponse extends ResearchResponse {
 
 	private Pokedex pokedex;
 	private GoPokedex goPokedex;
+	private String color;
+
+	private int maxAt;
+	private int minAt;
+	private int medAt;
+
+	private int maxDf;
+	private int minDf;
+	private int medDf;
+
+	private int maxHp;
+	private int minHp;
+	private int medHp;
 }
