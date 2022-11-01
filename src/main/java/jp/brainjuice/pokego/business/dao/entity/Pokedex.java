@@ -70,7 +70,7 @@ public class Pokedex implements Serializable, Cloneable {
 		try {
 			pokedex = (Pokedex) super.clone();
 		} catch (CloneNotSupportedException e) {
-			log.error("Clone failed.");
+			log.error("Clone failed.", e);
 		}
 		return pokedex;
 	}

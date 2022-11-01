@@ -14,6 +14,7 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
+import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -26,20 +27,29 @@ public class GoConvertService {
 
 	private PokemonUtils pokemonUtils;
 
+	private PokemonStatisticsInfo pokemonStatisticsInfo;
+
 	@Autowired
 	public GoConvertService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
-			PokemonUtils pokemonUtils) {
+			PokemonUtils pokemonUtils,
+			PokemonStatisticsInfo pokemonStatisticsInfo) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonUtils = pokemonUtils;
+		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void init() {
 		insertGoPokedexAll();
 		log.info("GoPokedex table generated!!");
+
+		List<Pokedex> pokedexList = pokedexRepository.findAll();
+		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAll();
+		pokemonStatisticsInfo.create(pokedexList, goPokedexList);
+		log.info("PokemonStatisticsInfo generated!!");
 	}
 
 	/**

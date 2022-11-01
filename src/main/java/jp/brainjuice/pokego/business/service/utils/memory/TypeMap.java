@@ -37,4 +37,20 @@ public class TypeMap extends HashMap<String, Map<String, Integer>> {
 			throw new PokemonDataInitException(e);
 		}
 	}
+
+	/**
+	 * マップのキーとなる値。（タイプはここでは定義しない。）
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
+	public enum KeyElem {
+
+		/** 赤色 */
+		r,
+		/** 緑色 */
+		g,
+		/** 青色 */
+		b,
+	}
 }

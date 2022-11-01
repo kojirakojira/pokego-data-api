@@ -62,7 +62,7 @@ public class GoPokedex implements Serializable, Cloneable {
 		try {
 			goPokedex = (GoPokedex) super.clone();
 		} catch (CloneNotSupportedException e) {
-			log.error("Clone failed.");
+			log.error("Clone failed.", e);
 		}
 		return goPokedex;
 	}

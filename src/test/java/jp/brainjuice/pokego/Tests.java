@@ -7,19 +7,10 @@ public class Tests {
 	@Test
 	public void testCase001() throws Exception {
 
-//		ArrayList<PageViewInfo> viList = new ArrayList<>();
-//		viList.add(new PageViewInfo("sp", "111", "ip", new Date()));
-//		viList.add(new PageViewInfo("sp", "111", "ip", new Date()));
-//		viList.add(new PageViewInfo("sp", "111", "ip", new Date()));
-//		viList.add(new PageViewInfo("sp", "111", "ip", new Date()));
-//		viList.add(new PageViewInfo("sp", "111", "ip", new Date()));
+//		PokemonStatisticsInfo info = new PokemonStatisticsInfo();
 //
-//
-//		ArrayList<PageViewInfo> tempViList = new ArrayList<PageViewInfo>(viList.subList(0, 2));
-//		viList.clear();
-//		viList.addAll(tempViList);
-//
-//		viList.forEach(System.out::println);
-
+//		List<Integer> valList = new ArrayList<Integer>();
+//		valList.addAll(Arrays.asList(5, 10, 15, 20, 25, 30));
+//		System.out.println(info.getStatistics(valList));
 	}
 }
