@@ -7,20 +7,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
 import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
+import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
@@ -34,6 +40,8 @@ public class SearchController {
 	private RaceResearchService raceResearchService;
 	private ResearchServiceExecutor<RaceResponse> raceResRse;
 
+	private RaceDiffService raceDiffService;
+
 	private GoConvertService goConvertService;
 
 	private PokemonSearchService pokemonSearchService;
@@ -45,13 +53,16 @@ public class SearchController {
 	@Autowired
 	public SearchController(
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
+			RaceDiffService raceDiffService,
 			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService) {
-		// 種族値取得
+		// 種族値検索
 		this.raceResearchService = raceResearchService;
 		this.raceResRse = raceResRse;
+		// 種族値比較
+		this.raceDiffService = raceDiffService;
 
 		this.goConvertService = goConvertService;
 		// 検索
@@ -97,6 +108,40 @@ public class SearchController {
 		RaceResponse raceRes = new RaceResponse();
 		raceResRse.execute(raceReq, raceRes, raceResearchService);
 		return raceRes;
+	}
+
+	/**
+	 * 種族値比較用API（content-type:application/jsonで取得する。）
+	 *
+	 * @param raceReq
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@PostMapping("/raceDiff")
+	public RaceDiffResponse raceDiff(@RequestBody RaceDiffRequest raceDiffReq) throws BadRequestException {
+
+		RaceDiffResponse raceDiffRes = new RaceDiffResponse();
+		if (!raceDiffService.check(raceDiffReq, raceDiffRes)) {
+			return raceDiffRes;
+		}
+
+		if (raceDiffReq.getIdArr() != null) {
+			// idでの検索
+			raceDiffService.exec(raceDiffReq, raceDiffRes);
+
+		} else {
+
+			MultiSearchResult msr = pokemonSearchService.multiSearch(raceDiffReq.getNameArr());
+			raceDiffRes.setMsr(msr);
+			raceDiffRes.setSuccess(true);
+
+			if (msr.isAllUnique()) {
+				// MultiSearchResult
+				raceDiffService.exec(msr, raceDiffRes);
+			}
+		}
+
+		return raceDiffRes;
 	}
 
 

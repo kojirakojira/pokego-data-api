@@ -50,12 +50,10 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
 		List<GoPokedex> goPokedexList = new ArrayList<GoPokedex>();
 		ids.forEach(id -> {
-			for (GoPokedex gp: goPokedexes) {
-				if (id.equals(gp.getPokedexId())) {
-					goPokedexList.add(gp.clone());
-					break;
-				}
-			}
+			Optional<GoPokedex> gpOp = ((List<GoPokedex>) goPokedexes).stream().filter(gp -> gp.getPokedexId().equals(id)).findAny();
+			gpOp.ifPresentOrElse(
+					gp -> { goPokedexList.add(gp); },
+					() -> { goPokedexList.add(null); });
 		});
 		return goPokedexList;
 	}

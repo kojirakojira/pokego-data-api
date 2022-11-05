@@ -25,4 +25,10 @@ public class PokemonSearchResult {
 
 	/** あいまい検索によって検索された場合 */
 	private boolean maybe;
+
+	/** ヒットしたかどうか */
+	private boolean hit;
+
+	/** 検索したかどうか */
+	private boolean searched;
 }

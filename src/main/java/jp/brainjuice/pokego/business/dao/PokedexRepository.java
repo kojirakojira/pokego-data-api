@@ -59,15 +59,6 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	}
 
 	/**
-	 * すべてのPokdexを取得します。
-	 *
-	 * @return
-	 */
-	public List<Pokedex> findAll() {
-		return new ArrayList<>(pokedexes);
-	}
-
-	/**
 	 * 図鑑№からPokedexを検索します。
 	 *
 	 * @param pokedexId
@@ -87,6 +78,33 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 		}
 
 		return pokedexOp;
+	}
+
+	/**
+	 * すべてのPokdexを取得します。
+	 *
+	 * @return
+	 */
+	public List<Pokedex> findAll() {
+		return new ArrayList<>(pokedexes);
+	}
+
+	/**
+	 * 図鑑№のリストからPokedexを検索します。
+	 *
+	 * @param ids
+	 * @return
+	 */
+	@Override
+	public Iterable<Pokedex> findAllById(Iterable<String> ids) {
+		List<Pokedex> pokedexList = new ArrayList<>();
+		ids.forEach(id -> {
+			Optional<Pokedex> pOp = ((List<Pokedex>) pokedexes).stream().filter(gp -> gp.getPokedexId().equals(id)).findAny();
+			pOp.ifPresentOrElse(
+					gp -> { pokedexList.add(gp); },
+					() -> { pokedexList.add(null); });
+		});
+		return pokedexList;
 	}
 
 	/**
@@ -150,15 +168,6 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	public boolean existsById(String id) {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public Iterable<Pokedex> findAllById(Iterable<String> ids) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
 	}
 
 	/**
