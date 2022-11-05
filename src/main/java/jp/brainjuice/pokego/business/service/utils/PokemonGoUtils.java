@@ -539,27 +539,4 @@ public class PokemonGoUtils {
 		return cpRankList;
 
 	}
-
-	/**
-	 * 名前に備考を連結させます。remarksが空文字の場合は何もしません。<br>
-	 * format: name + "(" + remarks + ")"
-	 *
-	 * @param goPokedexes
-	 */
-	public void appendRemarks(Iterable<GoPokedex> goPokedexes) {
-		goPokedexes.forEach(gp -> {
-			appendRemarks(gp);
-		});
-	}
-
-	/**
-	 * 名前に備考を連結させます。remarksが空文字の場合は何もしません。<br>
-	 * format: name + "(" + remarks + ")"
-	 *
-	 * @param goPokedex
-	 */
-	public void appendRemarks(GoPokedex goPokedex) {
-		String remarks = goPokedex.getRemarks().isEmpty() ? "": "(" + goPokedex.getRemarks() + ")";
-		goPokedex.setName(goPokedex.getName() + remarks);
-	}
 }

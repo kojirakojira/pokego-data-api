@@ -13,7 +13,6 @@ import com.ibm.icu.text.Transliterator;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
@@ -22,8 +21,6 @@ import jp.brainjuice.pokego.utils.exception.BadRequestException;
 public class PokemonSearchService {
 
 	private GoPokedexRepository goPokedexRepository;
-
-	private PokemonGoUtils pokemonGoUtils;
 
 	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
 	private Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
@@ -38,11 +35,8 @@ public class PokemonSearchService {
 	private static final String MSG_NO_ENTERED = "入力してください。";
 
 	@Autowired
-	public PokemonSearchService(
-			GoPokedexRepository goPokedexRepository,
-			PokemonGoUtils pokemonGoUtils) {
+	public PokemonSearchService(GoPokedexRepository goPokedexRepository) {
 		this.goPokedexRepository = goPokedexRepository;
-		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	/**
@@ -135,7 +129,6 @@ public class PokemonSearchService {
 			}
 		}
 
-		pokemonGoUtils.appendRemarks(goPokedexList);
 		result.setGoPokedexList(goPokedexList);
 
 		return result;

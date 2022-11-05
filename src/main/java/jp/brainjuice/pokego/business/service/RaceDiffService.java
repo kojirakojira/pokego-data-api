@@ -14,7 +14,6 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
@@ -33,8 +32,6 @@ public class RaceDiffService {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
-	private PokemonGoUtils pokemonGoUtils;
-
 	private TypeMap typeMap;
 
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
@@ -44,12 +41,10 @@ public class RaceDiffService {
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
-			PokemonGoUtils pokemonGoUtils,
 			TypeMap typeMap) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
-		this.pokemonGoUtils = pokemonGoUtils;
 		this.typeMap = typeMap;
 	}
 
@@ -122,14 +117,7 @@ public class RaceDiffService {
 
 	private void exec(List<GoPokedex> goPokedexList, List<String> idList, RaceDiffResponse res) {
 
-		pokemonGoUtils.appendRemarks(goPokedexList);
-
 		List<Pokedex> pokedexList = (List<Pokedex>) pokedexRepository.findAllById(idList);
-
-		// TODO: 連結方法を変更する。
-		pokedexList.forEach(p -> {
-			p.setName(p.getName() + "(" + p.getRemarks() + ")");
-		});
 
 		List<Race> raceList = new ArrayList<>();
 		for (int i = 0; i < idList.size(); i++) {

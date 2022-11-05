@@ -14,7 +14,6 @@ import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
@@ -46,8 +45,6 @@ public class TopicListManager {
 
 	private TopicPokemonList topicPokemonList;
 
-	private PokemonGoUtils pokemonGoUtils;
-
 	private static final String START_MSG_UPDATE_TOPIC_LIST = "Start update TopicList schedule. TopicPageList: {0}, TopicPokemonList: {1}";
 	private static final String END_MSG_UPDATE_TOPIC_LIST = "End update TopicList schedule. TopicPageList: {0}, TopicPokemonList: {1}";
 
@@ -59,14 +56,12 @@ public class TopicListManager {
 			PokemonTempViewRedisRepository pokemonTempViewRedisRepository,
 			GoPokedexRepository goPokedexRepository,
 			TopicPokemonList topicPokemonList,
-			TopicPageList topicPageList,
-			PokemonGoUtils pokemonGoUtils) {
+			TopicPageList topicPageList) {
 		this.pageTempViewRedisRepository = pageTempViewRedisRepository;
 		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.topicPokemonList = topicPokemonList;
 		this.topicPageList = topicPageList;
-		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	/**
@@ -166,7 +161,6 @@ public class TopicListManager {
 		viewsCountMap.forEach((k, v) -> {
 			for (GoPokedex gp: goPokedexList) {
 				if (k.equals(gp.getPokedexId())) {
-					pokemonGoUtils.appendRemarks(gp);
 					topicPokemonList.add(new TopicPokemon(gp.getPokedexId(), gp.getName(), gp.getImage(), v));
 				}
 			}

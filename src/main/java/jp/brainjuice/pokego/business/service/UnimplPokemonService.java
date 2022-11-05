@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
@@ -20,19 +19,15 @@ public class UnimplPokemonService {
 
 	private ViewsCacheProvider viewsCacheProvider;
 
-	private PokemonGoUtils pokemonGoUtils;
-
 	private GenNameMap genNameMap;
 
 	@Autowired
 	public UnimplPokemonService(
 			GoPokedexRepository goPokedexRepository,
 			ViewsCacheProvider viewsCacheProvider,
-			PokemonGoUtils pokemonGoUtils,
 			GenNameMap genNameMap) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.viewsCacheProvider = viewsCacheProvider;
-		this.pokemonGoUtils = pokemonGoUtils;
 		this.genNameMap = genNameMap;
 	}
 
@@ -42,8 +37,6 @@ public class UnimplPokemonService {
 
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByImplFlg(false);
 
-		// nameにremarksを連結
-		pokemonGoUtils.appendRemarks(goPokedexList);
 		goPokedexList.forEach(gp -> {
 			simpPokemonList.add(new SimpPokemon(gp.getPokedexId(), gp.getName(), gp.getImage(), genNameMap.get(gp.getGen())));
 		});
