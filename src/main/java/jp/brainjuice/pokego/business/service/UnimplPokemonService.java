@@ -38,7 +38,12 @@ public class UnimplPokemonService {
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByImplFlg(false);
 
 		goPokedexList.forEach(gp -> {
-			simpPokemonList.add(new SimpPokemon(gp.getPokedexId(), gp.getName(), gp.getImage(), genNameMap.get(gp.getGen())));
+			simpPokemonList.add(new SimpPokemon(
+					gp.getPokedexId(),
+					gp.getName(),
+					gp.getImage(),
+					genNameMap.get(gp.getGen()),
+					gp.getRemarks()));
 		});
 
 		// 閲覧数を手動で追加。

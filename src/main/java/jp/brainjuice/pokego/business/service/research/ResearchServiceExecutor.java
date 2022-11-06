@@ -120,9 +120,10 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 		// 実行
 		researchService.exec(iv, res);
 
-		// 図鑑№、ポケモンのセット
+		// 図鑑№、ポケモン、備考のセット
 		res.setPokedexId(goPokedex.getPokedexId());
 		res.setName(goPokedex.getName());
+		res.setRemarks(goPokedex.getRemarks());
 
 		res.setSuccess(true);
 	}

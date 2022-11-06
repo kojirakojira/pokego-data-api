@@ -13,4 +13,5 @@ public class SimpPokemon {
 	private String name;
 	private String image;
 	private String gen;
+	private String remarks;
 }
