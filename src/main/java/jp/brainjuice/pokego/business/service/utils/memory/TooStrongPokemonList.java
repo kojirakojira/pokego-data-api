@@ -16,17 +16,22 @@ import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import lombok.extern.slf4j.Slf4j;
 
-
+/**
+ *
+ *
+ * @author saibabanagchampa
+ *
+ */
 @Component
 @Slf4j
-public class IdentifierPokemonList extends ArrayList<String> {
+public class TooStrongPokemonList extends ArrayList<String> {
 
 	private PokedexRepository pokedexRepository;
 
 	private PokemonGoUtils pokemonGoUtils;
 
 	@Autowired
-	public IdentifierPokemonList(
+	public TooStrongPokemonList(
 			PokedexRepository pokedexRepository,
 			PokemonGoUtils pokemonGoUtils) {
 		this.pokedexRepository = pokedexRepository;

@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.business.service.utils.memory.IdentifierPokemonList;
+import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PokemonUtils {
 
-	private IdentifierPokemonList identifierPokemonList;
+	private TooStrongPokemonList tooStrongPokemonList;
 
 	private PokemonGoUtils pokemonGoUtils;
 
@@ -35,9 +35,9 @@ public class PokemonUtils {
 	}
 
 	@Autowired
-	public PokemonUtils(IdentifierPokemonList identifierPokemonList,
+	public PokemonUtils(TooStrongPokemonList tooStrongPokemonList,
 			PokemonGoUtils pokemonGoUtils) {
-		this.identifierPokemonList = identifierPokemonList;
+		this.tooStrongPokemonList = tooStrongPokemonList;
 		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
@@ -146,7 +146,7 @@ public class PokemonUtils {
 
 		if (correctFlg) {
 			// 個体値が高い個体の補正後は四捨五入
-			baseHp = identifierPokemonList.contains(pokedexId) ? Math.round(baseHp * 0.91) : baseHp;
+			baseHp = tooStrongPokemonList.contains(pokedexId) ? Math.round(baseHp * 0.91) : baseHp;
 		}
 
 		return (int) baseHp;
@@ -188,7 +188,7 @@ public class PokemonUtils {
 		double baseAttack = baseAttack(attack, spAttack, speed);
 
 		if (correctFlg) {
-			baseAttack = identifierPokemonList.contains(pokedexId) ? baseAttack * 0.91 : baseAttack;
+			baseAttack = tooStrongPokemonList.contains(pokedexId) ? baseAttack * 0.91 : baseAttack;
 		}
 
 		return (int) Math.round(baseAttack);
@@ -238,7 +238,7 @@ public class PokemonUtils {
 		double baseDefense = baseDefense(defense, spDefense, speed);
 
 		if (correctFlg) {
-			baseDefense = identifierPokemonList.contains(pokedexId) ? baseDefense * 0.91 : baseDefense;
+			baseDefense = tooStrongPokemonList.contains(pokedexId) ? baseDefense * 0.91 : baseDefense;
 		}
 
 		return (int) Math.round(baseDefense);
