@@ -11,4 +11,5 @@ public class RaceResponse extends ResearchResponse {
 
 	private Race race;
 	private PokemonStatisticsInfo statistics;
+	private boolean tooStrong;
 }

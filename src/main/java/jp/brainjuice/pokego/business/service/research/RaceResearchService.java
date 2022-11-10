@@ -8,6 +8,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
@@ -19,15 +20,19 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
+	private TooStrongPokemonList tooStrongPokemonList;
+
 	private TypeMap typeMap;
 
 	@Autowired
 	public RaceResearchService(
 			PokedexRepository pokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
+			TooStrongPokemonList tooStrongPokemonList,
 			TypeMap typeMap) {
 		this.pokedexRepository = pokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
+		this.tooStrongPokemonList = tooStrongPokemonList;
 		this.typeMap = typeMap;
 	}
 
@@ -41,6 +46,8 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 		Race race = new Race(pokedex, goPokedex, typeMap);
 		res.setRace(race);
+
+		res.setTooStrong(tooStrongPokemonList.contains(pokedexId));
 
 		res.setStatistics(pokemonStatisticsInfo.clone());
 	}
