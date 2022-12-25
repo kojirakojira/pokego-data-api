@@ -141,7 +141,6 @@ public class PokemonUtils {
 			return raceExHpMap.get(pokedexId).get(RaceEx.fixed.name()).intValue();
 		}
 
-		// 小数点以下切り捨て
 		double baseHp = baseHp(hp);
 
 		if (correctFlg) {
@@ -149,6 +148,7 @@ public class PokemonUtils {
 			baseHp = tooStrongPokemonList.contains(pokedexId) ? Math.round(baseHp * 0.91) : baseHp;
 		}
 
+		// 小数点以下切り捨て
 		return (int) baseHp;
 	}
 
