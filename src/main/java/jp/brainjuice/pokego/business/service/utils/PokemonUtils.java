@@ -142,7 +142,7 @@ public class PokemonUtils {
 		}
 
 		// 小数点以下切り捨て
-		double baseHp = Math.floor(baseHp(hp));
+		double baseHp = baseHp(hp);
 
 		if (correctFlg) {
 			// 個体値が高い個体の補正後は四捨五入
