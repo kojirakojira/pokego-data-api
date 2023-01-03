@@ -28,7 +28,10 @@ public class PokemonUtils {
 
 	private Map<String, Object> raceExMap;
 
-	public PokemonUtils (PokemonGoUtils pokemonGoUtils) {
+	// 強ポケ補正の基準になるPL
+	private static final String TOO_STRONG_PL = "50.5";
+
+	public PokemonUtils (PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
 		this.pokemonGoUtils = pokemonGoUtils;
 
 		init();
@@ -63,7 +66,7 @@ public class PokemonUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init() {
+	public void init() throws PokemonDataInitException {
 
 		raceExMap = new HashMap<String, Object>();
 		DefaultResourceLoader resourceLoader;
@@ -82,6 +85,7 @@ public class PokemonUtils {
 			if (raceExMap.get(RaceEx.DEFENSE.name()) == null) { raceExMap.put(RaceEx.DEFENSE.name(), new HashMap<>()); }
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			throw new PokemonDataInitException(e);
 		}
 	}
 
@@ -283,8 +287,8 @@ public class PokemonUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcCpFromMain(Pokedex pokedex, String pl) {
-		return pokemonGoUtils.culcCp(
+	public int calcCpFromMain(Pokedex pokedex, String pl) {
+		return pokemonGoUtils.calcCp(
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true),
@@ -303,12 +307,12 @@ public class PokemonUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	public int culcBaseCpFromMain(Pokedex pokedex) {
+	public int calcBaseCpFromMain(Pokedex pokedex) {
 
-		return pokemonGoUtils.culcCp(
+		return pokemonGoUtils.calcCp(
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), false),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), false),
-				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), false), "50.5");
+				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), false), TOO_STRONG_PL);
 	}
 
 	/**
@@ -318,8 +322,8 @@ public class PokemonUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcMaxIvCpFromMain(Pokedex pokedex, String pl) {
-		return pokemonGoUtils.culcMaxIvCp(
+	public int calcMaxIvCpFromMain(Pokedex pokedex, String pl) {
+		return pokemonGoUtils.calcMaxIvCp(
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true),
@@ -333,8 +337,8 @@ public class PokemonUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcMaxCpFromMain(Pokedex pokedex) {
-		return pokemonGoUtils.culcMaxCp(
+	public int calcMaxCpFromMain(Pokedex pokedex) {
+		return pokemonGoUtils.calcMaxCp(
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true));

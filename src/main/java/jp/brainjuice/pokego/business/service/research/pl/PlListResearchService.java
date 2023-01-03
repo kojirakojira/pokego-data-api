@@ -34,7 +34,7 @@ public class PlListResearchService implements ResearchService<PlListResponse> {
 
 		ArrayList<PlCp> plList = new ArrayList<>();
 		cpMultiplierMap.forEach((k, v) -> {
-			int cp = pokemonGoUtils.culcCp(goPokedex, iv.getIva(), iv.getIvd(), iv.getIvh(), k);
+			int cp = pokemonGoUtils.calcCp(goPokedex, iv.getIva(), iv.getIvd(), iv.getIvh(), k);
 			// noは一旦nullで作成
 			plList.add(new PlCp(null, k, cp));
 		});

@@ -35,10 +35,10 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 	public void exec(IndividialValue iv, RaidResponse res) {
 
 		GoPokedex goPokedex = iv.getGoPokedex();
-		res.setMaxCp(pokemonGoUtils.culcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL));
-		res.setMinCp(pokemonGoUtils.culcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL));
-		res.setWbMaxCp(pokemonGoUtils.culcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL_WB));
-		res.setWbMinCp(pokemonGoUtils.culcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL_WB));
+		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL));
+		res.setMinCp(pokemonGoUtils.calcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL));
+		res.setWbMaxCp(pokemonGoUtils.calcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL_WB));
+		res.setWbMinCp(pokemonGoUtils.calcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL_WB));
 
 		res.setMessage("");
 	}

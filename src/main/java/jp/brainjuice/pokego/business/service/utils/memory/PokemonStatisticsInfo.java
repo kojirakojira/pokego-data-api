@@ -167,9 +167,9 @@ public class PokemonStatisticsInfo implements Cloneable {
 		Collections.sort(valList);
 
 		stats.setList(valList);
-		stats.setMax(culcMax(valList));
-		stats.setMin(culcMin(valList));
-		stats.setMed(culcMed(valList));
+		stats.setMax(calcMax(valList));
+		stats.setMin(calcMin(valList));
+		stats.setMed(calcMed(valList));
 
 		return stats;
 	}
@@ -179,7 +179,7 @@ public class PokemonStatisticsInfo implements Cloneable {
 	 *
 	 * @return
 	 */
-	private int culcMax(List<Integer> valList) {
+	private int calcMax(List<Integer> valList) {
 
 		int rtnVal = 0;
 		for (Integer v: valList) {
@@ -196,7 +196,7 @@ public class PokemonStatisticsInfo implements Cloneable {
 	 *
 	 * @return
 	 */
-	private int culcMin(List<Integer> valList) {
+	private int calcMin(List<Integer> valList) {
 
 		int rtnVal = 999;
 		for (Integer v: valList) {
@@ -214,7 +214,7 @@ public class PokemonStatisticsInfo implements Cloneable {
 	 * @param valList
 	 * @return
 	 */
-	private double culcMed(List<Integer> valList) {
+	private double calcMed(List<Integer> valList) {
 
 		// 昇順ソート
 		Collections.sort(valList);

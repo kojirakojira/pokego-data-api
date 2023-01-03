@@ -14,6 +14,7 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
+import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,7 +40,7 @@ public class TooStrongPokemonList extends ArrayList<String> {
 	}
 
 	@PostConstruct
-	public void init() {
+	public void init() throws PokemonDataInitException {
 
 		// 依存関係の都合でDI管理外で生成。
 		PokemonUtils pokemonUtils = new PokemonUtils(pokemonGoUtils);
@@ -48,7 +49,7 @@ public class TooStrongPokemonList extends ArrayList<String> {
 		pokeList.forEach(p -> {
 			// メガシンカを除く。
 			if (!p.getPokedexId().substring(4, 5).equals("M")) {
-				int cp = pokemonUtils.culcBaseCpFromMain(p);
+				int cp = pokemonUtils.calcBaseCpFromMain(p);
 
 				if (cp > 4000) {
 					// 原作→GOの単純変換でCPが4000を超えるポケモン

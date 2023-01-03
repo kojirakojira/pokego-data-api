@@ -56,7 +56,7 @@ public class PlResearchService implements ResearchService<PlResponse> {
 		for (int tpl = 510; tpl >= 10; tpl-=5) {
 			pl = plFormat.format(tpl / 10.0);
 			// PLに応じたCPを取得する。
-			int plcp = pokemonGoUtils.culcCp(at, df, hp, pl);
+			int plcp = pokemonGoUtils.calcCp(at, df, hp, pl);
 
 			if (cp == plcp) {
 				res.setPl(pl);
@@ -83,7 +83,7 @@ public class PlResearchService implements ResearchService<PlResponse> {
 		for (int tpl = 10; tpl <= 510; tpl+=5) {
 			String pl = plFormat.format(tpl / 10.0);
 			// PLに応じたCPを取得する。
-			int plcp = pokemonGoUtils.culcCp(at, df, hp, pl);
+			int plcp = pokemonGoUtils.calcCp(at, df, hp, pl);
 
 			if (plcp <= 10) {
 				plList.add(pl);

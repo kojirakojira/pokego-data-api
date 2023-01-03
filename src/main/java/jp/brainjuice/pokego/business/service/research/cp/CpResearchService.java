@@ -24,7 +24,7 @@ public class CpResearchService implements ResearchService<CpResponse> {
 	@Override
 	public void exec(IndividialValue iv, CpResponse cpResponse) {
 
-		int cp = pokemonGoUtils.culcCp(
+		int cp = pokemonGoUtils.calcCp(
 				iv.getGoPokedex(),
 				iv.getIva(),
 				iv.getIvd(),

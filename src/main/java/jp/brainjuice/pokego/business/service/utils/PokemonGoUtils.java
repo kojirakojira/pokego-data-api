@@ -36,10 +36,10 @@ public class PokemonGoUtils {
 	 * @param hp
 	 * @return
 	 */
-	public int culcMaxCp(GoPokedex goPokedex) {
+	public int calcMaxCp(GoPokedex goPokedex) {
 
 		// 個体値
-		return culcMaxCp(
+		return calcMaxCp(
 				goPokedex.getAttack(),
 				goPokedex.getDefense(),
 				goPokedex.getHp());
@@ -56,9 +56,9 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcCp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, String pl) {
+	public int calcCp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, String pl) {
 
-		return culcCp(
+		return calcCp(
 				goPokedex.getAttack() + ivAttack,
 				goPokedex.getDefense() + ivDefense,
 				goPokedex.getHp() + ivHp,
@@ -78,9 +78,9 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcCp(int bsAttack, int bsDefense, int bsHp, int ivAttack, int ivDefense, int ivHp, String pl) {
+	public int calcCp(int bsAttack, int bsDefense, int bsHp, int ivAttack, int ivDefense, int ivHp, String pl) {
 
-		return culcCp(
+		return calcCp(
 				bsAttack + ivAttack,
 				bsDefense + ivDefense,
 				bsHp + ivHp,
@@ -98,9 +98,9 @@ public class PokemonGoUtils {
 	 * @param ivHp
 	 * @return
 	 */
-	public int culcBaseCp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp) {
+	public int calcBaseCp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp) {
 
-		return culcBaseCp(
+		return calcBaseCp(
 				goPokedex.getAttack() + ivAttack,
 				goPokedex.getDefense() + ivDefense,
 				goPokedex.getHp() + ivHp);
@@ -119,9 +119,9 @@ public class PokemonGoUtils {
 	 * @param ivHp
 	 * @return
 	 */
-	public int culcBaseCp(int bsAttack, int bsDefense, int bsHp, int ivAttack, int ivDefense, int ivHp) {
+	public int calcBaseCp(int bsAttack, int bsDefense, int bsHp, int ivAttack, int ivDefense, int ivHp) {
 
-		return culcBaseCp(
+		return calcBaseCp(
 				bsAttack + ivAttack,
 				bsDefense + ivDefense,
 				bsHp + ivHp);
@@ -136,10 +136,10 @@ public class PokemonGoUtils {
 	 * @param hp
 	 * @return
 	 */
-	public int culcMaxIvCp(int attack, int defense, int hp, String pl) {
+	public int calcMaxIvCp(int attack, int defense, int hp, String pl) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcMaxIvCp(attack, defense, hp, pl, cpMultiplierMap);
+		return calcMaxIvCp(attack, defense, hp, pl, cpMultiplierMap);
 	}
 
 	/**
@@ -151,10 +151,10 @@ public class PokemonGoUtils {
 	 * @param hp
 	 * @return
 	 */
-	public int culcMaxCp(int attack, int defense, int hp) {
+	public int calcMaxCp(int attack, int defense, int hp) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcMaxCp(attack, defense, hp, cpMultiplierMap);
+		return calcMaxCp(attack, defense, hp, cpMultiplierMap);
 	}
 
 	/**
@@ -167,10 +167,10 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	public int culcBaseCp(int attack, int defense, int hp) {
+	public int calcBaseCp(int attack, int defense, int hp) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcBaseCp(attack, defense, hp, cpMultiplierMap);
+		return calcBaseCp(attack, defense, hp, cpMultiplierMap);
 	}
 
 	/**
@@ -183,10 +183,10 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcCp(GoPokedex goPokedex, String pl) {
+	public int calcCp(GoPokedex goPokedex, String pl) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcCp(
+		return calcCp(
 				goPokedex.getAttack(),
 				goPokedex.getDefense(),
 				goPokedex.getHp(),
@@ -204,10 +204,10 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public int culcCp(int attack, int defense, int hp, String pl) {
+	public int calcCp(int attack, int defense, int hp, String pl) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcCp(attack, defense, hp, pl, cpMultiplierMap);
+		return calcCp(attack, defense, hp, pl, cpMultiplierMap);
 	}
 
 	/**
@@ -220,9 +220,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private int culcMaxCp(int attack, int defense, int hp, CpMultiplierMap cpMultiplierMap) {
+	private int calcMaxCp(int attack, int defense, int hp, CpMultiplierMap cpMultiplierMap) {
 
-		return culcMaxIvCp(attack,
+		return calcMaxIvCp(attack,
 				defense,
 				hp,
 				MAX_PL,
@@ -239,9 +239,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private int culcMaxIvCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
+	private int calcMaxIvCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
 
-		return culcCp(attack + 15,
+		return calcCp(attack + 15,
 				defense + 15,
 				hp + 15,
 				pl,
@@ -258,9 +258,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private int culcBaseCp(int attack, int defense, int hp, CpMultiplierMap cpMultiplierMap) {
+	private int calcBaseCp(int attack, int defense, int hp, CpMultiplierMap cpMultiplierMap) {
 
-		return culcCp(attack, defense, hp, BASE_PL, cpMultiplierMap);
+		return calcCp(attack, defense, hp, BASE_PL, cpMultiplierMap);
 	}
 
 	/**
@@ -274,9 +274,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private int culcCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
+	private int calcCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
 
-		int cp = (int) Math.floor(culcPlainCp(attack, defense, hp) * (Math.pow(cpMultiplierMap.get(pl), 2.0)) / 10.0);
+		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(cpMultiplierMap.get(pl), 2.0)) / 10.0);
 
 		if (cp <= 10) {
 			cp = 10;
@@ -294,7 +294,7 @@ public class PokemonGoUtils {
 	 * @param hp
 	 * @return
 	 */
-	public double culcPlainCp(int attack, int defense, int hp) {
+	public double calcPlainCp(int attack, int defense, int hp) {
 
 		double attackD = Integer.valueOf(attack).doubleValue();
 		double defenseD = Integer.valueOf(defense).doubleValue();
@@ -318,9 +318,9 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public double culcScp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, String pl) {
+	public double calcScp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, String pl) {
 
-		return culcScp(
+		return calcScp(
 				goPokedex.getAttack() + ivAttack,
 				goPokedex.getDefense() + ivDefense,
 				goPokedex.getHp() + ivHp,
@@ -338,9 +338,9 @@ public class PokemonGoUtils {
 	 * @param cpm
 	 * @return
 	 */
-	public double culcScp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, double cpm) {
+	public double calcScp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, double cpm) {
 
-		return culcScp(
+		return calcScp(
 				goPokedex.getAttack() + ivAttack,
 				goPokedex.getDefense() + ivDefense,
 				goPokedex.getHp() + ivHp,
@@ -357,10 +357,10 @@ public class PokemonGoUtils {
 	 * @param pl
 	 * @return
 	 */
-	public double culcScp(int attack, int defense, int hp, String pl) {
+	public double calcScp(int attack, int defense, int hp, String pl) {
 
 		// DIのCpMultiplierMapを使用する。
-		return culcScp(attack, defense, hp, pl, cpMultiplierMap);
+		return calcScp(attack, defense, hp, pl, cpMultiplierMap);
 	}
 
 	/**
@@ -373,9 +373,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private double culcScp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
+	private double calcScp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
 
-		return culcScp(attack, defense, hp, cpMultiplierMap.get(pl));
+		return calcScp(attack, defense, hp, cpMultiplierMap.get(pl));
 	}
 
 	/**
@@ -388,9 +388,9 @@ public class PokemonGoUtils {
 	 * @param cpMultiplierMap
 	 * @return
 	 */
-	private double culcScp(int attack, int defense, int hp, double cpm) {
+	private double calcScp(int attack, int defense, int hp, double cpm) {
 
-		double scp = culcScp(statusProduct(attack, defense, hp, cpm));
+		double scp = calcScp(statusProduct(attack, defense, hp, cpm));
 
 		return scp;
 	}
@@ -401,7 +401,7 @@ public class PokemonGoUtils {
 	 * @param sp
 	 * @return
 	 */
-	public double culcScp(double sp) {
+	public double calcScp(double sp) {
 
 		// ((attack * defense * hp) ^ 2 / 3) / 10
 		double scp = (Math.pow(sp, 2.0 / 3.0) / 10.0);
@@ -517,7 +517,7 @@ public class PokemonGoUtils {
 
 		cpRankList.forEach(cr -> {
 			// CPを求め、セットする。
-			int cp = culcCp(goPokedex, cr.getIva(), cr.getIvd(), cr.getIvh(), pl);
+			int cp = calcCp(goPokedex, cr.getIva(), cr.getIvd(), cr.getIvh(), pl);
 			cr.setCp(cp);
 
 			// 個体値のパーセント

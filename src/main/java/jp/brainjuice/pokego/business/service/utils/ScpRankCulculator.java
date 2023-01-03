@@ -163,13 +163,13 @@ public class ScpRankCulculator {
 					Integer cp = null; // CP
 					for (int tpl = 510; tpl >= 10; tpl-=5) {
 						pl = plFormat.format(tpl / 10.0);
-						int tmpCp = pokemonGoUtils.culcCp(goPokedex, iva, ivd, ivh, pl);
+						int tmpCp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
 
 						if (cpLimitPredicate.test(tmpCp)) {
 							// CP制限を超えていない場合
 							cp = Integer.valueOf(tmpCp);
 							sp = pokemonGoUtils.statusProduct(goPokedex, iva, ivd, ivh, cpMultiplierMap.get(pl));
-							scp = pokemonGoUtils.culcScp(sp);
+							scp = pokemonGoUtils.calcScp(sp);
 							break;
 						}
 
