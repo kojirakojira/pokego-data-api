@@ -23,9 +23,6 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 	/** 通常時PL */
 	private static final String FR_PL = "15";
 
-	/** 天候ブースト時PL */
-	private static final String FR_PL_WB = "20";
-
 	@Autowired
 	public FRTaskResearchService(PokemonGoUtils pokemonGoUtils) {
 		this.pokemonGoUtils = pokemonGoUtils;
@@ -37,8 +34,6 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 		GoPokedex goPokedex = iv.getGoPokedex();
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, FR_MAX_IV, FR_MAX_IV, FR_MAX_IV, FR_PL));
 		res.setMinCp(pokemonGoUtils.calcCp(goPokedex, FR_MIN_IV, FR_MIN_IV, FR_MIN_IV, FR_PL));
-		res.setWbMaxCp(pokemonGoUtils.calcCp(goPokedex, FR_MAX_IV, FR_MAX_IV, FR_MAX_IV, FR_PL_WB));
-		res.setWbMinCp(pokemonGoUtils.calcCp(goPokedex, FR_MIN_IV, FR_MIN_IV, FR_MIN_IV, FR_PL_WB));
 
 		res.setMessage("");
 	}

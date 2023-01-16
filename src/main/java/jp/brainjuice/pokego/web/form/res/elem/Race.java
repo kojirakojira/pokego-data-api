@@ -34,14 +34,14 @@ public class Race {
 		setGoPokedex(goPokedex);
 
 		// タイプ1の色を設定
-		Map<String, Integer> colorMap1 = typeMap.get(pokedex.getType1());
+		final Map<String, Integer> colorMap1 = typeMap.get(goPokedex.getType1());
 		setType1Color(new Color(
 				colorMap1.get(TypeMap.KeyElem.r.name()),
 				colorMap1.get(TypeMap.KeyElem.g.name()),
 				colorMap1.get(TypeMap.KeyElem.b.name())));
 		// タイプ2の色を設定
 		if (!StringUtils.isEmpty(goPokedex.getType2())) {
-			Map<String, Integer> colorMap2 = typeMap.get(pokedex.getType2());
+			final Map<String, Integer> colorMap2 = typeMap.get(goPokedex.getType2());
 			setType2Color(new Color(
 					colorMap2.get(TypeMap.KeyElem.r.name()),
 					colorMap2.get(TypeMap.KeyElem.g.name()),
@@ -62,11 +62,11 @@ public class Race {
 
 		Color color = null;
 
-		String type1 = goPokedex.getType1();
-		String type2 = goPokedex.getType2();
+		final String type1 = goPokedex.getType1();
+		final String type2 = goPokedex.getType2();
 		if (StringUtils.isEmpty(type2)) {
 			// タイプ１のみの場合。
-			Map<String, Integer> colorMap = typeMap.get(type1);
+			final Map<String, Integer> colorMap = typeMap.get(type1);
 			color = new Color(
 					colorMap.get(TypeMap.KeyElem.r.name()),
 					colorMap.get(TypeMap.KeyElem.g.name()),

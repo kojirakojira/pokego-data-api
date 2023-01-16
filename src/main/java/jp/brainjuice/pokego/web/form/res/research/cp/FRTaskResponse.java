@@ -14,8 +14,4 @@ public class FRTaskResponse extends ResearchResponse {
 
 	private int maxCp;
 	private int minCp;
-
-	/** 天候ブースト時 */
-	private int wbMaxCp;
-	private int wbMinCp;
 }

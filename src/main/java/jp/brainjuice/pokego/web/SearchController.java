@@ -16,6 +16,7 @@ import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
+import jp.brainjuice.pokego.business.service.research.EvolutionResearchService;
 import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
@@ -25,10 +26,12 @@ import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
+import jp.brainjuice.pokego.web.form.req.research.EvolutionRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
+import jp.brainjuice.pokego.web.form.res.research.EvolutionResponse;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +45,9 @@ public class SearchController {
 
 	private RaceDiffService raceDiffService;
 
+	private EvolutionResearchService evolutionResearchService;
+	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
+
 	private GoConvertService goConvertService;
 
 	private PokemonSearchService pokemonSearchService;
@@ -54,6 +60,7 @@ public class SearchController {
 	public SearchController(
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			RaceDiffService raceDiffService,
+			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
 			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
@@ -61,8 +68,13 @@ public class SearchController {
 		// 種族値検索
 		this.raceResearchService = raceResearchService;
 		this.raceResRse = raceResRse;
+
 		// 種族値比較
 		this.raceDiffService = raceDiffService;
+
+		// 進化ツリー
+		this.evolutionResearchService = evolutionResearchService;
+		this.evolutionResRse = evolutionResRse;
 
 		this.goConvertService = goConvertService;
 		// 検索
@@ -142,6 +154,21 @@ public class SearchController {
 		}
 
 		return raceDiffRes;
+	}
+
+	/**
+	 * 進化取得用API
+	 *
+	 * @param raceReq
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/evolution")
+	public EvolutionResponse evolution(EvolutionRequest evolutionReq) throws BadRequestException {
+
+		EvolutionResponse evolutionRes = new EvolutionResponse();
+		evolutionResRse.execute(evolutionReq, evolutionRes, evolutionResearchService);
+		return evolutionRes;
 	}
 
 
