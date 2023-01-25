@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class EvolutionResponse extends ResearchResponse {
 
-	private List<List<Hierarchy>> evoTree;
+	// ツリーリスト<yリスト<xリスト<Hierarchy>>>
+	private List<List<List<Hierarchy>>> evoTreeInfo;
+	private List<String> anotherForms;
 	private Map<String, Race> raceMap;
 }

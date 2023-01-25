@@ -99,7 +99,13 @@ public class BjCsvMapper {
 
 		int x = 0;
 		int y = 0;
-		for (y = 1; y < rowList.size(); y++) {
+		int size;
+		for (y = 1, size = rowList.size(); y < size; y++) {
+
+			if (rowList.get(y).trim().charAt(0) == '#') {
+				// コメント行の場合
+				continue;
+			}
 
 			E elem = null;
 			try {

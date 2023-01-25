@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.service.utils.memory;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +13,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.business.service.utils.dto.Evolution;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
@@ -30,6 +34,9 @@ public class EvolutionInfo {
 
 	/** 進化前のポケモンをvalueに持つマップ */
 	private final Map<String, String> bfEvoMap = new HashMap<>();
+
+	/** 進化前が複数する例外的なポケモンのマップ */
+	private final Map<String, List<String>> exceptionsMap = new HashMap<>();
 
 	private static final String FILE_NAME = "pokemon-evolution.csv";
 
@@ -93,11 +100,27 @@ public class EvolutionInfo {
 		// pokedexIdの前半4桁は図鑑№
 		String pokedexNo = pokedexId.substring(0, 4);
 
+		// 進化前が存在するポケモンのMapから、図鑑№が一致するポケモンを洗い出す。
 		bfEvoMap.forEach((k, v) -> {
 			if (pokedexNo.equals(k.substring(0, 4))) {
 				anotherFormList.add(k);
 			}
 		});
+
+		// 進化しないポケモンのSetから、図鑑№が一致するポケモンを洗い出す。
+		noEvoSet.stream().filter(pokeId -> pokedexNo.equals(pokeId.substring(0, 4))).forEach(anotherFormList::add);
+
+		/** 同じpokedexId、ダミーのpokedexIdは排除する。 */
+		// 削除する対象のリスト
+		final List<String> removeList = new ArrayList<>();
+		// 例外のダミーのpokedexIdを追加。
+		exceptionsMap.forEach((k, v) -> {
+			removeList.addAll(v);
+		});
+		// 検索対象のpokedexIdも追加。
+		removeList.add(pokedexId);
+		// すべて削除
+		anotherFormList.removeAll(removeList);
 
 		return anotherFormList;
 	}
@@ -208,9 +231,62 @@ public class EvolutionInfo {
 	@Data
 	private class TempHierarchyInfo {
 		/** 最終進化ポケモンリスト */
-		private List<String> finalEvoList = new ArrayList<>();
+		private final List<String> finalEvoList = new ArrayList<>();
 		/** 最終進化でないポケモンのリスト */
 		private List<String> notFinalEvoList = new ArrayList<>();
+	}
+
+	/**
+	 * Hierarchyのリストを取得する。<br>
+	 * ガーメイルのような例外的に進化前が複数存在するポケモンに対する考慮済み。<br>
+	 * ほとんどのポケモンは、一番外側のリストは1件のみになる。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public List<List<List<Hierarchy>>> getEvoTrees(String pokedexId) {
+
+		final List<List<List<Hierarchy>>> treeList = new ArrayList<>();
+
+		// 例外ポケモンの場合はダミーのpokedexIdを取得
+		List<String> excList = exceptionsMap.get(pokedexId);
+
+		if (excList == null) {
+			// 例外でない場合
+			treeList.add(getEvoTree(pokedexId));
+		} else {
+			// 例外の場合（ガーメイル）
+			// 検索対象のpokedexIdも追加して並び替え
+			excList = new ArrayList<>(excList);
+			excList.add(pokedexId);
+			Collections.sort(excList);
+			// ツリー取得
+			excList.forEach(pokeId -> {
+				treeList.add(getEvoTree(pokeId));
+			});
+		}
+
+		/** ダミーのpokedexIdを正規のpokedexIdに変換する。*/
+		// 直列化
+		final List<Hierarchy> hieList = new ArrayList<>();
+		treeList.forEach(yList -> {
+			yList.forEach(xList -> {
+				hieList.addAll(xList);
+			});
+		});
+		// 例外マップを見て正規のpokedexIdに変換する。
+		exceptionsMap.forEach((k, v) -> {
+			hieList.forEach(hie -> {
+				if (v.contains(hie.getId())) {
+					hie.setId(k);
+				}
+				if (v.contains(hie.getBid())) {
+					hie.setBid(k);
+				}
+			});
+		});
+
+		return treeList;
 	}
 
 	/**
@@ -220,7 +296,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<List<Hierarchy>> getEvoTree(String pokedexId) {
+	private List<List<Hierarchy>> getEvoTree(String pokedexId) {
 
 		final List<List<Hierarchy>> yList = new ArrayList<>();
 
@@ -507,13 +583,14 @@ public class EvolutionInfo {
 	}
 
 	/**
-	 * 起動時に実行。CSVファイルの内容をメモリに抱える。
+	 * 起動時に実行。
 	 *
 	 * @throws PokemonDataInitException
 	 */
 	@PostConstruct
 	public void init() throws PokemonDataInitException {
 
+		// CSVファイルの内容をメモリに抱える。
 		try {
 			List<Evolution> evolutionList = BjCsvMapper.mapping(FILE_NAME, Evolution.class);
 
@@ -531,6 +608,23 @@ public class EvolutionInfo {
 			log.error(e.getMessage(), e);
 			throw new PokemonDataInitException(e);
 		}
+
+		// yamlファイルの内容をメモリに抱える。
+		DefaultResourceLoader resourceLoader;
+		InputStreamReader reader;
+		try {
+			resourceLoader = new DefaultResourceLoader();
+			Resource resource = resourceLoader.getResource("classpath:pokemon-evolution-exceptions.yml");
+			reader = new InputStreamReader(resource.getInputStream());
+
+			Yaml yaml = new Yaml();
+			exceptionsMap.putAll(yaml.load(reader));
+
+		} catch (Exception e) {
+			throw new PokemonDataInitException(e);
+		}
+
+		log.info("EvolutionInfo generated!!");
 	}
 
 }

@@ -40,11 +40,15 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		String pokedexId = iv.getGoPokedex().getPokedexId();
 
 		// 進化ツリーの取得
-		final List<List<Hierarchy>> hieList = evolutionInfo.getEvoTree(pokedexId);
+		final List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);
+		// 別のすがた
+		final List<String> anotherFormList = evolutionInfo.getAnotherFormList(pokedexId);
 
-		// 図鑑IDを抜き出す
+		/** Raceマップの作成（色をクライアント側に渡すため。） */
+		// 図鑑IDをすべてリストに追加する。
 		final Set<String> pokedexIdList = new HashSet<>();
-		hieList.forEach(li -> li.forEach(h -> pokedexIdList.add(h.getId())));
+		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> pokedexIdList.add(h.getId()))));
+		pokedexIdList.addAll(anotherFormList);
 
 		// GOステータスの取得
 		final List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(pokedexIdList);
@@ -55,7 +59,9 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 			raceMap.put(gp.getPokedexId(), new Race(null, gp, typeMap));
 		});
 
-		res.setEvoTree(hieList);
+		// レスポンスのセット
+		res.setEvoTreeInfo(hieList);
+		res.setAnotherForms(anotherFormList);
 		res.setRaceMap(raceMap);
 	}
 
