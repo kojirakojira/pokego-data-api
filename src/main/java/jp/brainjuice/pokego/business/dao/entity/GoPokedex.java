@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GoPokedex implements Serializable, Cloneable {
 
-	/** 図鑑No(4) + 亜種フラグ(1) + 連番(2) */
+	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
 	private String pokedexId;
 
 	/** ポケモン */

@@ -15,5 +15,6 @@ public class EvolutionResponse extends ResearchResponse {
 	// ツリーリスト<yリスト<xリスト<Hierarchy>>>
 	private List<List<List<Hierarchy>>> evoTreeInfo;
 	private List<String> anotherForms;
+	private List<String> bfAfAotForms;
 	private Map<String, Race> raceMap;
 }
