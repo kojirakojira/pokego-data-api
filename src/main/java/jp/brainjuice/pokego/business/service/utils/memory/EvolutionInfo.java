@@ -273,8 +273,13 @@ public class EvolutionInfo {
 
 			hieList = tmpList;
 		}
-
-		retList.remove(pokedexId);
+		final List<String> removeList = new ArrayList<>();
+		// 例外のダミーのpokedexIdを追加。
+		exceptionsMap.forEach((k, v) -> {
+			removeList.addAll(v);
+		});
+		removeList.add(pokedexId);
+		retList.removeAll(removeList);
 
 		return retList;
 	}
