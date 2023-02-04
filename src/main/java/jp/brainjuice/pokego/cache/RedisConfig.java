@@ -49,7 +49,7 @@ public class RedisConfig {
 	public RedisCacheConfiguration cacheConfiguration() {
 		return RedisCacheConfiguration
 				.defaultCacheConfig()
-				.entryTtl(Duration.ofHours(5L)).disableCachingNullValues()
+				.entryTtl(Duration.ofDays(3L)).disableCachingNullValues()
 				.serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 	}
 
