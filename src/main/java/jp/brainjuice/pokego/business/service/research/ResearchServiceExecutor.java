@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.business.service.research;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,6 +65,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 			if (!goPokedexOp.isPresent()) {
 				res.setSuccess(true);
 				res.setMessage("存在しないIDです。");
+				res.setMsgLevel(MsgLevelEnum.error);
 				return;
 			}
 
@@ -103,8 +104,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 				req.getIva(),
 				req.getIvd(),
 				req.getIvh(),
-				req.getPl(),
-				new HashMap<String, Object>());
+				req.getPl());
 
 		// Requestの値をivのマップにセット
 		for (Field field: req.getClass().getDeclaredFields()) {
