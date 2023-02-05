@@ -17,4 +17,6 @@ public class RaceRequest extends ResearchRequestImpl {
 	private Integer ivh;
 	@Null
 	private String pl;
+
+	private boolean finEvo = false;
 }

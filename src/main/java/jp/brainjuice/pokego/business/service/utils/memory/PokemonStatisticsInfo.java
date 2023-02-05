@@ -10,12 +10,13 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ポケモン統計情報を保持するクラスです。
+ * ポケモン統計情報を取得するクラスです。
  *
  * @author saibabanagchampa
  *
@@ -24,13 +25,51 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter(lombok.AccessLevel.PRIVATE)
 @ToString
+@NoArgsConstructor
 @Slf4j
 public class PokemonStatisticsInfo implements Cloneable {
 
 	private PokedexStats pokedexStats;
 	private GoPokedexStats goPokedexStats;
 
+	/**
+	 * DI以外で生成する用のコンストラクタ
+	 *
+	 * @param iterable
+	 * @param iterable2
+	 */
+	public PokemonStatisticsInfo(Iterable<Pokedex> iterable, Iterable<GoPokedex> iterable2) {
+		create(iterable, iterable2);
+	}
 
+	/**
+	 * 引数に指定したPokedexリストを対象に統計情報を生成する。
+	 *
+	 * @param pokedexList
+	 * @return
+	 */
+	public PokedexStats createPokedexStats(List<Pokedex> pokedexList) {
+
+		return new PokedexStats(pokedexList);
+	}
+
+	/**
+	 * 引数に指定したGoPokedexリストを対象に統計情報を生成する。
+	 *
+	 * @param goPokedexList
+	 * @return
+	 */
+	public GoPokedexStats createGoPokedexStats(List<GoPokedex> goPokedexList) {
+
+		return new GoPokedexStats(goPokedexList);
+	}
+
+	/**
+	 * ポケモン（原作）の統計情報
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
 	@Data
 	public class PokedexStats implements Cloneable {
 
@@ -41,7 +80,7 @@ public class PokemonStatisticsInfo implements Cloneable {
 		private Statistics spDfStats;
 		private Statistics spStats;
 
-		public PokedexStats(List<Pokedex> pokedexList) {
+		public PokedexStats(Iterable<Pokedex> iterable) {
 
 			List<Integer> hpList = new ArrayList<>();
 			List<Integer> atList = new ArrayList<>();
@@ -49,7 +88,7 @@ public class PokemonStatisticsInfo implements Cloneable {
 			List<Integer> spAtList = new ArrayList<>();
 			List<Integer> spDfList = new ArrayList<>();
 			List<Integer> spList = new ArrayList<>();
-			pokedexList.forEach(p -> {
+			iterable.forEach(p -> {
 				hpList.add(p.getHp());
 				atList.add(p.getAttack());
 				dfList.add(p.getDefense());
@@ -76,6 +115,12 @@ public class PokemonStatisticsInfo implements Cloneable {
 		}
 	}
 
+	/**
+	 * ポケモンGOの統計情報
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
 	@Data
 	public class GoPokedexStats implements Cloneable {
 
@@ -83,12 +128,12 @@ public class PokemonStatisticsInfo implements Cloneable {
 		private Statistics goDfStats;
 		private Statistics goHpStats;
 
-		public GoPokedexStats(List<GoPokedex> goPokedexList) {
+		public GoPokedexStats(Iterable<GoPokedex> iterable2) {
 
 			List<Integer> hpList = new ArrayList<>();
 			List<Integer> atList = new ArrayList<>();
 			List<Integer> dfList = new ArrayList<>();
-			goPokedexList.forEach(p -> {
+			iterable2.forEach(p -> {
 				hpList.add(p.getHp());
 				atList.add(p.getAttack());
 				dfList.add(p.getDefense());
@@ -138,16 +183,16 @@ public class PokemonStatisticsInfo implements Cloneable {
 	/**
 	 * ポケモン統計情報を生成し、フィールドへセットします。
 	 *
-	 * @param pokedexList
-	 * @param goPokedexList
+	 * @param iterable
+	 * @param iterable2
 	 */
-	public void create(List<Pokedex> pokedexList, List<GoPokedex> goPokedexList) {
+	public void create(Iterable<Pokedex> iterable, Iterable<GoPokedex> iterable2) {
 
 		// 原作
-		setPokedexStats(new PokedexStats(pokedexList));
+		setPokedexStats(new PokedexStats(iterable));
 
 		// ポケモンGO
-		setGoPokedexStats(new GoPokedexStats(goPokedexList));
+		setGoPokedexStats(new GoPokedexStats(iterable2));
 
 		log.debug(this.toString());
 

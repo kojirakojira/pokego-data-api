@@ -48,6 +48,7 @@ public class GoConvertService {
 
 		List<Pokedex> pokedexList = pokedexRepository.findAll();
 		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAll();
+		// 全ポケモンを対象とした統計情報をDIに設定する。
 		pokemonStatisticsInfo.create(pokedexList, goPokedexList);
 		log.info("PokemonStatisticsInfo generated!!");
 	}

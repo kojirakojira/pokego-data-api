@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Evolution;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
@@ -38,6 +39,9 @@ public class EvolutionInfo {
 
 	/** 進化前のポケモンをvalueに持つマップ */
 	private final Map<String, String> bfEvoMap = new HashMap<>();
+
+	/** 最終進化のポケモンのセット（進化なしのポケモン含む） */
+	private final Set<String> finalEvoSet = new HashSet<>();
 
 	/** 進化前が複数する例外的なポケモンのマップ */
 	private final Map<String, List<String>> exceptionsMap = new HashMap<>();
@@ -244,6 +248,38 @@ public class EvolutionInfo {
 		/** 最終進化でないポケモンのリスト */
 		private List<String> notFinalEvoList = new ArrayList<>();
 	}
+
+	/**
+	 * 最終進化のポケモンかを判定する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public boolean isFinalEvolution(String pokedexId) {
+		return finalEvoSet.contains(pokedexId);
+	}
+
+	/**
+	 * 最終進化のポケモンのセットを取得する。
+	 *
+	 * @return
+	 */
+	public Set<String> getFinalEvoSet() {
+		return new HashSet<String>(finalEvoSet);
+	}
+
+	/**
+	 * 最終進化だけに絞り込む。
+	 *
+	 * @param goPokedexList
+	 * @return
+	 */
+	public List<GoPokedex> filterFinalEvoList(List<GoPokedex> goPokedexList) {
+
+		return goPokedexList.stream().filter(
+				poke -> finalEvoSet.contains(poke.getPokedexId())).collect(Collectors.toList());
+	}
+
 
 	/**
 	 * 進化ツリー上の進化前、進化後のポケモンをすべて取得する。<br>
@@ -603,7 +639,6 @@ public class EvolutionInfo {
 	 * @param tree 例：{0280N01={0281N01={0282N01=null, 0475N01=null}}}
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private Map<String, Object> searchMap(String pokedexId, Map<String, Object> tree) {
 
 		if (tree.containsKey(pokedexId)) {
@@ -613,6 +648,7 @@ public class EvolutionInfo {
 
 		// 次の階層のマップでループ
 		for (String pokeId: tree.keySet()) {
+			@SuppressWarnings("unchecked")
 			Map<String, Object> next = (Map<String, Object>) tree.get(pokeId);
 			if (next == null) {
 				continue;
@@ -642,6 +678,8 @@ public class EvolutionInfo {
 		try {
 			List<Evolution> evolutionList = BjCsvMapper.mapping(FILE_NAME, Evolution.class);
 
+			Set<String> noEvoSet = new HashSet<String>();
+			Map<String, String> bfEvoMap = new HashMap<String, String>();
 			evolutionList.forEach(evo -> {
 				if (evo.getBeforeEvolution().isEmpty()) {
 					// 進化前が存在しない場合
@@ -651,6 +689,8 @@ public class EvolutionInfo {
 					bfEvoMap.put(evo.getPokedexId(), evo.getBeforeEvolution());
 				}
 			});
+			this.noEvoSet.addAll(noEvoSet);
+			this.bfEvoMap.putAll(bfEvoMap);
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -672,7 +712,41 @@ public class EvolutionInfo {
 			throw new PokemonDataInitException(e);
 		}
 
+
+		this.finalEvoSet.addAll(createNoBfEvoMap(noEvoSet, bfEvoMap, exceptionsMap));
+
 		log.info("EvolutionInfo generated!!");
+	}
+
+	/**
+	 * noBfEvoMapを生成する。
+	 *
+	 * @param noEvoSet
+	 * @param bfEvoMap
+	 * @return noBfEvoMap
+	 */
+	private Set<String> createNoBfEvoMap(
+			Set<String> noEvoSet,
+			Map<String, String> bfEvoMap,
+			Map<String, List<String>> exceptionsMap) {
+
+		final Set<String> noBfEvoMap = new HashSet<>();
+
+		// 進化前が存在しないポケモンのセットから進化後が存在しないポケモンを抜き出す。
+		noBfEvoMap.addAll(noEvoSet.stream().filter(
+				pid1 -> !isAfterEvolution(pid1)).collect(Collectors.toList()));
+
+		// 進化前のポケモンをvalueに持つマップから進化後が存在しないポケモンを抜き出す。
+		noBfEvoMap.addAll(bfEvoMap.entrySet().stream().filter(
+				entry1 -> !isAfterEvolution(entry1.getKey())).map(
+						entry2 -> entry2.getKey()).collect(Collectors.toList()));
+
+		// ダミーのpokedexIdを削除する。
+		List<String> dummyIdList = new ArrayList<>();
+		exceptionsMap.forEach((k, v) -> v.forEach(dummyId -> dummyIdList.add(dummyId)));
+		noBfEvoMap.removeAll(dummyIdList);
+
+		return noBfEvoMap;
 	}
 
 }
