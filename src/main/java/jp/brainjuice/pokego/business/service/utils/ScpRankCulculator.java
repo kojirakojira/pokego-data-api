@@ -20,8 +20,6 @@ public class ScpRankCulculator {
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	public static final String LEAGUE = "league";
-
 	@Autowired
 	public ScpRankCulculator(
 			CpMultiplierMap cpMultiplierMap,

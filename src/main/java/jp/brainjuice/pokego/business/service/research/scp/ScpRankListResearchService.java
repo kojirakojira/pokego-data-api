@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCulculator;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankListResponse;
 
@@ -26,7 +27,7 @@ public class ScpRankListResearchService implements ResearchService<ScpRankListRe
 	public void exec(IndividialValue iv, ScpRankListResponse res) {
 
 		// leagueを取得
-		String league = (String) iv.getParamsMap().get(ScpRankCulculator.LEAGUE);
+		String league = (String) iv.getParamsMap().get(ParamsEnum.league);
 		// scpRankListを生成
 		ArrayList<ScpRank> scpRankList = scpRankCulculator.getSummary(
 				iv.getGoPokedex(),
