@@ -9,4 +9,5 @@ public class RaceDiffRequest {
 
 	private List<String> idArr;
 	private List<String> nameArr;
+	private boolean finEvo = false;
 }

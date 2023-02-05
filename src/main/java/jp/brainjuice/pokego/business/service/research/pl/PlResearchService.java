@@ -9,7 +9,8 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.PokemonEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.pl.PlResponse;
 
 @Service
@@ -30,13 +31,19 @@ public class PlResearchService implements ResearchService<PlResponse> {
 		final int df = goPokedex.getDefense() + iv.getIvd();
 		final int hp = goPokedex.getHp() + iv.getIvh();
 
-		final int cp = (int) iv.getParamsMap().get(PokemonEnum.cp.name());
+		String pl = null;
+		final int cp = (int) iv.get(ParamsEnum.cp);
 		if (cp <= 10) {
-			setPlLessThan10Cp(at, df, hp, cp, res);
-			return;
+			pl = getPlLessThan10Cp(at, df, hp, cp);
+		} else {
+			pl = getPl(at, df, hp, cp);
 		}
+		res.setPl(pl);
 
-		setPl(at, df, hp, cp, res);
+		if (pl == null) {
+			res.setMessage("存在しないステータスを指定しています。");
+			res.setMsgLevel(MsgLevelEnum.error);
+		}
 	}
 
 	/**
@@ -46,9 +53,9 @@ public class PlResearchService implements ResearchService<PlResponse> {
 	 * @param df
 	 * @param hp
 	 * @param cp
-	 * @param res
+	 * @return
 	 */
-	private void setPl(int at, int df, int hp, int cp, PlResponse res) {
+	private String getPl(int at, int df, int hp, int cp) {
 
 		String pl = null;
 		DecimalFormat plFormat = new DecimalFormat("0.#");
@@ -59,12 +66,11 @@ public class PlResearchService implements ResearchService<PlResponse> {
 			int plcp = pokemonGoUtils.calcCp(at, df, hp, pl);
 
 			if (cp == plcp) {
-				res.setPl(pl);
-				break;
+				return pl;
 			}
 		}
+		return null;
 
-		res.setMessage("存在しないステータスを指定しています。");
 	}
 
 	/**
@@ -74,10 +80,11 @@ public class PlResearchService implements ResearchService<PlResponse> {
 	 * @param df
 	 * @param hp
 	 * @param cp
-	 * @param res
+	 * @return
 	 */
-	private void setPlLessThan10Cp(int at, int df, int hp, int cp, PlResponse res) {
+	private String getPlLessThan10Cp(int at, int df, int hp, int cp) {
 
+		String retPl = null;
 		ArrayList<String> plList = new ArrayList<String>();
 		DecimalFormat plFormat = new DecimalFormat("0.#");
 		for (int tpl = 10; tpl <= 510; tpl+=5) {
@@ -94,10 +101,12 @@ public class PlResearchService implements ResearchService<PlResponse> {
 		}
 
 		if (plList.size() == 1) {
-			res.setPl(plList.get(0));
+			retPl = plList.get(0);
 		} else if (1 < plList.size()) {
-			res.setPl(plList.get(0) + "～" + plList.get(plList.size() - 1));
+			retPl = plList.get(0) + "～" + plList.get(plList.size() - 1);
 		}
+
+		return retPl;
 	}
 
 }

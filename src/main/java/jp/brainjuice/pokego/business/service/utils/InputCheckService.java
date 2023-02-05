@@ -18,6 +18,7 @@ import com.ibm.icu.text.MessageFormat;
 import jp.brainjuice.pokego.business.service.utils.dto.CheckItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,6 +94,7 @@ public class InputCheckService {
 		try {
 			msg = exec(checkList);
 			res.setMessage(msg);
+			res.setMsgLevel(MsgLevelEnum.error);
 			res.setSuccess(msg.isEmpty());
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);

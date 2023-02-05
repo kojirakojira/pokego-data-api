@@ -18,6 +18,7 @@ import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import lombok.extern.slf4j.Slf4j;
@@ -53,18 +54,21 @@ public class RaceDiffService {
 		if (req.getIdArr() == null && req.getNameArr() == null) {
 			res.setSuccess(false);
 			res.setMessage("idとnameの少なくとも一方は指定してください。。");
+			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
 
 		if (req.getIdArr() != null && !(2 <= req.getIdArr().size() && req.getIdArr().size() <= 6)) {
 			res.setSuccess(false);
 			res.setMessage("idは2～6で指定してください。");
+			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
 
 		if (req.getNameArr() != null && !(2 <= req.getNameArr().size() && req.getNameArr().size() <= 6)) {
 			res.setSuccess(false);
 			res.setMessage("nameは2～6で指定してください。");
+			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
 
@@ -85,6 +89,7 @@ public class RaceDiffService {
 			// 検索結果にnullが含まれている場合。
 			res.setSuccess(false);
 			res.setMessage(MSG_NO_RESULTS);
+			res.setMsgLevel(MsgLevelEnum.error);
 			log.info(MessageFormat.format(
 					MSG_NO_RESULTS + " idList: {0}, goPokedexList: {1}",
 					req.getIdArr().toString(),

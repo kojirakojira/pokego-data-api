@@ -16,6 +16,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 
 @Service
 public class PokemonSearchService {
@@ -62,10 +63,12 @@ public class PokemonSearchService {
 		if (psrList.stream().filter(psr -> { return !psr.isSearched(); }).anyMatch(e -> true)) {
 			// 未入力のnameが存在する場合。(Stream#anyMatch(e -> true)でStream版のisEmpty()になる。）
 			res.setMessage(MSG_NO_ENTERED);
+			res.setMsgLevel(MsgLevelEnum.error);
 
 		} else if (psrList.stream().filter(psr -> { return !psr.isHit(); }).anyMatch(e -> true)) {
 			// 検索結果なしのnameが存在する場合。
 			res.setMessage(MSG_NO_RESULTS);
+			res.setMsgLevel(MsgLevelEnum.error);
 
 		} else if (!psrList.stream().filter(psr -> { return !psr.isUnique(); }).anyMatch(e -> true)) {
 			// psrListが全て一意になる場合。（ユニークじゃないやつがない存在しない場合。）
