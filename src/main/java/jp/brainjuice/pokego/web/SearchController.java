@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.GoConvertService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
@@ -48,7 +47,6 @@ public class SearchController {
 	private EvolutionResearchService evolutionResearchService;
 	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
 
-	private GoConvertService goConvertService;
 
 	private PokemonSearchService pokemonSearchService;
 
@@ -61,7 +59,6 @@ public class SearchController {
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			RaceDiffService raceDiffService,
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
-			GoConvertService goConvertService,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService) {
@@ -76,7 +73,6 @@ public class SearchController {
 		this.evolutionResearchService = evolutionResearchService;
 		this.evolutionResRse = evolutionResRse;
 
-		this.goConvertService = goConvertService;
 		// 検索
 		this.pokemonSearchService = pokemonSearchService;
 
@@ -88,18 +84,6 @@ public class SearchController {
 	@GetMapping("/home")
 	public String home() {
 		return "pokego-api server is running!!";
-	}
-
-	@GetMapping("/go")
-	public String go(String id) {
-
-		return goConvertService.getGoStatus(id);
-	}
-
-	@GetMapping("/save")
-	public String save() {
-
-		return goConvertService.insertGoPokedexAll();
 	}
 
 	@GetMapping("/search")

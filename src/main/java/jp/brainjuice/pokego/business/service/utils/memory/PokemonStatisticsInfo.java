@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import lombok.Data;
@@ -31,6 +34,23 @@ public class PokemonStatisticsInfo implements Cloneable {
 
 	private PokedexStats pokedexStats;
 	private GoPokedexStats goPokedexStats;
+
+	/**
+	 * DIで生成する用のコンストラクタ
+	 *
+	 * @param pokedexRepository
+	 * @param goPokedexRepository
+	 */
+	@Autowired
+	public PokemonStatisticsInfo(
+			PokedexRepository pokedexRepository, GoPokedexRepository goPokedexRepository) {
+
+		List<Pokedex> pokedexList = pokedexRepository.findAll();
+		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
+		// 全ポケモンを対象とした統計情報をDIに設定する。
+		create(pokedexList, goPokedexList);
+		log.info("PokemonStatisticsInfo generated!!");
+	}
 
 	/**
 	 * DI以外で生成する用のコンストラクタ

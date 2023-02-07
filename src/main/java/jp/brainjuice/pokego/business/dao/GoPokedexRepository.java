@@ -1,14 +1,18 @@
 package jp.brainjuice.pokego.business.dao;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * メモリにて保持しているGoPokedexを管理するRepositoryです。<br>
@@ -18,15 +22,33 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
  *
  */
 @Repository
+@Slf4j
 public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 
-	private Iterable<GoPokedex> goPokedexes = new ArrayList<>();
+	private final List<GoPokedex> goPokedexes = new ArrayList<>();
+
+	/**
+	 * Pokedexを変換し、DIに登録する。
+	 *
+	 * @param pokedexRepository
+	 * @param pokemonUtils
+	 */
+	@Autowired
+	public GoPokedexRepository(
+			PokedexRepository pokedexRepository,
+			PokemonUtils pokemonUtils) {
+
+		List<Pokedex> pokeList = pokedexRepository.findAll();
+		List<GoPokedex> goPokeList = pokeList.stream().map(p -> pokemonUtils.getGoPokedex(p)).collect(Collectors.toList());
+		saveAll(goPokeList);
+
+		log.info("GoPokedex table generated!!");
+	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <S extends GoPokedex> Iterable<S> saveAll(Iterable<S> entities) {
-		goPokedexes = (Iterable<GoPokedex>) entities;
-		return (Iterable<S>) new ArrayList<>((Collection<? extends GoPokedex>) goPokedexes);
+		entities.forEach(goPokedexes::add);
+		return entities;
 	}
 
 	@Override
@@ -42,20 +64,20 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	}
 
 	@Override
-	public Iterable<GoPokedex> findAll() {
-		return new ArrayList<>((Collection<? extends GoPokedex>) goPokedexes);
+	public List<GoPokedex> findAll() {
+		return new ArrayList<>(goPokedexes);
 	}
 
 	@Override
 	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
-		List<GoPokedex> goPokedexList = new ArrayList<GoPokedex>();
-		ids.forEach(id -> {
-			Optional<GoPokedex> gpOp = ((List<GoPokedex>) goPokedexes).stream().filter(gp -> gp.getPokedexId().equals(id)).findAny();
-			gpOp.ifPresentOrElse(
-					gp -> { goPokedexList.add(gp); },
-					() -> { goPokedexList.add(null); });
-		});
-		return goPokedexList;
+		return goPokedexes.stream().filter(p -> {
+			boolean exists = false;
+			for (String pid: ids) {
+				exists = p.getPokedexId().equals(pid);
+				if (exists) break;
+			}
+			return exists;
+		}).collect(Collectors.toList());
 	}
 
 	/**

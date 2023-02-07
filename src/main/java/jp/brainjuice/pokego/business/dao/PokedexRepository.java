@@ -3,13 +3,12 @@ package jp.brainjuice.pokego.business.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -27,26 +26,27 @@ import lombok.extern.slf4j.Slf4j;
  * @author saibabanagchampa
  *
  */
-@Component
+@Repository
 @Slf4j
 public class PokedexRepository implements CrudRepository<Pokedex, String> {
 
-	private List<Pokedex> pokedexes;
-
-	private TypeMap typeMap;
-	private GenNameMap genNameMap;
+	private final List<Pokedex> pokedexes = new ArrayList<Pokedex>();
 
 	private static final String MSG_INVALID_TYPE_ERROR = "タイプの指定に誤りがあります。{0}";
 	private static final String MSG_INVALID_GEN_ERROR = "世代の指定に誤りがあります。{0}";
 
 	private static final String FILE_NAME = "pokemon.csv";
 
+	/**
+	 * CSVファイルからPokedexを生成し、DIに登録する。
+	 *
+	 * @param typeMap
+	 * @param genNameMap
+	 * @throws PokemonDataInitException
+	 */
 	@Autowired
-	public PokedexRepository(
-			TypeMap typeMap,
-			GenNameMap genNameMap) {
-		this.typeMap = typeMap;
-		this.genNameMap = genNameMap;
+	public PokedexRepository(TypeMap typeMap, GenNameMap genNameMap) throws PokemonDataInitException {
+		init(typeMap, genNameMap);
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	}
 
 	/**
-	 * すべてのPokdexを取得します。
+	 * すべてのPokedexを取得します。
 	 *
 	 * @return
 	 */
@@ -88,14 +88,14 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 */
 	@Override
 	public Iterable<Pokedex> findAllById(Iterable<String> ids) {
-		List<Pokedex> pokedexList = new ArrayList<>();
-		ids.forEach(id -> {
-			Optional<Pokedex> pOp = ((List<Pokedex>) pokedexes).stream().filter(gp -> gp.getPokedexId().equals(id)).findAny();
-			pOp.ifPresentOrElse(
-					gp -> { pokedexList.add(gp); },
-					() -> { pokedexList.add(null); });
-		});
-		return pokedexList;
+		return pokedexes.stream().filter(p -> {
+			boolean exists = false;
+			for (String pid: ids) {
+				exists = p.getPokedexId().equals(pid);
+				if (exists) break;
+			}
+			return exists;
+		}).collect(Collectors.toList());
 	}
 
 	/**
@@ -171,12 +171,16 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	}
 
 	/**
-	 * @deprecated 未実装
+	 * すべてのPokedexを保存します。
+	 *
+	 * @param <S>
+	 * @param entities
+	 * @return
 	 */
 	@Override
 	public <S extends Pokedex> Iterable<S> saveAll(Iterable<S> entities) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		entities.forEach(pokedexes::add);
+		return entities;
 	}
 
 	/**
@@ -184,23 +188,22 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 *
 	 * @throws PokemonDataInitException
 	 */
-	@PostConstruct
-	public void init() throws PokemonDataInitException {
+	public void init(TypeMap typeMap, GenNameMap genNameMap) throws PokemonDataInitException {
 
 		try {
-			pokedexes = BjCsvMapper.mapping(FILE_NAME, Pokedex.class);
+			List<Pokedex> pokedexes = (List<Pokedex>) saveAll(BjCsvMapper.mapping(FILE_NAME, Pokedex.class));
 
 			// タイプが正しい値かをチェックする。
-			checkType(pokedexes);
+			checkType(pokedexes, typeMap);
 			// 世代が正しい値かチェックする。
-			checkGen(pokedexes);
-
-			log.info("Pokedex table generated!!");
+			checkGen(pokedexes, genNameMap);
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PokemonDataInitException(e);
 		}
+
+		log.info("Pokedex table generated!!");
 	}
 
 	/**
@@ -210,7 +213,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 * @param pokedexList
 	 * @return
 	 */
-	private void checkType(List<Pokedex> pokedexList) throws PokemonDataInitException {
+	private void checkType(List<Pokedex> pokedexList, TypeMap typeMap) throws PokemonDataInitException {
 
 		for (Pokedex p: pokedexList) {
 			if (!typeMap.containsKey(p.getType1())) {
@@ -231,7 +234,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 * @param pokedexList
 	 * @return
 	 */
-	private void checkGen(List<Pokedex> pokedexList) throws PokemonDataInitException {
+	private void checkGen(List<Pokedex> pokedexList, GenNameMap genNameMap) throws PokemonDataInitException {
 
 		for (Pokedex p: pokedexList) {
 			if (!genNameMap.containsKey(p.getGen())) {
