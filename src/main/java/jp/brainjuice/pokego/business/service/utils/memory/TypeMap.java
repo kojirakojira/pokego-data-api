@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -38,8 +39,46 @@ public class TypeMap extends HashMap<String, Map<String, Integer>> {
 		}
 	}
 
+	public enum TypeEnum {
+		normal("ノーマル"),
+		fire("ほのお"),
+		water("みず"),
+		grass("くさ"),
+		electric("でんき"),
+		ice("こおり"),
+		fighting("かくとう"),
+		poison("どく"),
+		ground("じめん"),
+		flying("ひこう"),
+		psychic("エスパー"),
+		bug("むし"),
+		rock("いわ"),
+		ghost("ゴースト"),
+		dragon("ドラゴン"),
+		dark("あく"),
+		steel("はがね"),
+		fairy("フェアリー");
+
+		@Getter
+		private final String name;
+
+		TypeEnum(String name) {
+			this.name = name;
+		}
+
+
+		public static TypeEnum getEnumName(String str) {
+			for(TypeEnum v : values()) {
+				if(v.getName().equals(str)) {
+					return v;
+				}
+			}
+			return null;
+		}
+	}
+
 	/**
-	 * マップのキーとなる値。（タイプはここでは定義しない。）
+	 * マップのキーとなる値。
 	 *
 	 * @author saibabanagchampa
 	 *

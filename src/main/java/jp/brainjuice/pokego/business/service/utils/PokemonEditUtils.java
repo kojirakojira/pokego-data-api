@@ -6,19 +6,59 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+
 @Component
 public class PokemonEditUtils {
+
+	private static final String M = "M";
+	private static final String N = "N";
+	private static final String G = "G";
+	private static final String A = "A";
+	private static final String H = "H";
+
+	/**
+	 * 地域を表す列挙型。
+	 * pokedexIdの5桁目（亜種コード）をvalueにもつ。
+	 * ※メガ進化(M)はnoneとして扱うようにする。
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
+	public enum RegionEnum {
+		none(N), // N（Mもnoneとして扱う。）
+		galar(G), // G
+		alola(A), // A
+		hisui(H); // H
+
+		@Getter
+		private final String name;
+
+		RegionEnum(String name) {
+			this.name = name;
+		}
+
+
+		public static RegionEnum getEnumName(String str) {
+			for(RegionEnum v : values()) {
+				if(v.getName().equals(str)) {
+					return v;
+				}
+			}
+			return M.equals(str) ? RegionEnum.none: null;
+		}
+	}
 
 	/**
 	 * 亜種コードの順序
 	 */
 	private Map<String, Integer> subspeciesMap = new HashMap<String, Integer>();
 	{
-		subspeciesMap.put("M", Integer.valueOf(0));
-		subspeciesMap.put("N", Integer.valueOf(1));
-		subspeciesMap.put("A", Integer.valueOf(2));
-		subspeciesMap.put("G", Integer.valueOf(3));
-		subspeciesMap.put("H", Integer.valueOf(4));
+		subspeciesMap.put(M, Integer.valueOf(0));
+		subspeciesMap.put(N, Integer.valueOf(1));
+		subspeciesMap.put(A, Integer.valueOf(2));
+		subspeciesMap.put(G, Integer.valueOf(3));
+		subspeciesMap.put(H, Integer.valueOf(4));
 	}
 
 	/**
@@ -49,6 +89,16 @@ public class PokemonEditUtils {
 	 */
 	public String getSubspecies(String pokedexId) {
 		return pokedexId.substring(4, 5);
+	}
+
+	/**
+	 * メガシンカのpokedexIdかどうかを判定する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public boolean isMega(String pokedexId) {
+		return M.equals(getSubspecies(pokedexId));
 	}
 
 	/**
