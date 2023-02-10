@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import com.ibm.icu.text.MessageFormat;
 
+import jp.brainjuice.pokego.business.constant.GenNameEnum;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +45,8 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 * @throws PokemonDataInitException
 	 */
 	@Autowired
-	public PokedexRepository(TypeMap typeMap, GenNameMap genNameMap) throws PokemonDataInitException {
-		init(typeMap, genNameMap);
+	public PokedexRepository() throws PokemonDataInitException {
+		init();
 	}
 
 	/**
@@ -188,15 +188,15 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 *
 	 * @throws PokemonDataInitException
 	 */
-	public void init(TypeMap typeMap, GenNameMap genNameMap) throws PokemonDataInitException {
+	public void init() throws PokemonDataInitException {
 
 		try {
 			List<Pokedex> pokedexes = (List<Pokedex>) saveAll(BjCsvMapper.mapping(FILE_NAME, Pokedex.class));
 
 			// タイプが正しい値かをチェックする。
-			checkType(pokedexes, typeMap);
+			checkType(pokedexes);
 			// 世代が正しい値かチェックする。
-			checkGen(pokedexes, genNameMap);
+			checkGen(pokedexes);
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -213,14 +213,14 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 * @param pokedexList
 	 * @return
 	 */
-	private void checkType(List<Pokedex> pokedexList, TypeMap typeMap) throws PokemonDataInitException {
+	private void checkType(List<Pokedex> pokedexList) throws PokemonDataInitException {
 
 		for (Pokedex p: pokedexList) {
-			if (!typeMap.containsKey(p.getType1())) {
+			if (TypeEnum.getType(p.getType1()) == null) {
 				// タイプ１がタイプリストにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_TYPE_ERROR, p.toString()));
 			}
-			if (!p.getType2().isEmpty() && !typeMap.containsKey(p.getType2())) {
+			if (!p.getType2().isEmpty() && TypeEnum.getType(p.getType2()) == null) {
 				// タイプ２が空でないかつ、タイプリストにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_TYPE_ERROR, p.toString()));
 			}
@@ -234,10 +234,10 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 * @param pokedexList
 	 * @return
 	 */
-	private void checkGen(List<Pokedex> pokedexList, GenNameMap genNameMap) throws PokemonDataInitException {
+	private void checkGen(List<Pokedex> pokedexList) throws PokemonDataInitException {
 
 		for (Pokedex p: pokedexList) {
-			if (!genNameMap.containsKey(p.getGen())) {
+			if (GenNameEnum.valueOf(p.getGen()) == null) {
 				// 世代が世代マップにない場合
 				throw new PokemonDataInitException(MessageFormat.format(MSG_INVALID_GEN_ERROR, p.toString()));
 			}

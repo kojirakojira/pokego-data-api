@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.memory.GenNameMap;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 
@@ -19,16 +19,12 @@ public class UnimplPokemonService {
 
 	private ViewsCacheProvider viewsCacheProvider;
 
-	private GenNameMap genNameMap;
-
 	@Autowired
 	public UnimplPokemonService(
 			GoPokedexRepository goPokedexRepository,
-			ViewsCacheProvider viewsCacheProvider,
-			GenNameMap genNameMap) {
+			ViewsCacheProvider viewsCacheProvider) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.viewsCacheProvider = viewsCacheProvider;
-		this.genNameMap = genNameMap;
 	}
 
 	public List<SimpPokemon> getUnimplementedPokemonList() {
@@ -42,7 +38,7 @@ public class UnimplPokemonService {
 					gp.getPokedexId(),
 					gp.getName(),
 					gp.getImage(),
-					genNameMap.get(gp.getGen()),
+					GenNameEnum.valueOf(gp.getGen()).getJpn(),
 					gp.getRemarks()));
 		});
 

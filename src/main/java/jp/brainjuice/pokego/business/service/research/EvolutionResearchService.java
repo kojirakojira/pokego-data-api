@@ -16,7 +16,6 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.research.EvolutionResponse;
 
@@ -25,8 +24,6 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 
 	private EvolutionInfo evolutionInfo;
 
-	private TypeMap typeMap;
-
 	private GoPokedexRepository goPokedexRepository;
 
 	private PokemonEditUtils pokemonEditUtils;
@@ -34,11 +31,9 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 	@Autowired
 	public EvolutionResearchService(
 			EvolutionInfo evolutionInfo,
-			TypeMap typeMap,
 			GoPokedexRepository goPokedexRepository,
 			PokemonEditUtils pokemonEditUtils) {
 		this.evolutionInfo = evolutionInfo;
-		this.typeMap = typeMap;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonEditUtils = pokemonEditUtils;
 	}
@@ -84,7 +79,7 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		// Raceマップを作成
 		final Map<String, Race> raceMap = new HashMap<>();
 		goPokedexList.forEach(gp -> {
-			raceMap.put(gp.getPokedexId(), new Race(null, gp, typeMap));
+			raceMap.put(gp.getPokedexId(), new Race(null, gp));
 		});
 
 		/** レスポンスのセット */

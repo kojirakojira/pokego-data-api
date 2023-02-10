@@ -14,13 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.dao.entity.PokedexFilterInfo;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils.RegionEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap.TypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -43,17 +42,32 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 *
 	 */
 	public enum FilterEnum {
-		/** 最終進化<br>Boolean */
+		/**
+		 * 最終進化<br>Boolean
+		 */
 		finalEvo,
-		/** メガシンカ<br>Boolean */
+		/**
+		 * メガシンカ<br>Boolean
+		 */
 		mega,
-		/** 実装済み<br>Boolean */
+		/**
+		 * 実装済み<br>Boolean
+		 */
 		impled,
-		/** 地域<br>String */
+		/**
+		 * 地域<br>String or RegionEnum
+		 * @see RegionEnum
+		 */
 		region,
-		/** タイプ<br>String */
+		/**
+		 * タイプ<br>String or TypeEnum
+		 * @see TypeEnum
+		 */
 		type,
-		/** 2タイプ<br>List&lt;String&gt;(2elements) */
+		/**
+		 * 2タイプ<br>List&lt;String&gt;(2elements)
+		 * @see TypeEnum
+		 */
 		twoType,
 	}
 
@@ -71,11 +85,11 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 		boolFieldMap.put(FilterEnum.mega, (b) -> (pfi) -> pfi.isMega() == b.booleanValue());
 		boolFieldMap.put(FilterEnum.impled, (b) -> (pfi) -> pfi.isImpled() == b.booleanValue());
 
-		stringFieldMap.put(FilterEnum.region, (s) -> (pfi) -> pfi.getRegion().name().equals(s));
-		stringFieldMap.put(FilterEnum.type, (s) -> (pfi) -> s.equals(pfi.getType1().name()) || s.equals(pfi.getType2().name()));
+		stringFieldMap.put(FilterEnum.region, (s) -> (pfi) -> s.equals(pfi.getRegion().name()));
+		stringFieldMap.put(FilterEnum.type, (s) -> (pfi) -> s.equals(pfi.getType1Name()) || s.equals(pfi.getType2Name()));
 
-		twoStrFieldMap.put(FilterEnum.twoType, (type1) -> (type2) -> (pfi) -> (type1.equals(pfi.getType1().name()) && type2.equals(pfi.getType2().name()))
-				|| (type1.equals(pfi.getType2().name()) && type2.equals(pfi.getType1().name())));
+		twoStrFieldMap.put(FilterEnum.twoType, (type1) -> (type2) -> (pfi) -> (type1.equals(pfi.getType1Name()) && type2.equals(pfi.getType2Name()))
+				|| (type1.equals(pfi.getType2Name()) && type2.equals(pfi.getType1Name())));
 	}
 
 	/**
@@ -89,11 +103,10 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	@Autowired
 	public PokedexFilterInfoRepository(
 			PokedexRepository pokedexRepository,
-			TypeMap typeMap,
 			EvolutionInfo evolutionInfo,
 			PokemonEditUtils pokemonEditUtils) {
 
-		init(pokedexRepository, typeMap, evolutionInfo, pokemonEditUtils);
+		init(pokedexRepository, evolutionInfo, pokemonEditUtils);
 
 		log.info("PokedexFilterInfo table generated!!");
 	}
@@ -129,8 +142,9 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	/**
 	 * 引数に設定したMapを使用し、pokedexIdを絞り込む。
 	 *
-	 * @param values Key: PokedexFieldInfoのフィールド名, Value: FilterEnum参照
+	 * @param values
 	 * @return
+	 * @see FilterEnum
 	 */
 	public List<String> findByAny(Map<FilterEnum, Object> values) {
 
@@ -146,8 +160,11 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 				stream = stream.filter(stringFieldMap.get(key).apply((String) entry.getValue()));
 			} else if (twoStrFieldMap.containsKey(key)) {
 				// String型2つ
-				@SuppressWarnings("unchecked")
-				List<String> vList = (List<String>) entry.getValue();
+				List<String> vList = ((List<?>) entry.getValue()).stream().map(
+						v -> {
+							// Enumの場合は定数名を取得する。
+							return v.getClass().isEnum() ? ((Enum<?>) v).name() : (String) v;
+						}).collect(Collectors.toList());
 				stream = stream.filter(twoStrFieldMap.get(key).apply(vList.get(0)).apply(vList.get(1)));
 			}
 		}
@@ -254,11 +271,10 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * すべてのポケモン情報を登録する。
 	 *
 	 * @param pokedexRepository
-	 * @param typeMap
 	 * @param evolutionInfo
 	 * @param pokemonEditUtils
 	 */
-	public void init(PokedexRepository pokedexRepository, TypeMap typeMap, EvolutionInfo evolutionInfo, PokemonEditUtils pokemonEditUtils) {
+	public void init(PokedexRepository pokedexRepository, EvolutionInfo evolutionInfo, PokemonEditUtils pokemonEditUtils) {
 
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 
@@ -271,8 +287,8 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 			pfi.setMega(pokemonEditUtils.isMega(pid));
 			pfi.setImpled(p.isImplFlg());
 			pfi.setRegion(RegionEnum.getEnumName(subspecies));
-			pfi.setType1(TypeEnum.getEnumName(p.getType1()));
-			pfi.setType2(TypeEnum.getEnumName(p.getType2()));
+			pfi.setType1(TypeEnum.getType(p.getType1()));
+			pfi.setType2(TypeEnum.getType(p.getType2()));
 
 			return pfi;
 		}).collect(Collectors.toList());

@@ -2,8 +2,8 @@ package jp.brainjuice.pokego.business.dao.entity;
 
 import java.io.Serializable;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils.RegionEnum;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap.TypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,5 +38,18 @@ public class PokedexFilterInfo implements Serializable, Cloneable {
 			log.error("Clone failed.", e);
 		}
 		return filterInfo;
+	}
+
+	public String getRegionEnum() {
+		return getRegion().getName();
+	}
+
+	public String getType1Name() {
+		return getType1().name();
+	}
+
+	public String getType2Name() {
+		// タイプ2はnullがあり得る。
+		return getType2() == null ? null : getType2().name();
 	}
 }

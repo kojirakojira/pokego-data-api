@@ -16,7 +16,6 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
@@ -33,20 +32,16 @@ public class RaceDiffService {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
-	private TypeMap typeMap;
-
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
 
 	@Autowired
 	public RaceDiffService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
-			PokemonStatisticsInfo pokemonStatisticsInfo,
-			TypeMap typeMap) {
+			PokemonStatisticsInfo pokemonStatisticsInfo) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
-		this.typeMap = typeMap;
 	}
 
 	public boolean check(RaceDiffRequest req, RaceDiffResponse res) {
@@ -126,7 +121,7 @@ public class RaceDiffService {
 
 		List<Race> raceList = new ArrayList<>();
 		for (int i = 0; i < idList.size(); i++) {
-			Race race = new Race(pokedexList.get(i), goPokedexList.get(i), typeMap);
+			Race race = new Race(pokedexList.get(i), goPokedexList.get(i));
 			raceList.add(race);
 		}
 		res.setRaceArr(raceList);

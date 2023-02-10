@@ -14,7 +14,6 @@ import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnu
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeMap;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
@@ -32,22 +31,18 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private EvolutionInfo evolutionInfo;
 
-	private TypeMap typeMap;
-
 	@Autowired
 	public RaceResearchService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
 			TooStrongPokemonList tooStrongPokemonList,
-			EvolutionInfo evolutionInfo,
-			TypeMap typeMap) {
+			EvolutionInfo evolutionInfo) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.tooStrongPokemonList = tooStrongPokemonList;
 		this.evolutionInfo = evolutionInfo;
-		this.typeMap = typeMap;
 	}
 
 	@Override
@@ -65,7 +60,7 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		Pokedex pokedex = pokedexRepository.findById(pokedexId).get();
 		GoPokedex goPokedex = iv.getGoPokedex();
 
-		Race race = new Race(pokedex, goPokedex, typeMap);
+		Race race = new Race(pokedex, goPokedex);
 		res.setRace(race);
 
 		res.setTooStrong(tooStrongPokemonList.contains(pokedexId));
