@@ -15,9 +15,18 @@ public enum GenNameEnum {
 	g7("第七世代(サンムーン)"),
 	g7pv("第七世代(Let's GO! ピカチュウ&イーブイ)"),
 	g8("第八世代(剣盾)"),
-	arceus("LEGENDS アルセウス"),
+	g8arceus("LEGENDS アルセウス"),
 	;
 
 	@Getter
 	private final String jpn;
+
+	public static GenNameEnum getEnumName(String str) {
+		for(GenNameEnum v : values()) {
+			if(v.getJpn().equals(str)) {
+				return v;
+			}
+		}
+		return null;
+	}
 }
