@@ -27,12 +27,12 @@ public class PlResearchService implements ResearchService<PlResponse> {
 
 		GoPokedex goPokedex = iv.getGoPokedex();
 
-		final int at = goPokedex.getAttack() + iv.getIva();
-		final int df = goPokedex.getDefense() + iv.getIvd();
-		final int hp = goPokedex.getHp() + iv.getIvh();
+		final int at = goPokedex.getAttack() + ((Integer) iv.get(ParamsEnum.iva)).intValue();
+		final int df = goPokedex.getDefense() + ((Integer) iv.get(ParamsEnum.ivd)).intValue();
+		final int hp = goPokedex.getHp() + ((Integer) iv.get(ParamsEnum.ivh)).intValue();
 
 		String pl = null;
-		final int cp = (int) iv.get(ParamsEnum.cp);
+		final int cp = ((Integer) iv.get(ParamsEnum.cp)).intValue();
 		if (cp <= 10) {
 			pl = getPlLessThan10Cp(at, df, hp, cp);
 		} else {

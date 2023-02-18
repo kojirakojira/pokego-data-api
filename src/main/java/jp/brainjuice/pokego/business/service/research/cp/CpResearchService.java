@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
 
 @Service
@@ -26,10 +27,10 @@ public class CpResearchService implements ResearchService<CpResponse> {
 
 		int cp = pokemonGoUtils.calcCp(
 				iv.getGoPokedex(),
-				iv.getIva(),
-				iv.getIvd(),
-				iv.getIvh(),
-				iv.getPl());
+				((Integer) iv.get(ParamsEnum.iva)).intValue(),
+				((Integer) iv.get(ParamsEnum.ivd)).intValue(),
+				((Integer) iv.get(ParamsEnum.ivh)).intValue(),
+				(String) iv.get(ParamsEnum.pl));
 
 		cpResponse.setCp(cp);
 

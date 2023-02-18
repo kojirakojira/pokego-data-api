@@ -4,21 +4,20 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
+ * 強ポケ補正対象のポケモンを保持する。
  *
  * @author saibabanagchampa
  *
@@ -27,20 +26,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TooStrongPokemonList extends ArrayList<String> {
 
-	private PokedexRepository pokedexRepository;
-
-	private PokemonGoUtils pokemonGoUtils;
-
 	@Autowired
-	public TooStrongPokemonList(
+	public TooStrongPokemonList (
 			PokedexRepository pokedexRepository,
-			PokemonGoUtils pokemonGoUtils) {
-		this.pokedexRepository = pokedexRepository;
-		this.pokemonGoUtils = pokemonGoUtils;
+			PokemonGoUtils pokemonGoUtils,
+			PokemonEditUtils pokemonEditUtils) throws PokemonDataInitException {
+		init(pokedexRepository, pokemonGoUtils, pokemonEditUtils);
 	}
 
-	@PostConstruct
-	public void init() throws PokemonDataInitException {
+	public void init(
+			PokedexRepository pokedexRepository,
+			PokemonGoUtils pokemonGoUtils,
+			PokemonEditUtils pokemonEditUtils) throws PokemonDataInitException {
 
 		// 依存関係の都合でDI管理外で生成。
 		PokemonUtils pokemonUtils = new PokemonUtils(pokemonGoUtils);
@@ -48,7 +45,7 @@ public class TooStrongPokemonList extends ArrayList<String> {
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 		pokeList.forEach(p -> {
 			// メガシンカを除く。
-			if (!p.getPokedexId().substring(4, 5).equals("M")) {
+			if (!pokemonEditUtils.isMega(p.getPokedexId())) {
 				int cp = pokemonUtils.calcBaseCpFromMain(p);
 
 				if (cp > 4000) {

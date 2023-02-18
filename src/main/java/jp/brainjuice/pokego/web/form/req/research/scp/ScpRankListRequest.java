@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.web.form.req.research.scp;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequestImpl;
 import lombok.AllArgsConstructor;
@@ -15,16 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ScpRankListRequest extends ResearchRequestImpl {
 
-//	private String id;
-//	private String name;
-	@Null
-	private Integer iva;
-	@Null
-	private Integer ivd;
-	@Null
-	private Integer ivh;
-	@Null
-	private String pl;
 	@NotNull
 	private String league;
 }

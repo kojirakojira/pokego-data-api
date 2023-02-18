@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 public class CpRequest extends ResearchRequestImpl {
 
-//	private String id;
-//	private String name;
 	@NotNull
 	private Integer iva;
 	@NotNull

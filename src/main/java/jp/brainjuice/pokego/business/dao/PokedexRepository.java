@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,14 +89,15 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	 */
 	@Override
 	public Iterable<Pokedex> findAllById(Iterable<String> ids) {
-		return pokedexes.stream().filter(p -> {
-			boolean exists = false;
-			for (String pid: ids) {
-				exists = p.getPokedexId().equals(pid);
-				if (exists) break;
+		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
+			for (Pokedex p: pokedexes) {
+				if (p.getPokedexId().equals(pid)) {
+					return p;
+				}
 			}
-			return exists;
+			return null;
 		}).collect(Collectors.toList());
+
 	}
 
 	/**

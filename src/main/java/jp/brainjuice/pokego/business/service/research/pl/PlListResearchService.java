@@ -9,6 +9,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.form.res.elem.PlCp;
 import jp.brainjuice.pokego.web.form.res.research.pl.PlListResponse;
@@ -34,7 +35,12 @@ public class PlListResearchService implements ResearchService<PlListResponse> {
 
 		ArrayList<PlCp> plList = new ArrayList<>();
 		cpMultiplierMap.forEach((k, v) -> {
-			int cp = pokemonGoUtils.calcCp(goPokedex, iv.getIva(), iv.getIvd(), iv.getIvh(), k);
+			int cp = pokemonGoUtils.calcCp(
+					goPokedex,
+					((Integer) iv.get(ParamsEnum.iva)).intValue(),
+					((Integer) iv.get(ParamsEnum.ivd)).intValue(),
+					((Integer) iv.get(ParamsEnum.ivh)).intValue(),
+					k);
 			// noは一旦nullで作成
 			plList.add(new PlCp(null, k, cp));
 		});
@@ -50,9 +56,9 @@ public class PlListResearchService implements ResearchService<PlListResponse> {
 		}
 
 		res.setPlList(plList);
-		res.setIva(iv.getIva().intValue());
-		res.setIvd(iv.getIvd().intValue());
-		res.setIvh(iv.getIvh().intValue());
+		res.setIva(((Integer) iv.get(ParamsEnum.iva)).intValue());
+		res.setIvd(((Integer) iv.get(ParamsEnum.ivd)).intValue());
+		res.setIvh(((Integer) iv.get(ParamsEnum.ivh)).intValue());
 	}
 
 }

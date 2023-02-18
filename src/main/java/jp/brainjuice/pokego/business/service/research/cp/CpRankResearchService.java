@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.elem.CpRank;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 
@@ -24,9 +25,9 @@ public class CpRankResearchService implements ResearchService<CpRankResponse> {
 
 		CpRank cpRank = pokemonGoUtils.getBaseCpRank(
 				iv.getGoPokedex(),
-				iv.getIva(),
-				iv.getIvd(),
-				iv.getIvh());
+				((Integer) iv.get(ParamsEnum.iva)).intValue(),
+				((Integer) iv.get(ParamsEnum.ivd)).intValue(),
+				((Integer) iv.get(ParamsEnum.ivh)).intValue());
 		res.setCpRank(cpRank);
 
 		res.setMessage("");

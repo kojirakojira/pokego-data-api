@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -70,13 +71,13 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 
 	@Override
 	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
-		return goPokedexes.stream().filter(p -> {
-			boolean exists = false;
-			for (String pid: ids) {
-				exists = p.getPokedexId().equals(pid);
-				if (exists) break;
+		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
+			for (GoPokedex p: goPokedexes) {
+				if (p.getPokedexId().equals(pid)) {
+					return p;
+				}
 			}
-			return exists;
+			return null;
 		}).collect(Collectors.toList());
 	}
 

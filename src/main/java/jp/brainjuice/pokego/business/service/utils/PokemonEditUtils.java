@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import lombok.Getter;
-
 @Component
 public class PokemonEditUtils {
 
@@ -16,38 +14,6 @@ public class PokemonEditUtils {
 	private static final String G = "G";
 	private static final String A = "A";
 	private static final String H = "H";
-
-	/**
-	 * 地域を表す列挙型。
-	 * pokedexIdの5桁目（亜種コード）をvalueにもつ。
-	 * ※メガ進化(M)はnoneとして扱うようにする。
-	 *
-	 * @author saibabanagchampa
-	 *
-	 */
-	public enum RegionEnum {
-		none(N), // N（Mもnoneとして扱う。）
-		galar(G), // G
-		alola(A), // A
-		hisui(H); // H
-
-		@Getter
-		private final String name;
-
-		RegionEnum(String name) {
-			this.name = name;
-		}
-
-
-		public static RegionEnum getEnumName(String str) {
-			for(RegionEnum v : values()) {
-				if(v.getName().equals(str)) {
-					return v;
-				}
-			}
-			return M.equals(str) ? RegionEnum.none: null;
-		}
-	}
 
 	/**
 	 * 亜種コードの順序

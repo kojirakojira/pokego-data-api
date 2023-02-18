@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.research;
 
-import java.lang.reflect.Field;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +16,8 @@ import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 	private GoPokedexRepository goPokedexRepository;
@@ -99,23 +96,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 
 		// 個体値をセットする。（GoPokedexだけ必須。）
-		IndividialValue iv = new IndividialValue(
-				goPokedex,
-				req.getIva(),
-				req.getIvd(),
-				req.getIvh(),
-				req.getPl());
-
-		// Requestの値をivのマップにセット
-		for (Field field: req.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				iv.getParamsMap().put(field.getName(), field.get(req));
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				log.warn(MessageFormat.format(
-						"Failed to get field [{1}] of class name [{0}].", req.getClass().getName(), field.getName()));
-			}
-		}
+		IndividialValue iv = new IndividialValue(goPokedex, req);
 
 		// 実行
 		researchService.exec(iv, res);
