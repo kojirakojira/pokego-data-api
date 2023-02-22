@@ -29,15 +29,13 @@ public class TooStrongPokemonList extends ArrayList<String> {
 	@Autowired
 	public TooStrongPokemonList (
 			PokedexRepository pokedexRepository,
-			PokemonGoUtils pokemonGoUtils,
-			PokemonEditUtils pokemonEditUtils) throws PokemonDataInitException {
-		init(pokedexRepository, pokemonGoUtils, pokemonEditUtils);
+			PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
+		init(pokedexRepository, pokemonGoUtils);
 	}
 
 	public void init(
 			PokedexRepository pokedexRepository,
-			PokemonGoUtils pokemonGoUtils,
-			PokemonEditUtils pokemonEditUtils) throws PokemonDataInitException {
+			PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
 
 		// 依存関係の都合でDI管理外で生成。
 		PokemonUtils pokemonUtils = new PokemonUtils(pokemonGoUtils);
@@ -45,7 +43,7 @@ public class TooStrongPokemonList extends ArrayList<String> {
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 		pokeList.forEach(p -> {
 			// メガシンカを除く。
-			if (!pokemonEditUtils.isMega(p.getPokedexId())) {
+			if (!PokemonEditUtils.isMega(p.getPokedexId())) {
 				int cp = pokemonUtils.calcBaseCpFromMain(p);
 
 				if (cp > 4000) {

@@ -6,7 +6,7 @@ import lombok.Getter;
 public class Type {
 
 	@AllArgsConstructor
-	public enum TypeEnum {
+	public enum TypeEnum implements ConstantEnum {
 		/** ノーマル */
 		normal("ノーマル"),
 		/** ほのお */

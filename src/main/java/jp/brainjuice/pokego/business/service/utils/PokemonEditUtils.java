@@ -18,7 +18,7 @@ public class PokemonEditUtils {
 	/**
 	 * 亜種コードの順序
 	 */
-	private Map<String, Integer> subspeciesMap = new HashMap<String, Integer>();
+	private static Map<String, Integer> subspeciesMap = new HashMap<String, Integer>();
 	{
 		subspeciesMap.put(M, Integer.valueOf(0));
 		subspeciesMap.put(N, Integer.valueOf(1));
@@ -33,7 +33,7 @@ public class PokemonEditUtils {
 	 * @param pokedexId
 	 * @return
 	 */
-	public int getPokedexNo(String pokedexId) {
+	public static int getPokedexNo(String pokedexId) {
 		return Integer.valueOf(getStrPokedexNo(pokedexId)).intValue();
 	}
 
@@ -43,7 +43,7 @@ public class PokemonEditUtils {
 	 * @param pokedexId
 	 * @return
 	 */
-	public String getStrPokedexNo(String pokedexId) {
+	public static String getStrPokedexNo(String pokedexId) {
 		return pokedexId.substring(0, 4);
 	}
 
@@ -53,7 +53,7 @@ public class PokemonEditUtils {
 	 * @param pokedexId
 	 * @return
 	 */
-	public String getSubspecies(String pokedexId) {
+	public static String getSubspecies(String pokedexId) {
 		return pokedexId.substring(4, 5);
 	}
 
@@ -63,7 +63,7 @@ public class PokemonEditUtils {
 	 * @param pokedexId
 	 * @return
 	 */
-	public boolean isMega(String pokedexId) {
+	public static boolean isMega(String pokedexId) {
 		return M.equals(getSubspecies(pokedexId));
 	}
 
@@ -73,7 +73,7 @@ public class PokemonEditUtils {
 	 * @param pokedexId
 	 * @return
 	 */
-	public int getSerial(String pokedexId) {
+	public static int getSerial(String pokedexId) {
 		return Integer.valueOf(pokedexId.substring(5, 7)).intValue();
 	}
 
@@ -82,7 +82,7 @@ public class PokemonEditUtils {
 	 *
 	 * @return
 	 */
-	public Comparator<String> getPokedexIdComparator() {
+	public static Comparator<String> getPokedexIdComparator() {
 
 		return (o1, o2) -> {
 			// 図鑑№の昇順
@@ -100,5 +100,15 @@ public class PokemonEditUtils {
 			// 連番の昇順
 			return getSerial(o1) - getSerial(o2);
 		};
+	}
+
+	/**
+	 * String型の値を取得します。enum型、String型に対応しています。
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static String getStrName(Object value) {
+		return value.getClass().isEnum() ? ((Enum<?>) value).name() : (String) value;
 	}
 }

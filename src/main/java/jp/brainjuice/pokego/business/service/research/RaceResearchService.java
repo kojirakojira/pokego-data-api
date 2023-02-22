@@ -63,9 +63,11 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 		// 絞り込み検索
 		Map<FilterEnum, FilterParam> filterMap = IndividialValueUtils.mapping(iv.getFilterValue());
+		res.setFilteredItems(IndividialValueUtils.convDisp(filterMap));
+
+		// 絞り込み検索の実行有無
 		List<String> filterList = pokedexFilterInfoRepository.findByAny(filterMap);
 		int pokedexCnt = (int) pokedexFilterInfoRepository.count();
-
 		if (filterList.size() != pokedexCnt && !filterList.contains(pokedexId)) {
 			// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいない場合
 			res.setMessage("選択したポケモンが絞り込み条件の対象外でした。絞り込みは実行されませんでした。\n");

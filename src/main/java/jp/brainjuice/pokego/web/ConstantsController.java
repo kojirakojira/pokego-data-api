@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 
 @RestController
 @RequestMapping("/api")
@@ -42,5 +43,14 @@ public class ConstantsController {
 			genMap.put(gen.name(), gen.getJpn());
 		}
 		return genMap;
+	}
+
+	@GetMapping("/filterItemsConst")
+	public Map<String, String> filterItemsConst() {
+		Map<String, String> filterMap = new HashMap<>();
+		for (FilterEnum item: FilterEnum.values()) {
+			filterMap.put(item.name(), item.getJpn());
+		}
+		return filterMap;
 	}
 }

@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -32,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EvolutionInfo {
 
-	private PokemonEditUtils pokemonEditUtils;
-
 	/** 進化前が存在しないポケモンのセット */
 	private final Set<String> noEvoSet = new HashSet<>();
 
@@ -49,11 +46,6 @@ public class EvolutionInfo {
 	private static final String FILE_NAME = "pokemon-evolution.csv";
 
 	private static final String ROOT = "root";
-
-	@Autowired
-	public EvolutionInfo (PokemonEditUtils pokemonEditUtils) {
-		this.pokemonEditUtils = pokemonEditUtils;
-	}
 
 	/**
 	 * 進化前のポケモンを取得する。
@@ -111,17 +103,17 @@ public class EvolutionInfo {
 		final List<String> anotherFormList = new ArrayList<>();
 
 		// pokedexIdの前半4桁は図鑑№
-		String pokedexNo = pokemonEditUtils.getStrPokedexNo(pokedexId);
+		String pokedexNo = PokemonEditUtils.getStrPokedexNo(pokedexId);
 
 		// 進化前が存在するポケモンのMapから、図鑑№が一致するポケモンを洗い出す。
 		bfEvoMap.forEach((k, v) -> {
-			if (pokedexNo.equals(pokemonEditUtils.getStrPokedexNo(k))) {
+			if (pokedexNo.equals(PokemonEditUtils.getStrPokedexNo(k))) {
 				anotherFormList.add(k);
 			}
 		});
 
 		// 進化しないポケモンのSetから、図鑑№が一致するポケモンを洗い出す。
-		noEvoSet.stream().filter(pokeId -> pokedexNo.equals(pokemonEditUtils.getStrPokedexNo(pokeId))).forEach(anotherFormList::add);
+		noEvoSet.stream().filter(pokeId -> pokedexNo.equals(PokemonEditUtils.getStrPokedexNo(pokeId))).forEach(anotherFormList::add);
 
 		/** 同じpokedexId、ダミーのpokedexIdは排除する。 */
 		// 削除する対象のリスト
@@ -343,7 +335,7 @@ public class EvolutionInfo {
 			// 検索対象のpokedexIdも追加して並び替え
 			excList = new ArrayList<>(excList);
 			excList.add(pokedexId);
-			Collections.sort(excList, pokemonEditUtils.getPokedexIdComparator());
+			Collections.sort(excList, PokemonEditUtils.getPokedexIdComparator());
 			// ツリー取得
 			excList.forEach(pokeId -> {
 				treeList.add(getEvoTree(pokeId));
@@ -403,22 +395,22 @@ public class EvolutionInfo {
 			if (0 < y) {
 				// 1つ上の階層のポケモンの図鑑№のリストを取得する。（重複を削除する。）
 				List<String> befList = yList.get(y - 1).stream()
-						.map(h -> pokemonEditUtils.getStrPokedexNo(h.getId()))
+						.map(h -> PokemonEditUtils.getStrPokedexNo(h.getId()))
 						.distinct()
 						.collect(Collectors.toList());
 
 				// 並び替え
 				Collections.sort(yList.get(y), (o1, o2) -> {
 					// 1階層前のリストの何要素目かをそれぞれ求める。
-					final int i2 = befList.indexOf(pokemonEditUtils.getStrPokedexNo(o2.getBid()));
-					final int i1 = befList.indexOf(pokemonEditUtils.getStrPokedexNo(o1.getBid()));
+					final int i2 = befList.indexOf(PokemonEditUtils.getStrPokedexNo(o2.getBid()));
+					final int i1 = befList.indexOf(PokemonEditUtils.getStrPokedexNo(o1.getBid()));
 					// 進化前のポケモンのindexが一致しない場合。進化前のポケモンの並び順に合わせて並び替える。
 					if (i2 != i1) {
 						return i1 - i2;
 					}
 
 					// 進化前のポケモンが一致する場合は、図鑑№で昇順。
-					return pokemonEditUtils.getPokedexNo(o1.getId()) - pokemonEditUtils.getPokedexNo(o2.getId());
+					return PokemonEditUtils.getPokedexNo(o1.getId()) - PokemonEditUtils.getPokedexNo(o2.getId());
 				});
 			}
 

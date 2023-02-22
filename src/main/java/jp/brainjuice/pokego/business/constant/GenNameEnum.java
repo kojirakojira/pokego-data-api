@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public enum GenNameEnum {
+public enum GenNameEnum implements ConstantEnum {
 	g1("第一世代(赤緑青)"),
 	g2("第二世代(金銀)"),
 	g3("第三世代(ルビーサファイア)"),

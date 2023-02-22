@@ -26,16 +26,12 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private PokemonEditUtils pokemonEditUtils;
-
 	@Autowired
 	public EvolutionResearchService(
 			EvolutionInfo evolutionInfo,
-			GoPokedexRepository goPokedexRepository,
-			PokemonEditUtils pokemonEditUtils) {
+			GoPokedexRepository goPokedexRepository) {
 		this.evolutionInfo = evolutionInfo;
 		this.goPokedexRepository = goPokedexRepository;
-		this.pokemonEditUtils = pokemonEditUtils;
 	}
 
 	@Override
@@ -85,10 +81,10 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		/** レスポンスのセット */
 		res.setEvoTreeInfo(hieList);
 		// 並び替えてセット
-		anotherFormList.sort(pokemonEditUtils.getPokedexIdComparator());
+		anotherFormList.sort(PokemonEditUtils.getPokedexIdComparator());
 		res.setAnotherForms(anotherFormList);
 		// 並び替えてリストに変換してセット
-		res.setBfAfAotForms(bfAfAotFormSet.stream().sorted(pokemonEditUtils.getPokedexIdComparator()).collect(Collectors.toList()));
+		res.setBfAfAotForms(bfAfAotFormSet.stream().sorted(PokemonEditUtils.getPokedexIdComparator()).collect(Collectors.toList()));
 		res.setRaceMap(raceMap);
 	}
 }

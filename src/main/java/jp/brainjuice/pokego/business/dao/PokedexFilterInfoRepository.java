@@ -26,6 +26,8 @@ import jp.brainjuice.pokego.business.dao.entity.PokedexFilterInfo;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -48,43 +50,48 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * @author saibabanagchampa
 	 *
 	 */
+	@AllArgsConstructor
 	public enum FilterEnum {
 		/**
 		 * タイプ<br>String or TypeEnum or List<String><br>List検索はor演算
 		 * @see TypeEnum
 		 */
-		type,
+		type("タイプ"),
 		/**
 		 * 2タイプ<br>List&lt;String&gt;(2elements)
 		 * @see TypeEnum
 		 */
-		twoType,
+		twoType("タイプ"),
 		/**
 		 * 最終進化<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
 		 */
-		finalEvo,
+		finEvo("最終進化"),
 		/**
 		 * メガシンカ<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
 		 */
-		mega,
+		mega("メガシンカ"),
 		/**
 		 * 実装済み<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
 		 */
-		impled,
+		impled("PokémonGO実装済み"),
 		/**
 		 * 強ポケ補正<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
 		 */
-		TooStrong,
+		tooStrong("強ポケ補正"),
 		/**
 		 * 地域<br>String or RegionEnum or List<String><br>List検索はor演算
 		 * @see RegionEnum
 		 */
-		region,
+		region("地域"),
 		/**
 		 * 世代<br>String or GenNameEnum or List<String><br>List検索はor演算
 		 * @see GenNameEnum
 		 */
-		gen,
+		gen("世代"),
+		;
+
+		@Getter
+		private String jpn;
 	}
 
 	/**
@@ -97,10 +104,10 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	// String型のキーワードを２つ指定
 	private final Map<FilterEnum, Function<String, Function<String, Predicate<PokedexFilterInfo>>>> twoStrKeywordMap = new HashMap<>();
 	{
-		boolKeywordMap.put(FilterEnum.finalEvo, (pfi) -> pfi.isFinalEvo()); // 最終進化
+		boolKeywordMap.put(FilterEnum.finEvo, (pfi) -> pfi.isFinalEvo()); // 最終進化
 		boolKeywordMap.put(FilterEnum.mega, (pfi) -> pfi.isMega()); // メガシンカ
 		boolKeywordMap.put(FilterEnum.impled, (pfi) -> pfi.isImpled()); // 実装済み
-		boolKeywordMap.put(FilterEnum.TooStrong, (pfi) -> pfi.isTooStrong()); // 実装済み
+		boolKeywordMap.put(FilterEnum.tooStrong, (pfi) -> pfi.isTooStrong()); // 実装済み
 
 		stringKeywordMap.put(FilterEnum.region, (s) -> (pfi) -> s.equals(pfi.getRegion().name())); // 地域
 		stringKeywordMap.put(FilterEnum.type, (s) -> (pfi) -> s.equals(pfi.getType1Name()) || s.equals(pfi.getType2Name())); // タイプ
@@ -123,10 +130,9 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	public PokedexFilterInfoRepository(
 			PokedexRepository pokedexRepository,
 			EvolutionInfo evolutionInfo,
-			PokemonEditUtils pokemonEditUtils,
 			TooStrongPokemonList tooStrongPokemonList) {
 
-		init(pokedexRepository, evolutionInfo, pokemonEditUtils, tooStrongPokemonList);
+		init(pokedexRepository, evolutionInfo, tooStrongPokemonList);
 
 		log.info("PokedexFilterInfo table generated!!");
 	}
@@ -189,7 +195,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 
 				Predicate<PokedexFilterInfo> predicate = null;
 				for (Object v : (List<Object>) value) {
-					predicate = or(predicate, stringKeywordMap.get(key).apply(getStrName(v)));
+					predicate = or(predicate, stringKeywordMap.get(key).apply(PokemonEditUtils.getStrName(v)));
 				}
 
 				// キーワードごとに絞り込む（ORはこのタイミングで否定しなければならない。）
@@ -214,10 +220,10 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 					predicate = and(predicate, boolKeywordMap.get(key), negate);
 				} else if (stringKeywordMap.containsKey(key)) {
 					// String型（List<String>も可）
-					predicate = and(predicate, stringKeywordMap.get(key).apply(getStrName(value)), negate);
+					predicate = and(predicate, stringKeywordMap.get(key).apply(PokemonEditUtils.getStrName(value)), negate);
 				} else if (twoStrKeywordMap.containsKey(key)) {
 					// String型2つ
-					List<String> vList = ((List<?>) entry.getValue()).stream().map(this::getStrName).collect(Collectors.toList());
+					List<String> vList = ((List<?>) value).stream().map(PokemonEditUtils::getStrName).collect(Collectors.toList());
 					predicate = and(predicate, twoStrKeywordMap.get(key).apply(vList.get(0)).apply(vList.get(1)), negate);
 				}
 			}
@@ -229,16 +235,6 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 		return stream
 				.map(pfi -> pfi.getPokedexId())
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * String型の値を取得します。enum型、String型に対応しています。
-	 *
-	 * @param value
-	 * @return
-	 */
-	private String getStrName(Object value) {
-		return value.getClass().isEnum() ? ((Enum<?>) value).name() : (String) value;
 	}
 
 	private Predicate<PokedexFilterInfo> and(Predicate<PokedexFilterInfo> origin, Predicate<PokedexFilterInfo> integrated, boolean negate) {
@@ -356,20 +352,19 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	public void init(
 			PokedexRepository pokedexRepository,
 			EvolutionInfo evolutionInfo,
-			PokemonEditUtils pokemonEditUtils,
 			TooStrongPokemonList tooStrongPokemonList) {
 
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 
 		List<PokedexFilterInfo> pfiList = pokeList.stream().map(p -> {
 			String pid = p.getPokedexId();
-			String subspecies = pokemonEditUtils.getSubspecies(pid);
+			String subspecies = PokemonEditUtils.getSubspecies(pid);
 			PokedexFilterInfo pfi = new PokedexFilterInfo();
 			pfi.setPokedexId(pid);
 			pfi.setType1(TypeEnum.getType(p.getType1()));
 			pfi.setType2(TypeEnum.getType(p.getType2()));
 			pfi.setFinalEvo(!evolutionInfo.isAfterEvolution(pid));
-			pfi.setMega(pokemonEditUtils.isMega(pid));
+			pfi.setMega(PokemonEditUtils.isMega(pid));
 			pfi.setImpled(p.isImplFlg());
 			pfi.setTooStrong(tooStrongPokemonList.contains(pid));
 			pfi.setRegion(RegionEnum.getEnumName(subspecies));
