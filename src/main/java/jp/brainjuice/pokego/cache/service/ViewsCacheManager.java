@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.ibm.icu.text.MessageFormat;
 
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.cache.BjRedisEnum;
 import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
@@ -25,6 +27,7 @@ import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
 import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempInfo;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
+import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -71,14 +74,19 @@ public class ViewsCacheManager {
 	 *
 	 * @return
 	 */
-	Map<String, Integer> findPageViewsAll() {
+	Map<PageNameEnum, Integer> findPageViewsAll() {
 
 		// キーの一覧を取得する(command="keys pageViews:*")
 		Set<String> pageViewKeys = redisTemplate.keys(BjRedisEnum.pageViews.name().concat(":*"));
 
 		Map<String, Integer> rtnMap = getViewsMap(pageViewKeys);
 
-		return rtnMap;
+		// キーをString型からPageNameEnum型に変換して返却する。
+		return rtnMap.entrySet()
+				.stream()
+				.collect(Collectors.toMap(
+						entry -> PageNameEnum.valueOf(entry.getKey()),
+						Map.Entry::getValue));
 	}
 
 	/**
@@ -104,7 +112,7 @@ public class ViewsCacheManager {
 	 */
 	private Map<String, Integer> getViewsMap(Set<String> pageViewKeys) {
 
-		Map<String, Integer> rtnMap = new HashMap<String, Integer>();
+		Map<String, Integer> rtnMap = new HashMap<>();
 
 		// Keyのリスト（順番を担保）
 		ArrayList<String> keyList = new ArrayList<String>(pageViewKeys);
@@ -182,7 +190,7 @@ public class ViewsCacheManager {
 		// 集計対象の閲覧情報をMapに設定する。
 		aggregateTargetList.forEach(vti -> {
 			// ページの閲覧情報をMapに追加する。
-			addSetFunc.apply(pageViewMap).apply(vti.getPage()).accept(vti);
+			addSetFunc.apply(pageViewMap).apply(PokemonEditUtils.getStrName(vti.getPage())).accept(vti);
 			// ポケモンの閲覧情報をMapに追加する。
 			addSetFunc.apply(pokemonViewMap).apply(vti.getPokedexId()).accept(vti);
 
@@ -221,7 +229,8 @@ public class ViewsCacheManager {
 			// キーを一意にする。
 			String uniqueId = UUID.randomUUID().toString();
 			if (vti.getPage() != null) {
-				pageTempViewList.add(new PageTempView(vti.getPage() + uniqueId, vti.getPage(), vti.getIp(), vti.getTime()));
+				String pageName = vti.getPage().name();
+				pageTempViewList.add(new PageTempView(pageName + uniqueId, pageName, vti.getIp(), vti.getTime()));
 			}
 			if (vti.getPokedexId() != null) {
 				pokemonTempViewList.add(new PokemonTempView(vti.getPokedexId() + uniqueId, vti.getPokedexId(), vti.getIp(), vti.getTime()));

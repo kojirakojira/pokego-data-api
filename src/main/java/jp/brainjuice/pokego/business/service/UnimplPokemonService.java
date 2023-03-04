@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 
 @Service
@@ -17,14 +16,9 @@ public class UnimplPokemonService {
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private ViewsCacheProvider viewsCacheProvider;
-
 	@Autowired
-	public UnimplPokemonService(
-			GoPokedexRepository goPokedexRepository,
-			ViewsCacheProvider viewsCacheProvider) {
+	public UnimplPokemonService(GoPokedexRepository goPokedexRepository) {
 		this.goPokedexRepository = goPokedexRepository;
-		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
 	public List<SimpPokemon> getUnimplementedPokemonList() {
@@ -42,8 +36,6 @@ public class UnimplPokemonService {
 					gp.getRemarks()));
 		});
 
-		// 閲覧数を手動で追加。
-		viewsCacheProvider.addTempList();
 		return simpPokemonList;
 	}
 }

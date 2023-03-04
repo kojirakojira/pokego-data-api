@@ -21,12 +21,14 @@ import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
 import jp.brainjuice.pokego.cache.dao.entity.TempView;
 import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 import jp.brainjuice.pokego.cache.inmemory.data.TopicPage;
 import jp.brainjuice.pokego.cache.inmemory.data.TopicPokemon;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 話題の○○のリストを管理するクラスです。
+ * 話題の○○のリストを管理するクラスです。<br>
+ * Redisサーバからメモリ上のTopic○○に反映させます。
  *
  * @author saibabanagchampa
  *
@@ -83,7 +85,7 @@ public class TopicListManager {
 	}
 
 	/**
-	 * 話題のページ、話題のポケモン一覧を更新します。
+	 * Redisサーバ上の情報から、メモリ上の話題のページ(TopicPage)、話題のポケモン(TopicPokemon)の一覧を更新します。<br>
 	 *
 	 * 15分おきに実行
 	 * タスク実行完了の15分後
@@ -127,7 +129,8 @@ public class TopicListManager {
 
 		// TopicPageの生成
 		pageViewsMap.forEach((k, v) -> {
-			topicPageList.add(new TopicPage(k, null, v));
+			PageNameEnum pageName = PageNameEnum.valueOf(k);
+			topicPageList.add(new TopicPage(pageName, pageName.getJpn(), v));
 		});
 
 		// 並び替え（降順）
@@ -161,7 +164,7 @@ public class TopicListManager {
 		viewsCountMap.forEach((k, v) -> {
 			for (GoPokedex gp: goPokedexList) {
 				if (k.equals(gp.getPokedexId())) {
-					topicPokemonList.add(new TopicPokemon(gp.getPokedexId(), gp.getName(), gp.getImage(), v));
+					topicPokemonList.add(new TopicPokemon(gp.getPokedexId(), gp.getName(), v));
 				}
 			}
 		});

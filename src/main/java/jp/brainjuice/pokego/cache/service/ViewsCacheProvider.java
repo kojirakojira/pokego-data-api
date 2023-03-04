@@ -15,9 +15,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
+import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 
 /**
  * 閲覧情報にアクセスするためのプロバイダクラスです。
+ * 閲覧情報は、メモリ(ViewTempInfo)→Redisサーバ→メモリ(TopicPageとTopicPokemon)と処理されていきます。
+ * そのうちの、メモリ(ViewTempInfo)に追加するためのクラスです。
  *
  * @author saibabanagchampa
  * @see ViewsCacheManager
@@ -54,7 +57,7 @@ public class ViewsCacheProvider {
 		GoPokedex goPokedex = ((IndividialValue) jp.getArgs()[0]).getGoPokedex();
 		String pokedexId = goPokedex.getPokedexId();
 
-		addTempList(page, pokedexId, ip);
+		addTempList(PageNameEnum.valueOf(page), pokedexId, ip);
 	}
 
 	/**
@@ -70,7 +73,7 @@ public class ViewsCacheProvider {
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
 
-		addTempList(page, null, ip);
+		addTempList(PageNameEnum.valueOf(page), null, ip);
 
 	}
 
@@ -81,7 +84,7 @@ public class ViewsCacheProvider {
 	 * @param pokedexId
 	 * @param ip
 	 */
-	public void addTempList(String page, String pokedexId, String ip) {
+	public void addTempList(PageNameEnum page, String pokedexId, String ip) {
 
 		ViewTempList viewsTempList = viewsCacheManager.getViewsTempList();
 		viewsTempList.add(page, pokedexId, ip);
@@ -93,9 +96,9 @@ public class ViewsCacheProvider {
 	 *
 	 * @return
 	 */
-	public Map<String, Integer> findPageViewsAll() {
+	public Map<PageNameEnum, Integer> findPageViewsAll() {
 
-		Map<String, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
+		Map<PageNameEnum, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
 		return rtnMap;
 	}
 

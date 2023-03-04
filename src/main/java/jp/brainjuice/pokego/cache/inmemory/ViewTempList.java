@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.ibm.icu.text.MessageFormat;
 
+import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,7 +60,7 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	 * @param pokedexId
 	 * @param ip
 	 */
-	public synchronized void add(String page, String pokedexId, String ip) {
+	public synchronized void add(PageNameEnum page, String pokedexId, String ip) {
 
 		log.info(MessageFormat.format(VIEW_ADD_START_LOG, page, pokedexId, ip));
 

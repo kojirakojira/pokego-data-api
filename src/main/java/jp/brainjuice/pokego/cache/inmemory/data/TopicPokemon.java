@@ -9,6 +9,5 @@ public class TopicPokemon {
 
 	private String pokedexId;
 	private String name;
-	private String image;
 	private int count;
 }

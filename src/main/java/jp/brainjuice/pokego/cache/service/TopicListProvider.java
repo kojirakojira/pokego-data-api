@@ -6,6 +6,13 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 
+/**
+ * TopicListManagerにアクセスするためのプロバイダクラスです。<br>
+ * Redisサーバからメモリ上のTopic○○に反映させます。
+ *
+ * @author saibabanagchampa
+ * @see TopicListManager
+ */
 @Service
 public class TopicListProvider {
 
