@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +14,28 @@ import org.springframework.stereotype.Service;
 import com.ibm.icu.text.Transliterator;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
+import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
+import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
+import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexPlusAlpha;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
+import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 
 @Service
 public class PokemonSearchService {
 
 	private GoPokedexRepository goPokedexRepository;
+
+	private PokedexFilterInfoRepository pokedexFilterInfoRepository;
+
+	private PokemonGoUtils pokemonGoUtils;
 
 	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
 	private Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
@@ -36,8 +50,63 @@ public class PokemonSearchService {
 	private static final String MSG_NO_ENTERED = "入力してください。";
 
 	@Autowired
-	public PokemonSearchService(GoPokedexRepository goPokedexRepository) {
+	public PokemonSearchService(
+			GoPokedexRepository goPokedexRepository,
+			PokedexFilterInfoRepository pokedexFilterInfoRepository,
+			PokemonGoUtils pokemonGoUtils) {
 		this.goPokedexRepository = goPokedexRepository;
+		this.pokedexFilterInfoRepository = pokedexFilterInfoRepository;
+		this.pokemonGoUtils = pokemonGoUtils;
+
+	}
+
+	/**
+	 * ポケモンを絞り込みます。
+	 *
+	 * @param req
+	 * @return
+	 */
+	public PokemonFilterResult filter(ResearchRequest req) {
+
+		PokemonFilterResult result = new PokemonFilterResult();
+
+		// 絞り込み検索値の取得
+		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(PokemonFilterValueUtils.createPokemonFilterValue(req));
+
+		// 画面表示用の絞り込み検索値のセット
+		result.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
+
+		// 絞り込み
+		List<String> pokedexIdList = pokedexFilterInfoRepository.findByAny(filterMap);
+		// GoPokedexの取得
+		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(pokedexIdList);
+
+
+		if (goPokedexList.isEmpty()) {
+			// 検索結果なしだった場合
+			result.setMessage(MSG_NO_RESULTS);
+
+		} else {
+			// 空でない場合
+			result.setHit(true);
+			result.setMessage(MessageFormat.format(MSG_RESULTS, goPokedexList.size()));
+
+			if (goPokedexList.size() == 1) {
+				// 1件のみヒットした場合
+				result.setGoPokedex(getGoPokedexPlusAlpha(goPokedexList.get(0)));
+				result.setUnique(true);
+			}
+		}
+
+		List<GoPokedexPlusAlpha> goPlusAlphaList = goPokedexList.stream().map(this::getGoPokedexPlusAlpha).collect(Collectors.toList());
+		result.setGoPokedexList(goPlusAlphaList);
+		return result;
+	}
+
+	private GoPokedexPlusAlpha getGoPokedexPlusAlpha(GoPokedex goPokedex) {
+		int cp = pokemonGoUtils.calcBaseCp(goPokedex.getAttack(), goPokedex.getDefense(), goPokedex.getHp());
+		GoPokedexPlusAlpha goPlusAlpha = new GoPokedexPlusAlpha(goPokedex, cp);
+		return goPlusAlpha;
 	}
 
 	/**

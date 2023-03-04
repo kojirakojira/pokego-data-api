@@ -10,5 +10,7 @@ public enum MsgLevelEnum {
 	/** 警告 */
 	warn,
 	/** エラー */
-	error
+	error,
+	/** 情報(デフォルト設定とする。) */
+	info,
 }

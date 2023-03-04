@@ -70,7 +70,7 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	}
 
 	@Override
-	public Iterable<GoPokedex> findAllById(Iterable<String> ids) {
+	public List<GoPokedex> findAllById(Iterable<String> ids) {
 		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
 			for (GoPokedex p: goPokedexes) {
 				if (p.getPokedexId().equals(pid)) {

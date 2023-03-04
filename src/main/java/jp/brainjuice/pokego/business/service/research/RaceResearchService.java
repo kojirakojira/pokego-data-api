@@ -13,7 +13,7 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.business.service.utils.IndividialValueUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
@@ -62,8 +62,8 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		res.setTooStrong(tooStrongPokemonList.contains(pokedexId));
 
 		// 絞り込み検索
-		Map<FilterEnum, FilterParam> filterMap = IndividialValueUtils.mapping(iv.getFilterValue());
-		res.setFilteredItems(IndividialValueUtils.convDisp(filterMap));
+		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(iv.getFilterValue());
+		res.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// 絞り込み検索の実行有無
 		List<String> filterList = pokedexFilterInfoRepository.findByAny(filterMap);

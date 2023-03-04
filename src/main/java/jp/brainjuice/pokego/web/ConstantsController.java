@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.web;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
+import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 
@@ -18,17 +20,26 @@ import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 public class ConstantsController {
 
 	@GetMapping("/typeConst")
-	public Map<String, String> typeConst() {
-		Map<String, String> typeMap = new HashMap<>();
+	public Map<String, Map<String, Object>> typeConst() {
+		final Map<String, Map<String, Object>> typeMap = new LinkedHashMap<>();
 		for (TypeEnum type: TypeEnum.values()) {
-			typeMap.put(type.name(), type.getJpn());
+
+			final Map<String, Object> map = new HashMap<>();
+
+			map.put("jpn", type.getJpn());
+
+			TypeColorEnum color = TypeColorEnum.valueOf(type.name());
+			map.put("r", color.getR());
+			map.put("g", color.getG());
+			map.put("b", color.getB());
+			typeMap.put(type.name(), map);
 		}
 		return typeMap;
 	}
 
 	@GetMapping("/regionConst")
 	public Map<String, String> regionConst() {
-		Map<String, String> regionMap = new HashMap<>();
+		Map<String, String> regionMap = new LinkedHashMap<>();
 		for (RegionEnum region: RegionEnum.values()) {
 			if (region == RegionEnum.none) continue;
 			regionMap.put(region.name(), region.getJpn());

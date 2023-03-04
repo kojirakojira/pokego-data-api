@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,14 +17,18 @@ import jp.brainjuice.pokego.business.service.research.EvolutionResearchService;
 import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
+import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
+import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.req.research.EvolutionRequest;
+import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
+import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
@@ -47,12 +49,13 @@ public class SearchController {
 	private EvolutionResearchService evolutionResearchService;
 	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
 
-
 	private PokemonSearchService pokemonSearchService;
 
 	private TopicListProvider topicListProvider;
 
 	private UnimplPokemonService unimplPokemonService;
+
+	private ViewsCacheProvider viewsCacheProvider;
 
 	@Autowired
 	public SearchController(
@@ -61,7 +64,8 @@ public class SearchController {
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
-			UnimplPokemonService unimplPokemonService) {
+			UnimplPokemonService unimplPokemonService,
+			ViewsCacheProvider viewsCacheProvider) {
 		// 種族値検索
 		this.raceResearchService = raceResearchService;
 		this.raceResRse = raceResRse;
@@ -79,6 +83,9 @@ public class SearchController {
 		this.topicListProvider = topicListProvider;
 
 		this.unimplPokemonService = unimplPokemonService;
+
+		//
+		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
 	@GetMapping("/home")
@@ -89,6 +96,27 @@ public class SearchController {
 	@GetMapping("/search")
 	public PokemonSearchResult search(String name) {
 		return pokemonSearchService.search(name);
+	}
+
+	/**
+	 * 絞り込み検索用API
+	 *
+	 * @param req
+	 * @return
+	 */
+	@GetMapping("/filterAll")
+	public FilterAllResponse filterAll(FilterAllRequest req) {
+
+		FilterAllResponse res = new FilterAllResponse();
+		PokemonFilterResult pfr = pokemonSearchService.filter(req);
+		res.setPfr(pfr);
+		res.setSuccess(true);
+		res.setMessage("");
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
+		return res;
 	}
 
 	/**
@@ -113,8 +141,8 @@ public class SearchController {
 	 * @return
 	 * @throws BadRequestException
 	 */
-	@PostMapping("/raceDiff")
-	public RaceDiffResponse raceDiff(@RequestBody RaceDiffRequest raceDiffReq) throws BadRequestException {
+	@GetMapping("/raceDiff")
+	public RaceDiffResponse raceDiff(RaceDiffRequest raceDiffReq) throws BadRequestException {
 
 		RaceDiffResponse raceDiffRes = new RaceDiffResponse();
 		if (!raceDiffService.check(raceDiffReq, raceDiffRes)) {
@@ -136,6 +164,9 @@ public class SearchController {
 				raceDiffService.exec(msr, raceDiffRes);
 			}
 		}
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
 
 		return raceDiffRes;
 	}
@@ -203,6 +234,9 @@ public class SearchController {
 		res.setUnimplList(simpPokemonList);
 		res.setSuccess(true);
 		res.setMessage("");
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
 
 		return res;
 	}
