@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.IndividialValueUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class IndividialValue {
 		setGoPokedex(goPokedex);
 
 		// 絞り込み検索値のセット
-		setFilterValue(IndividialValueUtils.createPokemonFilterValue(req));
+		setFilterValue(PokemonFilterValueUtils.createPokemonFilterValue(req));
 
 		// Requestの値をParamsMapにセット
 		ParamsMap paramsMap = new ParamsMap();

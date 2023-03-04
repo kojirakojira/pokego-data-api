@@ -21,7 +21,7 @@ import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 
-public class IndividialValueUtils {
+public class PokemonFilterValueUtils {
 
 	private static final String DISP_NAME = "name";
 	private static final String DISP_FILTER_VALUE = "filterValue";
@@ -120,6 +120,12 @@ public class IndividialValueUtils {
 		return retMap;
 	}
 
+	/**
+	 * 絞り込み検索値を画面表示用に変換する。
+	 *
+	 * @param filterMap
+	 * @return
+	 */
 	public static List<Map<String, String>> convDisp(Map<FilterEnum, FilterParam> filterMap) {
 
 		List<Map<String, String>> retList = filterMap.entrySet().stream().map(entry -> {
