@@ -25,6 +25,8 @@ public class IndividialValue {
 
 	private PokemonFilterValue filterValue;
 
+	private boolean enableCount;
+
 	/** 検索固有の値 */
 	private ParamsMap paramsMap;
 
@@ -48,6 +50,8 @@ public class IndividialValue {
 			}
 		}
 		setParamsMap(paramsMap);
+
+		setEnableCount(req.isEnableCount());
 	}
 
 	/**

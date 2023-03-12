@@ -47,12 +47,16 @@ public class ViewsCacheProvider {
 	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.research.ResearchService.exec(..))")
 	public void addTempList(JoinPoint jp) {
 
+		if (((IndividialValue) jp.getArgs()[0]).isEnableCount()) {
+			// オンの場合は閲覧数をカウントしない。
+			return;
+		}
+
 		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
 		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		String uri = req.getRequestURI();
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
-
 
 		GoPokedex goPokedex = ((IndividialValue) jp.getArgs()[0]).getGoPokedex();
 		String pokedexId = goPokedex.getPokedexId();

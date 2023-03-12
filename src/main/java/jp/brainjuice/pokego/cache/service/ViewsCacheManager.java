@@ -189,8 +189,11 @@ public class ViewsCacheManager {
 
 		// 集計対象の閲覧情報をMapに設定する。
 		aggregateTargetList.forEach(vti -> {
-			// ページの閲覧情報をMapに追加する。
-			addSetFunc.apply(pageViewMap).apply(PokemonEditUtils.getStrName(vti.getPage())).accept(vti);
+			// ページの日本語名が空文字の場合はページ名はカウントしない。
+			if (!vti.getPage().getJpn().isEmpty()) {
+				// ページの閲覧情報をMapに追加する。
+				addSetFunc.apply(pageViewMap).apply(PokemonEditUtils.getStrName(vti.getPage())).accept(vti);
+			}
 			// ポケモンの閲覧情報をMapに追加する。
 			addSetFunc.apply(pokemonViewMap).apply(vti.getPokedexId()).accept(vti);
 

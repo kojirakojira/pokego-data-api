@@ -62,6 +62,11 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	 */
 	public synchronized void add(PageNameEnum page, String pokedexId, String ip) {
 
+		// 日本語名が空文字の場合は中断する。
+		if (page.getJpn().isEmpty()) {
+			return;
+		}
+
 		log.info(MessageFormat.format(VIEW_ADD_START_LOG, page, pokedexId, ip));
 
 		// 5分前の時間を取得
@@ -146,7 +151,7 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	}
 
 	/**
-	 * n時間前の時間を取得する。
+	 * n分前の時間を取得する。
 	 *
 	 * @param minute
 	 * @return
