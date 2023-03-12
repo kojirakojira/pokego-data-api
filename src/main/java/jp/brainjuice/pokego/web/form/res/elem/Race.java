@@ -41,35 +41,7 @@ public class Race {
 		}
 
 		// ポケモンの色（タイプから算出））
-		setColor(getColor(goPokedex));
+		setColor(new Color(goPokedex));
 
-	}
-
-	/**
-	 * ポケモンのタイプの色を取得します。（タイプ２が存在する場合は中間の色を取得する。）
-	 *
-	 * @return
-	 */
-	private Color getColor(GoPokedex goPokedex) {
-
-		Color color = null;
-
-		final String type1 = goPokedex.getType1();
-		final String type2 = goPokedex.getType2();
-
-		final TypeColorEnum c1 = TypeColorEnum.getTypeColorForJpn(type1);
-		if (StringUtils.isEmpty(type2)) {
-			// タイプ１のみの場合。
-			color = new Color(c1.getR(), c1.getG(), c1.getB());
-		} else {
-			// タイプ２がある場合。
-			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(type2);
-			color = new Color(
-					(c1.getR() + c2.getR()) / 2,
-					(c1.getG() + c2.getG()) / 2,
-					(c1.getB() + c2.getB()) / 2);
-		}
-
-		return color;
 	}
 }
