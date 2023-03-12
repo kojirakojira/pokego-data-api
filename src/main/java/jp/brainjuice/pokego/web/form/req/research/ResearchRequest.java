@@ -61,4 +61,8 @@ public interface ResearchRequest {
 	public boolean isNegaGen();
 	public void setNegaGen(boolean negaGen);
 
+	/** 閲覧数カウントをオフにする */
+	public boolean isEnableCount();
+	public void setEnableCount(boolean enableCount);
+
 }

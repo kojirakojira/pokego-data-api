@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
+import jp.brainjuice.pokego.business.service.research.AbundanceResearchService;
 import jp.brainjuice.pokego.business.service.research.EvolutionResearchService;
 import jp.brainjuice.pokego.business.service.research.RaceResearchService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
@@ -25,6 +26,7 @@ import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
+import jp.brainjuice.pokego.web.form.req.research.AbundanceRequest;
 import jp.brainjuice.pokego.web.form.req.research.EvolutionRequest;
 import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
@@ -32,6 +34,7 @@ import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
+import jp.brainjuice.pokego.web.form.res.research.AbundanceResponse;
 import jp.brainjuice.pokego.web.form.res.research.EvolutionResponse;
 import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,9 @@ public class SearchController {
 	private EvolutionResearchService evolutionResearchService;
 	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
 
+	private AbundanceResearchService abundanceResearchService;
+	private ResearchServiceExecutor<AbundanceResponse> abundanceResRse;
+
 	private PokemonSearchService pokemonSearchService;
 
 	private TopicListProvider topicListProvider;
@@ -62,6 +68,7 @@ public class SearchController {
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			RaceDiffService raceDiffService,
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
+			AbundanceResearchService abundanceResearchService, ResearchServiceExecutor<AbundanceResponse> abundanceResRse,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService,
@@ -76,6 +83,10 @@ public class SearchController {
 		// 進化ツリー
 		this.evolutionResearchService = evolutionResearchService;
 		this.evolutionResRse = evolutionResRse;
+
+		// アバンダンス
+		this.abundanceResearchService = abundanceResearchService;
+		this.abundanceResRse = abundanceResRse;
 
 		// 検索
 		this.pokemonSearchService = pokemonSearchService;
@@ -184,6 +195,21 @@ public class SearchController {
 		EvolutionResponse evolutionRes = new EvolutionResponse();
 		evolutionResRse.execute(evolutionReq, evolutionRes, evolutionResearchService);
 		return evolutionRes;
+	}
+
+	/**
+	 * アバンダンス取得用API
+	 *
+	 * @param abundanceReq
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/abundance")
+	public AbundanceResponse abundance(AbundanceRequest abundanceReq) throws BadRequestException {
+
+		AbundanceResponse abundanceRes = new AbundanceResponse();
+		abundanceResRse.execute(abundanceReq, abundanceRes, abundanceResearchService);
+		return abundanceRes;
 	}
 
 

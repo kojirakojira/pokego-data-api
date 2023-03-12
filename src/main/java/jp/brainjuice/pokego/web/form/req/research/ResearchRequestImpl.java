@@ -49,4 +49,10 @@ public abstract class ResearchRequestImpl implements ResearchRequest {
 	  */
 	private List<String> gen;
 	private boolean negaGen;
+
+
+	/**
+	 * 閲覧数カウントをオフにする
+	 */
+	private boolean enableCount;
 }

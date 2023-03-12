@@ -12,6 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PageNameEnum {
 
+	abundance(""), // ポケモンごとの情報は閲覧数を表示しない。
 	filterAll("全ポケ絞り込み"),
 	raid("レイドボスCP"),
 	fRTask("フィールドリサーチCP"),
