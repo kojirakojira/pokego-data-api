@@ -17,9 +17,13 @@ public class AbundanceResponse extends ResearchResponse {
 	// レイド
 	private int minRaidCp;
 	private int maxRaidCp;
-	// レイド（天候ブースト）
 	private int minWbRaidCp;
 	private int maxWbRaidCp;
+	// シャドウ
+	private int minShadowCp;
+	private int maxShadowCp;
+	private int minWbShadowCp;
+	private int maxWbShadowCp;
 	// フィールドリサーチ
 	private int minFrTaskCp;
 	private int maxFrTaskCp;
