@@ -15,6 +15,7 @@ public enum PageNameEnum {
 	abundance(""), // ポケモンごとの情報は閲覧数を表示しない。
 	filterAll("全ポケ絞り込み"),
 	raid("レイドボスCP"),
+	shadow("シャドウCP"),
 	fRTask("フィールドリサーチCP"),
 	scpRank("PvP順位"),
 	scpRankList("PvP順位一覧"),

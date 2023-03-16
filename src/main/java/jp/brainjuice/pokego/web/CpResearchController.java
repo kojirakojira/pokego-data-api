@@ -1,7 +1,5 @@
 package jp.brainjuice.pokego.web;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,7 @@ import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
+import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
 import jp.brainjuice.pokego.business.service.utils.InputCheckService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
@@ -23,11 +22,13 @@ import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
+import jp.brainjuice.pokego.web.form.req.research.cp.ShadowRequest;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
+import jp.brainjuice.pokego.web.form.res.research.cp.ShadowResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -50,6 +51,9 @@ public class CpResearchController {
 	private FRTaskResearchService fRTaskResearchService;
 	private ResearchServiceExecutor<FRTaskResponse> fRTaskResRse;
 
+	private ShadowResearchService shadowResearchService;
+	private ResearchServiceExecutor<ShadowResponse> shadowResRse;
+
 	private InputCheckService inputCheckService;
 
 	@Autowired
@@ -59,6 +63,7 @@ public class CpResearchController {
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
+			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
 			InputCheckService inputCheckService) {
 		// CP算出
 		this.cpResearchService = cpResearchService;
@@ -75,6 +80,9 @@ public class CpResearchController {
 		// フィールドリサーチCP算出
 		this.fRTaskResearchService = fRTaskResearchService;
 		this.fRTaskResRse = fRTaskResRse;
+		// シャドウCP算出
+		this.shadowResearchService = shadowResearchService;
+		this.shadowResRse = shadowResRse;
 		// 入力チェック
 		this.inputCheckService = inputCheckService;
 	}
@@ -159,12 +167,11 @@ public class CpResearchController {
 	 * レイドボスのCP最高値・最低値を求めるAPIです。
 	 *
 	 * @param raidReq
-	 * @param req
 	 * @return
 	 * @throws Exception
 	 */
 	@GetMapping("/raid")
-	public RaidResponse raid(RaidRequest raidReq, HttpServletRequest req) throws Exception {
+	public RaidResponse raid(RaidRequest raidReq) throws Exception {
 
 		inputCheckService.validation(raidReq);
 
@@ -182,13 +189,31 @@ public class CpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/fRTask")
-	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq, HttpServletRequest req) throws Exception {
+	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq) throws Exception {
 
 		inputCheckService.validation(fRTaskReq);
 
 		FRTaskResponse fRTaskRes = new FRTaskResponse();
 		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
 		return fRTaskRes;
+	}
+
+	/**
+	 * シャドウのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/shadow")
+	public ShadowResponse shadow(ShadowRequest shadowReq) throws Exception {
+
+		inputCheckService.validation(shadowReq);
+
+		ShadowResponse shadowRes = new ShadowResponse();
+		shadowResRse.execute(shadowReq, shadowRes, shadowResearchService);
+		return shadowRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

@@ -1,39 +1,38 @@
 package jp.brainjuice.pokego;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
-import jp.brainjuice.pokego.business.dao.dto.FilterParam;
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 
 @SpringBootTest
 class PokemonApplicationTests {
 
-	@Autowired
-	PokedexFilterInfoRepository pfiRepository;
 
 	@Autowired
 	GoPokedexRepository goPokeRepository;
 
+	@Autowired
+	PokemonGoUtils pokemonGoUtils;
+
 	@Test
 	void contextLoads() {
-		Map<FilterEnum, FilterParam> filterMap = new HashMap<>();
-//		filterMap.put(FilterEnum.impled, false);
-		filterMap.put(FilterEnum.mega, new FilterParam(Boolean.TRUE));
-//		filterMap.put(FilterEnum.twoType, Arrays.asList(Arrays.array(TypeEnum.psychic, TypeEnum.fairy)));
-//		filterMap.put(FilterEnum.region, Arrays.asList(Arrays.array(RegionEnum.alola)));
-//		filterMap.put(FilterEnum.gen, Arrays.asList(Arrays.array(GenNameEnum.g8, GenNameEnum.g2)));
-		List<String> pidList = pfiRepository.findByAny(filterMap);
-//		List<String> pidList = pfiRepository.findIdByType(TypeEnum.psychic, TypeEnum.fairy);
 
-		goPokeRepository.findAllById(pidList).forEach(System.out::println);
+		GoPokedex goPokedex = goPokeRepository.findById("0374N01").get();
+
+		{
+			int cp = pokemonGoUtils.calcCp(goPokedex, 15, 11, 6, "13");
+
+			System.out.println(cp);
+		}
+		{
+			int cp = pokemonGoUtils.calcCp(goPokedex, 8, 13, 10, "8");
+
+			System.out.println(cp);
+		}
 	}
 
 }
