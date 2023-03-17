@@ -10,7 +10,7 @@ import lombok.Getter;
  * @author saibabanagchampa
  *
  */
-public enum RegionEnum implements ConstantEnum {
+public enum RegionEnum implements ConstantEnumInterface {
 
 	none("N", ""), // N（Mもnoneとして扱う。）
 	galar("G", "ガラル"), // G

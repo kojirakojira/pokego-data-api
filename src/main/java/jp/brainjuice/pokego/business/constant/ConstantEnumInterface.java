@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.constant;
 
-public interface ConstantEnum {
+public interface ConstantEnumInterface {
 
 	public String getJpn();
 }
