@@ -1,8 +1,10 @@
 package jp.brainjuice.pokego.business.service.research;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
@@ -58,6 +60,13 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setTooStrong(tooStrongPokemonList.contains(goPokedex.getPokedexId()));
 
 		// ポケモンの色
-		res.setColor(new Color(goPokedex));
+		// タイプ1の色を設定
+		final TypeColorEnum c1 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType1());
+		res.setType1Color(new Color(c1.getR(), c1.getG(), c1.getB()));
+		// タイプ2の色を設定
+		if (!StringUtils.isEmpty(goPokedex.getType2())) {
+			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType2());
+			res.setType2Color(new Color(c2.getR(), c2.getG(), c2.getB()));
+		}
 	}
 }

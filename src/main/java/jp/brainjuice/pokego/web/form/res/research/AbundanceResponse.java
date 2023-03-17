@@ -31,5 +31,6 @@ public class AbundanceResponse extends ResearchResponse {
 	private boolean tooStrong;
 
 	// タイプから算出したポケモンの色
-	private Color color;
+	private Color type1Color;
+	private Color type2Color;
 }
