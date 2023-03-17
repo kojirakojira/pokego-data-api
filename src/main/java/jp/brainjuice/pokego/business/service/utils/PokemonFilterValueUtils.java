@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.brainjuice.pokego.business.constant.ConstantEnum;
+import jp.brainjuice.pokego.business.constant.ConstantEnumInterface;
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -184,7 +184,7 @@ public class PokemonFilterValueUtils {
 	 * @param clazz
 	 * @return
 	 */
-	private static <E extends Enum<E> & ConstantEnum> String getStrValue(Object value, Class<E> clazz) {
+	private static <E extends Enum<E> & ConstantEnumInterface> String getStrValue(Object value, Class<E> clazz) {
 
 		String ret = "";
 		if (value instanceof List) {
