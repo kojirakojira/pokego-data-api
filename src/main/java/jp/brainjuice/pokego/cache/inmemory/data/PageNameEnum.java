@@ -12,8 +12,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PageNameEnum {
 
-	abundance(""), // ポケモンごとの情報は閲覧数を表示しない。
-	filterAll("全ポケ絞り込み"),
+	abundance(""), // ポケモンごとの情報はページの閲覧数をカウントしない。
+	filterAll("ポケモン検索"),
+	searchAll("全ポケ絞り込み"),
 	raid("レイドボスCP"),
 	shadow("シャドウCP"),
 	fRTask("フィールドリサーチCP"),

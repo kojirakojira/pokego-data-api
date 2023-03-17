@@ -30,8 +30,10 @@ import jp.brainjuice.pokego.web.form.req.research.AbundanceRequest;
 import jp.brainjuice.pokego.web.form.req.research.EvolutionRequest;
 import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.RaceRequest;
+import jp.brainjuice.pokego.web.form.req.research.SearchAllRequest;
 import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
+import jp.brainjuice.pokego.web.form.res.SearchAllResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 import jp.brainjuice.pokego.web.form.res.research.AbundanceResponse;
@@ -104,9 +106,25 @@ public class SearchController {
 		return "pokego-api server is running!!";
 	}
 
-	@GetMapping("/search")
-	public PokemonSearchResult search(String name) {
-		return pokemonSearchService.search(name);
+	/**
+	 * ポケモン検索用API
+	 *
+	 * @param name
+	 * @return
+	 */
+	@GetMapping("/searchAll")
+	public SearchAllResponse search(SearchAllRequest req) {
+
+		SearchAllResponse res = new SearchAllResponse();
+		PokemonSearchResult psr = pokemonSearchService.search(req.getName());
+		res.setSuccess(true);
+		res.setMessage("");
+		res.setPokemonSearchResult(psr);
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
+		return res;
 	}
 
 	/**
