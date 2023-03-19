@@ -49,9 +49,9 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setMinWbRaidCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "25"));
 		res.setMaxWbRaidCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "25"));
 		// CP(シャドウ）
-		res.setMinShadowCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "8"));
+		res.setMinShadowCp(pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, "8"));
 		res.setMaxShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "8"));
-		res.setMinWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "13"));
+		res.setMinWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, "13"));
 		res.setMaxWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "13"));
 		// CP(フィールドリサーチ)
 		res.setMinFrTaskCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "15"));

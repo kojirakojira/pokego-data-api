@@ -18,7 +18,7 @@ public class ShadowResearchService implements ResearchService<ShadowResponse> {
 	private static final int SHADOW_MAX_IV = 15;
 
 	/** レイド個体値最低 */
-	private static final int SHADOW_MIN_IV = 10;
+	private static final int SHADOW_MIN_IV = 0;
 
 	/** 通常時PL */
 	private static final String SHADOW_PL = "8";
