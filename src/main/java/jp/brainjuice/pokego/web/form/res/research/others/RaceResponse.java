@@ -1,10 +1,11 @@
-package jp.brainjuice.pokego.web.form.res.research;
+package jp.brainjuice.pokego.web.form.res.research.others;
 
 import java.util.List;
 import java.util.Map;
 
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

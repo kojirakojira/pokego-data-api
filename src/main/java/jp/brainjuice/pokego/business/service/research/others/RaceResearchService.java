@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.research;
+package jp.brainjuice.pokego.business.service.research.others;
 
 import java.util.List;
 import java.util.Map;
@@ -13,13 +13,14 @@ import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
-import jp.brainjuice.pokego.web.form.res.research.RaceResponse;
+import jp.brainjuice.pokego.web.form.res.research.others.RaceResponse;
 
 @Service
 public class RaceResearchService implements ResearchService<RaceResponse> {

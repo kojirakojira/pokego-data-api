@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.research;
+package jp.brainjuice.pokego.business.service.research.others;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,11 +6,12 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
-import jp.brainjuice.pokego.web.form.res.research.AbundanceResponse;
+import jp.brainjuice.pokego.web.form.res.research.others.AbundanceResponse;
 
 /**
  * ポケモンの総合的な情報を取得するためのサービスクラスです。

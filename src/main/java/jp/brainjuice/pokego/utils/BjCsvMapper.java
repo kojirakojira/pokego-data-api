@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -82,9 +83,13 @@ public class BjCsvMapper {
 	 * @throws InstantiationException
 	 * @throws Exception
 	 */
-	public static <E> List<E> mapping(ArrayList<String> rowList, Class<E> clazz) throws CsvMappingException, Exception {
+	public static <E> List<E> mapping(List<String> rowList, Class<E> clazz) throws CsvMappingException, Exception {
 
+		// 返却値用のリスト
 		List<E> eList = new ArrayList<>();
+
+		// コメント行の除去。
+		rowList = rowList.stream().filter(r -> r.trim().charAt(0) != '#').collect(Collectors.toList());
 
 		// メソッド名のリストを作成する。csvファイルの1行目はカラム名（キャメルケース）
 		List<List<Object>> setterList = new ArrayList<List<Object>>();
@@ -101,11 +106,6 @@ public class BjCsvMapper {
 		int y = 0;
 		int size;
 		for (y = 1, size = rowList.size(); y < size; y++) {
-
-			if (rowList.get(y).trim().charAt(0) == '#') {
-				// コメント行の場合
-				continue;
-			}
 
 			E elem = null;
 			try {

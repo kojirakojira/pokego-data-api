@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.research;
+package jp.brainjuice.pokego.business.service.research.others;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,12 +12,13 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
-import jp.brainjuice.pokego.web.form.res.research.EvolutionResponse;
+import jp.brainjuice.pokego.web.form.res.research.others.EvolutionResponse;
 
 @Service
 public class EvolutionResearchService implements ResearchService<EvolutionResponse> {

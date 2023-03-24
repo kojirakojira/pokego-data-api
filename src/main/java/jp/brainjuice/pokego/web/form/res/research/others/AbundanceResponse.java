@@ -1,7 +1,8 @@
-package jp.brainjuice.pokego.web.form.res.research;
+package jp.brainjuice.pokego.web.form.res.research.others;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
+import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

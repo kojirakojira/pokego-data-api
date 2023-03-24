@@ -4,35 +4,31 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
 
 @SpringBootTest
 class PokemonApplicationTests {
 
 
 	@Autowired
-	GoPokedexRepository goPokeRepository;
-
-	@Autowired
-	PokemonGoUtils pokemonGoUtils;
+	TypeChartInfo typeChartInfo;
 
 	@Test
 	void contextLoads() {
 
-		GoPokedex goPokedex = goPokeRepository.findById("0374N01").get();
-
-		{
-			int cp = pokemonGoUtils.calcCp(goPokedex, 15, 11, 6, "13");
-
-			System.out.println(cp);
+		for (TypeEnum te1: TypeEnum.values()) {
+			System.out.println("------------------" + te1.name());
+//			for (TypeEnum te2: TypeEnum.values()) {
+////				if (te1 == te2) continue;
+//				System.out.println(te2.name() + ": " + typeChartInfo.defenderScore(te1, te2));
+//			}
+			System.out.println(te1.name() + ": " + typeChartInfo.defenderScore(te1));
 		}
-		{
-			int cp = pokemonGoUtils.calcCp(goPokedex, 8, 13, 10, "8");
-
-			System.out.println(cp);
-		}
+//		System.out.println(typeChartInfo.getWeaknessTypes(TypeEnum.rock, TypeEnum.steel));
+//		System.out.println(typeChartInfo.getWeaknessTypes(TypeEnum.steel, TypeEnum.rock));
+//		System.out.println(typeChartInfo.getWeaknessTypes(TypeEnum.steel, null));
+//		System.out.println(typeChartInfo.getWeaknessTypes(TypeEnum.steel, TypeEnum.steel));
 	}
 
 }
