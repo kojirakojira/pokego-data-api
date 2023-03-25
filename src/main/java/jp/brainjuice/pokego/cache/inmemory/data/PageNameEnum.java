@@ -23,6 +23,7 @@ public enum PageNameEnum {
 	scpRankMaxMin("PvP最高(最低)順位"),
 	race("種族値検索"),
 	raceDiff("種族値比較"),
+	typeScore("タイプ評価"),
 	plList("PLごとのCP一覧"),
 	unimplPokemon("未実装ポケモン一覧"),
 	evolution("進化ツリーと別のすがた"),;

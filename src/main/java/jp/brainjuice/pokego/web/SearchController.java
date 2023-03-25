@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.others.AbundanceResearchService;
-import jp.brainjuice.pokego.business.service.research.others.EvolutionResearchService;
-import jp.brainjuice.pokego.business.service.research.others.RaceResearchService;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
@@ -28,17 +24,11 @@ import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.SearchAllRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.AbundanceRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.EvolutionRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.RaceRequest;
 import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.SearchAllResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
-import jp.brainjuice.pokego.web.form.res.research.others.AbundanceResponse;
-import jp.brainjuice.pokego.web.form.res.research.others.EvolutionResponse;
-import jp.brainjuice.pokego.web.form.res.research.others.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -46,16 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SearchController {
 
-	private RaceResearchService raceResearchService;
-	private ResearchServiceExecutor<RaceResponse> raceResRse;
-
 	private RaceDiffService raceDiffService;
-
-	private EvolutionResearchService evolutionResearchService;
-	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
-
-	private AbundanceResearchService abundanceResearchService;
-	private ResearchServiceExecutor<AbundanceResponse> abundanceResRse;
 
 	private PokemonSearchService pokemonSearchService;
 
@@ -67,28 +48,14 @@ public class SearchController {
 
 	@Autowired
 	public SearchController(
-			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			RaceDiffService raceDiffService,
-			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
-			AbundanceResearchService abundanceResearchService, ResearchServiceExecutor<AbundanceResponse> abundanceResRse,
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService,
 			ViewsCacheProvider viewsCacheProvider) {
-		// 種族値検索
-		this.raceResearchService = raceResearchService;
-		this.raceResRse = raceResRse;
 
 		// 種族値比較
 		this.raceDiffService = raceDiffService;
-
-		// 進化ツリー
-		this.evolutionResearchService = evolutionResearchService;
-		this.evolutionResRse = evolutionResRse;
-
-		// アバンダンス
-		this.abundanceResearchService = abundanceResearchService;
-		this.abundanceResRse = abundanceResRse;
 
 		// 検索
 		this.pokemonSearchService = pokemonSearchService;
@@ -97,7 +64,6 @@ public class SearchController {
 
 		this.unimplPokemonService = unimplPokemonService;
 
-		//
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
@@ -149,21 +115,6 @@ public class SearchController {
 	}
 
 	/**
-	 * 種族値検索用API
-	 *
-	 * @param raceReq
-	 * @return
-	 * @throws BadRequestException
-	 */
-	@GetMapping("/race")
-	public RaceResponse race(RaceRequest raceReq) throws BadRequestException {
-
-		RaceResponse raceRes = new RaceResponse();
-		raceResRse.execute(raceReq, raceRes, raceResearchService);
-		return raceRes;
-	}
-
-	/**
 	 * 種族値比較用API（content-type:application/jsonで取得する。）
 	 *
 	 * @param raceReq
@@ -198,36 +149,6 @@ public class SearchController {
 		viewsCacheProvider.addTempList();
 
 		return raceDiffRes;
-	}
-
-	/**
-	 * 進化取得用API
-	 *
-	 * @param raceReq
-	 * @return
-	 * @throws BadRequestException
-	 */
-	@GetMapping("/evolution")
-	public EvolutionResponse evolution(EvolutionRequest evolutionReq) throws BadRequestException {
-
-		EvolutionResponse evolutionRes = new EvolutionResponse();
-		evolutionResRse.execute(evolutionReq, evolutionRes, evolutionResearchService);
-		return evolutionRes;
-	}
-
-	/**
-	 * アバンダンス取得用API
-	 *
-	 * @param abundanceReq
-	 * @return
-	 * @throws BadRequestException
-	 */
-	@GetMapping("/abundance")
-	public AbundanceResponse abundance(AbundanceRequest abundanceReq) throws BadRequestException {
-
-		AbundanceResponse abundanceRes = new AbundanceResponse();
-		abundanceResRse.execute(abundanceReq, abundanceRes, abundanceResearchService);
-		return abundanceRes;
 	}
 
 

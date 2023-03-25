@@ -5,6 +5,12 @@ import lombok.Getter;
 
 public class Type {
 
+	/**
+	 * タイプを定義する。
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
 	@AllArgsConstructor
 	public enum TypeEnum implements ConstantEnumInterface {
 		/** ノーマル */
@@ -57,6 +63,80 @@ public class Type {
 		}
 	}
 
+	/**
+	 * タイプのダメージ倍率を定義する。
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
+	@AllArgsConstructor
+	public enum TypeEffectiveEnum {
+		/**
+		 * 効果はばつぐんだ！<br>
+		 * <ul>
+		 * <li>抜群×抜群</li>
+		 * </ul><br>
+		 * (原作×4, GO×2.56)
+		 */
+		MAX(2.56d),
+		/**
+		 * 効果はばつぐんだ！<br>
+		 * <ul>
+		 * <li>抜群</li>
+		 * <li>抜群×普通</li>
+		 * </ul><br>
+		 * GO×1.6(原作×2)
+		 */
+		HIGH(1.6d),
+		/**
+		 * (普通の効果)<br>
+		 * <ul>
+		 * <li>普通</li>
+		 * <li>半減×抜群</li>
+		 * </ul><br>
+		 * GO×1(原作×1)
+		 */
+		NORMAL(1),
+		/**
+		 * 効果はいまひとつだ...<br>
+		 * <ul>
+		 * <li>耐性</li>
+		 * <li>耐性×普通</li>
+		 * <li>無効×抜群</li>
+		 * </ul><br>
+		 * GO×0.625(原作×0.5 or 0)
+		 */
+		LOW(0.625d),
+		/**
+		 * 効果がないようだ...<br>
+		 * <ul>
+		 * <li>無効</li>
+		 * <li>無効×普通</li>
+		 * <li>耐性×耐性</li>
+		 * </ul><br>
+		 * GO×0.390625(原作×0 or 0.25)
+		 */
+		VERY_LOW(0.390625d),
+		/**
+		 * 効果がないようだ...<br>
+		 * <ul>
+		 * <li>耐性×無効</li>
+		 * </ul>
+		 * GO×0.244140625(原作×0)
+		 * */
+		MIN(0.244140625d),
+		;
+		/** ダメージ倍率 */
+		@Getter
+		private double damageMultiplier;
+	}
+
+	/**
+	 * タイプの色を定義する。
+	 *
+	 * @author saibabanagchampa
+	 *
+	 */
 	@AllArgsConstructor
 	public enum TypeColorEnum {
 		/** ノーマル */
