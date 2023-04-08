@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import jp.brainjuice.pokego.business.constant.Type;
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import jp.brainjuice.pokego.business.service.utils.dto.TypeStrength;
+import jp.brainjuice.pokego.business.service.utils.dto.type.TypeStrength;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;

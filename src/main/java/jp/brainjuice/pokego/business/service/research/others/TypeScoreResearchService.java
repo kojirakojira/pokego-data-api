@@ -8,6 +8,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.TypeCommentMap;
 import jp.brainjuice.pokego.web.form.res.research.others.TypeScoreResponse;
 
 @Service
@@ -15,9 +16,12 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 
 	TypeChartInfo typeChartInfo;
 
+	TypeCommentMap typeCommentMap;
+
 	@Autowired
-	public TypeScoreResearchService(TypeChartInfo typeChartInfo) {
+	public TypeScoreResearchService(TypeChartInfo typeChartInfo, TypeCommentMap typeCommentMap) {
 		this.typeChartInfo = typeChartInfo;
+		this.typeCommentMap = typeCommentMap;
 	}
 
 	@Override
@@ -30,6 +34,13 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 		res.setExecutedType(false); // ポケモンから実行
 	}
 
+	/**
+	 * タイプから検索したときの呼び口
+	 *
+	 * @param type1
+	 * @param type2
+	 * @param res
+	 */
 	public void execFromType(TypeEnum type1, TypeEnum type2, TypeScoreResponse res) {
 		exec(type1, type2, res);
 		res.setSuccess(true);
@@ -61,6 +72,9 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 			res.setAttackerType2Map(typeChartInfo.getAttackerTypes(type2));
 		}
 		res.setDefenderTypeMap(typeChartInfo.getDefenderTypes(type1, type2));
+
+		// タイプコメント
+		res.setTypeComments(typeCommentMap.get(type1, type2));
 
 		res.setMessage("");
 	}

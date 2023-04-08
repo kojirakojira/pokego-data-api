@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -302,7 +303,7 @@ public class EvolutionInfo {
 			hieList = tmpList;
 		}
 		final List<String> removeList = new ArrayList<>();
-		// 例外のダミーのpokedexIdを追加。
+		// 例外のダミーのpokedexIdを削除対象に追加。
 		exceptionsMap.forEach((k, v) -> {
 			removeList.addAll(v);
 		});
@@ -310,6 +311,36 @@ public class EvolutionInfo {
 		retList.removeAll(removeList);
 
 		return retList;
+	}
+
+	/**
+	 * 同系統のすべてのポケモンを取得する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public List<String> getAllInEvoTree(String pokedexId) {
+
+		// 別のすがたを取得 -> 進化前、進化後を取得 -> 別のすがたを取得 -> Setに変換 -> Listに変換。
+		return Stream.concat(getAnotherFormList(pokedexId).stream(), Stream.of(pokedexId))
+				.flatMap(pid -> Stream.concat(getBfAfEvoList(pid).stream(), Stream.of(pid)))
+				.flatMap(pid -> Stream.concat(getAnotherFormList(pid).stream(), Stream.of(pid)))
+				.collect(Collectors.toSet()).stream()
+				.collect(Collectors.toList());
+
+	}
+
+	/**
+	 * 同系統のポケモンにおける一意の図鑑№を取得する。<br>
+	 * （その系統のポケモンの進化ツリー上の最も若い図鑑№を取得する。）
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public int basePokedexNo(String pokedexId) {
+		List<String> allPokeIdList = getAllInEvoTree(pokedexId);
+		allPokeIdList.sort(PokemonEditUtils.getPokedexIdComparator());
+		return PokemonEditUtils.getPokedexNo(allPokeIdList.get(0));
 	}
 
 	/**

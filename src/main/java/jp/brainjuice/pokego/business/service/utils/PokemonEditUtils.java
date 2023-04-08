@@ -4,9 +4,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 
-@Component
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+
 public class PokemonEditUtils {
 
 	private static final String M = "M";
@@ -19,12 +20,12 @@ public class PokemonEditUtils {
 	 * 亜種コードの順序
 	 */
 	private static Map<String, Integer> subspeciesMap = new HashMap<String, Integer>();
-	{
-		subspeciesMap.put(M, Integer.valueOf(0));
-		subspeciesMap.put(N, Integer.valueOf(1));
-		subspeciesMap.put(A, Integer.valueOf(2));
-		subspeciesMap.put(G, Integer.valueOf(3));
-		subspeciesMap.put(H, Integer.valueOf(4));
+	static {
+		subspeciesMap.put(N, Integer.valueOf(0));
+		subspeciesMap.put(A, Integer.valueOf(1));
+		subspeciesMap.put(G, Integer.valueOf(2));
+		subspeciesMap.put(H, Integer.valueOf(3));
+		subspeciesMap.put(M, Integer.valueOf(4));
 	}
 
 	/**
@@ -68,6 +69,17 @@ public class PokemonEditUtils {
 	}
 
 	/**
+	 * メガシンカ、キョダイマックス等の特殊フォルムかどうかを判定する。
+	 * TODO: キョダイマックス実装後に見直す。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public static boolean isSpecialForm(String pokedexId) {
+		return isMega(pokedexId);
+	}
+
+	/**
 	 * 図鑑IDから連番を取得する。
 	 *
 	 * @param pokedexId
@@ -75,6 +87,27 @@ public class PokemonEditUtils {
 	 */
 	public static int getSerial(String pokedexId) {
 		return Integer.valueOf(pokedexId.substring(5, 7)).intValue();
+	}
+
+	/**
+	 * ポケモンの名前に備考を連結させた文字列を返却します。<br>
+	 * 備考は括弧("(",")")で括ります。
+	 *
+	 * @param goPokedex
+	 * @return
+	 */
+	public static String appendRemarks(GoPokedex goPokedex) {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(goPokedex.getName());
+
+		String remarks = goPokedex.getRemarks();
+		if (!StringUtils.isEmpty(remarks)) {
+			// 備考がある場合は、"(" + 備考 + ")"を連結する。
+			sb.append('(').append(remarks).append(')');
+		}
+
+		return sb.toString();
 	}
 
 	/**
@@ -99,6 +132,31 @@ public class PokemonEditUtils {
 
 			// 連番の昇順
 			return getSerial(o1) - getSerial(o2);
+		};
+	}
+
+	/**
+	 * 図鑑IDを並び替える用のComparatorを取得します。
+	 *
+	 * @return
+	 */
+	public static Comparator<GoPokedex> getPokedexComparator() {
+
+		return (o1, o2) -> {
+			// 図鑑№の昇順
+			final int pokedexNo1 = getPokedexNo(o1.getPokedexId());
+			final int pokedexNo2 = getPokedexNo(o2.getPokedexId());
+			if (pokedexNo1 < pokedexNo2) return -1;
+			if (pokedexNo1 > pokedexNo2) return 1;
+
+			// 亜種コードの昇順
+			final String subspecies1 = getSubspecies(o1.getPokedexId());
+			final String subspecies2 = getSubspecies(o2.getPokedexId());
+			if (subspeciesMap.get(subspecies1) < subspeciesMap.get(subspecies2)) return -1;
+			if (subspeciesMap.get(subspecies1) > subspeciesMap.get(subspecies2)) return 1;
+
+			// 連番の昇順
+			return getSerial(o1.getPokedexId()) - getSerial(o2.getPokedexId());
 		};
 	}
 

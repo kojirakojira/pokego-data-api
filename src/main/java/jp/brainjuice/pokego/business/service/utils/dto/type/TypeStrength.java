@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.utils.dto;
+package jp.brainjuice.pokego.business.service.utils.dto.type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

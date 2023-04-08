@@ -276,7 +276,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	}
 
 	@Override
-	public Iterable<PokedexFilterInfo> findAll() {
+	public List<PokedexFilterInfo> findAll() {
 		return new ArrayList<>(fPokedexes);
 	}
 

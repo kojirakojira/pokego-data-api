@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.web.form.res.research.others;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,5 @@ public class TypeScoreResponse extends ResearchResponse {
 	private Map<TypeEffectiveEnum, List<TypeEnum>> attackerType1Map;
 	private Map<TypeEffectiveEnum, List<TypeEnum>> attackerType2Map;
 	private Map<TypeEffectiveEnum, List<TypeEnum>> defenderTypeMap;
+	private LinkedHashSet<String> typeComments;
 }
