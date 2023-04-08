@@ -223,7 +223,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 					continue;
 				}
 
-				String msg = MessageFormat.format(msgFormat, StringUtils.join(typeList, ','));
+				String msg = MessageFormat.format(msgFormat, StringUtils.join(typeList, ", "));
 				putMsg(te1, te2, msg);
 
 			}
