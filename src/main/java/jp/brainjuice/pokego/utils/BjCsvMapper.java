@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
@@ -95,7 +96,7 @@ public class BjCsvMapper {
 		List<List<Object>> setterList = new ArrayList<List<Object>>();
 		Method[] methods = clazz.getDeclaredMethods();
 		for (String col: rowList.get(0).split(SEPARATOR, -1)) {
-			String methodName = "set" + col.substring(0, 1).toUpperCase() + col.substring(1);
+			String methodName = "set" + StringUtils.capitalize(col);
 
 			Class<?> dataType = getDataType(methodName, methods);
 

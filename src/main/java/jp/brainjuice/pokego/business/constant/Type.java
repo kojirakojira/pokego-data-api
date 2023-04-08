@@ -53,9 +53,9 @@ public class Type {
 		@Getter
 		private final String jpn;
 
-		public static TypeEnum getType(String str) {
+		public static TypeEnum getType(String jpn) {
 			for(TypeEnum v : values()) {
-				if(v.getJpn().equals(str)) {
+				if(v.getJpn().equals(jpn)) {
 					return v;
 				}
 			}

@@ -9,6 +9,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * GOポケモン図鑑
+ *
+ * @author saibabanagchampa
+ *
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
