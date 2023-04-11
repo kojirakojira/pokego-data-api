@@ -427,6 +427,12 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		});
 	}
 
+	/**
+	 * 存在しない組み合わせの2タイプであることを伝えるメッセージを作成する。
+	 *
+	 * @param goPokedexRepository
+	 * @param msgFormat
+	 */
 	private void notExistsTwoType(GoPokedexRepository goPokedexRepository, String msgFormat) {
 
 		// GOポケモン図鑑を全て取得する
@@ -497,6 +503,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 									.collect(Collectors.toList());
 						}));
 
+		// TwoTypeKeyをキーとして、こうげき時の倍率が第3引数どおりのタイプ
 		Map<TwoTypeKey, Map<TypeEnum, List<String>>> ttKeySetMap = maxCntTypeMap.entrySet().stream()
 				.flatMap(entry -> {
 					// 1タイプ目はタイプ数が倍率ごとに最大のタイプ。2タイプ目をくっつけてTwoTypeKeyにする。
@@ -514,6 +521,8 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 									.filter(entry -> entry.getKey() == ttk.getType1() || entry.getKey() == ttk.getType2())
 									.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)); // 重複を削除
 						}));
+
+		// メッセージを生成
 		ttKeySetMap.forEach((ttk, set) -> {
 			set.forEach((type, list) -> {
 				// put

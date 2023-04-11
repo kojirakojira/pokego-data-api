@@ -77,7 +77,7 @@ public class CpResearchController {
 		// レイドボスCP算出
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
-		// フィールドリサーチCP算出
+		// フィールドリサーチ、タマゴCP算出
 		this.fRTaskResearchService = fRTaskResearchService;
 		this.fRTaskResRse = fRTaskResRse;
 		// シャドウCP算出
@@ -190,6 +190,25 @@ public class CpResearchController {
 	 */
 	@GetMapping("/fRTask")
 	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq) throws Exception {
+
+		inputCheckService.validation(fRTaskReq);
+
+		FRTaskResponse fRTaskRes = new FRTaskResponse();
+		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
+		return fRTaskRes;
+	}
+
+	/**
+	 * タマゴCP最高値・最低値を求めるAPIです。<br>
+	 * フィールドリサーチと全く同じなので、処理を使いまわします。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/eggs")
+	public FRTaskResponse eggs(FRTaskRequest fRTaskReq) throws Exception {
 
 		inputCheckService.validation(fRTaskReq);
 

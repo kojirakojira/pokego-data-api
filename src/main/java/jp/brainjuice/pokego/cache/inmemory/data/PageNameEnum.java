@@ -18,6 +18,7 @@ public enum PageNameEnum {
 	raid("レイドボスCP"),
 	shadow("シャドウCP"),
 	fRTask("フィールドリサーチCP"),
+	eggs("タマゴCP"),
 	scpRank("PvP順位"),
 	scpRankList("PvP順位一覧"),
 	scpRankMaxMin("PvP最高(最低)順位"),
