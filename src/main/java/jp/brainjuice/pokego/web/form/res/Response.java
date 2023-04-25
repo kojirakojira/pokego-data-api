@@ -12,7 +12,7 @@ import lombok.Data;
 public abstract class Response {
 
 	private boolean success;
-	private String message;
+	private String message = "";
 	private MsgLevelEnum msgLevel = MsgLevelEnum.info;
 
 }

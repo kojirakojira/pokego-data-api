@@ -3,9 +3,11 @@ package jp.brainjuice.pokego.business.service.utils;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 
 public class PokemonEditUtils {
@@ -108,6 +110,17 @@ public class PokemonEditUtils {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Optional型のタイプ英字名から、Optional型のTypeEnumを取得します。<br>
+	 * nullの場合はOptional型のnullを返却します。
+	 *
+	 * @param type
+	 * @return
+	 */
+	public static Optional<TypeEnum> convTypeEnum(Optional<String> type) {
+		return type.isPresent() ? Optional.of(TypeEnum.valueOf(type.get())) : Optional.empty();
 	}
 
 	/**

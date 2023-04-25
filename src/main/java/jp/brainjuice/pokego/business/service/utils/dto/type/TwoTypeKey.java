@@ -21,6 +21,49 @@ public class TwoTypeKey {
 	private TypeEnum type1;
 	private TypeEnum type2;
 
+	public String toJpnString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		if (type1 != null) {
+			sb.append(type1.getJpn());
+		}
+
+		if (type1 != null && type2 != null) {
+			sb.append(", ");
+		}
+
+		if (type2 != null) {
+			sb.append(type2.getJpn());
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		if (type1 != null) {
+			sb.append(type1.name());
+		}
+
+		if (type1 != null && type2 != null) {
+			sb.append(", ");
+		}
+
+		if (type2 != null) {
+			sb.append(type2.name());
+		}
+
+		return sb.toString();
+	}
+
 	/**
 	 * (非 Javadoc)
 	 * @see java.lang.Object#hashCode()

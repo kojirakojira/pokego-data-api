@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -15,9 +17,12 @@ import org.springframework.stereotype.Component;
 import jp.brainjuice.pokego.business.constant.Type;
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TypeStrength;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,6 +46,47 @@ public class TypeChartInfo {
 	// 最大、最小の攻撃を受ける側のスコア
 	private double maxDfScore;
 	private double minDfScore;
+
+	/**
+	 * スコアを求める際、こうげき・ぼうぎょ偏重で求めたい場合に使用する。
+	 *
+	 * @author saibabanagchampa
+	 */
+	@AllArgsConstructor
+	public enum EmphasisEnum {
+		/** 設定なし */
+		none("設定なし"),
+		/** こうげき重視 */
+		attack("こうげき重視"),
+		/** ぼうぎょ重視 */
+		defense("ぼうぎょ重視"),
+		;
+
+		@Getter
+		private final String jpn;
+
+		/**
+		 * 引数に指定された文字列が、EmphasisEnumに定義されているかを判定する。
+		 *
+		 * @param emphasis
+		 * @return
+		 */
+		public static boolean isDefined(String emphasis) {
+
+			boolean flg = false;
+
+			if (emphasis == null) return flg;
+
+			for (EmphasisEnum emp: EmphasisEnum.values()) {
+				if (emp.name().equals(emphasis)) {
+					flg = true;
+					break;
+				}
+			}
+
+			return flg;
+		}
+	}
 
 	/**
 	 * 引数に指定したタイプの攻撃に対する、倍率ごとのタイプを取得する。
@@ -152,6 +198,135 @@ public class TypeChartInfo {
 				.filter(e -> e.getValue().doubleValue() == damageRate)
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * こうげき側のタイプ、ぼうぎょ側のタイプからTypeEffectiveEnumを取得します。
+	 *
+	 * @param atkType
+	 * @param defType
+	 * @return
+	 */
+	public Optional<TypeEffectiveEnum> getEffective(TypeEnum atkType, TypeEnum defType) {
+
+		if (atkType == null || defType == null) return Optional.empty();
+
+		// こうげき側からTypeStrength(type-chartのx軸の値)を取得する。
+		final TypeStrength typeStrength = getAttackerTypeStrength(atkType);
+
+		// ぼうぎょ側のタイプを指定し、ダメージ倍率を取得する。
+		final double damageMult = typeStrength.get(defType);
+
+		// ダメージ倍率からTypeEffectiveEnumを突き止める。
+		TypeEffectiveEnum ret = null;
+		for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {
+			if (Math.abs(damageMult - tee.getDamageMultiplier()) < 0.0001) {
+				ret = tee;
+				break;
+			}
+		}
+
+		return Optional.of(ret);
+	}
+
+	/**
+	 * こうげき側のタイプ、ぼうぎょ側のタイプからTypeEffectiveEnumを取得します。
+	 *
+	 * @param atkType
+	 * @param defTtKey
+	 * @return
+	 */
+	public Optional<TypeEffectiveEnum> getEffective(TypeEnum atkType, TwoTypeKey defTtKey) {
+
+		if (atkType == null || defTtKey == null) return Optional.empty();
+
+		// こうげき側からTypeStrength(type-chartのx軸の値)を取得する。
+		final TypeStrength typeStrength = getAttackerTypeStrength(atkType);
+
+		// ぼうぎょ側のタイプを指定し、ダメージ倍率を取得する。
+		final double damageMult =
+				(defTtKey.getType1() == null ? 1.0 : typeStrength.get(defTtKey.getType1()))
+				* (defTtKey.getType2() == null ? 1.0 :  typeStrength.get(defTtKey.getType2()));
+
+		// ダメージ倍率からTypeEffectiveEnumを突き止める。
+		TypeEffectiveEnum ret = null;
+		for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {
+			if (Math.abs(damageMult - tee.getDamageMultiplier()) < 0.0001) {
+				ret = tee;
+				break;
+			}
+		}
+
+		return Optional.of(ret);
+	}
+
+	/**
+	 * 2つのタイプの相性のスコアを求める。<br>
+	 * 第一引数のタイプが有利な場合は数値が大きくなり、第二引数のタイプが有利な場合は数値が小さくなる。
+	 *
+	 * @param ttKey1
+	 * @param ttKey2
+	 * @return
+	 */
+	public double score(TwoTypeKey ttKey1, TwoTypeKey ttKey2) {
+
+		return score(ttKey1, ttKey2, EmphasisEnum.none);
+	}
+
+	/**
+	 * 2つのタイプの相性のスコアを求める。<br>
+	 * 第一引数のタイプが有利な場合は数値が大きくなり、第二引数のタイプが有利な場合は数値が小さくなる。<br>
+	 * 第三引数に指定した列挙子を指定した場合、こうげきまたはぼうぎょ偏重の算出が可能である。
+	 *
+	 * @param TwoTypeKey ownTtKey 自分側タイプ
+	 * @param TwoTypeKey oppTtKey 相手側タイプ
+	 * @param EmphasisEnum emphasis
+	 * @return
+	 */
+	public double score(TwoTypeKey ownTtKey, TwoTypeKey oppTtKey, EmphasisEnum emphasis) {
+
+		BiFunction<TypeStrength, TypeEnum, Double> func = (ts, te) -> te == null ? 1.0 : ts.get(te);
+
+		// 重みは5.0とする。(最小倍率≒0.244のため、4.167倍より大きければ何でもよい。
+		double atkEmphasisMult = emphasis == EmphasisEnum.attack ? 5.0 : 1.0;
+		double defEmphasisMult = emphasis == EmphasisEnum.defense ? 5.0 : 1.0;
+
+		// スコアを求めるFunction。こうげきスコアに対してぼうぎょスコアを除算する。
+		BiFunction<TypeEnum, TypeEnum, Double> func2 = (te1, te2) -> {
+					TypeStrength atTs = getAttackerTypeStrength(te1);
+					TypeStrength dfTs = getDefenderTypeStrength(te1);
+
+					final double atkScore = func.apply(atTs, te2).doubleValue();
+					final double defScore = func.apply(dfTs, te2).doubleValue();
+
+					// 倍率が1倍の場合は、重みを考慮しない。
+					return (atkScore * atkEmphasisMult) - (defScore * defEmphasisMult);
+		};
+
+		double score = 1.0;
+
+		if (ownTtKey.getType1() != null) {
+			// 自分側タイプ１がnullでない場合
+
+			// 自分側タイプ１→相手側タイプ１
+			score+=func2.apply(ownTtKey.getType1(), oppTtKey.getType1()).doubleValue();
+
+			// 自分側タイプ１→相手側タイプ２
+			score+=func2.apply(ownTtKey.getType1(), oppTtKey.getType2()).doubleValue();
+
+		}
+
+		if (ownTtKey.getType2() != null && ownTtKey.getType1() != ownTtKey.getType2()) {
+			// 自分側タイプ２がnullでない、かつ自分側タイプ１=自分側タイプ２でない場合
+
+			// 自分側タイプ２→相手側タイプ１
+			score+=func2.apply(ownTtKey.getType2(), oppTtKey.getType1()).doubleValue();
+
+			// 自分側タイプ２→相手側タイプ２
+			score+=func2.apply(ownTtKey.getType2(), oppTtKey.getType2()).doubleValue();
+		}
+
+		return score;
 	}
 
 	/**

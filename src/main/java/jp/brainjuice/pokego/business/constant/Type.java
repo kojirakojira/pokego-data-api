@@ -53,6 +53,12 @@ public class Type {
 		@Getter
 		private final String jpn;
 
+		/**
+		 * 日本語名からTypeEnumを取得する。
+		 *
+		 * @param jpn
+		 * @return
+		 */
 		public static TypeEnum getType(String jpn) {
 			for(TypeEnum v : values()) {
 				if(v.getJpn().equals(jpn)) {
@@ -60,6 +66,28 @@ public class Type {
 				}
 			}
 			return null;
+		}
+
+		/**
+		 * 引数に指定された文字列が、TypeEnumに定義されているかを判定する。
+		 *
+		 * @param type
+		 * @return
+		 */
+		public static boolean isDefined(String type) {
+
+			boolean flg = false;
+
+			if (type == null) return flg;
+
+			for (TypeEnum te: TypeEnum.values()) {
+				if (te.name().equals(type)) {
+					flg = true;
+					break;
+				}
+			}
+
+			return flg;
 		}
 	}
 
