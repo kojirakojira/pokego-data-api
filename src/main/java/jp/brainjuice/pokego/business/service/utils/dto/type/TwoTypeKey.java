@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.business.service.utils.dto.type;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * ポケモンのタイプを表現します。<br>
@@ -15,7 +15,7 @@ import lombok.Getter;
  *
  */
 @AllArgsConstructor
-@Getter
+@Data
 public class TwoTypeKey {
 
 	private TypeEnum type1;
