@@ -23,6 +23,13 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 
+/**
+ * タイプごとのメッセージを保持します。
+ * TwoTypeKeyをキーとして、メッセージをリストで保持します。
+ *
+ * @author saibabanagchampa
+ *
+ */
 @Component
 public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
@@ -72,11 +79,11 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		leastWeaknessType(typeChartInfo, "{0}は、弱点タイプが最も少なく{1}しかありません。弱点タイプが{1}の組み合わせは、全タイプ中{2}存在します。（弱点タイプ：{3}）");
 
 		// めっぽう弱い
-		weak(typeChartInfo, "{0}のこうげきに対してめっぽう弱いです…。(×2.56倍)", TypeEffectiveEnum.MAX);
+		weak(typeChartInfo, "{0}のこうげきに対してめっぽう弱いです…。(×{1}倍)", TypeEffectiveEnum.MAX);
 		// とてつもない耐性
-		weak(typeChartInfo, "{0}のこうげきに対してとてつもなく耐性があります。(×0.244140625倍)", TypeEffectiveEnum.MIN);
+		weak(typeChartInfo, "{0}のこうげきに対してとてつもなく耐性があります。(×{1}倍)", TypeEffectiveEnum.MIN);
 		// 強い耐性
-		weak(typeChartInfo, "{0}のこうげきに対して強い耐性があります。(×0.390625倍)", TypeEffectiveEnum.VERY_LOW);
+		weak(typeChartInfo, "{0}のこうげきに対して強い耐性があります。(×{1}倍)", TypeEffectiveEnum.VERY_LOW);
 		// 唯一の×2.56
 		onlyOneType(typeChartInfo, "{0}のこうげきに対して唯一×{1}倍のダメージ倍率が出ます。", TypeEffectiveEnum.MAX);
 		// 唯一の×0.244140625
@@ -88,8 +95,8 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
 		// ダメージ倍率数の最大（こうげき）
 		{
-			String strengthMsgFormat = "{0}は、こうげき時に×{1}倍のダメージ倍率が出るタイプの数が、{2}あります。これは全タイプ中最も多く、こうげき面で優秀です。（対象タイプ：{3}）";
-			String weakMsgFormat = "{0}は、こうげき時に×{1}倍のダメージ倍率が出るタイプの数が、{2}あります。これは全タイプ中最も多く、こうげき面に難ありです…。（対象タイプ：{3}）";
+			String strengthMsgFormat = "{0}は、こうげき時に×{1}倍のダメージ倍率が出るタイプが{2}あります。これは全タイプ中最も多く、こうげき面で優秀です。（対象タイプ：{3}）";
+			String weakMsgFormat = "{0}は、こうげき時に×{1}倍のダメージ倍率が出るタイプが{2}あります。これは全タイプ中最も多く、こうげき面に難ありです…。（対象タイプ：{3}）";
 			maxCountAttackerDamageMult(
 					typeChartInfo,
 					strengthMsgFormat,
@@ -103,8 +110,8 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
 		// ダメージ倍率数の最大（ぼうぎょ）
 		{
-			String weakMsgFormat = "{0}は、ぼうぎょ時に×{1}倍のダメージ倍率が出るタイプの数が、{2}あります。これは全タイプ中最も多く、ぼうぎょ面に難ありです…。（対象タイプ：{3}）";
-			String strengthMsgFormat = "{0}は、ぼうぎょ時に×{1}倍のダメージ倍率が出るタイプの数が、{2}あります。これは全タイプ中最も多く、ぼうぎょ面で優秀です。（対象タイプ：{3}）";
+			String weakMsgFormat = "{0}は、ぼうぎょ時に×{1}倍のダメージ倍率が出るタイプが{2}あります。これは全タイプ中最も多く、ぼうぎょ面に難ありです…。（対象タイプ：{3}）";
+			String strengthMsgFormat = "{0}は、ぼうぎょ時に×{1}倍のダメージ倍率が出るタイプが{2}あります。これは全タイプ中最も多く、ぼうぎょ面で優秀です。（対象タイプ：{3}）";
 			maxCountDefenderDamageMult(
 					typeChartInfo,
 					weakMsgFormat + "",
@@ -178,6 +185,10 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 						}));
 	}
 
+	/**
+	 * @param typeChartInfo
+	 * @return
+	 */
 	private Map<TwoTypeKey, Double> getDefenderScoreMap(TypeChartInfo typeChartInfo) {
 
 		return getTwoTypeStreamContainsOneType()
@@ -198,22 +209,21 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 */
 	private void weak(TypeChartInfo typeChartInfo, String msgFormat, TypeEffectiveEnum typeEff) {
 
-		for (TypeEnum te1: TypeEnum.values()) {
-			for (TypeEnum te2: TypeEnum.values()) {
-				if (te1 == te2) continue;
-				Map<TypeEffectiveEnum, List<TypeEnum>> typeMap = typeChartInfo.getDefenderTypes(te1, te2);
+		// 2タイプに対して、引数に指定されたダメージ倍率になるタイプのリストを取得する。
+		Map<TwoTypeKey, List<String>> weakTypeMap = getTwoTypeStream()
+				.collect(Collectors.toMap(
+						ttk -> ttk,
+						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()).get(typeEff)))
+				.entrySet().stream()
+				.filter(entry -> !entry.getValue().isEmpty())
+				.collect(Collectors.toMap(
+						entry -> entry.getKey(),
+						entry -> entry.getValue().stream().map(TypeEnum::getJpn).collect(Collectors.toList())));
 
-				List<String> typeList = typeMap.get(typeEff).stream().map(TypeEnum::getJpn).collect(Collectors.toList());
+		weakTypeMap.forEach((k, v) -> {
+			putMsg(k, MessageFormat.format(msgFormat, StringUtils.join(v, ", "), typeEff.getDamageMultiplier()));
+		});
 
-				if (typeList.isEmpty()) {
-					continue;
-				}
-
-				String msg = MessageFormat.format(msgFormat, StringUtils.join(typeList, ", "));
-				putMsg(te1, te2, msg);
-
-			}
-		}
 	}
 
 	/**
@@ -225,45 +235,40 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 */
 	private void onlyOneType(TypeChartInfo typeChartInfo, String msgFormat, TypeEffectiveEnum typeEff) {
 
-		final Map<TwoTypeKey, List<TypeEnum>> typeMap = new HashMap<>();
+		// Map<2タイプ, 引数に指定されたダメージ倍率になるタイプのリスト>
+		Map<TwoTypeKey, List<TypeEnum>> typeListMap = getTwoTypeStream()
+				.collect(Collectors.toMap(
+						ttk -> ttk,
+						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()).get(typeEff)))
+				.entrySet().stream()
+				.filter(entry -> !entry.getValue().isEmpty())
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue));
 
-		// こうげき倍率が×2.56になるタイプのリストを作成する。
-		for (TypeEnum te1: TypeEnum.values()) {
-			for (TypeEnum te2: TypeEnum.values()) {
-				if (te1 == te2) continue;
-				final Map<TypeEffectiveEnum, List<TypeEnum>> typeEffMap = typeChartInfo.getDefenderTypes(te1, te2);
+		// そのダメージ倍率になるタイプの内、1つしか存在しないタイプのリスト
+		List<TypeEnum> onlyTypeList = typeListMap.entrySet().stream()
+				.flatMap(entry -> entry.getValue().stream()) // Valueだけを抽出し、直列化する。
+				.collect(Collectors.groupingBy(te -> te, Collectors.counting())) // タイプごとの出現件数を求める。(Map<TypeEnum, Long>)
+				.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(1L)) // 1件だけのタイプに絞り込む
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
 
-				final List<TypeEnum> tmpTypeList = typeEffMap.get(typeEff);
-
-				if (tmpTypeList.isEmpty()) {
-					continue;
-				}
-
-				typeMap.put(new TwoTypeKey(te1, te2), tmpTypeList);
-
-			}
-		}
-
-		Map<TwoTypeKey, TypeEnum> twoTypeMap = new HashMap<>();
-		for (TypeEnum type: TypeEnum.values()) {
-			boolean isDuplication = false;
-			TwoTypeKey tmpTwoTypeKey = null;
-			for (Map.Entry<TwoTypeKey, List<TypeEnum>> entry: typeMap.entrySet()) {
-
-				if (entry.getValue().contains(type)) {
-					if (tmpTwoTypeKey != null) {
-						isDuplication = true;
-						break;
-					}
-					tmpTwoTypeKey = entry.getKey();
-				}
-			}
-			if (tmpTwoTypeKey != null && !isDuplication) {
-				twoTypeMap.put(tmpTwoTypeKey, type);
-			}
-		}
+		// Map<2タイプ, 引数に指定されたダメージ倍率の内の、唯一のタイプ>
+		Map<TwoTypeKey, TypeEnum> twoTypeMap = typeListMap.entrySet().stream()
+				.filter(entry -> entry.getValue().stream()
+						.anyMatch(te -> onlyTypeList.contains(te))) // 1つしか存在しないタイプが含まれているEntryに絞り込む。
+				.collect(Collectors.toMap(
+						entry -> entry.getKey(),
+						entry -> {
+							return entry.getValue().stream()
+									.filter(te -> onlyTypeList.contains(te))
+									.findFirst().get(); // 1つしか存在しないタイプを抽出する。
+						}));
 
 		twoTypeMap.forEach((k, v) -> {
+			// put
 			putMsg(k, MessageFormat.format(msgFormat, v.getJpn(), typeEff.getDamageMultiplier()));
 		});
 	}
@@ -653,11 +658,13 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		return String.valueOf(wordCount) + (wordCount < 10 ? "つ": "こ");
 	}
 
-	private void putMsg(TypeEnum type1, TypeEnum type2, String msg) {
-		TwoTypeKey key = new TwoTypeKey(type1, type2);
-		putMsg(key, msg);
-	}
-
+	/**
+	 * 第１引数に該当するkeyのvalueにもつListにメッセージを追加する。
+	 *
+	 *
+	 * @param key
+	 * @param msg
+	 */
 	private void putMsg(TwoTypeKey key, String msg) {
 		// msgMapのvalueがnullの場合は、リストを生成してadd、ある場合はそのインスタンスにadd。
 		computeIfAbsent(key, li -> new LinkedHashSet<>()).add(msg);

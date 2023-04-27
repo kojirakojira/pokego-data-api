@@ -91,6 +91,9 @@ public class TypeController {
 
 		xTypeService.exec(ownType1, ownType2, oppType1, oppType2, emphasis, xTypeRes);
 
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
 		return xTypeRes;
 	}
 
