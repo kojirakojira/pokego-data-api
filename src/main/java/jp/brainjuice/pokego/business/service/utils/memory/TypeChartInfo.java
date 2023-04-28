@@ -95,7 +95,7 @@ public class TypeChartInfo {
 	 */
 	public Map<TypeEffectiveEnum, List<TypeEnum>> getAttackerTypes(TypeEnum type) {
 
-		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new HashMap<>();
+		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new LinkedHashMap<>();
 
 		for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {
 			retMap.put(tee, getAttackerTypes(type, tee));
@@ -112,7 +112,7 @@ public class TypeChartInfo {
 	 */
 	public Map<TypeEffectiveEnum, List<TypeEnum>> getDefenderTypes(TypeEnum type) {
 
-		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new HashMap<>();
+		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new LinkedHashMap<>();
 
 		for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {
 			retMap.put(tee, getDefenderTypes(type, tee));
@@ -134,7 +134,7 @@ public class TypeChartInfo {
 			return getDefenderTypes(type);
 		}
 
-		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new HashMap<>();
+		final Map<TypeEffectiveEnum, List<TypeEnum>> retMap = new LinkedHashMap<>();
 
 		// Mapに0～5のすべて倍率を設定
 		for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {

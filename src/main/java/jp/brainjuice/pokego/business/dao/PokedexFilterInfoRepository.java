@@ -24,6 +24,7 @@ import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.dao.entity.PokedexFilterInfo;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
+import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import lombok.AllArgsConstructor;
@@ -153,14 +154,17 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	/**
 	 * ２つのタイプからpokedexIdを絞り込む。
 	 *
-	 * @param type1
-	 * @param type2
+	 * @param twoTypeKey
 	 * @return
 	 */
-	public List<String> findIdByType(TypeEnum type1, TypeEnum type2) {
+	public List<String> findIdByType(TwoTypeKey twoTypeKey) {
+
+		TypeEnum type1 = twoTypeKey.getType1();
+		TypeEnum type2 = twoTypeKey.getType2();
+
 		return fPokedexes.stream()
-				.filter(pfi -> (type1.equals(pfi.getType1()) && type2.equals(pfi.getType2()))
-						|| (type1.equals(pfi.getType2()) && type2.equals(pfi.getType1())))
+				.filter(pfi -> (type1 == pfi.getType1() && type2 == pfi.getType2())
+						|| (type1 == pfi.getType2() && type2 == pfi.getType1()))
 				.map(pfi2 -> pfi2.getPokedexId())
 				.collect(Collectors.toList());
 	}

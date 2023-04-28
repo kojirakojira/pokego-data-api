@@ -151,22 +151,23 @@ public class PokemonEditUtils {
 	/**
 	 * 図鑑IDを並び替える用のComparatorを取得します。
 	 *
+	 * @param order 昇順の場合：正の数、降順の場合：負の数
 	 * @return
 	 */
-	public static Comparator<GoPokedex> getPokedexComparator() {
+	public static Comparator<GoPokedex> getPokedexComparator(int order) {
 
 		return (o1, o2) -> {
 			// 図鑑№の昇順
 			final int pokedexNo1 = getPokedexNo(o1.getPokedexId());
 			final int pokedexNo2 = getPokedexNo(o2.getPokedexId());
-			if (pokedexNo1 < pokedexNo2) return -1;
-			if (pokedexNo1 > pokedexNo2) return 1;
+			if (pokedexNo1 < pokedexNo2) return order > 0 ? -1 : 1;
+			if (pokedexNo1 > pokedexNo2) return order > 0 ? 1 : -1;
 
 			// 亜種コードの昇順
 			final String subspecies1 = getSubspecies(o1.getPokedexId());
 			final String subspecies2 = getSubspecies(o2.getPokedexId());
-			if (subspeciesMap.get(subspecies1) < subspeciesMap.get(subspecies2)) return -1;
-			if (subspeciesMap.get(subspecies1) > subspeciesMap.get(subspecies2)) return 1;
+			if (subspeciesMap.get(subspecies1) < subspeciesMap.get(subspecies2)) return order > 0 ? -1 : 1;
+			if (subspeciesMap.get(subspecies1) > subspeciesMap.get(subspecies2)) return order > 0 ? 1 : -1;
 
 			// 連番の昇順
 			return getSerial(o1.getPokedexId()) - getSerial(o2.getPokedexId());

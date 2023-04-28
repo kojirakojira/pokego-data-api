@@ -25,6 +25,8 @@ public enum PageNameEnum {
 	race("種族値検索"),
 	raceDiff("種族値比較"),
 	typeScore("タイプ評価"),
+	xType("Xタイプ検索"),
+	iroiroTypeRank("色々タイプランキング"),
 	plList("PLごとのCP一覧"),
 	unimplPokemon("未実装ポケモン一覧"),
 	evolution("進化ツリーと別のすがた"),;

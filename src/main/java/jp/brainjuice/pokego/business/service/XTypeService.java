@@ -21,14 +21,14 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.utils.dto.XTypeElement;
+import jp.brainjuice.pokego.business.service.utils.dto.type.AttackPattern;
+import jp.brainjuice.pokego.business.service.utils.dto.type.BattlePattern;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo.EmphasisEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeCommentMap;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.XTypeResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 @Service
 public class XTypeService {
@@ -383,32 +383,6 @@ public class XTypeService {
 				.collect(Collectors.toList());
 
 		return msgList;
-	}
-
-	/**
-	 * 1vs1で戦う際のタイプのパターンを表現するクラス
-	 *
-	 * @author saibabanagchampa
-	 *
-	 */
-	@Data
-	@AllArgsConstructor
-	private class BattlePattern {
-		TwoTypeKey ownType;
-		TwoTypeKey oppType;
-	}
-
-	/**
-	 * こうげきする彩のパターンを表現するクラス
-	 *
-	 * @author saibabanagchampa
-	 *
-	 */
-	@Data
-	@AllArgsConstructor
-	private class AttackPattern {
-		TypeEnum atkType;
-		TwoTypeKey defType;
 	}
 
 	private LinkedHashSet<String> getCommentsMap(

@@ -1,18 +1,26 @@
 package jp.brainjuice.pokego.web;
 
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.service.IroiroTypeRankService;
+import jp.brainjuice.pokego.business.service.IroiroTypeRankService.IroiroTypeRankSearchPattern;
 import jp.brainjuice.pokego.business.service.XTypeService;
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.research.others.TypeScoreResearchService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.IroiroTypeRankRequest;
 import jp.brainjuice.pokego.web.form.req.XTypeRequest;
 import jp.brainjuice.pokego.web.form.req.research.others.TypeScoreRequest;
+import jp.brainjuice.pokego.web.form.res.IroiroTypeRankResponse;
 import jp.brainjuice.pokego.web.form.res.XTypeResponse;
 import jp.brainjuice.pokego.web.form.res.research.others.TypeScoreResponse;
 
@@ -25,11 +33,14 @@ public class TypeController {
 
 	private XTypeService xTypeService;
 
+	private IroiroTypeRankService iroiroTypeRankService;
+
 	private ViewsCacheProvider viewsCacheProvider;
 
 	public TypeController (
 			TypeScoreResearchService typeScoreResearchService, ResearchServiceExecutor<TypeScoreResponse> typeScoreResRse,
 			XTypeService xTypeService,
+			IroiroTypeRankService iroiroTypeRankService,
 			ViewsCacheProvider viewsCacheProvider) {
 
 		// タイプ評価
@@ -38,6 +49,9 @@ public class TypeController {
 
 		// Xタイプ検索
 		this.xTypeService = xTypeService;
+
+		// 色々タイプ検索
+		this.iroiroTypeRankService = iroiroTypeRankService;
 
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
@@ -95,6 +109,45 @@ public class TypeController {
 		viewsCacheProvider.addTempList();
 
 		return xTypeRes;
+	}
+
+	/**
+	 * @return
+	 */
+	@GetMapping("/iroiroTypeSearchPattern")
+	public LinkedHashMap<String, String> iroiroTypeSearchPattern() {
+
+		return Stream.of(IroiroTypeRankSearchPattern.values())
+				.collect(Collectors.toMap(
+						itrs -> itrs.name(),
+						itrs -> itrs.getJpn(),
+						(a, b) -> a,
+						LinkedHashMap::new));
+	}
+
+	/**
+	 * 色々タイプ順位取得用API
+	 *
+	 * @param typeScoreReq
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/iroiroTypeRank")
+	public IroiroTypeRankResponse iroiroTypeRank(IroiroTypeRankRequest iroiroTypeRankReq) throws BadRequestException {
+
+		IroiroTypeRankResponse iroiroTypeRankRes = new IroiroTypeRankResponse();
+
+		if (!iroiroTypeRankService.check(iroiroTypeRankReq.getSp(), iroiroTypeRankRes)) {
+			return iroiroTypeRankRes;
+		}
+
+		IroiroTypeRankSearchPattern sp = IroiroTypeRankSearchPattern.valueOf(iroiroTypeRankReq.getSp());
+		iroiroTypeRankService.exec(sp, iroiroTypeRankRes);
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
+		return iroiroTypeRankRes;
 	}
 
 }

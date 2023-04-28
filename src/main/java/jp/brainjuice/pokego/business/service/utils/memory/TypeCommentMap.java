@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
+import jp.brainjuice.pokego.business.service.utils.TypeUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 
@@ -172,7 +172,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 */
 	private Map<TwoTypeKey, Double> getAttackerScoreMap(TypeChartInfo typeChartInfo) {
 
-		return getTwoTypeStreamContainsOneType()
+		return TypeUtils.getTwoTypeStreamContainsOneType()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> {
@@ -191,7 +191,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 */
 	private Map<TwoTypeKey, Double> getDefenderScoreMap(TypeChartInfo typeChartInfo) {
 
-		return getTwoTypeStreamContainsOneType()
+		return TypeUtils.getTwoTypeStreamContainsOneType()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> {
@@ -210,7 +210,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	private void weak(TypeChartInfo typeChartInfo, String msgFormat, TypeEffectiveEnum typeEff) {
 
 		// 2タイプに対して、引数に指定されたダメージ倍率になるタイプのリストを取得する。
-		Map<TwoTypeKey, List<String>> weakTypeMap = getTwoTypeStream()
+		Map<TwoTypeKey, List<String>> weakTypeMap = TypeUtils.getTwoTypeStream()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()).get(typeEff)))
@@ -236,7 +236,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	private void onlyOneType(TypeChartInfo typeChartInfo, String msgFormat, TypeEffectiveEnum typeEff) {
 
 		// Map<2タイプ, 引数に指定されたダメージ倍率になるタイプのリスト>
-		Map<TwoTypeKey, List<TypeEnum>> typeListMap = getTwoTypeStream()
+		Map<TwoTypeKey, List<TypeEnum>> typeListMap = TypeUtils.getTwoTypeStream()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()).get(typeEff)))
@@ -281,7 +281,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 */
 	private void allDamageMultiplier(TypeChartInfo typeChartInfo, String msgFormat) {
 
-		List<TwoTypeKey> twoTypeKeyList = getTwoTypeStream()
+		List<TwoTypeKey> twoTypeKeyList = TypeUtils.getTwoTypeStream()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2())))
@@ -339,7 +339,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		typeGpMap.entrySet().stream().forEach(entry -> {
 			final TwoTypeKey ttKey = entry.getKey();
 			final List<String> pokeNameList = entry.getValue().stream()
-					.sorted(PokemonEditUtils.getPokedexComparator()) // 昇順で並び替え
+					.sorted(PokemonEditUtils.getPokedexComparator(1)) // 昇順で並び替え
 					.map(gp -> PokemonEditUtils.appendRemarks(gp)) // 備考を連結
 					.collect(Collectors.toList());
 
@@ -402,7 +402,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		maxTypeGpMap.entrySet().stream().forEach(entry -> {
 			final TwoTypeKey ttKey = entry.getKey();
 			final List<String> pokeNameList = entry.getValue().stream()
-					.sorted(PokemonEditUtils.getPokedexComparator()) // 昇順で並び替え
+					.sorted(PokemonEditUtils.getPokedexComparator(1)) // 昇順で並び替え
 					.map(gp -> PokemonEditUtils.appendRemarks(gp)) // 備考を連結
 					.collect(Collectors.toList());
 
@@ -434,7 +434,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 				.collect(Collectors.toList());
 
 		// 存在しないタイプの組み合わせを洗い出す。
-		List<TwoTypeKey> noMatchTwoTypeList = getTwoTypeStreamContainsOneType()
+		List<TwoTypeKey> noMatchTwoTypeList = TypeUtils.getTwoTypeStreamContainsOneType()
 				.filter(ttk -> !twoTypeList.contains(ttk)) // 存在するタイプを省く。
 				.collect(Collectors.toList());
 
@@ -531,7 +531,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 			TypeEffectiveEnum typeEff) {
 
 		// 1タイプの場合も確認対象。
-		Map<TwoTypeKey, List<TypeEnum>> ttKeyMap = getTwoTypeStreamContainsOneType()
+		Map<TwoTypeKey, List<TypeEnum>> ttKeyMap = TypeUtils.getTwoTypeStreamContainsOneType()
 				.collect(Collectors.toMap(
 						ttk -> ttk,
 						ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()).get(typeEff)));
@@ -572,11 +572,11 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	private void leastWeaknessType(TypeChartInfo typeChartInfo, String msgFormat) {
 
 		// タイプごとに弱点タイプを保持したマップを作成する。
-		Map<TwoTypeKey, List<TypeEnum>> weaknessMap = getTwoTypeStreamContainsOneType()
+		Map<TwoTypeKey, List<TypeEnum>> weaknessMap = TypeUtils.getTwoTypeStreamContainsOneType()
 				.collect(Collectors.toMap( // collectし、Valueをくっつけてマップにする。
 						ttk -> ttk,
 						ttk -> {
-							return typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()) // Map<各倍率: タイプ>を取得
+							return typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()) // Map<各倍率: List<タイプ>>を取得
 									.entrySet().stream()
 									// 弱点タイプにだけ絞り込む。
 									.filter(entry -> entry.getKey() == TypeEffectiveEnum.HIGH || entry.getKey() == TypeEffectiveEnum.MAX)
@@ -616,37 +616,6 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	}
 
 
-
-	/**
-	 * TwoTypeKeyのStreamを取得する。
-	 * ※1タイプのTwoTypeKeyは含まない。
-	 *
-	 * @return
-	 */
-	private Stream<TwoTypeKey> getTwoTypeStream() {
-		return Stream.of(TypeEnum.values())
-				.flatMap(te -> Stream.of(TypeEnum.values()).map(te2 -> new TwoTypeKey(te, te2))) // TwoTypeKeyを作成。
-				.distinct() // 重複除去
-				.filter(ttk -> ttk.getType1() != ttk.getType2()); // タイプ1,2が重複しているものは省く。
-	}
-
-	/**
-	 * TwoTypeKeyのStreamを取得する。
-	 * ※1タイプのTwoTypeKeyも含む。
-	 *
-	 * @return
-	 */
-	private Stream<TwoTypeKey> getTwoTypeStreamContainsOneType() {
-		return Stream.of(TypeEnum.values())
-				.flatMap(te -> Stream.of(TypeEnum.values()).map(te2 -> new TwoTypeKey(te, te2))) // TwoTypeKeyを作成。
-				.distinct() // 重複除去
-				.map(ttk -> {
-					if (ttk.getType1() == ttk.getType2()) {
-						ttk.setType2(null);
-					}
-					return ttk;
-				}); // タイプ1,2が重複している場合は、単一タイプとし、タイプ2を除去する。
-	}
 
 	/**
 	 * 助数詞を連結します。
