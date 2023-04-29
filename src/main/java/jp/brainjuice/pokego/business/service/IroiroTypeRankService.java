@@ -119,9 +119,9 @@ public class IroiroTypeRankService {
 		case leastWeakness -> "弱点タイプ";
 		case qtyOfPoke1Type -> "詳細";
 		case qtyOfPoke2Type -> "詳細";
-		case strongAtk -> "詳細";
-		case strongDef1Only -> "詳細";
-		case strongDef -> "詳細";
+		case strongAtk -> "こうげき時倍率";
+		case strongDef1Only -> "ぼうぎょ時倍率";
+		case strongDef -> "ぼうぎょ時倍率";
 		});
 
 		res.setMsgDecoration(switch (searchPattern) {
@@ -152,7 +152,7 @@ public class IroiroTypeRankService {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 		// スコアをValueにもつ、降順にソートされたマップ
-		Map<TwoTypeKey, Integer> sortedScoreMap = weakEffMap.entrySet().stream()
+		LinkedHashMap<TwoTypeKey, Integer> sortedScoreMap = weakEffMap.entrySet().stream()
 				.map(entry -> {
 					int score = 0;
 					for (Map.Entry<TypeEffectiveEnum, List<TypeEnum>> effEntry: entry.getValue().entrySet()) {
@@ -169,7 +169,7 @@ public class IroiroTypeRankService {
 						LinkedHashMap::new)); // 順番を担保
 
 		// メッセージリストを生成する。
-		Map<TwoTypeKey, List<String>> msgsMap = weakEffMap.entrySet().stream()
+		Map<TwoTypeKey, List<String>> msgListMap = weakEffMap.entrySet().stream()
 				.collect(Collectors.toMap(
 						entry -> entry.getKey(),
 						entry -> {
@@ -185,29 +185,16 @@ public class IroiroTypeRankService {
 							return msgList;
 						}));
 
+		// 降順のスコアのリスト
+		List<Integer> scoreList = new ArrayList<>(sortedScoreMap.values());
+
 		// 返却値の作成
-		List<IroiroTypeRankElement> itreList = new ArrayList<>();
-		{
-			int rank = 0;
-			int tmpScore = 0;
-			for (Map.Entry<TwoTypeKey, Integer> scoreEntry: sortedScoreMap.entrySet()) {
-
-				int score = scoreEntry.getValue().intValue();
-				// scoreが異なる場合、ランクを1インクリメントさせる。
-				if (score > tmpScore) {
-					rank+=1;
-				}
-
-				itreList.add(new IroiroTypeRankElement(
-						scoreEntry.getKey(),
-						rank,
-						msgsMap.get(scoreEntry.getKey())));
-
-				tmpScore = score;
-			}
-		}
-
-		return itreList;
+		return sortedScoreMap.entrySet().stream()
+				.map(entry -> new IroiroTypeRankElement(
+						entry.getKey(),
+						scoreList.indexOf(entry.getValue()) + 1, // 順位
+						msgListMap.get(entry.getKey()))) // メッセージのリスト
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -243,7 +230,7 @@ public class IroiroTypeRankService {
 			String msgRaceQty, String msgPokeQty, String msgPokes, Stream<TwoTypeKey> ttkStream) {
 
 		// key: TwoTypeKey, value: Map<PokedexNo, List<PokedexId>>>のMapを作成する。
-		Map<TwoTypeKey, Map<Integer, List<String>>> basePdxNoMap = ttkStream
+		LinkedHashMap<TwoTypeKey, Map<Integer, List<String>>> basePdxNoMap = ttkStream
 				.map(ttk -> Map.entry(ttk, pokedexFilterInfoRepository.findIdByType(ttk))) // Map<TwoTypeKey, List<PokedexId>
 				.map(entry -> Map.entry(
 						entry.getKey(),
@@ -256,28 +243,18 @@ public class IroiroTypeRankService {
 						(a, b) -> a,
 						LinkedHashMap::new)); // 順番を担保
 
+		// ランキングを求めるため、TwoTypeKeyごとの種族数のリストを作成する。
+		List<Integer> sizeList = basePdxNoMap.values().stream()
+				.map(Map::size)
+				.collect(Collectors.toList());
+
 		// 返却値の作成
-		List<IroiroTypeRankElement> itreList = new ArrayList<>();
-		{
-			int rank = 1;
-			int tmpSize = 0;
-			for (Map.Entry<TwoTypeKey, Map<Integer, List<String>>> entry: basePdxNoMap.entrySet()) {
-
-				int size = entry.getValue().size();
-				// 種族数が異なる場合、ランクを1インクリメントさせる。
-				if (size < tmpSize) {
-					rank+=1;
-				}
-
-				itreList.add(new IroiroTypeRankElement(
-						entry.getKey(),
-						rank,
-						getMsgsQtyOfPokemon(entry, msgRaceQty, msgPokeQty, msgPokes)));
-
-				tmpSize = size;
-			}
-		}
-		return itreList;
+		return basePdxNoMap.entrySet().stream()
+				.map(entry -> new IroiroTypeRankElement(
+								entry.getKey(),
+								sizeList.indexOf(entry.getValue().size()) + 1, // 順位の作成
+								getMsgsQtyOfPokemon(entry, msgRaceQty, msgPokeQty, msgPokes))) // メッセージリストの作成。
+				.collect(Collectors.toList());
 
 	}
 
@@ -314,6 +291,13 @@ public class IroiroTypeRankService {
 		return msgList;
 	}
 
+
+	/**
+	 * こうげきの優秀順を取得する。
+	 *
+	 * @param msgFormat
+	 * @return
+	 */
 	private List<IroiroTypeRankElement> getStrongAtkRank(String msgFormat) {
 
 		return getStrongTypeRank(
@@ -328,6 +312,12 @@ public class IroiroTypeRankService {
 				ttk -> typeChartInfo.getAttackerTypes(ttk.getType1()));
 	}
 
+	/**
+	 * ぼうぎょの優秀順(1タイプのみ)を取得する。
+	 *
+	 * @param msgFormat
+	 * @return
+	 */
 	private List<IroiroTypeRankElement> getStrongDefOnly1Rank(String msgFormat) {
 
 		return getStrongTypeRank(
@@ -342,6 +332,12 @@ public class IroiroTypeRankService {
 				ttk -> typeChartInfo.getDefenderTypes(ttk.getType1()));
 	}
 
+	/**
+	 * ぼうぎょの優秀順を取得する。
+	 *
+	 * @param msgFormat
+	 * @return
+	 */
 	private List<IroiroTypeRankElement> getStrongDefRank(String msgFormat) {
 
 		return getStrongTypeRank(
@@ -352,6 +348,16 @@ public class IroiroTypeRankService {
 				ttk -> typeChartInfo.getDefenderTypes(ttk.getType1(), ttk.getType2()));
 	}
 
+	/**
+	 * 優秀順のIroiroTypeRankElementのリストを取得する。
+	 *
+	 * @param msgFormat
+	 * @param twoTypeKeyStream
+	 * @param calcScoreFunc
+	 * @param effPredicate
+	 * @param getTypeEffFunc
+	 * @return
+	 */
 	private List<IroiroTypeRankElement> getStrongTypeRank(
 			String msgFormat,
 			Stream<TwoTypeKey> twoTypeKeyStream,
@@ -359,47 +365,44 @@ public class IroiroTypeRankService {
 			Predicate<Map.Entry<TypeEffectiveEnum, List<TypeEnum>>> effPredicate,
 			Function<TwoTypeKey, Map<TypeEffectiveEnum, List<TypeEnum>>> getTypeEffFunc) {
 
-		Map<TwoTypeKey, Double> sortedScoreMap = twoTypeKeyStream
+		// スコアの降順に並んだMap(Map<TwoTypeKey, スコア>)
+		LinkedHashMap<TwoTypeKey, Double> sortedScoreMap = twoTypeKeyStream
 				.map(ttk -> Map.entry(ttk, Double.valueOf(calcScoreFunc.apply(ttk))))
 				.sorted((o1, o2) -> o2.getValue().doubleValue() - o1.getValue().doubleValue() > 0 ? 1 : -1) // 降順で並び替える
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
 
+		// メッセージリストを作成
+		Map<TwoTypeKey, List<String>> msgListMap = sortedScoreMap.keySet().stream()
+				.collect(Collectors.toMap(
+						ttk -> ttk,
+						ttk -> {
+							return getTypeEffFunc.apply(ttk)
+									.entrySet().stream()
+									.filter(effPredicate)
+									.map(entry -> {
+										// ダメージ倍率ごとのタイプのリスト
+										String types = entry.getValue().isEmpty() ? "なし" : StringUtils.join(
+												entry.getValue().stream().map(TypeEnum::getJpn).collect(Collectors.toList()),
+												", ");
+										// メッセージ作成
+										return MessageFormat.format(
+												msgFormat,
+												entry.getKey().getDamageMultiplier(), // ダメージ倍率
+												types); // タイプのリスト
+									})
+									.collect(Collectors.toList());
+						}));
+
+		// 順位を求めるため、TwoTypeKeyごとのスコアのリストを作成する。
+		List<Double> scoreList = new ArrayList<>(sortedScoreMap.values());
+
 		// 返却値の作成
-		List<IroiroTypeRankElement> itreList = new ArrayList<>();
-		{
-			int rank = 1;
-			double tmpScore = 0;
-			for (Map.Entry<TwoTypeKey, Double> scoreEntry: sortedScoreMap.entrySet()) {
-
-				double score = scoreEntry.getValue();
-				// 種族数が異なる場合、ランクを1インクリメントさせる。
-				if (score < tmpScore) {
-					rank+=1;
-				}
-
-				List<String> msgList = getTypeEffFunc.apply(scoreEntry.getKey())
-						.entrySet().stream()
-						.filter(effPredicate)
-						.map(entry -> {
-							String types = entry.getValue().isEmpty() ? "なし" : StringUtils.join(
-									entry.getValue().stream().map(TypeEnum::getJpn).collect(Collectors.toList()),
-									", ");
-							return MessageFormat.format(
-									msgFormat,
-									entry.getKey().getDamageMultiplier(),
-									types);
-						})
-						.collect(Collectors.toList());
-
-				itreList.add(new IroiroTypeRankElement(
-						scoreEntry.getKey(),
-						rank,
-						msgList));
-
-				tmpScore = score;
-			}
-		}
-		return itreList;
+		return sortedScoreMap.entrySet().stream()
+				.map(entry -> new IroiroTypeRankElement(
+						entry.getKey(),
+						scoreList.indexOf(entry.getValue()) + 1, // 順位
+						msgListMap.get(entry.getKey()))) // メッセージのリスト
+				.collect(Collectors.toList());
 	}
 
 }
