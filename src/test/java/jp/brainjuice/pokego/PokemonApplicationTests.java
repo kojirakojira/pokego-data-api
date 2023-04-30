@@ -4,23 +4,27 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import jp.brainjuice.pokego.business.service.IroiroTypeRankService;
-import jp.brainjuice.pokego.business.service.IroiroTypeRankService.IroiroTypeRankSearchPattern;
-import jp.brainjuice.pokego.web.form.res.IroiroTypeRankResponse;
+import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 
 @SpringBootTest
 class PokemonApplicationTests {
 
+	@Autowired
+	GoPokedexRepository gpRepository;
 
 	@Autowired
-	IroiroTypeRankService iroiroTypeRankService;
+	PokemonGoUtils pokemonGoUtils;
 
 	@Test
 	void contextLoads() {
-		IroiroTypeRankResponse res = new IroiroTypeRankResponse();
-		iroiroTypeRankService.exec(IroiroTypeRankSearchPattern.leastWeakness, res);
 
-		res.getTypeRankList().forEach(System.out::println);
+		GoPokedex gp = gpRepository.findById("0129N01").get();
+
+		String pl = pokemonGoUtils.calcPl(gp, 0, 0, 0, 100);
+
+		System.out.println(pl);
 	}
 
 }

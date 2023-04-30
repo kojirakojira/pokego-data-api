@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.business.service.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,59 @@ public class PokemonGoUtils {
 	/** 最大CP表現時のPL(世間的な"最大CP"はPL50のCPを指します。) */
 	private static final String MAX_PL ="50";
 
+	/** 最低CP */
+	private static final int LOWEST_CP = 10;
+
+	/** calcPlメソッドにおいて、CPに対してPLが複数存在する場合のメッセージ */
+	public static final String DUPLICATE = "DUPLICATE";
+
+	/** calcPlメソッドにおいて、CPに対応するPLが存在しない場合のメッセージ */
+	public static final String NOT_EXIST = "NOT_EXIST";
+
 	@Autowired
 	public PokemonGoUtils(CpMultiplierMap cpMultiplierMap) {
 		this.cpMultiplierMap = cpMultiplierMap;
 	}
 
+	/**
+	 * PLを算出する。<br>
+	 * 指定されたCPに対応するPLが存在しない場合は、"NOT_EXIST"を返す。<br>
+	 * 指定されたCPに対してPLが複数存在する場合は、"DUPLICATE"を返す。
+	 *
+	 * @param goPokedex
+	 * @param ivAttack
+	 * @param ivDefense
+	 * @param ivHp
+	 * @param cp
+	 * @return
+	 */
+	public String calcPl(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, int cp) {
+
+		String pl = null;
+		// CP Multiplierでループ
+		for (Map.Entry<String, Double> entry: cpMultiplierMap.entrySet()) {
+			int calcedCp = calcCp(goPokedex, ivAttack, ivDefense, ivHp, entry.getValue().doubleValue());
+
+			// 算出したCPと、引数のCPが一致しない場合はスキップ
+			if (calcedCp != cp) continue;
+
+			// CPに対してPLが複数存在する場合の考慮（引数に最低CP(CP:10)が指定されたときのみ起こりうる。）
+			if (pl != null) {
+				// 前のループで既にplがセットされていた場合
+				pl = DUPLICATE;
+				break;
+			}
+
+			// PLをセット
+			pl = entry.getKey();
+
+			// CPが最低CPで無ければ、有無を言わずにPL確定。
+			if (cp != LOWEST_CP) break;
+
+		}
+		// PLがnullの場合は"NOT_EXIST"を返却する。
+		return pl == null ? NOT_EXIST : pl;
+	}
 
 	/**
 	 * 個体値から最大cpを求めます。<br>
@@ -43,6 +92,26 @@ public class PokemonGoUtils {
 				goPokedex.getAttack(),
 				goPokedex.getDefense(),
 				goPokedex.getHp());
+	}
+
+	/**
+	 * GoPokedex、個体値、CP Multiplierからcpを求めます。<br>
+	 * ※引数にはGOのステータスを指定してください。
+	 *
+	 * @param goPokedex
+	 * @param ivAttack
+	 * @param ivDefense
+	 * @param ivHp
+	 * @param multiplier
+	 * @return
+	 */
+	public int calcCp(GoPokedex goPokedex, int ivAttack, int ivDefense, int ivHp, double multiplier) {
+
+		return calcCp(
+				goPokedex.getAttack() + ivAttack,
+				goPokedex.getDefense() + ivDefense,
+				goPokedex.getHp() + ivHp,
+				multiplier);
 	}
 
 	/**
@@ -276,10 +345,30 @@ public class PokemonGoUtils {
 	 */
 	private int calcCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
 
-		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(cpMultiplierMap.get(pl), 2.0)) / 10.0);
+		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(cpMultiplierMap.get(pl).doubleValue(), 2.0)) / 10.0);
 
-		if (cp <= 10) {
-			cp = 10;
+		if (cp <= LOWEST_CP) {
+			cp = LOWEST_CP;
+		}
+		return cp;
+	}
+
+	/**
+	 * CPを求めます。<br>
+	 * 返却値 = (攻撃 * √防御 * √HP) * CPM ^ 2 / 10 (最小値：10）
+	 *
+	 * @param attack
+	 * @param defense
+	 * @param hp
+	 * @param multiplier
+	 * @return
+	 */
+	private int calcCp(int attack, int defense, int hp, double multiplier) {
+
+		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(multiplier, 2.0)) / 10.0);
+
+		if (cp <= LOWEST_CP) {
+			cp = LOWEST_CP;
 		}
 		return cp;
 	}

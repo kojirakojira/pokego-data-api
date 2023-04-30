@@ -151,7 +151,7 @@ public class PokemonEditUtils {
 	/**
 	 * 図鑑IDを並び替える用のComparatorを取得します。
 	 *
-	 * @param order 昇順の場合：正の数、降順の場合：負の数
+	 * @param order 正の数の場合：昇順、負の数の場合：降順
 	 * @return
 	 */
 	public static Comparator<GoPokedex> getPokedexComparator(int order) {

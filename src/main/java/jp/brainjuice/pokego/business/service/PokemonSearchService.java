@@ -20,7 +20,7 @@ import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexPlusAlpha;
+import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
@@ -93,20 +93,22 @@ public class PokemonSearchService {
 
 			if (goPokedexList.size() == 1) {
 				// 1件のみヒットした場合
-				result.setGoPokedex(getGoPokedexPlusAlpha(goPokedexList.get(0)));
+				result.setGoPokedex(getGoPokedexAndCp(goPokedexList.get(0)));
 				result.setUnique(true);
 			}
 		}
 
-		List<GoPokedexPlusAlpha> goPlusAlphaList = goPokedexList.stream().map(this::getGoPokedexPlusAlpha).collect(Collectors.toList());
-		result.setGoPokedexList(goPlusAlphaList);
+		List<GoPokedexAndCp> gpAndCpList = goPokedexList.stream()
+				.map(this::getGoPokedexAndCp)
+				.collect(Collectors.toList());
+		result.setGpAndCpList(gpAndCpList);
 		return result;
 	}
 
-	private GoPokedexPlusAlpha getGoPokedexPlusAlpha(GoPokedex goPokedex) {
+	private GoPokedexAndCp getGoPokedexAndCp(GoPokedex goPokedex) {
 		int cp = pokemonGoUtils.calcBaseCp(goPokedex.getAttack(), goPokedex.getDefense(), goPokedex.getHp());
-		GoPokedexPlusAlpha goPlusAlpha = new GoPokedexPlusAlpha(goPokedex, cp);
-		return goPlusAlpha;
+		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(goPokedex, cp);
+		return gpAndCp;
 	}
 
 	/**

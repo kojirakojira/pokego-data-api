@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.research.cp.AfterEvoCpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
@@ -17,12 +18,14 @@ import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
 import jp.brainjuice.pokego.business.service.utils.InputCheckService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.research.cp.AfterEvoCpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.ShadowRequest;
+import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
@@ -45,6 +48,9 @@ public class CpResearchController {
 	private CpRankListResearchService cpRankListResearchService;
 	private ResearchServiceExecutor<CpRankListResponse> cpRankListResRse;
 
+	private AfterEvoCpResearchService afterEvoCpResearchService;
+	private ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse;
+
 	private RaidResearchService raidResearchService;
 	private ResearchServiceExecutor<RaidResponse> raidResRse;
 
@@ -61,19 +67,23 @@ public class CpResearchController {
 			CpResearchService cpResearchService, ResearchServiceExecutor<CpResponse> cpResRse,
 			CpRankResearchService cpRankResearchService, ResearchServiceExecutor<CpRankResponse> cpRankResRse,
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
+			AfterEvoCpResearchService afterEvoCpResearchService, ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse,
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
 			InputCheckService inputCheckService) {
-		// CP算出
+		// CP算出※未使用
 		this.cpResearchService = cpResearchService;
 		this.cpResRse = cpResRse;
-		// CPランク算出
+		// CPランク算出※未使用
 		this.cpRankResearchService = cpRankResearchService;
 		this.cpRankResRse = cpRankResRse;
-		// CPランク一覧取得
+		// CPランク一覧取得※未使用
 		this.cpRankListResearchService = cpRankListResearchService;
 		this.cpRankListResRse = cpRankListResRse;
+		// 進化後CP
+		this.afterEvoCpResearchService = afterEvoCpResearchService;
+		this.afterEvoCpResRse = afterEvoCpResRse;
 		// レイドボスCP算出
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
@@ -88,15 +98,6 @@ public class CpResearchController {
 	}
 
 	/**
-	 * CPを求めるAPIです。<br>
-	 * INPUT：
-	 * <ul>
-	 *   <li>id or name</li>
-	 *   <li>iva</li>
-	 *   <li>ivd</li>
-	 *   <li>ivh</li>
-	 *   <li>pl</li>
-	 * </ul>
 	 *
 	 * @param cpReq
 	 * @return
@@ -114,14 +115,6 @@ public class CpResearchController {
 	}
 
 	/**
-	 * CPの順位を求めるAPIです。<br>
-	 * INPUT：
-	 * <ul>
-	 *   <li>id or name</li>
-	 *   <li>iva</li>
-	 *   <li>ivd</li>
-	 *   <li>ivh</li>
-	 * </ul>
 	 *
 	 * @param cpRankReq
 	 * @return
@@ -139,15 +132,6 @@ public class CpResearchController {
 	}
 
 	/**
-	 * 対象のポケモンのCPの一覧をランキングで取得するAPIです。<br>
-	 * ※PLが40の場合のCPの一覧です。
-	 * INPUT：
-	 * <ul>
-	 *   <li>id or name</li>
-	 *   <li>iva</li>
-	 *   <li>ivd</li>
-	 *   <li>ivh</li>
-	 * </ul>
 	 *
 	 * @param cpRankListReq
 	 * @return
@@ -161,6 +145,23 @@ public class CpResearchController {
 		CpRankListResponse cpRankListRes = new CpRankListResponse();
 		cpRankListResRse.execute(cpRankListReq, cpRankListRes, cpRankListResearchService);
 		return cpRankListRes;
+	}
+
+	/**
+	 * 進化後CP取得用API
+	 *
+	 * @param afterEvoCpRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/afterEvoCp")
+	public AfterEvoCpResponse afterEvoCp(AfterEvoCpRequest afterEvoCpRequest) throws Exception {
+
+		inputCheckService.validation(afterEvoCpRequest);
+
+		AfterEvoCpResponse afterEvoCpRes = new AfterEvoCpResponse();
+		afterEvoCpResRse.execute(afterEvoCpRequest, afterEvoCpRes, afterEvoCpResearchService);
+		return afterEvoCpRes;
 	}
 
 	/**

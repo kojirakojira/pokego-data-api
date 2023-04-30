@@ -1,7 +1,7 @@
 package jp.brainjuice.pokego.business.service.utils.memory;
 
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.annotation.PostConstruct;
 
@@ -14,9 +14,14 @@ import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
 
+/**
+ * CP Multiplier
+ *
+ * @author saibabanagchampa
+ */
 @Component
 @Slf4j
-public class CpMultiplierMap extends HashMap<String, Double> {
+public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 
 	@PostConstruct
 	public void init() throws PokemonDataInitException {

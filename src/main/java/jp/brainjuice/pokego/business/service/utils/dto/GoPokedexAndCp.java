@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoPokedexPlusAlpha {
+public class GoPokedexAndCp {
 
 	private GoPokedex goPokedex;
 	private int cp;

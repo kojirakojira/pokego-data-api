@@ -18,10 +18,10 @@ public class PokemonFilterResult {
 	private boolean unique;
 
 	/** 検索結果が複数件の場合 */
-	private List<GoPokedexPlusAlpha> goPokedexList;
+	private List<GoPokedexAndCp> gpAndCpList;
 
 	/** 検索結果が1件の場合 */
-	private GoPokedexPlusAlpha goPokedex;
+	private GoPokedexAndCp goPokedex;
 
 	/** ヒットしたかどうか */
 	private boolean hit;
