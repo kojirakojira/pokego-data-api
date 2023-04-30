@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
@@ -49,7 +48,8 @@ public class RedisConfig {
 	public RedisCacheConfiguration cacheConfiguration() {
 		return RedisCacheConfiguration
 				.defaultCacheConfig()
-				.entryTtl(Duration.ofDays(3L)).disableCachingNullValues()
+				// TODO: Spring Data Redisのバグのため効いていないっぽい。（https://techhelpnotes.com/java-spring-boot-redis-crud-repository-findbyid-or-findall-always-returns-optional-empty-null/）
+				.disableCachingNullValues()
 				.serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 	}
 

@@ -10,14 +10,15 @@ import lombok.Data;
 
 /**
  * ポケモンの閲覧情報<br>
- * 3時間で期限切れにする。（過去3時間での閲覧数を求めるために使用する。）
+ * Redisサーバ上に保存するためのBeanクラス。<br>
+ * 3日で期限切れにする。（過去3日間での閲覧数を求めるために使用する。）
  *
  * @author saibabanagchampa
  *
  */
 @Data
 @AllArgsConstructor
-@RedisHash(value = "pokemonTempView", timeToLive = 10800L)
+@RedisHash(value = "pokemonTempView", timeToLive = 259200L)
 public class PokemonTempView implements TempView {
 
 	/** id = (pokedexId + UUID) */

@@ -31,7 +31,7 @@ import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 閲覧情報を管理するためのクラスです。
+ * Redisサーバ上の閲覧情報を管理するためのクラスです。
  *
  * @author saibabanagchampa
  *
@@ -115,8 +115,9 @@ public class ViewsCacheManager {
 		Map<String, Integer> rtnMap = new HashMap<>();
 
 		// Keyのリスト（順番を担保）
-		ArrayList<String> keyList = new ArrayList<String>(pageViewKeys);
+		List<String> keyList = new ArrayList<String>(pageViewKeys);
 		// Valueのリスト（multiGetはコレクションの順番ごとに取得される。返却値の型はArrayList。）
+		// command="mget key1 key2..."
 		List<String> views = redisTemplate.opsForValue().multiGet(pageViewKeys);
 
 		// 順番ごとに2つのリストをループさせMapを作成する。
@@ -149,7 +150,7 @@ public class ViewsCacheManager {
 		log.info(START_MSG_SCHEDULE);
 
 		// 集計対象の閲覧情報の取得
-		ArrayList<ViewTempInfo> aggregateTargetList = viewTempList.getAggregateTargetList();
+		List<ViewTempInfo> aggregateTargetList = viewTempList.getAggregateTargetList();
 
 		// 閲覧数の加算
 		incrViewsCount(aggregateTargetList);
@@ -166,9 +167,9 @@ public class ViewsCacheManager {
 	 *
 	 * @param aggregateTargetList
 	 */
-	private void incrViewsCount(ArrayList<ViewTempInfo> aggregateTargetList) {
+	private void incrViewsCount(List<ViewTempInfo> aggregateTargetList) {
 
-		log.info(START_MSG_INCR_VIEWS_COUNT_INFO);
+		log.debug(START_MSG_INCR_VIEWS_COUNT_INFO);
 
 		// page閲覧情報リスト、pokemon閲覧情報リストに分割する。
 		Map<String, Set<ViewTempInfo>> pageViewMap = new HashMap<>();
@@ -209,7 +210,7 @@ public class ViewsCacheManager {
 			vOps.increment(BjRedisEnum.pokemonViews.name() + ":" + k, (long) v.size());
 		});
 
-		log.info(MessageFormat.format(END_MSG_INCR_VIEWS_COUNT_INFO, pageViewMap, pokemonViewMap));
+		log.debug(MessageFormat.format(END_MSG_INCR_VIEWS_COUNT_INFO, pageViewMap, pokemonViewMap));
 
 	}
 
@@ -220,7 +221,7 @@ public class ViewsCacheManager {
 	 * @see PageTempView
 	 * @see PokemonTempView
 	 */
-	private void sendViewsTempInfo(ArrayList<ViewTempInfo> aggregateTargetList) {
+	private void sendViewsTempInfo(List<ViewTempInfo> aggregateTargetList) {
 
 		log.info(START_MSG_SEND_VIEW_TEMP_INFO);
 

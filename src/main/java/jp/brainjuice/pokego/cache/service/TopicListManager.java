@@ -32,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
  * Redisサーバからメモリ上のTopic○○に反映させます。
  *
  * @author saibabanagchampa
+ * @see ViewsCacheProvider
+ * @see ViewsCacheManager
  *
  */
 @Component

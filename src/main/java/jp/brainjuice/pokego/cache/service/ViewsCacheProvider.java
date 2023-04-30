@@ -48,7 +48,7 @@ public class ViewsCacheProvider {
 	public void addTempList(JoinPoint jp) {
 
 		if (((IndividialValue) jp.getArgs()[0]).isEnableCount()) {
-			// オンの場合は閲覧数をカウントしない。
+			// enableCountがオンの場合は閲覧数をカウントしない。
 			return;
 		}
 
