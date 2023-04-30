@@ -1,10 +1,10 @@
 package jp.brainjuice.pokego.cache.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,6 +14,7 @@ import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
@@ -98,12 +99,12 @@ public class TopicListManager {
 		log.info(MessageFormat.format(START_MSG_UPDATE_TOPIC_LIST, this.topicPageList.toString(), this.topicPokemonList.toString()));
 
 		// TopicPageを更新する。
-		ArrayList<TopicPage> topicPageList = createTopicPageList();
+		List<TopicPage> topicPageList = createTopicPageList();
 		this.topicPageList.clear();
 		this.topicPageList.addAll(topicPageList);
 
 		// TopicPokemonを更新する。
-		ArrayList<TopicPokemon> topicPokemonList = createTopicPokemonList();
+		List<TopicPokemon> topicPokemonList = createTopicPokemonList();
 		this.topicPokemonList.clear();
 		this.topicPokemonList.addAll(topicPokemonList);
 
@@ -117,9 +118,7 @@ public class TopicListManager {
 	 *
 	 * @return
 	 */
-	private ArrayList<TopicPage> createTopicPageList() {
-
-		ArrayList<TopicPage> topicPageList = new ArrayList<>();
+	private List<TopicPage> createTopicPageList() {
 
 		// Redisから検索
 		Iterable<PageTempView> viewsCountMap = pageTempViewRedisRepository.findAll();
@@ -127,18 +126,16 @@ public class TopicListManager {
 		// pageごとの閲覧数をマップで取得
 		Map<String, Integer> pageViewsMap = createViewsCountMap(viewsCountMap);
 
-		// TopicPageの生成
-		pageViewsMap.forEach((k, v) -> {
-			PageNameEnum pageName = PageNameEnum.valueOf(k);
-			topicPageList.add(new TopicPage(pageName, pageName.getJpn(), v));
-		});
-
-		// 並び替え（降順）
-		Collections.sort(topicPageList, (o1, o2) -> {
-			return o1.getCount() < o2.getCount() ? 1 : -1;
-		});
-
-		return topicPageList;
+		// TopicPageのリストを生成
+		return pageViewsMap.entrySet().stream()
+				.map(entry -> {
+					PageNameEnum pageName = PageNameEnum.valueOf(entry.getKey());
+					return new TopicPage(pageName, pageName.getJpn(), entry.getValue());
+				})
+				.sorted((o1, o2) -> {
+					return o1.getCount() < o2.getCount() ? 1 : -1;
+				})
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -147,9 +144,7 @@ public class TopicListManager {
 	 *
 	 * @return
 	 */
-	private ArrayList<TopicPokemon> createTopicPokemonList() {
-
-		ArrayList<TopicPokemon> topicPokemonList = new ArrayList<>();
+	private List<TopicPokemon> createTopicPokemonList() {
 
 		// Redisから検索
 		Iterable<PokemonTempView> pokemonTempViewList = pokemonTempViewRedisRepository.findAll();
@@ -158,23 +153,24 @@ public class TopicListManager {
 		Map<String, Integer> viewsCountMap = createViewsCountMap(pokemonTempViewList);
 
 		// GoPokedexのリストを取得
-		Iterable<GoPokedex> goPokedexList = goPokedexRepository.findAllById(viewsCountMap.keySet());
+		Map<String, GoPokedex> goPokedexMap = goPokedexRepository.findAllById(viewsCountMap.keySet()).stream()
+				.collect(Collectors.toMap(
+						GoPokedex::getPokedexId,
+						gp -> gp));
 
-		// TopicPokemonの生成
-		viewsCountMap.forEach((k, v) -> {
-			for (GoPokedex gp: goPokedexList) {
-				if (k.equals(gp.getPokedexId())) {
-					topicPokemonList.add(new TopicPokemon(gp.getPokedexId(), gp.getName(), v));
-				}
-			}
-		});
-
-		// 並び替え（降順）
-		Collections.sort(topicPokemonList, (o1, o2) -> {
-			return o1.getCount() < o2.getCount() ? 1 : -1;
-		});
-
-		return topicPokemonList;
+		// TopicPokemonのリストを生成
+		return viewsCountMap.entrySet().stream()
+				.map(entry -> {
+					GoPokedex gp = goPokedexMap.get(entry.getKey());
+					return new TopicPokemon(
+							gp.getPokedexId(),
+							PokemonEditUtils.appendRemarks(gp),
+							entry.getValue()); // TopicPokemonに変換。
+				})
+				.sorted((o1, o2) -> {
+					return o1.getCount() < o2.getCount() ? 1 : -1;
+				}) // 並び替え
+				.collect(Collectors.toList());
 	}
 
 	/**
