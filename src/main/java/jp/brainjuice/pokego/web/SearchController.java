@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jp.brainjuice.pokego.business.service.OgpInfoService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
@@ -21,10 +22,14 @@ import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.OgpPokemonRequest;
+import jp.brainjuice.pokego.web.form.req.OgpTypeRequest;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.SearchAllRequest;
 import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
+import jp.brainjuice.pokego.web.form.res.OgpPokemonResponse;
+import jp.brainjuice.pokego.web.form.res.OgpTypeResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.SearchAllResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
@@ -44,6 +49,8 @@ public class SearchController {
 
 	private UnimplPokemonService unimplPokemonService;
 
+	private OgpInfoService ogpInfoService;
+
 	private ViewsCacheProvider viewsCacheProvider;
 
 	@Autowired
@@ -52,6 +59,7 @@ public class SearchController {
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService,
+			OgpInfoService ogpInfoService,
 			ViewsCacheProvider viewsCacheProvider) {
 
 		// 種族値比較
@@ -63,6 +71,8 @@ public class SearchController {
 		this.topicListProvider = topicListProvider;
 
 		this.unimplPokemonService = unimplPokemonService;
+
+		this.ogpInfoService = ogpInfoService;
 
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
@@ -204,6 +214,36 @@ public class SearchController {
 		viewsCacheProvider.addTempList();
 
 		return res;
+	}
+
+	/**
+	 * OGP情報の取得（ポケモン情報）
+	 *
+	 * @return
+	 */
+	@GetMapping("/ogpPokemon")
+	public OgpPokemonResponse ogpPokemon(OgpPokemonRequest ogpPokemonReq) {
+
+		OgpPokemonResponse ogpPokemonRes = new OgpPokemonResponse();
+
+		ogpInfoService.execPokemonInfo(ogpPokemonReq.getId(), ogpPokemonRes);
+
+		return ogpPokemonRes;
+	}
+
+	/**
+	 * OGP情報の取得（タイプ情報）
+	 *
+	 * @return
+	 */
+	@GetMapping("/ogpType")
+	public OgpTypeResponse ogpType(OgpTypeRequest ogpTypeReq) {
+
+		OgpTypeResponse ogpPokemonRes = new OgpTypeResponse();
+
+		ogpInfoService.execTypeInfo(ogpTypeReq.getType1(), ogpTypeReq.getType2(), ogpPokemonRes);
+
+		return ogpPokemonRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)
