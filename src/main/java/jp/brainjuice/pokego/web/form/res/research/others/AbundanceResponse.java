@@ -28,6 +28,9 @@ public class AbundanceResponse extends ResearchResponse {
 	// フィールドリサーチ
 	private int minFrTaskCp;
 	private int maxFrTaskCp;
+	// タマゴ
+	private int minEggCp;
+	private int maxEggCp;
 	// 強ポケ補正対象か否か
 	private boolean tooStrong;
 

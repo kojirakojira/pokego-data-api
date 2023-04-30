@@ -54,9 +54,15 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setMaxShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "8"));
 		res.setMinWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, "13"));
 		res.setMaxWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "13"));
+
+		int minFrTaskAndEggCp = pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "15");
+		int maxFrTaskAndEggCp = pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "15");
 		// CP(フィールドリサーチ)
-		res.setMinFrTaskCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "15"));
-		res.setMaxFrTaskCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "15"));
+		res.setMinFrTaskCp(minFrTaskAndEggCp);
+		res.setMaxFrTaskCp(maxFrTaskAndEggCp);
+		// CP(タマゴ)
+		res.setMinEggCp(minFrTaskAndEggCp);
+		res.setMaxEggCp(maxFrTaskAndEggCp);
 		// 強ポケ補正の有無
 		res.setTooStrong(tooStrongPokemonList.contains(goPokedex.getPokedexId()));
 
