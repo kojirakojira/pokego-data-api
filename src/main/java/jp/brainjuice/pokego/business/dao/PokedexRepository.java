@@ -36,7 +36,7 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	private static final String MSG_INVALID_TYPE_ERROR = "タイプの指定に誤りがあります。{0}";
 	private static final String MSG_INVALID_GEN_ERROR = "世代の指定に誤りがあります。{0}";
 
-	private static final String FILE_NAME = "pokemon.csv";
+	private static final String FILE_NAME = "pokemon/pokemon.csv";
 
 	/**
 	 * CSVファイルからPokedexを生成し、DIに登録する。

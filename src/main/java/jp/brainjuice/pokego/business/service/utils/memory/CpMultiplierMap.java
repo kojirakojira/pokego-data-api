@@ -30,7 +30,7 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 		InputStreamReader reader;
 		try {
 			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:config/cp-multiplier.yml");
+			Resource resource = resourceLoader.getResource("classpath:pokemon/cp-multiplier.yml");
 			reader = new InputStreamReader(resource.getInputStream());
 
 			Yaml yaml = new Yaml();

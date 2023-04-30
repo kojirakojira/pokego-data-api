@@ -44,7 +44,9 @@ public class EvolutionInfo {
 	/** 進化前が複数する例外的なポケモンのマップ */
 	private final Map<String, List<String>> exceptionsMap = new HashMap<>();
 
-	private static final String FILE_NAME = "pokemon-evolution.csv";
+	private static final String FILE_NAME = "pokemon/pokemon-evolution.csv";
+
+	private static final String EXCEPTIONS_FILE_NAME = "pokemon/pokemon-evolution-exceptions.yml";
 
 	private static final String ROOT = "root";
 
@@ -725,7 +727,7 @@ public class EvolutionInfo {
 		InputStreamReader reader;
 		try {
 			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:pokemon-evolution-exceptions.yml");
+			Resource resource = resourceLoader.getResource("classpath:" + EXCEPTIONS_FILE_NAME);
 			reader = new InputStreamReader(resource.getInputStream());
 
 			Yaml yaml = new Yaml();

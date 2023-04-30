@@ -37,7 +37,7 @@ public class TypeChartInfo {
 	private Map<TypeEnum, TypeStrength> typeChartMap = new HashMap<>();
 
 	/** 相性表のファイル名 */
-	private static final String FILE_NAME = "config/type-chart.csv";
+	private static final String FILE_NAME = "pokemon/type-chart.csv";
 
 	// 最大、最小の攻撃する側のスコア
 	private double maxAfScore;

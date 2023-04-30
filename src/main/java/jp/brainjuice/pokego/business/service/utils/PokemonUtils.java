@@ -73,7 +73,7 @@ public class PokemonUtils {
 		InputStreamReader reader;
 		try {
 			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:config/race-exceptions.yml");
+			Resource resource = resourceLoader.getResource("classpath:pokemon/race-exceptions.yml");
 			reader = new InputStreamReader(resource.getInputStream());
 
 			Yaml yaml = new Yaml();
