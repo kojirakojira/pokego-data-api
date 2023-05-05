@@ -14,7 +14,7 @@ public enum PageNameEnum {
 
 	// jpnを空文字にした場合、ページの閲覧数をカウントしない。
 
-	abundance(""),
+	abundance("ポケモン情報"),
 	filterAll("ポケモン検索"),
 	searchAll("全ポケ絞り込み"),
 	raid("レイドボスCP"),
