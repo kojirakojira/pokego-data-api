@@ -82,6 +82,23 @@ public class ViewsCacheProvider {
 	}
 
 	/**
+	 * 閲覧情報をメモリ上のリストに追加する。<br>
+	 * 単体のポケモンに対する閲覧じゃない場合の呼び出し口。
+	 *
+	 */
+	public void addTempList(String pokedexId) {
+
+		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
+		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		String uri = req.getRequestURI();
+		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+		String ip = req.getRemoteAddr();
+
+		addTempList(PageNameEnum.valueOf(page), pokedexId, ip);
+
+	}
+
+	/**
 	 * 閲覧情報をメモリ上のリストに追加する。
 	 *
 	 * @param page
