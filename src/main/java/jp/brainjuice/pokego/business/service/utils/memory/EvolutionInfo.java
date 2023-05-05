@@ -12,13 +12,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import com.ibm.icu.text.MessageFormat;
+
+import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Evolution;
@@ -49,6 +50,12 @@ public class EvolutionInfo {
 	private static final String EXCEPTIONS_FILE_NAME = "pokemon/pokemon-evolution-exceptions.yml";
 
 	private static final String ROOT = "root";
+
+	private static final String NOT_EXISTS_MSG = "pokemon.csvに定義したポケモンがpokemon-evolution.csvに定義されていません。{0}";
+
+	public EvolutionInfo(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+		init(goPokedexRepository);
+	}
 
 	/**
 	 * 進化前のポケモンを取得する。
@@ -696,12 +703,15 @@ public class EvolutionInfo {
 	 *
 	 * @throws PokemonDataInitException
 	 */
-	@PostConstruct
-	public void init() throws PokemonDataInitException {
+	private void init(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
 
 		// CSVファイルの内容をメモリに抱える。
 		try {
 			List<Evolution> evolutionList = BjCsvMapper.mapping(FILE_NAME, Evolution.class);
+
+			// pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
+			checkAllExists(evolutionList, goPokedexRepository);
+
 
 			Set<String> noEvoSet = new HashSet<String>();
 			Map<String, String> bfEvoMap = new HashMap<String, String>();
@@ -772,6 +782,33 @@ public class EvolutionInfo {
 		noBfEvoMap.removeAll(dummyIdList);
 
 		return noBfEvoMap;
+	}
+
+	/**
+	 * pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
+	 *
+	 * @param evoList
+	 * @param goPokedexRepository
+	 * @return
+	 * @throws PokemonDataInitException
+	 */
+	private void checkAllExists(List<Evolution> evoList, GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+
+		List<String> evoPidList = evoList.stream()
+				.map(Evolution::getPokedexId)
+				.collect(Collectors.toList());
+
+		List<GoPokedex> notExistsGpList = goPokedexRepository.findAll().stream()
+				.filter(gp -> !evoPidList.contains(gp.getPokedexId()))
+				.collect(Collectors.toList());
+
+		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
+		if (!notExistsGpList.isEmpty()) {
+			throw new PokemonDataInitException(
+					MessageFormat.format(
+							NOT_EXISTS_MSG,
+							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));
+		}
 	}
 
 }

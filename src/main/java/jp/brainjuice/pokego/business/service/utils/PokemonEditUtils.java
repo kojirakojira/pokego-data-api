@@ -12,11 +12,12 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 
 public class PokemonEditUtils {
 
-	private static final String M = "M";
 	private static final String N = "N";
 	private static final String G = "G";
 	private static final String A = "A";
 	private static final String H = "H";
+	private static final String P = "P";
+	private static final String M = "M";
 
 	/**
 	 * 亜種コードの順序
@@ -27,7 +28,8 @@ public class PokemonEditUtils {
 		subspeciesMap.put(A, Integer.valueOf(1));
 		subspeciesMap.put(G, Integer.valueOf(2));
 		subspeciesMap.put(H, Integer.valueOf(3));
-		subspeciesMap.put(M, Integer.valueOf(4));
+		subspeciesMap.put(P, Integer.valueOf(4));
+		subspeciesMap.put(M, Integer.valueOf(5));
 	}
 
 	/**
