@@ -421,36 +421,19 @@ public class EvolutionInfo {
 
 		/** 進化ツリーをList<List<Hierarchy>>の形式に変換する */
 		hieMap.entrySet().stream().forEach(hieEntry -> {
-			final List<Hierarchy> xList = new ArrayList<>();
-			hieEntry.getValue().entrySet().stream().forEach(entry -> {
-				xList.add(new Hierarchy(0, hieEntry.getKey().intValue(), 0, entry.getKey(), entry.getValue()));
-			});
+			List<Hierarchy> xList = hieEntry.getValue().entrySet().stream()
+					.map(entry -> new Hierarchy(0, hieEntry.getKey().intValue(), 0, entry.getKey(), entry.getValue()))
+					.collect(Collectors.toList());
 			yList.add(xList);
 		});
 
 		/** 並び替え、x軸の位置、進化前のポケモンのx軸の距離を設定する。 */
 		for (int y = 0, ySize = yList.size(); y < ySize; y++) {
 
-			// 並び替え
 			if (0 < y) {
-				// 1つ上の階層のポケモンの図鑑№のリストを取得する。（重複を削除する。）
-				List<String> befList = yList.get(y - 1).stream()
-						.map(h -> PokemonEditUtils.getStrPokedexNo(h.getId()))
-						.distinct()
-						.collect(Collectors.toList());
-
 				// 並び替え
 				Collections.sort(yList.get(y), (o1, o2) -> {
-					// 1階層前のリストの何要素目かをそれぞれ求める。
-					final int i2 = befList.indexOf(PokemonEditUtils.getStrPokedexNo(o2.getBid()));
-					final int i1 = befList.indexOf(PokemonEditUtils.getStrPokedexNo(o1.getBid()));
-					// 進化前のポケモンのindexが一致しない場合。進化前のポケモンの並び順に合わせて並び替える。
-					if (i2 != i1) {
-						return i1 - i2;
-					}
-
-					// 進化前のポケモンが一致する場合は、図鑑№で昇順。
-					return PokemonEditUtils.getPokedexNo(o1.getId()) - PokemonEditUtils.getPokedexNo(o2.getId());
+					return PokemonEditUtils.getPokedexIdComparator().compare(o1.getId(), o2.getId());
 				});
 			}
 
@@ -492,8 +475,9 @@ public class EvolutionInfo {
 
 		/** x軸の重複を解消する。（重複してる場合はいい感じにx軸の正の方向にずらす。） */
 		// 処理の都合上、直列で持ち変える
-		final List<Hierarchy> parallelList = new ArrayList<>();
-		yList.forEach(y -> y.forEach(parallelList::add));
+		List<Hierarchy> parallelList = yList.stream()
+				.flatMap(xList -> xList.stream())
+				.collect(Collectors.toList());
 
 		int i = 0;
 		int size = parallelList.size();
@@ -571,20 +555,9 @@ public class EvolutionInfo {
 			hierarchy++;
 
 			// hieMapは、<その階層のpokedexId, 進化前のpokedexId>の情報を持つ。
-			final Map<String, String> hieMap = new HashMap<>();
-
-			final List<String> nextHierarchyList = new ArrayList<>();
-
-			beforeHieList.forEach(pokeId -> {
-				// 進化後のポケモンをすべて取得する。
-				List<String> afterList = getAfterEvolution(pokeId);
-				// hieMapにすべて追加。
-				afterList.forEach(afPokeId -> {
-					hieMap.put(afPokeId, pokeId);
-				});
-				// 次の階層のpokedexIdをすべて追加。
-				nextHierarchyList.addAll(afterList);
-			});
+			Map<String, String> hieMap = beforeHieList.stream()
+					.flatMap(bfPid -> getAfterEvolution(bfPid).stream().map(afPid -> Map.entry(afPid, bfPid)))
+					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
 			if (hieMap.isEmpty()) {
 				break;
@@ -593,7 +566,10 @@ public class EvolutionInfo {
 			// <階数, <その階層のpokedexId, 次の階層のpokedexId>>
 			retMap.put(Integer.valueOf(hierarchy), hieMap);
 
-			beforeHieList = nextHierarchyList;
+			// 次の階層の準備のため、進化後のpokedexIdを進化前のpokedexIdとする。
+			beforeHieList = hieMap.entrySet().stream()
+					.map(Map.Entry::getKey) // 進化後のpokedexId
+					.collect(Collectors.toList());
 
 		}
 
