@@ -142,9 +142,9 @@ public class ViewsCacheManager {
 	 *
 	 * 15分おきに実行
 	 * タスク実行完了の15分後
-	 * （サーバ起動10分後から開始）
+	 * （サーバ起動5分後から開始）
 	 */
-	@Scheduled(initialDelay = 600000, fixedDelay = 900000)
+	@Scheduled(initialDelay = 300000, fixedDelay = 900000)
 	public void sendViewInfo() {
 
 		log.info(START_MSG_SCHEDULE);

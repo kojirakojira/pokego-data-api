@@ -92,10 +92,10 @@ public class TopicListManager {
 	 *
 	 * 15分おきに実行
 	 * タスク実行完了の15分後
-	 * （サーバ起動15分後から開始）
+	 * （サーバ起動30秒後から開始）
 	 * @param <T>
 	 */
-	@Scheduled(initialDelay = 900000, fixedDelay = 900000)
+	@Scheduled(initialDelay = 30000, fixedDelay = 900000)
 	public void updateTopicList() {
 
 		log.info(MessageFormat.format(START_MSG_UPDATE_TOPIC_LIST, this.topicPageList.toString(), this.topicPokemonList.toString()));
@@ -134,6 +134,7 @@ public class TopicListManager {
 					PageNameEnum pageName = PageNameEnum.valueOf(entry.getKey());
 					return new TopicPage(pageName, pageName.getJpn(), entry.getValue());
 				})
+				.filter(tp -> tp.getPage() != PageNameEnum.abundance) // abundanceは検索ページではないため、対象外とする。
 				.sorted((o1, o2) -> {
 					return o1.getCount() < o2.getCount() ? 1 : -1;
 				})
