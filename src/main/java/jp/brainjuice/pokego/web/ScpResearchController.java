@@ -9,14 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.research.scp.AfterEvoScpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankMaxMinResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankResearchService;
 import jp.brainjuice.pokego.business.service.utils.InputCheckService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.research.scp.AfterEvoScpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankMaxMinRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankRequest;
+import jp.brainjuice.pokego.web.form.res.research.scp.AfterEvoScpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankMaxMinResponse;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankResponse;
@@ -36,6 +39,9 @@ public class ScpResearchController {
 	private ScpRankListResearchService scpRankListResearchService;
 	private ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse;
 
+	private AfterEvoScpRankResearchService afterEvoScpRankResearchService;
+	private ResearchServiceExecutor<AfterEvoScpRankResponse> afterEvoScpRankResRse;
+
 	private InputCheckService inputCheckService;
 
 	@Autowired
@@ -43,6 +49,7 @@ public class ScpResearchController {
 			ScpRankResearchService scpRankResearchService, ResearchServiceExecutor<ScpRankResponse> scpRankResRse,
 			ScpRankMaxMinResearchService scpRankMaxMinResearchService, ResearchServiceExecutor<ScpRankMaxMinResponse> scpRankMaxMinResRse,
 			ScpRankListResearchService scpRankListResearchService, ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse,
+			AfterEvoScpRankResearchService afterEvoScpRankResearchService, ResearchServiceExecutor<AfterEvoScpRankResponse> afterEvoScpRankResRse,
 			InputCheckService inputCheckService) {
 		// SCPランク算出
 		this.scpRankResearchService = scpRankResearchService;
@@ -53,6 +60,9 @@ public class ScpResearchController {
 		// SCPランク一覧取得
 		this.scpRankListResearchService = scpRankListResearchService;
 		this.scpRankListResRse = scpRankListResRse;
+		// 進化後SCPランク
+		this.afterEvoScpRankResearchService = afterEvoScpRankResearchService;
+		this.afterEvoScpRankResRse = afterEvoScpRankResRse;
 		// 入力チェック
 		this.inputCheckService = inputCheckService;
 	}
@@ -104,8 +114,9 @@ public class ScpResearchController {
 	}
 
 	/**
+	 * PvP順位一覧用API
 	 *
-	 * リーグに応じたSCPの順位（pvp順位）を求めます。
+	 * リーグに応じたSCPの順位（PvP順位）を求めます。
 	 * INPUT：
 	 * <ul>
 	 *   <li>id or name</li>
@@ -124,6 +135,23 @@ public class ScpResearchController {
 		ScpRankListResponse scpRankListRes = new ScpRankListResponse();
 		scpRankListResRse.execute(scpRankListReq, scpRankListRes, scpRankListResearchService);
 		return scpRankListRes;
+	}
+
+	/**
+	 * 進化後PvP順位用API
+	 *
+	 * @param afterEvoScpRankListReq
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/afterEvoScpRank")
+	public AfterEvoScpRankResponse afterEvoScpRank(AfterEvoScpRankRequest afterEvoScpRankListReq) throws Exception {
+
+		inputCheckService.validation(afterEvoScpRankListReq);
+
+		AfterEvoScpRankResponse afterEvoScpRankRes = new AfterEvoScpRankResponse();
+		afterEvoScpRankResRse.execute(afterEvoScpRankListReq, afterEvoScpRankRes, afterEvoScpRankResearchService);
+		return afterEvoScpRankRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

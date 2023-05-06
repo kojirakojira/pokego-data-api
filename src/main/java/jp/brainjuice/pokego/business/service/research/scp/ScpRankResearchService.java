@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
-import jp.brainjuice.pokego.business.service.utils.ScpRankCulculator;
+import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankResponse;
@@ -13,10 +13,10 @@ import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankResponse;
 @Service
 public class ScpRankResearchService implements ResearchService<ScpRankResponse> {
 
-	private ScpRankCulculator scpRankCulculator;
+	private ScpRankCalculator scpRankCulculator;
 
 	@Autowired
-	public ScpRankResearchService(ScpRankCulculator scpRankCulculator) {
+	public ScpRankResearchService(ScpRankCalculator scpRankCulculator) {
 		this.scpRankCulculator = scpRankCulculator;
 	}
 
@@ -28,25 +28,12 @@ public class ScpRankResearchService implements ResearchService<ScpRankResponse> 
 		int ivh = (int) iv.get(ParamsEnum.ivh);
 
 		GoPokedex goPokedex = iv.getGoPokedex();
-		scpRankCulculator.getSuperLeagueSummary(goPokedex).forEach(scpl -> {
-			if (iva == scpl.getIva() && ivd == scpl.getIvd() && ivh == scpl.getIvh()) {
-				res.setScpSlRank(scpl);
-			}
-		});
 
-		scpRankCulculator.getHyperLeagueSummary(goPokedex).forEach(scpl -> {
-			if (iva == scpl.getIva() && ivd == scpl.getIvd() && ivh == scpl.getIvh()) {
-				res.setScpHlRank(scpl);
-			}
-		});
+		res.setScpSlRank(scpRankCulculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh));
 
-		scpRankCulculator.getMasterLeagueSummary(goPokedex).forEach(scpl -> {
-			if (iva == scpl.getIva() && ivd == scpl.getIvd() && ivh == scpl.getIvh()) {
-				res.setScpMlRank(scpl);
-			}
-		});
+		res.setScpHlRank(scpRankCulculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh));
 
-		res.setMessage("");
+		res.setScpMlRank(scpRankCulculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh));
 	}
 
 }

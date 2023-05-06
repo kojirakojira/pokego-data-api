@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.research.ResearchService;
-import jp.brainjuice.pokego.business.service.utils.ScpRankCulculator;
+import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
@@ -15,11 +15,11 @@ import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankListResponse;
 @Service
 public class ScpRankListResearchService implements ResearchService<ScpRankListResponse> {
 
-	private ScpRankCulculator scpRankCulculator;
+	private ScpRankCalculator scpRankCulculator;
 
 	@Autowired
 	public ScpRankListResearchService(
-			ScpRankCulculator scpRankCulculator) {
+			ScpRankCalculator scpRankCulculator) {
 		this.scpRankCulculator = scpRankCulculator;
 	}
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
-import jp.brainjuice.pokego.business.service.utils.ScpRankCulculator;
+import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
 import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankMaxMinResponse;
@@ -15,10 +15,10 @@ import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankMaxMinResponse;
 @Service
 public class ScpRankMaxMinResearchService implements ResearchService<ScpRankMaxMinResponse> {
 
-	private ScpRankCulculator scpRankCulculator;
+	private ScpRankCalculator scpRankCulculator;
 
 	@Autowired
-	public ScpRankMaxMinResearchService(ScpRankCulculator scpRankCulculator) {
+	public ScpRankMaxMinResearchService(ScpRankCalculator scpRankCulculator) {
 		this.scpRankCulculator = scpRankCulculator;
 	}
 
