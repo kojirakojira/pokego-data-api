@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ibm.icu.text.MessageFormat;
-
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
@@ -78,7 +76,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 			res.setSuccess(true);
 		} else {
-			throw new BadRequestException(MessageFormat.format("id:{0}, name: {1}", req.getId(), req.getName()));
+			throw new BadRequestException(req.getId(), req.getName());
 		}
 	}
 

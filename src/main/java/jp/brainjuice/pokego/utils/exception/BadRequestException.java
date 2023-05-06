@@ -1,5 +1,12 @@
 package jp.brainjuice.pokego.utils.exception;
 
+import java.text.MessageFormat;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 /**
  * リクエストのパラメータに誤りがある場合にスローします。
  *
@@ -22,5 +29,17 @@ public class BadRequestException extends Exception {
 
 	public BadRequestException(Throwable e) {
 		super(e);
+	}
+
+	public BadRequestException(String id, String name) {
+		super(getMessage(id, name));
+	}
+
+	private static String getMessage(String id, String name) {
+
+		HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		String uri = httpServletRequest.getRequestURI();
+		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+		return MessageFormat.format("page:{0}, id:{1}, name:{2}", page, id, name);
 	}
 }
