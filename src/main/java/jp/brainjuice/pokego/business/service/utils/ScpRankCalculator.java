@@ -4,7 +4,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,12 +23,17 @@ public class ScpRankCalculator {
 
 	private PokemonGoUtils pokemonGoUtils;
 
+	/** 処理の都合上、CpMultiplierMapをListで持つ。 */
+	private List<Map.Entry<String, Double>> cpMultiplierList;
+
 	@Autowired
 	public ScpRankCalculator(
 			CpMultiplierMap cpMultiplierMap,
 			PokemonGoUtils pokemonGoUtils) {
 		this.cpMultiplierMap = cpMultiplierMap;
 		this.pokemonGoUtils = pokemonGoUtils;
+
+		cpMultiplierList = cpMultiplierMap.entrySet().stream().collect(Collectors.toList());
 	}
 
 	/**
@@ -53,12 +60,11 @@ public class ScpRankCalculator {
 
 	// スーパーリーグ用CP制限判定用Predicate
 	private final Predicate<Integer> slCpLimitPredicate = (arg) -> { return arg.intValue() <= 1500; };
-
 	// ハイパーリーグ用CP制限判定用Predicate
 	private final Predicate<Integer> hlCpLimitPredicate = (arg) -> { return arg.intValue() <= 2500; };
-
 	// マスターリーグ用CP制限判定用Predicate
 	private final Predicate<Integer> mlCpLimitPredicate = (arg) -> { return true; };
+
 
 	/**
 	 * リーグに応じたSCPのランク一覧を取得します。<br>
@@ -95,7 +101,11 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getSuperLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = getSuperLeagueSummary(goPokedex);
+		ArrayList<ScpRank> scpRankList = summary(goPokedex, slCpLimitPredicate);
+
+		sort(scpRankList);
+
+		ranking(scpRankList);
 
 		return getScpRank(scpRankList, iva, ivd, ivh);
 	}
@@ -111,7 +121,11 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getHyperLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = getHyperLeagueSummary(goPokedex);
+		ArrayList<ScpRank> scpRankList = summary(goPokedex, hlCpLimitPredicate);
+
+		sort(scpRankList);
+
+		ranking(scpRankList);
 
 		return getScpRank(scpRankList, iva, ivd, ivh);
 	}
@@ -127,7 +141,11 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getMasterLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = getMasterLeagueSummary(goPokedex);
+		ArrayList<ScpRank> scpRankList = summary(goPokedex, mlCpLimitPredicate);
+
+		sort(scpRankList);
+
+		ranking(scpRankList);
 
 		return getScpRank(scpRankList, iva, ivd, ivh);
 	}
@@ -207,7 +225,7 @@ public class ScpRankCalculator {
 	}
 
 	/**
-	 * 個体値ごとの"ScpRank"のリストを作成します。
+	 * 個体値ごとのScpRankのリストを作成します。
 	 *
 	 * @param goPokedex
 	 * @param league
@@ -222,7 +240,7 @@ public class ScpRankCalculator {
 			for (int ivd = 0; ivd <= 15; ivd++) {
 				for (int ivh = 0; ivh <= 15; ivh++) {
 
-					ScpRank scpRank = createScpRank(goPokedex, iva, ivd, ivh, cpLimitPredicate, plFormat);
+					ScpRank scpRank = createScpRank(goPokedex, iva, ivd, ivh, plFormat, cpLimitPredicate);
 					if (scpRank != null) {
 						scpRankList.add(scpRank);
 					}
@@ -235,7 +253,7 @@ public class ScpRankCalculator {
 
 	/**
 	 * CP制限内の最も高い個体値(ScpRank)を取得する。
-	 * 最も高い個体値が存在しない
+	 * CP制限内の個体値が存在しない場合は、nullを返却する。
 	 *
 	 * @param goPokedex
 	 * @param iva
@@ -250,37 +268,53 @@ public class ScpRankCalculator {
 			int iva,
 			int ivd,
 			int ivh,
-			Predicate<Integer> cpLimitPredicate,
-			DecimalFormat plFormat) {
+			DecimalFormat plFormat,
+			Predicate<Integer> cpLimitPredicate) {
 
-		// PLは上からループさせ、CP制限を上回る最大のCPの場合、その個体値のCP,ステ積、SCP、PLをリストに追加する。
-		double scp = 0.0; // SCP
-		double sp = 0.0; // ステ積
-		String pl = null; // PL
-		Integer cp = null; // CP
-		for (int tpl = 510; tpl >= 10; tpl-=5) {
-			pl = plFormat.format(tpl / 10.0);
-			Integer tmpCp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
+		/** CP制限内で、最も高い個体値のPL、CPを求める。 */
+		// マスターリーグの場合は、固定でPL51が最高個体になるため、まずPL最大値(PL:51)の個体値を調べる。
+		// （スーパー、ハイパーリーグの場合もPL最大個体がCP制限を上回るパターンは多いため、処理性能向上に繋がる。）
+		String pl = cpMultiplierList.get(cpMultiplierList.size() - 1).getKey();
+		int cp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
 
-			if (cpLimitPredicate.test(tmpCp)) {
-				// CP制限を超えていない場合
-				cp = tmpCp;
-				sp = pokemonGoUtils.statusProduct(goPokedex, iva, ivd, ivh, cpMultiplierMap.get(pl));
-				scp = pokemonGoUtils.calcScp(sp);
-				break;
+		if (!cpLimitPredicate.test(cp)) {
+			// PLが最大値のとき、CP制限に収まっていない場合。
+
+			int left = 0;
+			int right = cpMultiplierList.size();
+
+			int mid = 0;
+			// 中央 = 左 + (右 - 左) / 2になるまでループ
+			while (mid != left + (right - left) / 2) {
+				mid = left + (right - left) / 2;
+				// 中央のCPを求める。
+				cp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, cpMultiplierList.get(mid).getValue());
+
+				if (cpLimitPredicate.test(cp)) {
+					// 中央のCPが制限を超えていない場合、左を狭める。
+					left = mid - 1;
+				} else {
+					// 中央のCPが制限を超えている場合、右を狭める。
+					right = mid + 1;
+				}
 			}
-
+			// 確定したPLを取得
+			pl = cpMultiplierList.get(mid).getKey();
 		}
 
+
 		ScpRank scpRank = null;
-		// （PL1でもCP制限を上回る場合はnullになる。）
-		if (cp != null) {
+		// （PL1でもCP制限を上回る場合はfalseになる。）
+		if (cpLimitPredicate.test(cp)) {
+			double sp = pokemonGoUtils.statusProduct(goPokedex, iva, ivd, ivh, cpMultiplierMap.get(pl));
+			double scp = pokemonGoUtils.calcScp(sp);
+
 			scpRank = new ScpRank(iva, ivd, ivh);
-			scpRank.setCp(cp.intValue());
-			scpRank.setScp(scp);
+			scpRank.setCp(cp);
 			scpRank.setSp(sp);
+			scpRank.setScp(scp);
 			scpRank.setPl(pl);
-			// rankとpercentはセットしない。
+			// rankとpercentはここではセットしない。
 		}
 
 		return scpRank;
