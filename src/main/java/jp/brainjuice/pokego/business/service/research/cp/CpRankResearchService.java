@@ -3,6 +3,7 @@ package jp.brainjuice.pokego.business.service.research.cp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
@@ -23,14 +24,18 @@ public class CpRankResearchService implements ResearchService<CpRankResponse> {
 	@Override
 	public void exec(IndividialValue iv, CpRankResponse res) {
 
-		CpRank cpRank = pokemonGoUtils.getBaseCpRank(
-				iv.getGoPokedex(),
-				((Integer) iv.get(ParamsEnum.iva)).intValue(),
-				((Integer) iv.get(ParamsEnum.ivd)).intValue(),
-				((Integer) iv.get(ParamsEnum.ivh)).intValue());
-		res.setCpRank(cpRank);
+		int iva = ((Integer) iv.get(ParamsEnum.iva)).intValue();
+		int ivd = ((Integer) iv.get(ParamsEnum.ivd)).intValue();
+		int ivh = ((Integer) iv.get(ParamsEnum.ivh)).intValue();
+		GoPokedex goPokedex = iv.getGoPokedex();
 
-		res.setMessage("");
+		res.setIva(iva);
+		res.setIvd(ivd);
+		res.setIvh(ivh);
+		res.setGoPokedex(goPokedex);
+
+		CpRank cpRank = pokemonGoUtils.getBaseCpRank(goPokedex,iva, ivd, ivh);
+		res.setCpRank(cpRank);
 
 	}
 

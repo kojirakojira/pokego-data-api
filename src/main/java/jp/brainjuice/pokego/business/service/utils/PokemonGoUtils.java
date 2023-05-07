@@ -2,7 +2,9 @@ package jp.brainjuice.pokego.business.service.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -599,31 +601,35 @@ public class PokemonGoUtils {
 		for (int iva = 0; iva <= 15; iva++) {
 			for (int ivd = 0; ivd <= 15; ivd++) {
 				for (int ivh = 0; ivh <= 15; ivh++) {
-					cpRankList.add(new CpRank(iva, ivd, ivh));
+					CpRank cpRank = new CpRank(iva, ivd, ivh);
+
+					// CP
+					cpRank.setCp(calcCp(goPokedex, iva, ivd, ivh, pl));
+
+					// 個体値のパーセント
+					double percent = (((double) (iva + ivd + ivh)) / 45.0) * 100.0;
+					percent = (Math.round(percent * 10.0)) / 10.0; // 小数第二位で四捨五入
+					cpRank.setPercent(percent);
+
+					cpRankList.add(cpRank);
 				}
 			}
 		}
 
-		cpRankList.forEach(cr -> {
-			// CPを求め、セットする。
-			int cp = calcCp(goPokedex, cr.getIva(), cr.getIvd(), cr.getIvh(), pl);
-			cr.setCp(cp);
-
-			// 個体値のパーセント
-			double percent = (((double) (cr.getIva() + cr.getIvd() + cr.getIvh())) / 45.0) * 100.0;
-			percent = (Math.round(percent * 10.0)) / 10.0; // 小数第二位で四捨五入
-			cr.setPercent(percent);
-		});
-
 		// CPでの降順
 		Collections.sort(cpRankList, (o1, o2) -> {
-			return o1.getPercent() < o2.getPercent() ? 1 : -1;
+			return o2.getCp() - o1.getCp();
 		});
 
+		// CPのランキングをつくる。
+		List<Integer> cpList = cpRankList.stream()
+				.map(CpRank::getCp)
+				.collect(Collectors.toList());
 		// 順位付け
-		for(int i = 0; i < cpRankList.size(); i++) {
-			cpRankList.get(i).setRank(i + 1);
-		}
+		cpRankList.stream().forEach(cr -> {
+			int index = cpList.indexOf(cr.getCp());
+			cr.setRank(index + 1);
+		});
 
 		return cpRankList;
 

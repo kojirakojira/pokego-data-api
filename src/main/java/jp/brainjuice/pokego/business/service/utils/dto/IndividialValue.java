@@ -69,7 +69,7 @@ public class IndividialValue {
 		/** 個体値（hp） */
 		ivh(Integer.class),
 		/** 個体値（hp） */
-		pl(Integer.class),
+		pl(String.class),
 		/** CP */
 		cp(Integer.class),
 		/** リーグ */

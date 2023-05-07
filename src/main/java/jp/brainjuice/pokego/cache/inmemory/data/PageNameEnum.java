@@ -32,6 +32,9 @@ public enum PageNameEnum {
 	xType("Xタイプ検索"),
 	iroiroTypeRank("色々タイプランキング"),
 	plList("PLごとのCP一覧"),
+	cp("CP算出"),
+	cpRank("CP順位"),
+	cpRankList("CPランキング"),
 	unimplPokemon("未実装ポケモン一覧"),
 	evolution("進化ツリーと別のすがた"),;
 

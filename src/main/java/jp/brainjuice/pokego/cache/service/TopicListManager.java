@@ -102,13 +102,11 @@ public class TopicListManager {
 
 		// TopicPageを更新する。
 		List<TopicPage> topicPageList = createTopicPageList();
-		this.topicPageList.clear();
-		this.topicPageList.addAll(topicPageList);
+		this.topicPageList.setAll(topicPageList);
 
 		// TopicPokemonを更新する。
 		List<TopicPokemon> topicPokemonList = createTopicPokemonList();
-		this.topicPokemonList.clear();
-		this.topicPokemonList.addAll(topicPokemonList);
+		this.topicPokemonList.setAll(topicPokemonList);
 
 		log.info(MessageFormat.format(END_MSG_UPDATE_TOPIC_LIST, this.topicPageList.toString(), this.topicPokemonList.toString()));
 	}

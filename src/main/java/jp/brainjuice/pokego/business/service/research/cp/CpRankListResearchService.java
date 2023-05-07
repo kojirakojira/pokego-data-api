@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
@@ -23,10 +24,12 @@ public class CpRankListResearchService implements ResearchService<CpRankListResp
 
 	@Override
 	public void exec(IndividialValue iv, CpRankListResponse res) {
-		ArrayList<CpRank> cpRankList = pokemonGoUtils.getBaseCpRankList(iv.getGoPokedex());
-		res.setCpRankList(cpRankList);
 
-		res.setMessage("");
+		GoPokedex goPokedex = iv.getGoPokedex();
+		res.setGoPokedex(goPokedex);
+
+		ArrayList<CpRank> cpRankList = pokemonGoUtils.getBaseCpRankList(goPokedex);
+		res.setCpRankList(cpRankList);
 	}
 
 }

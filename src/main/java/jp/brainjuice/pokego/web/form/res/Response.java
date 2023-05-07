@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public abstract class Response {
 
-	private boolean success;
+	private boolean success = true;
 	private String message = "";
 	private MsgLevelEnum msgLevel = MsgLevelEnum.info;
 

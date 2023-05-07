@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.web.form.res.research.cp;
 
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CpResponse extends ResearchResponse {
 
+	private GoPokedex goPokedex;
+	private int iva;
+	private int ivd;
+	private int ivh;
+	private String pl;
 	private int cp;
-
-	public CpResponse(IndividialValue iv) {
-		setMessage("");
-		setPokedexId(iv.getGoPokedex().getPokedexId());
-		setName(iv.getGoPokedex().getName());
-	}
 }

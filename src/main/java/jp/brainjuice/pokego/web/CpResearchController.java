@@ -72,13 +72,14 @@ public class CpResearchController {
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
 			InputCheckService inputCheckService) {
-		// CP算出※未使用
+
+		// CP算出
 		this.cpResearchService = cpResearchService;
 		this.cpResRse = cpResRse;
-		// CPランク算出※未使用
+		// CP順位算出
 		this.cpRankResearchService = cpRankResearchService;
 		this.cpRankResRse = cpRankResRse;
-		// CPランク一覧取得※未使用
+		// CP順位一覧取得
 		this.cpRankListResearchService = cpRankListResearchService;
 		this.cpRankListResRse = cpRankListResRse;
 		// 進化後CP
@@ -98,6 +99,7 @@ public class CpResearchController {
 	}
 
 	/**
+	 * CP算出用API
 	 *
 	 * @param cpReq
 	 * @return
@@ -109,12 +111,18 @@ public class CpResearchController {
 		inputCheckService.validation(cpReq);
 
 		CpResponse cpRes = new CpResponse();
+
+		if (!cpResearchService.check(cpReq.getPl(), cpRes)) {
+			return cpRes;
+		}
+
 		cpResRse.execute(cpReq, cpRes, cpResearchService);
 
 		return cpRes;
 	}
 
 	/**
+	 * CPランキング算出用API
 	 *
 	 * @param cpRankReq
 	 * @return
@@ -132,6 +140,7 @@ public class CpResearchController {
 	}
 
 	/**
+	 * CPランキング一覧取得用API
 	 *
 	 * @param cpRankListReq
 	 * @return

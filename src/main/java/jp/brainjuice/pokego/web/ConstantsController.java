@@ -2,8 +2,10 @@ package jp.brainjuice.pokego.web;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +16,17 @@ import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
+import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
 
 @RestController
 @RequestMapping("/api")
 public class ConstantsController {
+
+	private CpMultiplierMap cpMultiplierMap;
+
+	public ConstantsController(CpMultiplierMap cpMultiplierMap) {
+		this.cpMultiplierMap = cpMultiplierMap;
+	}
 
 	@GetMapping("/typeConst")
 	public Map<String, Map<String, Object>> typeConst() {
@@ -63,5 +72,12 @@ public class ConstantsController {
 			filterMap.put(item.name(), item.getJpn());
 		}
 		return filterMap;
+	}
+
+	@GetMapping("/plConst")
+	public List<String> genPl() {
+		return cpMultiplierMap.entrySet().stream()
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
 	}
 }
