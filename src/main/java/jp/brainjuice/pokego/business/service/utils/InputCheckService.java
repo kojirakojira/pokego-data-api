@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.validation.constraints.Max;
@@ -12,8 +13,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 import org.springframework.stereotype.Service;
-
-import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.service.utils.dto.CheckItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;

@@ -1,11 +1,10 @@
 package jp.brainjuice.pokego.business.service.utils.dto;
 
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
-
-import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;

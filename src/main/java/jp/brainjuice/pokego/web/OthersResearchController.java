@@ -9,7 +9,6 @@ import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.research.others.AbundanceResearchService;
 import jp.brainjuice.pokego.business.service.research.others.EvolutionResearchService;
 import jp.brainjuice.pokego.business.service.research.others.RaceResearchService;
-import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.others.AbundanceRequest;
 import jp.brainjuice.pokego.web.form.req.research.others.EvolutionRequest;
@@ -31,13 +30,10 @@ public class OthersResearchController {
 	private AbundanceResearchService abundanceResearchService;
 	private ResearchServiceExecutor<AbundanceResponse> abundanceResRse;
 
-	private ViewsCacheProvider viewsCacheProvider;
-
 	public OthersResearchController (
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
-			AbundanceResearchService abundanceResearchService, ResearchServiceExecutor<AbundanceResponse> abundanceResRse,
-			ViewsCacheProvider viewsCacheProvider) {
+			AbundanceResearchService abundanceResearchService, ResearchServiceExecutor<AbundanceResponse> abundanceResRse) {
 
 		// 種族値検索
 		this.raceResearchService = raceResearchService;
@@ -50,8 +46,6 @@ public class OthersResearchController {
 		// アバンダンス
 		this.abundanceResearchService = abundanceResearchService;
 		this.abundanceResRse = abundanceResRse;
-
-		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
 	/**

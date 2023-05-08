@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.cache.inmemory;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -9,8 +10,6 @@ import java.util.ListIterator;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.springframework.stereotype.Component;
-
-import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 import jp.brainjuice.pokego.utils.BjUtils;
