@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 import jp.brainjuice.pokego.utils.exception.CsvMappingException;
@@ -52,8 +51,7 @@ public class BjCsvMapper {
 
 	public static <E> List<E> mapping(String fileName, Class<E> clazz) throws IOException, CsvMappingException, Exception {
 
-		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-		Resource resource = resourceLoader.getResource("classpath:" + fileName);
+		Resource resource = BjUtils.loadFile(fileName);
 		BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
 
 		// 行のリスト
@@ -62,6 +60,7 @@ public class BjCsvMapper {
 		while ((text = br.readLine()) != null) {
 			rowList.add(text);
 		}
+		br.close();
 
 		return mapping(rowList, clazz);
 

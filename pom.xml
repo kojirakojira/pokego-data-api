@@ -123,6 +123,15 @@
 			<artifactId>icu4j</artifactId>
 			<version>71.1</version>
 		</dependency>
+		<!--  形態素解析ライブラリ -->
+		<!-- https://mvnrepository.com/artifact/com.atilika.kuromoji/kuromoji-ipadic -->
+		<dependency>
+			<groupId>com.atilika.kuromoji</groupId>
+			<artifactId>kuromoji-ipadic</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+
 
 	</dependencies>
 

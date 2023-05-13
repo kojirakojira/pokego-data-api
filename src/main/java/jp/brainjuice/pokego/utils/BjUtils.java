@@ -1,5 +1,12 @@
 package jp.brainjuice.pokego.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -9,7 +16,10 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.filter.log.LogUtils;
 
@@ -175,4 +185,61 @@ public final class BjUtils {
 		}
 		return value;
 	}
+
+	/**
+	 * resource配下に配置したYamlファイルを読み込み、ファイル内容を返却する。
+	 * @param <T>
+	 *
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
+	public static <T> T loadYaml(String fileName, Class<? extends T> clazz) throws IOException {
+
+		Resource resource = loadFile(fileName);
+		InputStreamReader reader = new InputStreamReader(resource.getInputStream());
+
+		Yaml yaml = new Yaml();
+		return yaml.loadAs(reader, clazz);
+	}
+
+	/**
+	 * resource配下に配置したファイルを読み込み、Resourceを返却する。
+	 *
+	 * @param fileName
+	 * @return
+	 */
+	public static Resource loadFile(String fileName) {
+
+		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+		return resourceLoader.getResource("classpath:" + fileName);
+	}
+
+    /**
+     * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
+     * @param <T>
+     *
+     * @param original
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public static <T extends Serializable> T deepCopy(T original) {
+        try {
+            // 1. オブジェクトをシリアライズしてバイトストリームに変換する
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(original);
+
+            // 2. バイトストリームからオブジェクトをデシリアライズする
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            Object copy = ois.readObject();
+
+            // 3. 新しいオブジェクトを返す
+            return (T) copy;
+        } catch (IOException | ClassNotFoundException e) {
+            // 例外が発生した場合はnullを返す
+            return null;
+        }
+    }
 }

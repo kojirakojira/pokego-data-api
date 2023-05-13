@@ -15,7 +15,8 @@ public enum RegionEnum implements ConstantEnumInterface {
 	none("N", ""), // N（Mもnoneとして扱う。）
 	galar("G", "ガラル"), // G
 	alola("A", "アローラ"), // A
-	hisui("H", "ヒスイ"); // H
+	hisui("H", "ヒスイ"), // H
+	paldea("P", "パルデア"); // P
 
 	@Getter
 	private final String code;

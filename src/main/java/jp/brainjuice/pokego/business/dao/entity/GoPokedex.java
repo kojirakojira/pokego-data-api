@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GoPokedex implements Serializable, Cloneable {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
+	@Nonnull
 	private String pokedexId;
 
 	/** ポケモン */
@@ -72,4 +73,33 @@ public class GoPokedex implements Serializable, Cloneable {
 		}
 		return goPokedex;
 	}
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+        return pokedexId.hashCode();
+	}
+
+    /**
+     * (非 Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+
+    	if (this == obj) {
+    		return true;
+    	}
+
+    	if (!(obj instanceof GoPokedex)) {
+    		return false;
+    	}
+
+    	GoPokedex other = (GoPokedex) obj;
+
+    	return pokedexId != null && pokedexId.equals(other.getPokedexId());
+    }
 }

@@ -1,20 +1,18 @@
 package jp.brainjuice.pokego.business.service.utils;
 
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +25,8 @@ public class PokemonUtils {
 	private PokemonGoUtils pokemonGoUtils;
 
 	private Map<String, Object> raceExMap;
+
+	private static final String FILE_NAME = "pokemon/race-exceptions.yml";
 
 	// 強ポケ補正の基準になるPL
 	private static final String TOO_STRONG_PL = "50.5";
@@ -69,20 +69,13 @@ public class PokemonUtils {
 	public void init() throws PokemonDataInitException {
 
 		raceExMap = new HashMap<String, Object>();
-		DefaultResourceLoader resourceLoader;
-		InputStreamReader reader;
 		try {
-			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:pokemon/race-exceptions.yml");
-			reader = new InputStreamReader(resource.getInputStream());
+			raceExMap.putAll(BjUtils.loadYaml(FILE_NAME, Map.class));
 
-			Yaml yaml = new Yaml();
-			raceExMap.putAll(yaml.loadAs(reader, Map.class));
-
-			//
-			if (raceExMap.get(RaceEx.HP.name()) == null) { raceExMap.put(RaceEx.HP.name(), new HashMap<>()); }
-			if (raceExMap.get(RaceEx.ATTACK.name()) == null) { raceExMap.put(RaceEx.ATTACK.name(), new HashMap<>()); }
-			if (raceExMap.get(RaceEx.DEFENSE.name()) == null) { raceExMap.put(RaceEx.DEFENSE.name(), new HashMap<>()); }
+			// 未設定の場合、空を設定する。
+			Stream.of(RaceEx.values()).forEach(raceEx -> {
+				raceExMap.putIfAbsent(raceEx.name(), new HashMap<>());
+			});
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PokemonDataInitException(e);

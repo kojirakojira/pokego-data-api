@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.utils.memory;
 
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -24,6 +20,7 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Evolution;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
+import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -708,15 +705,10 @@ public class EvolutionInfo {
 		}
 
 		// yamlファイルの内容をメモリに抱える。
-		DefaultResourceLoader resourceLoader;
-		InputStreamReader reader;
 		try {
-			resourceLoader = new DefaultResourceLoader();
-			Resource resource = resourceLoader.getResource("classpath:" + EXCEPTIONS_FILE_NAME);
-			reader = new InputStreamReader(resource.getInputStream());
-
-			Yaml yaml = new Yaml();
-			exceptionsMap.putAll(yaml.load(reader));
+			@SuppressWarnings("unchecked")
+			Map<String, List<String>> yamlMap = BjUtils.loadYaml(EXCEPTIONS_FILE_NAME, Map.class);
+			exceptionsMap.putAll(yamlMap);
 
 		} catch (Exception e) {
 			throw new PokemonDataInitException(e);

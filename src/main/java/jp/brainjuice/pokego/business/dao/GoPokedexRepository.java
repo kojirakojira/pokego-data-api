@@ -82,17 +82,37 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	}
 
 	/**
-	 * 部分一致で検索します。<br>
+	 * ポケモン名を部分一致で検索します。<br>
 	 * イメージ： WHERE name LIKE '%name%'
 	 *
 	 * @param name
 	 * @return
 	 */
-	public List<GoPokedex> findByNameIn(Iterable<String> name) {
+	public List<GoPokedex> findByNameIn(Iterable<String> names) {
 		List<GoPokedex> goPokedexList = new ArrayList<>();
 		goPokedexes.forEach(gp -> {
-			for (String n: name) {
+			for (String n: names) {
 				if (gp.getName().contains(n)) {
+					goPokedexList.add(gp.clone());
+					break;
+				}
+			}
+		});
+		return goPokedexList;
+	}
+
+	/**
+	 * 備考を部分一致で検索します。<br>
+	 * イメージ： WHERE name LIKE '%name%'
+	 *
+	 * @param name
+	 * @return
+	 */
+	public List<GoPokedex> findByRemarksIn(Iterable<String> remarks) {
+		List<GoPokedex> goPokedexList = new ArrayList<>();
+		goPokedexes.forEach(gp -> {
+			for (String n: remarks) {
+				if (gp.getRemarks().contains(n)) {
 					goPokedexList.add(gp.clone());
 					break;
 				}
