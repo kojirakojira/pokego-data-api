@@ -16,7 +16,7 @@ import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
-import jp.brainjuice.pokego.business.service.utils.InputCheckService;
+import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.AfterEvoCpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
@@ -60,7 +60,7 @@ public class CpResearchController {
 	private ShadowResearchService shadowResearchService;
 	private ResearchServiceExecutor<ShadowResponse> shadowResRse;
 
-	private InputCheckService inputCheckService;
+	private ValidationService validationService;
 
 	@Autowired
 	public CpResearchController(
@@ -71,7 +71,7 @@ public class CpResearchController {
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
-			InputCheckService inputCheckService) {
+			ValidationService validationService) {
 
 		// CP算出
 		this.cpResearchService = cpResearchService;
@@ -95,7 +95,7 @@ public class CpResearchController {
 		this.shadowResearchService = shadowResearchService;
 		this.shadowResRse = shadowResRse;
 		// 入力チェック
-		this.inputCheckService = inputCheckService;
+		this.validationService = validationService;
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class CpResearchController {
 	@GetMapping("/cp")
 	public CpResponse cp(CpRequest cpReq) throws Exception {
 
-		inputCheckService.validation(cpReq);
+		validationService.validation(cpReq);
 
 		CpResponse cpRes = new CpResponse();
 
@@ -131,7 +131,7 @@ public class CpResearchController {
 	@GetMapping("/cpRank")
 	public CpRankResponse cpRank(CpRankRequest cpRankReq) throws Exception {
 
-		inputCheckService.validation(cpRankReq);
+		validationService.validation(cpRankReq);
 
 		CpRankResponse cpRankRes = new CpRankResponse();
 		cpRankResRse.execute(cpRankReq, cpRankRes, cpRankResearchService);
@@ -149,7 +149,7 @@ public class CpResearchController {
 	@GetMapping("/cpRankList")
 	public CpRankListResponse cpRankList(CpRankListRequest cpRankListReq) throws Exception {
 
-		inputCheckService.validation(cpRankListReq);
+		validationService.validation(cpRankListReq);
 
 		CpRankListResponse cpRankListRes = new CpRankListResponse();
 		cpRankListResRse.execute(cpRankListReq, cpRankListRes, cpRankListResearchService);
@@ -166,7 +166,7 @@ public class CpResearchController {
 	@GetMapping("/afterEvoCp")
 	public AfterEvoCpResponse afterEvoCp(AfterEvoCpRequest afterEvoCpRequest) throws Exception {
 
-		inputCheckService.validation(afterEvoCpRequest);
+		validationService.validation(afterEvoCpRequest);
 
 		AfterEvoCpResponse afterEvoCpRes = new AfterEvoCpResponse();
 		afterEvoCpResRse.execute(afterEvoCpRequest, afterEvoCpRes, afterEvoCpResearchService);
@@ -183,7 +183,7 @@ public class CpResearchController {
 	@GetMapping("/raid")
 	public RaidResponse raid(RaidRequest raidReq) throws Exception {
 
-		inputCheckService.validation(raidReq);
+		validationService.validation(raidReq);
 
 		RaidResponse raidRes = new RaidResponse();
 		raidResRse.execute(raidReq, raidRes, raidResearchService);
@@ -201,7 +201,7 @@ public class CpResearchController {
 	@GetMapping("/fRTask")
 	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq) throws Exception {
 
-		inputCheckService.validation(fRTaskReq);
+		validationService.validation(fRTaskReq);
 
 		FRTaskResponse fRTaskRes = new FRTaskResponse();
 		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
@@ -220,7 +220,7 @@ public class CpResearchController {
 	@GetMapping("/eggs")
 	public FRTaskResponse eggs(FRTaskRequest fRTaskReq) throws Exception {
 
-		inputCheckService.validation(fRTaskReq);
+		validationService.validation(fRTaskReq);
 
 		FRTaskResponse fRTaskRes = new FRTaskResponse();
 		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
@@ -238,7 +238,7 @@ public class CpResearchController {
 	@GetMapping("/shadow")
 	public ShadowResponse shadow(ShadowRequest shadowReq) throws Exception {
 
-		inputCheckService.validation(shadowReq);
+		validationService.validation(shadowReq);
 
 		ShadowResponse shadowRes = new ShadowResponse();
 		shadowResRse.execute(shadowReq, shadowRes, shadowResearchService);

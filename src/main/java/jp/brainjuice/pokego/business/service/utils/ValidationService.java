@@ -14,7 +14,7 @@ import javax.validation.constraints.Null;
 
 import org.springframework.stereotype.Service;
 
-import jp.brainjuice.pokego.business.service.utils.dto.CheckItem;
+import jp.brainjuice.pokego.business.service.utils.dto.ValidationItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class InputCheckService {
+public class ValidationService {
 
 	private static final String VALIDATION_PACKAGE_NAME = "javax.validation.constraints";
 
@@ -55,7 +55,7 @@ public class InputCheckService {
 	public void validation(ResearchRequest req) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
-		CheckItem checkItem = new CheckItem(); // インスタンスを使いまわす。
+		ValidationItem validItem = new ValidationItem(); // インスタンスを使いまわす。
 		// Requestの値をivのマップにセット
 		for (Field field: req.getClass().getDeclaredFields()) {
 			field.setAccessible(true);
@@ -66,16 +66,16 @@ public class InputCheckService {
 					// TODO: if文で連結させているが、この形式をとるかは要検討。
 					if (clazz == NotNull.class) {
 
-						execCheck(checkItem.setAll(field.getName(), CheckPattern.NotNull, null, field.get(req)), sb);
+						execCheck(validItem.setAll(field.getName(), CheckPattern.NotNull, null, field.get(req)), sb);
 					} else if (clazz == Null.class) {
 
-						execCheck(checkItem.setAll(field.getName(), CheckPattern.Null, null, field.get(req)), sb);
+						execCheck(validItem.setAll(field.getName(), CheckPattern.Null, null, field.get(req)), sb);
 					} else if (clazz == Min.class) {
 						Min min = (Min) anno;
-						execCheck(checkItem.setAll(field.getName(), CheckPattern.Min, min.value(), field.get(req)), sb);
+						execCheck(validItem.setAll(field.getName(), CheckPattern.Min, min.value(), field.get(req)), sb);
 					} else if (clazz == Max.class) {
 						Max max = (Max) anno;
-						execCheck(checkItem.setAll(field.getName(), CheckPattern.Max, max.value(), field.get(req)), sb);
+						execCheck(validItem.setAll(field.getName(), CheckPattern.Max, max.value(), field.get(req)), sb);
 					}
 				}
 
@@ -87,7 +87,7 @@ public class InputCheckService {
 		}
 	}
 
-	public boolean exec(List<CheckItem> checkList, ResearchResponse res) {
+	public boolean exec(List<ValidationItem> checkList, ResearchResponse res) {
 
 		String msg = null;
 		try {
@@ -101,10 +101,10 @@ public class InputCheckService {
 		return msg.isEmpty();
 	}
 
-	public String exec(List<CheckItem> checkList) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public String exec(List<ValidationItem> checkList) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
 		StringBuffer sb = new StringBuffer();
-		for (CheckItem checkItem: checkList) {
+		for (ValidationItem checkItem: checkList) {
 			execCheck(checkItem, sb);
 		}
 		return sb.toString();
@@ -121,7 +121,7 @@ public class InputCheckService {
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
-	private void execCheck(CheckItem checkItem, StringBuffer sb) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private void execCheck(ValidationItem checkItem, StringBuffer sb) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
 		Method method = CheckModule.class.getMethod(checkItem.getCheckPattern().name(), Object.class, Object.class, String.class);
 		String msg = (String) method.invoke(null, checkItem.getConstraint(), checkItem.getValue(), checkItem.getItemName());

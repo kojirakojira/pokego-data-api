@@ -13,7 +13,7 @@ import jp.brainjuice.pokego.business.service.research.scp.AfterEvoScpRankResearc
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankMaxMinResearchService;
 import jp.brainjuice.pokego.business.service.research.scp.ScpRankResearchService;
-import jp.brainjuice.pokego.business.service.utils.InputCheckService;
+import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.scp.AfterEvoScpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankListRequest;
@@ -42,7 +42,7 @@ public class ScpResearchController {
 	private AfterEvoScpRankResearchService afterEvoScpRankResearchService;
 	private ResearchServiceExecutor<AfterEvoScpRankResponse> afterEvoScpRankResRse;
 
-	private InputCheckService inputCheckService;
+	private ValidationService validationService;
 
 	@Autowired
 	public ScpResearchController(
@@ -50,7 +50,7 @@ public class ScpResearchController {
 			ScpRankMaxMinResearchService scpRankMaxMinResearchService, ResearchServiceExecutor<ScpRankMaxMinResponse> scpRankMaxMinResRse,
 			ScpRankListResearchService scpRankListResearchService, ResearchServiceExecutor<ScpRankListResponse> scpRankListResRse,
 			AfterEvoScpRankResearchService afterEvoScpRankResearchService, ResearchServiceExecutor<AfterEvoScpRankResponse> afterEvoScpRankResRse,
-			InputCheckService inputCheckService) {
+			ValidationService validationService) {
 		// SCPランク算出
 		this.scpRankResearchService = scpRankResearchService;
 		this.scpRankResRse = scpRankResRse;
@@ -64,7 +64,7 @@ public class ScpResearchController {
 		this.afterEvoScpRankResearchService = afterEvoScpRankResearchService;
 		this.afterEvoScpRankResRse = afterEvoScpRankResRse;
 		// 入力チェック
-		this.inputCheckService = inputCheckService;
+		this.validationService = validationService;
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class ScpResearchController {
 	@GetMapping("/scpRank")
 	public ScpRankResponse scpRank(ScpRankRequest scpRankReq) throws Exception {
 
-		inputCheckService.validation(scpRankReq);
+		validationService.validation(scpRankReq);
 
 		ScpRankResponse scpRankRes = new ScpRankResponse();
 		scpRankResRse.execute(scpRankReq, scpRankRes, scpRankResearchService);
@@ -106,7 +106,7 @@ public class ScpResearchController {
 	@GetMapping("/scpRankMaxMin")
 	public ScpRankMaxMinResponse scpRankMaxMin(ScpRankMaxMinRequest scpMaxMinReq) throws Exception {
 
-		inputCheckService.validation(scpMaxMinReq);
+		validationService.validation(scpMaxMinReq);
 
 		ScpRankMaxMinResponse scpRankMaxMinRes = new ScpRankMaxMinResponse();
 		scpRankMaxMinResRse.execute(scpMaxMinReq, scpRankMaxMinRes, scpRankMaxMinResearchService);
@@ -130,7 +130,7 @@ public class ScpResearchController {
 	@GetMapping("/scpRankList")
 	public ScpRankListResponse scpRankList(ScpRankListRequest scpRankListReq) throws Exception {
 
-		inputCheckService.validation(scpRankListReq);
+		validationService.validation(scpRankListReq);
 
 		ScpRankListResponse scpRankListRes = new ScpRankListResponse();
 		scpRankListResRse.execute(scpRankListReq, scpRankListRes, scpRankListResearchService);
@@ -147,7 +147,7 @@ public class ScpResearchController {
 	@GetMapping("/afterEvoScpRank")
 	public AfterEvoScpRankResponse afterEvoScpRank(AfterEvoScpRankRequest afterEvoScpRankListReq) throws Exception {
 
-		inputCheckService.validation(afterEvoScpRankListReq);
+		validationService.validation(afterEvoScpRankListReq);
 
 		AfterEvoScpRankResponse afterEvoScpRankRes = new AfterEvoScpRankResponse();
 		afterEvoScpRankResRse.execute(afterEvoScpRankListReq, afterEvoScpRankRes, afterEvoScpRankResearchService);
