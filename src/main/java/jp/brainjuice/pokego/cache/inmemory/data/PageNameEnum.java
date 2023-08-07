@@ -38,6 +38,7 @@ public enum PageNameEnum {
 	unimplPokemon("未実装ポケモン一覧"),
 	evolution("進化ツリーと別のすがた"),
 	wildIv("野生個体値"),
+	threeGalarBirds("ガラル三鳥個体値"),
 	;
 
 	@Getter
