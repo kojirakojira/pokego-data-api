@@ -15,8 +15,8 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.AfterEvoIv;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.scp.AfterEvoScpRankResponse;
@@ -51,13 +51,13 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 	}
 
 	@Override
-	public void exec(IndividialValue iv, AfterEvoScpRankResponse res) {
+	public void exec(SearchValue sv, AfterEvoScpRankResponse res) {
 
-		GoPokedex sp = iv.getGoPokedex();
-		Integer spCp = iv.get(ParamsEnum.cp) == null ? null: (Integer) iv.get(ParamsEnum.cp); // 仕様上nullが有り得る
-		int iva = ((Integer) iv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) iv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) iv.get(ParamsEnum.ivh)).intValue();
+		GoPokedex sp = sv.getGoPokedex();
+		Integer spCp = sv.get(ParamsEnum.cp) == null ? null: (Integer) sv.get(ParamsEnum.cp); // 仕様上nullが有り得る
+		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
+		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
+		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
 
 		res.setSearchPokemon(sp);
 		res.setCp(spCp);

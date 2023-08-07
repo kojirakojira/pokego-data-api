@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -607,8 +609,7 @@ public class PokemonGoUtils {
 					cpRank.setCp(calcCp(goPokedex, iva, ivd, ivh, pl));
 
 					// 個体値のパーセント
-					double percent = (((double) (iva + ivd + ivh)) / 45.0) * 100.0;
-					percent = (Math.round(percent * 10.0)) / 10.0; // 小数第二位で四捨五入
+					double percent = calcPercentIv(iva, ivd, ivh);
 					cpRank.setPercent(percent);
 
 					cpRankList.add(cpRank);
@@ -633,5 +634,108 @@ public class PokemonGoUtils {
 
 		return cpRankList;
 
+	}
+
+	/**
+	 * 個体値のパーセントを取得します。
+	 * (0 - 0 - 0)を0%個体、(15 - 15 - 15)を100%個体と判定します。
+	 *
+	 * @param iva
+	 * @param ivd
+	 * @param ivh
+	 * @return
+	 */
+	public double calcPercentIv(int iva, int ivd, int ivh) {
+
+		double percent = (((double) (iva + ivd + ivh)) / 45.0) * 100.0;
+		percent = (Math.round(percent * 10.0)) / 10.0; // 小数第二位で四捨五入
+
+		return percent;
+	}
+
+	/**
+	 * 対象のポケモンの特定の個体値における、PLの境界値を求める。
+	 * 二分探索を使用して探索を行う。
+	 *
+	 * @param cpPredicate CPの境界値の判定式
+	 * @param calcCpFunction cpMultiplier(Double)を渡して、cp(int)を取得する関数
+	 * @return index
+	 */
+	public int binarySearchForPlIdx(
+			Predicate<Integer> cpPredicate,
+			Function<Double, Integer> calcCpFunc) {
+
+		List<Map.Entry<String, Double>> cpMultiplierList = cpMultiplierMap.getList();
+
+		return binarySearchForPlIdx(
+				cpPredicate,
+				calcCpFunc,
+				0,
+				cpMultiplierList.size(),
+				cpMultiplierList);
+	}
+
+	/**
+	 * 対象のポケモンの特定の個体値における、PLの境界値を求める。
+	 * 二分探索を使用して探索を行う。
+	 *
+	 * @param cpPredicate CPの境界値の判定式
+	 * @param calcCpFunction cpMultiplier(Double)を渡して、cp(int)を取得する関数
+	 * @param minIdx cpMultiplierListの探索範囲（最低）
+	 * @param maxIdx cpMultiplierListの探索範囲（最高）
+	 * @return index
+	 */
+	public int binarySearchForPlIdx(
+			Predicate<Integer> cpPredicate,
+			Function<Double, Integer> calcCpFunc,
+			int minIdx,
+			int maxIdx) {
+
+		List<Map.Entry<String, Double>> cpMultiplierList = cpMultiplierMap.getList();
+
+		return binarySearchForPlIdx(
+				cpPredicate,
+				calcCpFunc,
+				minIdx,
+				maxIdx,
+				cpMultiplierList);
+	}
+
+	/**
+	 * 対象のポケモンの特定の個体値における、PLの境界値を求める。
+	 * 二分探索を使用して探索を行う。
+	 *
+	 * @param cpPredicate CPの境界値の判定式
+	 * @param calcCpFunction cpMultiplier(Double)を渡して、cp(int)を取得する関数
+	 * @param minIdx cpMultiplierListの探索範囲（最低）
+	 * @param maxIdx cpMultiplierListの探索範囲（最高）
+	 * @param cpMultiplierList CpMultiplierListを指定したい場合（ListはPLの低い順でなければならない。）
+	 * @return index
+	 */
+	public int binarySearchForPlIdx(
+			Predicate<Integer> cpPredicate,
+			Function<Double, Integer> calcCpFunc,
+			int minIdx,
+			int maxIdx,
+			List<Map.Entry<String, Double>> cpMultiplierList) {
+
+		int left = minIdx;
+		int right = maxIdx;
+		int mid = 0;
+		// 中央 = 左 + (右 - 左) / 2になるまでループ
+		while (mid != left + (right - left) / 2) {
+			mid = left + (right - left) / 2;
+			// 中央のCPを求める。
+			int cp = calcCpFunc.apply(cpMultiplierList.get(mid).getValue());
+
+			if (cpPredicate.test(cp)) {
+				// 中央のCPが制限を超えていない場合、左を狭める。
+				left = mid - 1;
+			} else {
+				// 中央のCPが制限を超えている場合、右を狭める。
+				right = mid + 1;
+			}
+		}
+		return mid;
 	}
 }

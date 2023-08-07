@@ -15,7 +15,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.research.others.EvolutionResponse;
@@ -36,9 +36,9 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 	}
 
 	@Override
-	public void exec(IndividialValue iv, EvolutionResponse res) {
+	public void exec(SearchValue sv, EvolutionResponse res) {
 
-		String pokedexId = iv.getGoPokedex().getPokedexId();
+		String pokedexId = sv.getGoPokedex().getPokedexId();
 
 		// 進化ツリーの取得
 		final List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);

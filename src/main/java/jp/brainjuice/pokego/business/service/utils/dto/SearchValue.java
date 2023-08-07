@@ -7,6 +7,7 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import lombok.AccessLevel;
@@ -15,9 +16,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * ポケモンの検索条件を保持する。
+ *
+ * @see ResearchServiceExecutor
+ */
 @Data
 @Slf4j
-public class IndividialValue {
+public class SearchValue {
 
 	@Nonnull
 	private GoPokedex goPokedex;
@@ -29,7 +35,7 @@ public class IndividialValue {
 	/** 検索固有の値 */
 	private ParamsMap paramsMap;
 
-	public IndividialValue(
+	public SearchValue(
 			GoPokedex goPokedex,
 			ResearchRequest req) {
 		setGoPokedex(goPokedex);
@@ -73,6 +79,8 @@ public class IndividialValue {
 		cp(Integer.class),
 		/** リーグ */
 		league(String.class),
+		/** 天候ブースト */
+		wbFlg(Boolean.class),
 		;
 
 		@Getter(value = AccessLevel.PUBLIC)

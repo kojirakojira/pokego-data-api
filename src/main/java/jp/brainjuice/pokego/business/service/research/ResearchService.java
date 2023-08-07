@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.service.research;
 
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.research.ResearchResponse;
 
 /**
@@ -15,9 +15,9 @@ public interface ResearchService<T extends ResearchResponse> {
 	/**
 	 * 実行します。
 	 *
-	 * @param IndividialValue iv
+	 * @param SearchValue sv
 	 * @param T(extends Response) res
 	 */
-	public void exec(IndividialValue iv, T res);
+	public void exec(SearchValue sv, T res);
 
 }

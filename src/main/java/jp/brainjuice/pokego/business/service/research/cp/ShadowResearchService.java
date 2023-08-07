@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.research.cp.ShadowResponse;
 
 @Service
@@ -32,9 +32,9 @@ public class ShadowResearchService implements ResearchService<ShadowResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, ShadowResponse res) {
+	public void exec(SearchValue sv, ShadowResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, SHADOW_MAX_IV, SHADOW_MAX_IV, SHADOW_MAX_IV, SHADOW_PL));
 		res.setMinCp(pokemonGoUtils.calcCp(goPokedex, SHADOW_MIN_IV, SHADOW_MIN_IV, SHADOW_MIN_IV, SHADOW_PL));
 		res.setWbMaxCp(pokemonGoUtils.calcCp(goPokedex, SHADOW_MAX_IV, SHADOW_MAX_IV, SHADOW_MAX_IV, SHADOW_PL_WB));

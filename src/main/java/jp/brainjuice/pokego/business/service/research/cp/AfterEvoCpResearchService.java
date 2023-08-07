@@ -15,8 +15,8 @@ import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
@@ -47,13 +47,13 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	}
 
 	@Override
-	public void exec(IndividialValue iv, AfterEvoCpResponse res) {
+	public void exec(SearchValue sv, AfterEvoCpResponse res) {
 
-		GoPokedex sp = iv.getGoPokedex();
-		int spCp = ((Integer) iv.get(ParamsEnum.cp)).intValue();
-		int iva = ((Integer) iv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) iv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) iv.get(ParamsEnum.ivh)).intValue();
+		GoPokedex sp = sv.getGoPokedex();
+		int spCp = ((Integer) sv.get(ParamsEnum.cp)).intValue();
+		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
+		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
+		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
 
 		res.setSearchPokemon(sp);
 		res.setCp(spCp);

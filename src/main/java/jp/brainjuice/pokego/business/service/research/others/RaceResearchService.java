@@ -15,7 +15,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
@@ -50,12 +50,12 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, RaceResponse res) {
+	public void exec(SearchValue sv, RaceResponse res) {
 
-		String pokedexId = iv.getGoPokedex().getPokedexId();
+		String pokedexId = sv.getGoPokedex().getPokedexId();
 
 		Pokedex pokedex = pokedexRepository.findById(pokedexId).get();
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 
 		Race race = new Race(pokedex, goPokedex);
 		res.setRace(race);
@@ -63,7 +63,7 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		res.setTooStrong(tooStrongPokemonList.contains(pokedexId));
 
 		// 絞り込み検索
-		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(iv.getFilterValue());
+		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(sv.getFilterValue());
 		res.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// 絞り込み検索の実行有無

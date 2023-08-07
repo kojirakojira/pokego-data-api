@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
@@ -43,20 +43,20 @@ public class CpResearchService implements ResearchService<CpResponse> {
 	 * CPを算出します。
 	 */
 	@Override
-	public void exec(IndividialValue iv, CpResponse cpResponse) {
+	public void exec(SearchValue sv, CpResponse cpResponse) {
 
-		int iva = ((Integer) iv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) iv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) iv.get(ParamsEnum.ivh)).intValue();
-		String pl = (String) iv.get(ParamsEnum.pl);
+		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
+		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
+		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
+		String pl = (String) sv.get(ParamsEnum.pl);
 
-		cpResponse.setGoPokedex(iv.getGoPokedex());
+		cpResponse.setGoPokedex(sv.getGoPokedex());
 		cpResponse.setIva(iva);
 		cpResponse.setIvd(ivd);
 		cpResponse.setIvh(ivh);
 		cpResponse.setPl(pl);
 
-		int cp = pokemonGoUtils.calcCp(iv.getGoPokedex(), iva, ivd, ivh, pl);
+		int cp = pokemonGoUtils.calcCp(sv.getGoPokedex(), iva, ivd, ivh, pl);
 
 		cpResponse.setCp(cp);
 

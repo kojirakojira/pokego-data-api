@@ -8,7 +8,7 @@ import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
 import jp.brainjuice.pokego.web.form.res.research.others.AbundanceResponse;
@@ -35,9 +35,9 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 	}
 
 	@Override
-	public void exec(IndividialValue iv, AbundanceResponse res) {
+	public void exec(SearchValue sv, AbundanceResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 		// こうげき、ぼうぎょ、HP、タイプ
 		res.setGoPokedex(goPokedex);
 		// CP(PL40)

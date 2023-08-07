@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.elem.CpRank;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 
@@ -22,12 +22,12 @@ public class CpRankResearchService implements ResearchService<CpRankResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, CpRankResponse res) {
+	public void exec(SearchValue sv, CpRankResponse res) {
 
-		int iva = ((Integer) iv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) iv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) iv.get(ParamsEnum.ivh)).intValue();
-		GoPokedex goPokedex = iv.getGoPokedex();
+		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
+		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
+		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
+		GoPokedex goPokedex = sv.getGoPokedex();
 
 		res.setIva(iva);
 		res.setIvd(ivd);

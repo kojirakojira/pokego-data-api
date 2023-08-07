@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
 
 @Service
@@ -32,9 +32,9 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, RaidResponse res) {
+	public void exec(SearchValue sv, RaidResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL));
 		res.setMinCp(pokemonGoUtils.calcCp(goPokedex, RAID_MIN_IV, RAID_MIN_IV, RAID_MIN_IV, RAID_PL));
 		res.setWbMaxCp(pokemonGoUtils.calcCp(goPokedex, RAID_MAX_IV, RAID_MAX_IV, RAID_MAX_IV, RAID_PL_WB));

@@ -17,7 +17,7 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 
@@ -72,7 +72,7 @@ public class PokemonFilterValueUtils {
 	 * @param filterValue
 	 * @return
 	 * @see PokedexFilterInfoRepository
-	 * @see IndividialValue
+	 * @see SearchValue
 	 * @see PokemonFilterValue
 	 */
 	public static Map<FilterEnum, FilterParam> mapping(PokemonFilterValue fv) {

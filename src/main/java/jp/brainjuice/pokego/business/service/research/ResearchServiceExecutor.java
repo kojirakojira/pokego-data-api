@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
@@ -94,10 +94,10 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 
 		// 個体値をセットする。（GoPokedexだけ必須。）
-		IndividialValue iv = new IndividialValue(goPokedex, req);
+		SearchValue sv = new SearchValue(goPokedex, req);
 
 		// 実行
-		researchService.exec(iv, res);
+		researchService.exec(sv, res);
 
 		// 図鑑№、ポケモン、備考のセット
 		res.setPokedexId(goPokedex.getPokedexId());

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,17 +23,12 @@ public class ScpRankCalculator {
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	/** 処理の都合上、CpMultiplierMapをListで持つ。 */
-	private List<Map.Entry<String, Double>> cpMultiplierList;
-
 	@Autowired
 	public ScpRankCalculator(
 			CpMultiplierMap cpMultiplierMap,
 			PokemonGoUtils pokemonGoUtils) {
 		this.cpMultiplierMap = cpMultiplierMap;
 		this.pokemonGoUtils = pokemonGoUtils;
-
-		cpMultiplierList = cpMultiplierMap.entrySet().stream().collect(Collectors.toList());
 	}
 
 	/**
@@ -271,35 +266,23 @@ public class ScpRankCalculator {
 			DecimalFormat plFormat,
 			Predicate<Integer> cpLimitPredicate) {
 
+		Function<Double, Integer> calcCpFunc = (pl) -> pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
+
 		/** CP制限内で、最も高い個体値のPL、CPを求める。 */
 		// マスターリーグの場合は、固定でPL51が最高個体になるため、まずPL最大値(PL:51)の個体値を調べる。
 		// （スーパー、ハイパーリーグの場合もPL最大個体がCP制限を上回るパターンは多いため、処理性能向上に繋がる。）
-		String pl = cpMultiplierList.get(cpMultiplierList.size() - 1).getKey();
-		int cp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
+		List<Map.Entry<String, Double>> cpMultiplierList = cpMultiplierMap.getList();
+		String pl = cpMultiplierMap.maxPl();
+		int cp = calcCpFunc.apply(cpMultiplierMap.get(pl));
 
 		if (!cpLimitPredicate.test(cp)) {
-			// PLが最大値のとき、CP制限に収まっていない場合。
-
-			int left = 0;
-			int right = cpMultiplierList.size();
-
-			int mid = 0;
-			// 中央 = 左 + (右 - 左) / 2になるまでループ
-			while (mid != left + (right - left) / 2) {
-				mid = left + (right - left) / 2;
-				// 中央のCPを求める。
-				cp = pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, cpMultiplierList.get(mid).getValue());
-
-				if (cpLimitPredicate.test(cp)) {
-					// 中央のCPが制限を超えていない場合、左を狭める。
-					left = mid - 1;
-				} else {
-					// 中央のCPが制限を超えている場合、右を狭める。
-					right = mid + 1;
-				}
-			}
+			// PLが最大値のとき、CP制限に収まっていない場合。（二分探索）
+			int plIdx = pokemonGoUtils.binarySearchForPlIdx(
+					cpLimitPredicate,
+					calcCpFunc);
 			// 確定したPLを取得
-			pl = cpMultiplierList.get(mid).getKey();
+			pl = cpMultiplierList.get(plIdx).getKey();
+			cp = calcCpFunc.apply(cpMultiplierMap.get(pl));
 		}
 
 

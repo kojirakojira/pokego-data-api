@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.research.pl.PlResponse;
 
@@ -23,16 +23,16 @@ public class PlResearchService implements ResearchService<PlResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, PlResponse res) {
+	public void exec(SearchValue sv, PlResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 
-		final int at = goPokedex.getAttack() + ((Integer) iv.get(ParamsEnum.iva)).intValue();
-		final int df = goPokedex.getDefense() + ((Integer) iv.get(ParamsEnum.ivd)).intValue();
-		final int hp = goPokedex.getHp() + ((Integer) iv.get(ParamsEnum.ivh)).intValue();
+		final int at = goPokedex.getAttack() + ((Integer) sv.get(ParamsEnum.iva)).intValue();
+		final int df = goPokedex.getDefense() + ((Integer) sv.get(ParamsEnum.ivd)).intValue();
+		final int hp = goPokedex.getHp() + ((Integer) sv.get(ParamsEnum.ivh)).intValue();
 
 		String pl = null;
-		final int cp = ((Integer) iv.get(ParamsEnum.cp)).intValue();
+		final int cp = ((Integer) sv.get(ParamsEnum.cp)).intValue();
 		if (cp <= 10) {
 			pl = getPlLessThan10Cp(at, df, hp, cp);
 		} else {

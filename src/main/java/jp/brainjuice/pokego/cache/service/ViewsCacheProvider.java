@@ -13,7 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
 import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 
@@ -47,7 +47,7 @@ public class ViewsCacheProvider {
 	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.research.ResearchService.exec(..))")
 	public void addTempList(JoinPoint jp) {
 
-		if (((IndividialValue) jp.getArgs()[0]).isEnableCount()) {
+		if (((SearchValue) jp.getArgs()[0]).isEnableCount()) {
 			// enableCountがオンの場合は閲覧数をカウントしない。
 			return;
 		}
@@ -58,7 +58,7 @@ public class ViewsCacheProvider {
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
 
-		GoPokedex goPokedex = ((IndividialValue) jp.getArgs()[0]).getGoPokedex();
+		GoPokedex goPokedex = ((SearchValue) jp.getArgs()[0]).getGoPokedex();
 		String pokedexId = goPokedex.getPokedexId();
 
 		addTempList(PageNameEnum.valueOf(page), pokedexId, ip);

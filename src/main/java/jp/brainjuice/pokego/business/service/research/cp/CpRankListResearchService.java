@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.elem.CpRank;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 
@@ -23,9 +23,9 @@ public class CpRankListResearchService implements ResearchService<CpRankListResp
 	}
 
 	@Override
-	public void exec(IndividialValue iv, CpRankListResponse res) {
+	public void exec(SearchValue sv, CpRankListResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 		res.setGoPokedex(goPokedex);
 
 		ArrayList<CpRank> cpRankList = pokemonGoUtils.getBaseCpRankList(goPokedex);

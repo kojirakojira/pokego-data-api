@@ -222,6 +222,7 @@ public class PokemonSearchService {
 
 		if (StringUtils.isEmpty(words)) {
 			result.setMessage(MSG_NO_ENTERED);
+			result.setMsgLevel(MsgLevelEnum.error);
 			return result;
 		}
 
@@ -239,6 +240,7 @@ public class PokemonSearchService {
 			} else {
 				// なんか負荷がかかりそうだから文字数が多いときは検索させない。
 				result.setMessage("20文字を超えた場合は、あいまい検索しません。");
+				result.setMsgLevel(MsgLevelEnum.error);
 			}
 
 		}
@@ -246,6 +248,7 @@ public class PokemonSearchService {
 		if (goPokedexList.isEmpty()) {
 			// 最終的に検索結果なしだった場合
 			result.setMessage(MSG_NO_RESULTS);
+			result.setMsgLevel(MsgLevelEnum.error);
 
 		} else {
 			// 空でない場合

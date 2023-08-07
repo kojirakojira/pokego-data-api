@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.IndividialValue;
+import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 
 @Service
@@ -29,9 +29,9 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 	}
 
 	@Override
-	public void exec(IndividialValue iv, FRTaskResponse res) {
+	public void exec(SearchValue sv, FRTaskResponse res) {
 
-		GoPokedex goPokedex = iv.getGoPokedex();
+		GoPokedex goPokedex = sv.getGoPokedex();
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, FR_MAX_IV, FR_MAX_IV, FR_MAX_IV, FR_PL));
 		res.setMinCp(pokemonGoUtils.calcCp(goPokedex, FR_MIN_IV, FR_MIN_IV, FR_MIN_IV, FR_PL));
 

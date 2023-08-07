@@ -16,6 +16,7 @@ import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
+import jp.brainjuice.pokego.business.service.research.cp.WildIvResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.AfterEvoCpRequest;
@@ -25,6 +26,7 @@ import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.ShadowRequest;
+import jp.brainjuice.pokego.web.form.req.research.cp.WildIvRequest;
 import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
@@ -32,6 +34,7 @@ import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.ShadowResponse;
+import jp.brainjuice.pokego.web.form.res.research.cp.WildIvResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -60,6 +63,9 @@ public class CpResearchController {
 	private ShadowResearchService shadowResearchService;
 	private ResearchServiceExecutor<ShadowResponse> shadowResRse;
 
+	private WildIvResearchService wildIvResearchService;
+	private ResearchServiceExecutor<WildIvResponse> wildIvResRse;
+
 	private ValidationService validationService;
 
 	@Autowired
@@ -71,6 +77,7 @@ public class CpResearchController {
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
+			WildIvResearchService wildIvResearchService, ResearchServiceExecutor<WildIvResponse> wildIvResRse,
 			ValidationService validationService) {
 
 		// CP算出
@@ -94,6 +101,9 @@ public class CpResearchController {
 		// シャドウCP算出
 		this.shadowResearchService = shadowResearchService;
 		this.shadowResRse = shadowResRse;
+		// 野生個体値
+		this.wildIvResearchService = wildIvResearchService;
+		this.wildIvResRse = wildIvResRse;
 		// 入力チェック
 		this.validationService = validationService;
 	}
@@ -243,6 +253,22 @@ public class CpResearchController {
 		ShadowResponse shadowRes = new ShadowResponse();
 		shadowResRse.execute(shadowReq, shadowRes, shadowResearchService);
 		return shadowRes;
+	}
+
+	/**
+	 * 野生個体値を取得するAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/wildIv")
+	public WildIvResponse wildIv(WildIvRequest wildIvReq) throws Exception {
+
+		WildIvResponse wildIvRes = new WildIvResponse();
+		wildIvResRse.execute(wildIvReq, wildIvRes, wildIvResearchService);
+		return wildIvRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

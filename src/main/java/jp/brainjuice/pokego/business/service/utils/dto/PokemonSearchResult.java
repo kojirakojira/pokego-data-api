@@ -3,6 +3,7 @@ package jp.brainjuice.pokego.business.service.utils.dto;
 import java.util.List;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class PokemonSearchResult {
 
 	private String message = "";
+
+	private MsgLevelEnum msgLevel = MsgLevelEnum.info;
 
 	/** 検索結果が1件かどうか */
 	private boolean unique;
