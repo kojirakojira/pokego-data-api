@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.OgpInfoService;
 import jp.brainjuice.pokego.business.service.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.PrevNextPokemonService;
 import jp.brainjuice.pokego.business.service.RaceDiffService;
 import jp.brainjuice.pokego.business.service.UnimplPokemonService;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
@@ -24,12 +25,14 @@ import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.OgpPokemonRequest;
 import jp.brainjuice.pokego.web.form.req.OgpTypeRequest;
+import jp.brainjuice.pokego.web.form.req.PrevNextPokemonRequest;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.req.research.FilterAllRequest;
 import jp.brainjuice.pokego.web.form.req.research.SearchAllRequest;
 import jp.brainjuice.pokego.web.form.res.FilterAllResponse;
 import jp.brainjuice.pokego.web.form.res.OgpPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.OgpTypeResponse;
+import jp.brainjuice.pokego.web.form.res.PrevNextPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.SearchAllResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
@@ -49,6 +52,8 @@ public class SearchController {
 
 	private UnimplPokemonService unimplPokemonService;
 
+	private PrevNextPokemonService prevNextPokemonService;
+
 	private OgpInfoService ogpInfoService;
 
 	private ViewsCacheProvider viewsCacheProvider;
@@ -59,6 +64,7 @@ public class SearchController {
 			PokemonSearchService pokemonSearchService,
 			TopicListProvider topicListProvider,
 			UnimplPokemonService unimplPokemonService,
+			PrevNextPokemonService prevNextPokemonService,
 			OgpInfoService ogpInfoService,
 			ViewsCacheProvider viewsCacheProvider) {
 
@@ -72,12 +78,14 @@ public class SearchController {
 
 		this.unimplPokemonService = unimplPokemonService;
 
+		this.prevNextPokemonService = prevNextPokemonService;
+
 		this.ogpInfoService = ogpInfoService;
 
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
-	@GetMapping("/home")
+	@GetMapping("/test")
 	public String home() {
 		return "pokego-api server is running!!";
 	}
@@ -212,6 +220,20 @@ public class SearchController {
 
 		// 閲覧数を手動で追加。
 		viewsCacheProvider.addTempList();
+
+		return res;
+	}
+
+	/**
+	 * 図鑑ID上の1つ前、1つ後のポケモンのGoPokedexを取得するAPI
+	 * @param req
+	 * @return
+	 */
+	@GetMapping("/prevNextPokemon")
+	public PrevNextPokemonResponse prevNextPokemon(PrevNextPokemonRequest req) {
+
+		PrevNextPokemonResponse res = new PrevNextPokemonResponse();
+		prevNextPokemonService.exec(req.getId(), res);
 
 		return res;
 	}
