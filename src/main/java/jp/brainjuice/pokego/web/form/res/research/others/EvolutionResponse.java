@@ -13,9 +13,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class EvolutionResponse extends ResearchResponse {
 
-	// ツリーリスト<yリスト<xリスト<Hierarchy>>>
+	/**
+	 * ツリーリスト<yリスト<xリスト<Hierarchy>>>
+	 * ツリーリストは、ガーメイルのような進化前が複数存在する場合にのみ登場する。
+	 */
 	private List<List<List<Hierarchy>>> evoTreeInfo;
 	private List<String> anotherForms;
 	private List<String> bfAfAotForms;
 	private Map<String, Race> raceMap;
+	private List<String> evoTreeAnnotations;
 }

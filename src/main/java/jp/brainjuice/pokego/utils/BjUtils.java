@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -184,6 +186,31 @@ public final class BjUtils {
 			return "";
 		}
 		return value;
+	}
+
+	/**
+	 * 第1引数が空文字またはnullでない場合、第2引数のリストに要素を追加する。
+	 *
+	 * @param str
+	 * @param list
+	 */
+	public static void addList(String str, List<String> list) {
+		if (!StringUtils.isEmpty(str)) {
+			list.add(str);
+		}
+	}
+
+	/**
+	 * 第1引数が空文字またはnullでない場合、第3引数の編集後、第2引数のリストに要素を追加する。
+	 *
+	 * @param str
+	 * @param list
+	 * @param editFunc
+	 */
+	public static void addList(String str, List<String> list, Function<String, String> editFunc) {
+		if (!StringUtils.isEmpty(str)) {
+			list.add(editFunc.apply(str));
+		}
 	}
 
 	/**

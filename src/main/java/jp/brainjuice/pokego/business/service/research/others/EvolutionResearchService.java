@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.service.research.others;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,51 +41,84 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		String pokedexId = sv.getGoPokedex().getPokedexId();
 
 		// 進化ツリーの取得
-		final List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);
+		List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);
+
+		// 進化ツリー上のポケモンを直列化する。
+		List<String> treePokeIdList = new ArrayList<>();
+		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> treePokeIdList.add(h.getId()))));
+
+		// 進化ツリー全体に係る注釈
+		List<String> evoTreeAnnoList = evolutionInfo.getEvoAnnotations(treePokeIdList);
+
 		// 別のすがた
-		final List<String> anotherFormList = evolutionInfo.getAnotherFormList(pokedexId);
-		// 別のすがたの進化前、進化後、別のすがたの
-		final Set<String> bfAfAotFormSet = new HashSet<>();
-		{
-			// 進化ツリー上のポケモンを直列化する。
-			final Set<String> treePokeIdSet = new HashSet<>();
-			hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> treePokeIdSet.add(h.getId()))));
-			// 直列化したポケモンをループさせ、進化ツリー上の別のすがたをすべて取得する。
-			final Set<String> treeAotPokeIdSet = new HashSet<>();
-			treePokeIdSet.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionInfo.getAnotherFormList(pokeId)));
+		List<String> anotherFormList = evolutionInfo.getAnotherFormList(pokedexId);
+		// 別のすがたの進化前、進化後
+		Set<String> bfAfAotFormSet = makeBfAfAotFormSet(treePokeIdList, anotherFormList);
 
-			// 進化ツリー上の別のすがたをすべて追加する。
-			bfAfAotFormSet.addAll(treeAotPokeIdSet);
-			// 進化ツリー上の別のすがたの進化前、進化後をすべて追加する。
-			treeAotPokeIdSet.forEach(pokeId -> bfAfAotFormSet.addAll(evolutionInfo.getBfAfEvoList(pokeId)));
-			// 進化ツリー上のポケモン、別のすがたと重複している場合は削除
-			bfAfAotFormSet.removeAll(treePokeIdSet);
-			bfAfAotFormSet.removeAll(anotherFormList);
-		}
+		// Raceマップの作成（色をクライアント側に渡すため。）
+		Map<String, Race> raceMap = makeRaceMap(hieList, anotherFormList, bfAfAotFormSet);
 
-		/** Raceマップの作成（色をクライアント側に渡すため。） */
-		// 図鑑IDをすべてリストに追加する。
-		final Set<String> pokedexIdSet = new HashSet<>();
-		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> pokedexIdSet.add(h.getId()))));
-		pokedexIdSet.addAll(anotherFormList);
-		pokedexIdSet.addAll(bfAfAotFormSet);
 
-		// GOステータスの取得
-		final List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(pokedexIdSet);
-
-		// Raceマップを作成
-		final Map<String, Race> raceMap = new HashMap<>();
-		goPokedexList.forEach(gp -> {
-			raceMap.put(gp.getPokedexId(), new Race(null, gp));
-		});
 
 		/** レスポンスのセット */
 		res.setEvoTreeInfo(hieList);
+		res.setEvoTreeAnnotations(evoTreeAnnoList);
 		// 並び替えてセット
 		anotherFormList.sort(PokemonEditUtils.getPokedexIdComparator());
 		res.setAnotherForms(anotherFormList);
 		// 並び替えてリストに変換してセット
 		res.setBfAfAotForms(bfAfAotFormSet.stream().sorted(PokemonEditUtils.getPokedexIdComparator()).collect(Collectors.toList()));
 		res.setRaceMap(raceMap);
+	}
+
+	/**
+	 * 別のすがたの進化前、進化後を取得する。
+	 *
+	 * @param treePokeIdList
+	 * @param anotherFormList
+	 * @return
+	 */
+	private Set<String> makeBfAfAotFormSet(List<String> treePokeIdList, List<String> anotherFormList) {
+
+		Set<String> bfAfAotFormSet = new HashSet<>();
+
+		// 直列化したポケモンをループさせ、進化ツリー上の別のすがたをすべて取得する。
+		Set<String> treeAotPokeIdSet = new HashSet<>();
+		treePokeIdList.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionInfo.getAnotherFormList(pokeId)));
+
+		// 進化ツリー上の別のすがたをすべて追加する。
+		bfAfAotFormSet.addAll(treeAotPokeIdSet);
+		// 進化ツリー上の別のすがたの進化前、進化後をすべて追加する。
+		treeAotPokeIdSet.forEach(pokeId -> bfAfAotFormSet.addAll(evolutionInfo.getBfAfEvoList(pokeId)));
+		// 進化ツリー上のポケモン、別のすがたと重複している場合は削除
+		bfAfAotFormSet.removeAll(treePokeIdList);
+		bfAfAotFormSet.removeAll(anotherFormList);
+
+		return bfAfAotFormSet;
+	}
+
+	/**
+	 * 種族値のMapを返却する。
+	 * ここでの使用目的は、タイプから算出した色の情報が欲しいだけ。
+	 *
+	 * @param hieList
+	 * @param anotherFormList
+	 * @param bfAfAotFormSet
+	 * @return
+	 */
+	private Map<String, Race> makeRaceMap(List<List<List<Hierarchy>>> hieList, List<String> anotherFormList, Set<String> bfAfAotFormSet) {
+
+		// 図鑑IDをすべてリストに追加する。
+		Set<String> pokedexIdSet = new HashSet<>();
+		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> pokedexIdSet.add(h.getId()))));
+		pokedexIdSet.addAll(anotherFormList);
+		pokedexIdSet.addAll(bfAfAotFormSet);
+
+		// GOステータスの取得
+		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(pokedexIdSet);
+
+		return goPokedexList.stream()
+				.map(gp -> Map.entry(gp.getPokedexId(), new Race(null, gp)))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 }
