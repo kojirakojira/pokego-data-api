@@ -1,7 +1,7 @@
 package jp.brainjuice.pokego.business.service.research.others;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,16 +44,16 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);
 
 		// 進化ツリー上のポケモンを直列化する。
-		List<String> treePokeIdList = new ArrayList<>();
-		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> treePokeIdList.add(h.getId()))));
+		Set<String> treePokeIdSet = new LinkedHashSet<>();
+		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> treePokeIdSet.add(h.getId()))));
 
 		// 進化ツリー全体に係る注釈
-		List<String> evoTreeAnnoList = evolutionInfo.getEvoAnnotations(treePokeIdList);
+		List<String> evoTreeAnnoList = evolutionInfo.getEvoAnnotations(treePokeIdSet);
 
 		// 別のすがた
 		List<String> anotherFormList = evolutionInfo.getAnotherFormList(pokedexId);
 		// 別のすがたの進化前、進化後
-		Set<String> bfAfAotFormSet = makeBfAfAotFormSet(treePokeIdList, anotherFormList);
+		Set<String> bfAfAotFormSet = makeBfAfAotFormSet(treePokeIdSet, anotherFormList);
 
 		// Raceマップの作成（色をクライアント側に渡すため。）
 		Map<String, Race> raceMap = makeRaceMap(hieList, anotherFormList, bfAfAotFormSet);
@@ -74,24 +74,24 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 	/**
 	 * 別のすがたの進化前、進化後を取得する。
 	 *
-	 * @param treePokeIdList
+	 * @param treePokeIdSet
 	 * @param anotherFormList
 	 * @return
 	 */
-	private Set<String> makeBfAfAotFormSet(List<String> treePokeIdList, List<String> anotherFormList) {
+	private Set<String> makeBfAfAotFormSet(Set<String> treePokeIdSet, List<String> anotherFormList) {
 
 		Set<String> bfAfAotFormSet = new HashSet<>();
 
 		// 直列化したポケモンをループさせ、進化ツリー上の別のすがたをすべて取得する。
 		Set<String> treeAotPokeIdSet = new HashSet<>();
-		treePokeIdList.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionInfo.getAnotherFormList(pokeId)));
+		treePokeIdSet.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionInfo.getAnotherFormList(pokeId)));
 
 		// 進化ツリー上の別のすがたをすべて追加する。
 		bfAfAotFormSet.addAll(treeAotPokeIdSet);
 		// 進化ツリー上の別のすがたの進化前、進化後をすべて追加する。
 		treeAotPokeIdSet.forEach(pokeId -> bfAfAotFormSet.addAll(evolutionInfo.getBfAfEvoList(pokeId)));
 		// 進化ツリー上のポケモン、別のすがたと重複している場合は削除
-		bfAfAotFormSet.removeAll(treePokeIdList);
+		bfAfAotFormSet.removeAll(treePokeIdSet);
 		bfAfAotFormSet.removeAll(anotherFormList);
 
 		return bfAfAotFormSet;

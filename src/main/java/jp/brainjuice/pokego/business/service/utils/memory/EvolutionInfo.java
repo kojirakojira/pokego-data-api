@@ -55,6 +55,8 @@ public class EvolutionInfo {
 
 	private static final String COSTS_CANDY_MSG = "アメ{0}個";
 
+	private static final String UNIMPL_UNKNOWN_MSG = "未実装のため不明";
+
 	public EvolutionInfo(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
 		init(goPokedexRepository);
 	}
@@ -741,9 +743,14 @@ public class EvolutionInfo {
 
 		// アメ
 		BjUtils.addList(
-				String.valueOf(evo.getCandy()),
+				evo.getCandy() == 0 ? "" : String.valueOf(evo.getCandy()), // アメ0個は、アメが進化条件にない、または未入力である。
 				retList,
 				(str) -> MessageFormat.format(COSTS_CANDY_MSG, str));
+
+		if (retList.isEmpty() && !evo.isImplFlg()) {
+			// 進化条件が無し、かつ未実装だった場合
+			retList.add(UNIMPL_UNKNOWN_MSG);
+		}
 
 		return retList;
 	}
@@ -762,6 +769,16 @@ public class EvolutionInfo {
 			// pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
 			checkAllExists(evolutionList, goPokedexRepository);
 
+			// EvolutionにimplFlgをセット
+			goPokedexRepository.findAll().stream().forEach(gp -> {
+				for (Evolution evo: evolutionList) {
+					if (gp.getPokedexId().equals(evo.getPokedexId())) {
+						evo.setImplFlg(gp.isImplFlg());
+						break;
+					}
+				}
+			});
+			// フィールドにEvolutionのリストをセット
 			evoList.addAll(evolutionList);
 
 			Set<String> noEvoSet = new HashSet<String>();
@@ -800,6 +817,33 @@ public class EvolutionInfo {
 	}
 
 	/**
+	 * pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
+	 *
+	 * @param evoList
+	 * @param goPokedexRepository
+	 * @return
+	 * @throws PokemonDataInitException
+	 */
+	private void checkAllExists(List<Evolution> evoList, GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+
+		List<String> evoPidList = evoList.stream()
+				.map(Evolution::getPokedexId)
+				.collect(Collectors.toList());
+
+		List<GoPokedex> notExistsGpList = goPokedexRepository.findAll().stream()
+				.filter(gp -> !evoPidList.contains(gp.getPokedexId()))
+				.collect(Collectors.toList());
+
+		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
+		if (!notExistsGpList.isEmpty()) {
+			throw new PokemonDataInitException(
+					MessageFormat.format(
+							NOT_EXISTS_MSG,
+							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));
+		}
+	}
+
+	/**
 	 * noBfEvoMapを生成する。
 	 *
 	 * @param noEvoSet
@@ -828,33 +872,6 @@ public class EvolutionInfo {
 		noBfEvoMap.removeAll(dummyIdList);
 
 		return noBfEvoMap;
-	}
-
-	/**
-	 * pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
-	 *
-	 * @param evoList
-	 * @param goPokedexRepository
-	 * @return
-	 * @throws PokemonDataInitException
-	 */
-	private void checkAllExists(List<Evolution> evoList, GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
-
-		List<String> evoPidList = evoList.stream()
-				.map(Evolution::getPokedexId)
-				.collect(Collectors.toList());
-
-		List<GoPokedex> notExistsGpList = goPokedexRepository.findAll().stream()
-				.filter(gp -> !evoPidList.contains(gp.getPokedexId()))
-				.collect(Collectors.toList());
-
-		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
-		if (!notExistsGpList.isEmpty()) {
-			throw new PokemonDataInitException(
-					MessageFormat.format(
-							NOT_EXISTS_MSG,
-							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));
-		}
 	}
 
 }
