@@ -31,5 +31,7 @@ public class Hierarchy {
 	private String bid;
 	/** 進化条件 */
 	private List<String> costs;
+	/** ポケモンGOで進化するか */
+	private boolean goEvo;
 
 }

@@ -432,7 +432,8 @@ public class EvolutionInfo {
 							0, // x軸の距離も一旦0で初期化
 							entry.getKey(),
 							entry.getValue(),
-							getCosts(entry.getKey(), entry.getValue())))
+							getCosts(entry.getKey(), entry.getValue()),
+							canGoEvo(entry.getKey(), entry.getValue())))
 					.collect(Collectors.toList());
 			yList.add(xList);
 		});
@@ -753,6 +754,28 @@ public class EvolutionInfo {
 		}
 
 		return retList;
+	}
+
+	/**
+	 * ポケモンGOにおいて進化できるかどうかを取得する。
+	 *
+	 * @param id
+	 * @param bid
+	 * @return
+	 */
+	private boolean canGoEvo(String id, String bid) {
+
+		if (ROOT.equals(bid)) {
+			// rootの場合は進化前は存在しない。
+			return false;
+		}
+
+		// 対象のEvolutionを取得
+		Evolution evo = evoList.stream()
+				.filter(ev -> Objects.equals(ev.getPokedexId(), id) && Objects.equals(ev.getBeforePokedexId(), bid))
+				.findFirst().get();
+
+		return evo.isCanGoEvo();
 	}
 
 	/**

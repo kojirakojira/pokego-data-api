@@ -26,6 +26,8 @@ public class Evolution {
 	 * ※進化ツリー全体に対して説明したい条件がある場合に使用する。（ランダムの場合等）
 	 */
 	private String evoAnnotations;
+	/** ポケモンGOで進化するかどうか */
+	private boolean canGoEvo;
 
 	/**
 	 * ポケモンGOで実装済みであるか
