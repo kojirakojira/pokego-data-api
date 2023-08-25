@@ -47,11 +47,11 @@ public class CpIvCalculator {
 		int start = minIvIdx < maxIvIdx ? minIvIdx : maxIvIdx;
 		int end = minIvIdx < maxIvIdx ? maxIvIdx : minIvIdx;
 
-		// 天候ブーストを考慮し、最低PL（PL1 or 6）、最高PL（PL30 or 35）を取得する。
+		// 天候ブーストを考慮し、最低PLと最高PLを取得する。
 		int minIdx = cpMultiplierMap.indexOf(wbFlg ? ir.getMinPlWb() : ir.getMinPl());
 		int maxIdx = cpMultiplierMap.indexOf(wbFlg ? ir.getMaxPlWb() : ir.getMaxPl());
 
-		if (!(minIdx <= start && end <= maxIdx)) {
+		if (maxIdx < start || end < minIdx) {
 			// 完全に範囲外の場合
 			return null;
 		}
@@ -63,7 +63,7 @@ public class CpIvCalculator {
 		// cpMultiplierListの取得
 		List<Map.Entry<String, Double>> cpMultList = cpMultiplierMap.getList();
 
-		return cpMultList.subList(start, end);
+		return cpMultList.subList(start, end + 1);
 
 	}
 
@@ -84,7 +84,7 @@ public class CpIvCalculator {
 		// 最低個体値の場合にcalcedCp <= cpとなるPLの最大PLのインデックスを取得する。
 		// （つまりは、そのポケモンそのCPにおいて、ありうる最大のPLを特定している。）
 		int idx = pokemonGoUtils.binarySearchForPlIdx(
-				(calcedCp) -> calcedCp <= cp,
+				(calcedCp) -> calcedCp < cp,
 				(mult) -> pokemonGoUtils.calcCp(gp, minIv, minIv, minIv, mult));
 
 		return idx;

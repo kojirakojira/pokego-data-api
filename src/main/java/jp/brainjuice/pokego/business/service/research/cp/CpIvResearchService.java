@@ -35,7 +35,7 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 
 	private static final String NO_HIT_MSG = "該当する個体値が存在しませんでした。";
 
-	private static final String CP_OUT_OF_SCOPE_MSG = "野生ではありえないCPが指定されました。";
+	private static final String CP_OUT_OF_SCOPE_MSG = "ありえないCPが指定されました。";
 
 	@Autowired
 	public CpIvResearchService(
