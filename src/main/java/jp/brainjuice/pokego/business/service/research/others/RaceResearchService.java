@@ -15,6 +15,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.research.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
@@ -35,18 +36,22 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private TooStrongPokemonList tooStrongPokemonList;
 
+	private PokemonUtils pokemonUtils;
+
 	@Autowired
 	public RaceResearchService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
 			PokedexFilterInfoRepository pokedexFilterInfoRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
-			TooStrongPokemonList tooStrongPokemonList) {
+			TooStrongPokemonList tooStrongPokemonList,
+			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokedexFilterInfoRepository = pokedexFilterInfoRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.tooStrongPokemonList = tooStrongPokemonList;
+		this.pokemonUtils = pokemonUtils;
 	}
 
 	@Override
@@ -54,7 +59,10 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 		String pokedexId = sv.getGoPokedex().getPokedexId();
 
-		Pokedex pokedex = pokedexRepository.findById(pokedexId).get();
+		Pokedex pokedex = null;
+		if (pokemonUtils.existsOrigin(pokedexId)) {
+			pokedex = pokedexRepository.findById(pokedexId).get();
+		}
 		GoPokedex goPokedex = sv.getGoPokedex();
 
 		Race race = new Race(pokedex, goPokedex);

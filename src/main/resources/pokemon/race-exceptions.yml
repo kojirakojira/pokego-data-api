@@ -1,8 +1,10 @@
-ATTACK:
+# アーマードミュウツーは原作種族値が存在しない。
+0150N02:
+  NOT_EXISTS_ORIGIN: true
+  ATTACK: 182
+  DEFENSE: 278
+  HP: 214
 
-DEFENSE:
-
-HP:
-  # ヌケニンはHP固定1
-  0292N01:
-    fixed: 1
+# ヌケニンはHP固定1
+0292N01:
+  HP: 1

@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +29,12 @@ public class PokemonUtils {
 	// 強ポケ補正の基準になるPL
 	private static final String TOO_STRONG_PL = "50.5";
 
+	/**
+	 * 起動時の依存関係の都合上存在しているコンストラクタ
+	 *
+	 * @param pokemonGoUtils
+	 * @throws PokemonDataInitException
+	 */
 	public PokemonUtils (PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
 		this.pokemonGoUtils = pokemonGoUtils;
 
@@ -39,9 +43,11 @@ public class PokemonUtils {
 
 	@Autowired
 	public PokemonUtils(TooStrongPokemonList tooStrongPokemonList,
-			PokemonGoUtils pokemonGoUtils) {
+			PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
 		this.tooStrongPokemonList = tooStrongPokemonList;
 		this.pokemonGoUtils = pokemonGoUtils;
+
+		init();
 	}
 
 	/**
@@ -55,8 +61,7 @@ public class PokemonUtils {
 		ATTACK, // 攻撃
 		DEFENSE, // 防御
 		HP, // HP
-
-		fixed, // 固定値
+		NOT_EXISTS_ORIGIN, // 原作に存在しないポケモンであるか否か
 	}
 
 	/**
@@ -65,7 +70,6 @@ public class PokemonUtils {
 	 * @throws PokemonDataInitException
 	 */
 	@SuppressWarnings("unchecked")
-	@PostConstruct
 	public void init() throws PokemonDataInitException {
 
 		raceExMap = new HashMap<String, Object>();
@@ -133,9 +137,9 @@ public class PokemonUtils {
 
 		// 例外の固定値が存在する場合はその値を返却する。
 		@SuppressWarnings("unchecked")
-		Map<String, Map<String, Integer>> raceExHpMap = (Map<String, Map<String, Integer>>) raceExMap.get(RaceEx.HP.name());
-		if (raceExHpMap.containsKey(pokedexId)) {
-			return raceExHpMap.get(pokedexId).get(RaceEx.fixed.name()).intValue();
+		Map<String, Integer> raceExHpMap = (Map<String, Integer>) raceExMap.get(pokedexId);
+		if (raceExHpMap != null && raceExHpMap.containsKey(RaceEx.HP.name())) {
+			return raceExHpMap.get(RaceEx.HP.name()).intValue();
 		}
 
 		double baseHp = baseHp(hp);
@@ -177,9 +181,9 @@ public class PokemonUtils {
 
 		// 例外の固定値が存在する場合はその値を返却する。
 		@SuppressWarnings("unchecked")
-		Map<String, Map<String, Integer>> raceExAtMap = (Map<String, Map<String, Integer>>) raceExMap.get(RaceEx.ATTACK.name());
-		if (raceExAtMap.containsKey(pokedexId)) {
-			return raceExAtMap.get(pokedexId).get(RaceEx.fixed.name()).intValue();
+		Map<String, Integer> raceExAtMap = (Map<String, Integer>) raceExMap.get(pokedexId);
+		if (raceExAtMap != null && raceExAtMap.containsKey(RaceEx.ATTACK.name())) {
+			return raceExAtMap.get(RaceEx.ATTACK.name()).intValue();
 		}
 
 		double baseAttack = baseAttack(attack, spAttack, speed);
@@ -227,9 +231,9 @@ public class PokemonUtils {
 
 		// 例外の固定値が存在する場合はその値を返却する。
 		@SuppressWarnings("unchecked")
-		Map<String, Map<String, Integer>> raceExDfMap = (Map<String, Map<String, Integer>>) raceExMap.get(RaceEx.DEFENSE.name());
-		if (raceExDfMap.containsKey(pokedexId)) {
-			return raceExDfMap.get(pokedexId).get(RaceEx.fixed.name()).intValue();
+		Map<String, Integer> raceExDfMap = (Map<String, Integer>) raceExMap.get(pokedexId);
+		if (raceExDfMap != null && raceExDfMap.containsKey(RaceEx.DEFENSE.name())) {
+			return raceExDfMap.get(RaceEx.DEFENSE.name()).intValue();
 		}
 
 		double baseDefense = baseDefense(defense, spDefense, speed);
@@ -335,5 +339,25 @@ public class PokemonUtils {
 				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
 				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true));
+	}
+
+	/**
+	 * 原作種族値が存在するかを判定する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean existsOrigin(String pokedexId) {
+
+		if (!raceExMap.containsKey(pokedexId)) {
+			return true;
+		}
+
+		Map<String, Boolean> notExistsOriginMap = (Map<String, Boolean>) raceExMap.get(pokedexId);
+
+		// NOT_EXISTS_ORIGINのキーがある、かつtrueの場合のみ原作種族値が存在しない。
+		return !(notExistsOriginMap.containsKey(RaceEx.NOT_EXISTS_ORIGIN.name())
+				&& notExistsOriginMap.get(RaceEx.NOT_EXISTS_ORIGIN.name()));
 	}
 }

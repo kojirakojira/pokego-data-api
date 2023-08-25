@@ -20,6 +20,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Race {
 
+	private String pokedexId;
+	private String name;
+	private String remarks;
 	private Pokedex pokedex;
 	private GoPokedex goPokedex;
 	private Color color;
@@ -27,6 +30,10 @@ public class Race {
 	private Color type2Color;
 
 	public Race(Pokedex pokedex, GoPokedex goPokedex) {
+
+		setPokedexId(goPokedex.getPokedexId());
+		setName(goPokedex.getName());
+		setRemarks(goPokedex.getRemarks());
 
 		setPokedex(pokedex);
 		setGoPokedex(goPokedex);

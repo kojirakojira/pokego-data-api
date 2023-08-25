@@ -14,6 +14,7 @@ public enum GenNameEnum implements ConstantEnumInterface {
 	g6oras("第六世代(ORAS)"),
 	g7("第七世代(サンムーン)"),
 	g7pv("第七世代(Let's GO! ピカチュウ&イーブイ)"),
+	g7mov("第七世代(映画オリジナル)"),
 	g8("第八世代(剣盾)"),
 	g8arceus("LEGENDS アルセウス"),
 	g9("第九世代(スカーレットヴァイオレット)"),

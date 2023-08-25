@@ -200,6 +200,7 @@ pokedexId,beforePokedexId,candy,evolutionItems,buddy,specialAction,lureModules,t
 0148N01,0147N01,25,,,,,,,TRUE
 0149N01,0148N01,100,,,,,,,TRUE
 0150N01,,0,,,,,,,FALSE
+0150N02,,0,,,,,,,FALSE
 0150M01,,0,,,,,,,FALSE
 0150M02,,0,,,,,,,FALSE
 0151N01,,0,,,,,,,FALSE

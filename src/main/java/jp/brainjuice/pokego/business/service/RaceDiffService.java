@@ -13,6 +13,7 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.req.RaceDiffRequest;
@@ -31,16 +32,20 @@ public class RaceDiffService {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
+	private PokemonUtils pokemonUtils;
+
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
 
 	@Autowired
 	public RaceDiffService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
-			PokemonStatisticsInfo pokemonStatisticsInfo) {
+			PokemonStatisticsInfo pokemonStatisticsInfo,
+			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
+		this.pokemonUtils = pokemonUtils;
 	}
 
 	public boolean check(RaceDiffRequest req, RaceDiffResponse res) {
@@ -114,9 +119,20 @@ public class RaceDiffService {
 		exec(goPokedexList, idList, res);
 	}
 
+	/**
+	 * 当サービスの主処理
+	 *
+	 * @param goPokedexList
+	 * @param idList
+	 * @param res
+	 */
 	private void exec(List<GoPokedex> goPokedexList, List<String> idList, RaceDiffResponse res) {
 
 		List<Pokedex> pokedexList = (List<Pokedex>) pokedexRepository.findAllById(idList);
+		// 原作種族値が存在しない場合は、Pokedexをnullにする。
+		pokedexList = pokedexList.stream()
+				.map(p -> pokemonUtils.existsOrigin(p.getPokedexId()) ? p : null)
+				.collect(Collectors.toList());
 
 		List<Race> raceList = new ArrayList<>();
 		for (int i = 0; i < idList.size(); i++) {
