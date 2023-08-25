@@ -8,4 +8,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class RaidRequest extends ResearchRequestImpl {
 
+	/** シャドウか否か */
+	private boolean shadow;
 }

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RaidResponse extends ResearchResponse {
 
+	private boolean shadow;
+
 	private int maxCp;
 	private int minCp;
 

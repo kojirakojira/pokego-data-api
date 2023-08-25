@@ -83,6 +83,8 @@ public class SearchValue {
 		wbFlg(Boolean.class),
 		/** ポケモンを捕まえるときのシチュエーション */
 		situation(String.class),
+		/** シャドウか否か */
+		shadow(Boolean.class),
 		;
 
 		@Getter(value = AccessLevel.PUBLIC)
