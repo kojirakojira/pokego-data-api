@@ -20,12 +20,10 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import jp.brainjuice.pokego.filter.log.LogUtils;
 
-@Component
 public final class BjUtils {
 
 	public static final Locale locale = Locale.JAPAN;
@@ -37,13 +35,6 @@ public final class BjUtils {
 	public static final String sdfMde = "MM/dd(E)";
 	public static final String sdfHm = "HH:mm";
 	public static final String dirFormat = "yyyyMMddHHmmss";
-
-//	private BjConfigMap bjdConfigMap;
-//
-//	@Autowired
-//	public BjUtils(BjConfigMap bjdConfigMap) {
-//		this.bjdConfigMap = bjdConfigMap;
-//	}
 
 	/**
 	 * 引数に指定された文字が、空文字またはnullでない場合は数値に変換し返却する。

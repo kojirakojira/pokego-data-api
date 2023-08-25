@@ -11,4 +11,5 @@ import lombok.EqualsAndHashCode;
 public class UnimplPokemonResponse extends Response {
 
 	private List<SimpPokemon> unimplList;
+	private String lastUpdated;
 }

@@ -1,7 +1,5 @@
 package jp.brainjuice.pokego.web;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +34,6 @@ import jp.brainjuice.pokego.web.form.res.PrevNextPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.RaceDiffResponse;
 import jp.brainjuice.pokego.web.form.res.SearchAllResponse;
 import jp.brainjuice.pokego.web.form.res.UnimplPokemonResponse;
-import jp.brainjuice.pokego.web.form.res.elem.SimpPokemon;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -213,10 +210,7 @@ public class SearchController {
 	public UnimplPokemonResponse unimplPokemon() {
 
 		UnimplPokemonResponse res = new UnimplPokemonResponse();
-		List<SimpPokemon> simpPokemonList = unimplPokemonService.getUnimplementedPokemonList();
-		res.setUnimplList(simpPokemonList);
-		res.setSuccess(true);
-		res.setMessage("");
+		unimplPokemonService.exec(res);
 
 		// 閲覧数を手動で追加。
 		viewsCacheProvider.addTempList();
