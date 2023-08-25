@@ -43,8 +43,9 @@ public class ViewsCacheManager {
 
 	private RedisTemplate<String, String> redisTemplate;
 
+	/** Redis上の一時的なページ閲覧情報を管理するためのリポジトリ */
 	private PageTempViewRedisRepository pageTempViewRedisRepository;
-
+	/** Redis上の一時的なポケモン閲覧情報を管理するためのリポジトリ */
 	private PokemonTempViewRedisRepository pokemonTempViewRedisRepository;
 
 	private static final String START_MSG_SCHEDULE = "Start ViewInfo(page, pokemon) schedule.";
@@ -55,6 +56,9 @@ public class ViewsCacheManager {
 
 	private static final String START_MSG_SEND_VIEW_TEMP_INFO = "> Start send ViewTempInfo.";
 	private static final String END_MSG_SEND_VIEW_TEMP_INFO = "> End send ViewTempInfo. page:{0}, pokemon:{1}";
+
+	private static final String DELETE_ALL_TEMP_PAGE_INFO = "Delete All PageTempView.";
+	private static final String DELETE_ALL_TEMP_POKEMON_INFO = "Delete All PokemonTempView.";
 
 	@Autowired
 	public ViewsCacheManager(
@@ -164,6 +168,9 @@ public class ViewsCacheManager {
 	/**
 	 * キャッシュサーバ(Redisサーバ)上のページ、ポケモンごとの閲覧数を加算する。
 	 *
+	 * ページのRedis上のキー名：pageViews
+	 * ポケモンのRedis上のキー名：pokemonViews
+	 *
 	 * @param aggregateTargetList
 	 */
 	private void incrViewsCount(List<ViewTempInfo> aggregateTargetList) {
@@ -215,6 +222,10 @@ public class ViewsCacheManager {
 
 	/**
 	 * ページ、ポケモンの閲覧情報をキャッシュサーバ(Redisサーバ)に送信する。<br>
+	 * これは一時的に保存する情報であり、存続期間が過ぎると古いものから削除されていく。
+	 *
+	 * ページのRedis上のキー名：pageTempView
+	 * ポケモンのRedis上のキー名：pokemonTempView
 	 *
 	 * @param aggregateTargetList
 	 * @see PageTempView
@@ -244,6 +255,26 @@ public class ViewsCacheManager {
 		pokemonTempViewRedisRepository.saveAll(pokemonTempViewList);
 
 		log.info(MessageFormat.format(END_MSG_SEND_VIEW_TEMP_INFO, pageTempViewList, pokemonTempViewList));
+	}
+
+	/**
+	 * Redis上のPageTempView(一時的に保持しているページ情報)をすべて削除する。
+	 */
+	void clearPageTempView() {
+
+		pageTempViewRedisRepository.deleteAll();
+
+		log.info(DELETE_ALL_TEMP_PAGE_INFO);
+	}
+
+	/**
+	 * Redis上のPokemonTempView(一時的に保持しているポケモン情報)をすべて削除する。
+	 */
+	void clearPokemonTempView() {
+
+		pokemonTempViewRedisRepository.deleteAll();
+
+		log.info(DELETE_ALL_TEMP_POKEMON_INFO);
 	}
 
 }

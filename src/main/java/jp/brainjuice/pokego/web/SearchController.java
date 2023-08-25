@@ -262,6 +262,35 @@ public class SearchController {
 		return ogpPokemonRes;
 	}
 
+	/**
+	 * Redisサーバ上のページの一時情報をすべて削除する。
+	 * TODO: いずれsecureにしようと思うが、悪影響がないので一旦解放。
+	 *
+	 * @return
+	 */
+	@GetMapping("/clearPageTempView")
+	public String clearPageTempView() {
+
+		viewsCacheProvider.clearPageTempView();
+
+		return "成功";
+	}
+
+
+	/**
+	 * Redisサーバ上のポケモンの一時情報をすべて削除する。
+	 * TODO: いずれsecureにしようと思うが、悪影響がないので一旦解放。
+	 *
+	 * @return
+	 */
+	@GetMapping("/clearPokemonTempView")
+	public String clearPokemonTempView() {
+
+		viewsCacheProvider.clearPokemonTempView();
+
+		return "成功";
+	}
+
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {
 		String errMsg = "不正なアクセスです。";

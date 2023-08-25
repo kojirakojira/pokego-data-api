@@ -19,8 +19,11 @@ import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
 
 /**
  * 閲覧情報にアクセスするためのプロバイダクラスです。
- * 閲覧情報は、メモリ(ViewTempInfo)→Redisサーバ→メモリ(TopicPageとTopicPokemon)と処理されていきます。
- * そのうちの、メモリ(ViewTempInfo)に追加するためのクラスです。
+ * 閲覧情報は、メモリ(ViewTempInfo)→Redisサーバ(一時的にPage,Pokemonを追加)→メモリ(TopicPageとTopicPokemon)と処理されていきます。
+ *
+ * 閲覧情報を処理する目的は大きく2つあります。
+ * 1つ目は、Topic機能で直近のアクセス上位を集計することです。
+ * 2つ目は、ページ、ポケモン単位でトータルの閲覧数を集計することです。
  *
  * @author saibabanagchampa
  * @see ViewsCacheManager
@@ -134,5 +137,21 @@ public class ViewsCacheProvider {
 		return rtnMap;
 	}
 
+
+	/**
+	 * リリース後、古いキャッシュが残り不備が発生する場合、このAPIを使用する。（ページ一時情報用）
+	 */
+	public void clearPageTempView() {
+
+		viewsCacheManager.clearPageTempView();
+	}
+
+	/**
+	 * リリース後、古いキャッシュが残り不備が発生する場合、このAPIを使用する。（ポケモン一時情報用）
+	 */
+	public void clearPokemonTempView() {
+
+		viewsCacheManager.clearPokemonTempView();
+	}
 
 }
