@@ -6,8 +6,9 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class WildIvRequest extends ResearchRequestImpl {
+public class CpIvRequest extends ResearchRequestImpl {
 
+	private String situation;
 	private int cp;
 	private boolean wbFlg;
 }

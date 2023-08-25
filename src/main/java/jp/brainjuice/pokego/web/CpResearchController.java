@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.research.cp.AfterEvoCpResearchService;
+import jp.brainjuice.pokego.business.service.research.cp.CpIvResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
@@ -17,10 +18,10 @@ import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ThreeGalarBirdsResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.WildIvResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.research.cp.AfterEvoCpRequest;
+import jp.brainjuice.pokego.web.form.req.research.cp.CpIvRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
@@ -28,8 +29,8 @@ import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.ShadowRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.ThreeGalarBirdsRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.WildIvRequest;
 import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
+import jp.brainjuice.pokego.web.form.res.research.cp.CpIvResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
@@ -37,7 +38,6 @@ import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.ShadowResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.ThreeGalarBirdsResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.WildIvResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -66,8 +66,8 @@ public class CpResearchController {
 	private ShadowResearchService shadowResearchService;
 	private ResearchServiceExecutor<ShadowResponse> shadowResRse;
 
-	private WildIvResearchService wildIvResearchService;
-	private ResearchServiceExecutor<WildIvResponse> wildIvResRse;
+	private CpIvResearchService cpIvResearchService;
+	private ResearchServiceExecutor<CpIvResponse> cpIvResRse;
 
 	private ThreeGalarBirdsResearchService threeGalarBirdsResearchService;
 	private ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse;
@@ -83,7 +83,7 @@ public class CpResearchController {
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
 			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
-			WildIvResearchService wildIvResearchService, ResearchServiceExecutor<WildIvResponse> wildIvResRse,
+			CpIvResearchService cpIvResearchService, ResearchServiceExecutor<CpIvResponse> cpIvResRse,
 			ThreeGalarBirdsResearchService threeGalarBirdsResearchService, ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse,
 			ValidationService validationService) {
 
@@ -109,8 +109,8 @@ public class CpResearchController {
 		this.shadowResearchService = shadowResearchService;
 		this.shadowResRse = shadowResRse;
 		// 野生個体値
-		this.wildIvResearchService = wildIvResearchService;
-		this.wildIvResRse = wildIvResRse;
+		this.cpIvResearchService = cpIvResearchService;
+		this.cpIvResRse = cpIvResRse;
 		// 野生個体値
 		this.threeGalarBirdsResearchService = threeGalarBirdsResearchService;
 		this.threeGalarBirdsResRse = threeGalarBirdsResRse;
@@ -282,19 +282,19 @@ public class CpResearchController {
 	}
 
 	/**
-	 * 野生個体値を取得するAPIです。
+	 * CPから個体値を算出するAPIです。
 	 *
-	 * @param raidReq
+	 * @param cpIvReq
 	 * @param req
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/wildIv")
-	public WildIvResponse wildIv(WildIvRequest wildIvReq) throws Exception {
+	@GetMapping("/cpIv")
+	public CpIvResponse cpIv(CpIvRequest cpIvReq) throws Exception {
 
-		WildIvResponse wildIvRes = new WildIvResponse();
-		wildIvResRse.execute(wildIvReq, wildIvRes, wildIvResearchService);
-		return wildIvRes;
+		CpIvResponse cpIvRes = new CpIvResponse();
+		cpIvResRse.execute(cpIvReq, cpIvRes, cpIvResearchService);
+		return cpIvRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

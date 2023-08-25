@@ -81,6 +81,8 @@ public class SearchValue {
 		league(String.class),
 		/** 天候ブースト */
 		wbFlg(Boolean.class),
+		/** ポケモンを捕まえるときのシチュエーション */
+		situation(String.class),
 		;
 
 		@Getter(value = AccessLevel.PUBLIC)

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
+import jp.brainjuice.pokego.business.constant.SituationEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
@@ -58,7 +58,7 @@ public class ConstantsController {
 
 	@GetMapping("/genConst")
 	public Map<String, String> genConst() {
-		Map<String, String> genMap = new TreeMap<>();
+		Map<String, String> genMap = new LinkedHashMap<>();
 		for (GenNameEnum gen: GenNameEnum.values()) {
 			genMap.put(gen.name(), gen.getJpn());
 		}
@@ -79,5 +79,14 @@ public class ConstantsController {
 		return cpMultiplierMap.entrySet().stream()
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/situationConst")
+	public Map<String, String> situationConst() {
+		Map<String, String> situationMap = new LinkedHashMap<>();
+		for (SituationEnum item: SituationEnum.values()) {
+			situationMap.put(item.name(), item.getJpn());
+		}
+		return situationMap;
 	}
 }
