@@ -722,18 +722,18 @@ public class PokemonGoUtils {
 		int left = minIdx;
 		int right = maxIdx;
 		int mid = 0;
-		// 中央 = 左 + (右 - 左) / 2になるまでループ
-		while (mid != left + (right - left) / 2) {
-			mid = left + (right - left) / 2;
+		// 範囲がなくなるまでループ
+		while (left <= right) {
+			mid = (left + right) / 2;
 			// 中央のCPを求める。
 			int cp = calcCpFunc.apply(cpMultiplierList.get(mid).getValue());
 
 			if (cpPredicate.test(cp)) {
 				// 中央のCPが制限を超えていない場合、左を狭める。
-				left = mid - 1;
+				left = mid + 1;
 			} else {
 				// 中央のCPが制限を超えている場合、右を狭める。
-				right = mid + 1;
+				right = mid - 1;
 			}
 		}
 		return mid;
