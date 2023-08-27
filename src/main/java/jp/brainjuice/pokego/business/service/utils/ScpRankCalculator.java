@@ -236,9 +236,11 @@ public class ScpRankCalculator {
 				for (int ivh = 0; ivh <= 15; ivh++) {
 
 					ScpRank scpRank = createScpRank(goPokedex, iva, ivd, ivh, plFormat, cpLimitPredicate);
-					if (scpRank != null) {
-						scpRankList.add(scpRank);
+					if (scpRank == null) {
+						// 個体値が高すぎてPL:1で既にあり得ない個体値の場合はHPのループをスキップする。
+						break;
 					}
+					scpRankList.add(scpRank);
 				}
 			}
 		}
@@ -284,7 +286,6 @@ public class ScpRankCalculator {
 			pl = cpMultiplierList.get(plIdx).getKey();
 			cp = calcCpFunc.apply(cpMultiplierMap.get(pl));
 		}
-
 
 		ScpRank scpRank = null;
 		// （PL1でもCP制限を上回る場合はfalseになる。）

@@ -736,6 +736,12 @@ public class PokemonGoUtils {
 				right = mid - 1;
 			}
 		}
+
+		// 比較演算子により二分探索を行っているため、場合によっては範囲を1-indexはみ出す。
+		if (!cpPredicate.test(calcCpFunc.apply(cpMultiplierList.get(mid).getValue()))) {
+			mid-=1;
+		}
+
 		return mid;
 	}
 }

@@ -47,7 +47,7 @@ public class CpIvCalculator {
 		int start = minIvIdx < maxIvIdx ? minIvIdx : maxIvIdx;
 		int end = minIvIdx < maxIvIdx ? maxIvIdx : minIvIdx;
 
-		// 天候ブーストを考慮し、最低PLと最高PLを取得する。
+		// 天候ブーストを考慮し、そのポケモンに有り得る最低PLと最高PLを取得する。
 		int minIdx = cpMultiplierMap.indexOf(wbFlg ? ir.getMinPlWb() : ir.getMinPl());
 		int maxIdx = cpMultiplierMap.indexOf(wbFlg ? ir.getMaxPlWb() : ir.getMaxPl());
 
@@ -56,7 +56,8 @@ public class CpIvCalculator {
 			return null;
 		}
 
-		// start、endの片方のみが範囲外の場合はPLの枠内に補正する。
+		// start、endの範囲外の場合はPLの枠内に補正する。
+		// （そのポケモンの個体値としてはあり得るが、シチュエーション的にあり得ない個体値を排除する。）
 		start = minIdx <= start ? start : minIdx;
 		end = end <= maxIdx ? end : maxIdx;
 
