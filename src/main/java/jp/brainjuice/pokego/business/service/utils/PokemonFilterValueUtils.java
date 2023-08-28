@@ -18,8 +18,8 @@ import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
-import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
 
 public class PokemonFilterValueUtils {
 

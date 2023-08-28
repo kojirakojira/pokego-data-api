@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.pl.PlListResearchService;
-import jp.brainjuice.pokego.business.service.research.pl.PlResearchService;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.pl.PlListResearchService;
+import jp.brainjuice.pokego.business.service.pl.PlResearchService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.research.pl.PlListRequest;
-import jp.brainjuice.pokego.web.form.req.research.pl.PlRequest;
-import jp.brainjuice.pokego.web.form.res.research.pl.PlListResponse;
-import jp.brainjuice.pokego.web.form.res.research.pl.PlResponse;
+import jp.brainjuice.pokego.web.form.req.pl.PlListRequest;
+import jp.brainjuice.pokego.web.form.req.pl.PlRequest;
+import jp.brainjuice.pokego.web.form.res.pl.PlListResponse;
+import jp.brainjuice.pokego.web.form.res.pl.PlResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

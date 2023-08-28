@@ -5,17 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.others.AbundanceResearchService;
-import jp.brainjuice.pokego.business.service.research.others.EvolutionResearchService;
-import jp.brainjuice.pokego.business.service.research.others.RaceResearchService;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.general.AbundanceResearchService;
+import jp.brainjuice.pokego.business.service.others.EvolutionResearchService;
+import jp.brainjuice.pokego.business.service.race.RaceResearchService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.research.others.AbundanceRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.EvolutionRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.RaceRequest;
-import jp.brainjuice.pokego.web.form.res.research.others.AbundanceResponse;
-import jp.brainjuice.pokego.web.form.res.research.others.EvolutionResponse;
-import jp.brainjuice.pokego.web.form.res.research.others.RaceResponse;
+import jp.brainjuice.pokego.web.form.req.general.AbundanceRequest;
+import jp.brainjuice.pokego.web.form.req.others.EvolutionRequest;
+import jp.brainjuice.pokego.web.form.req.race.RaceRequest;
+import jp.brainjuice.pokego.web.form.res.general.AbundanceResponse;
+import jp.brainjuice.pokego.web.form.res.others.EvolutionResponse;
+import jp.brainjuice.pokego.web.form.res.race.RaceResponse;
 
 @RestController
 @RequestMapping("/api")

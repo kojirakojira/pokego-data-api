@@ -8,36 +8,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.cp.AfterEvoCpResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.CpIvResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.CpRankListResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.RocketResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.ThreeGalarBirdsResearchService;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.cp.AfterEvoCpResearchService;
+import jp.brainjuice.pokego.business.service.cp.CpIvResearchService;
+import jp.brainjuice.pokego.business.service.cp.CpRankListResearchService;
+import jp.brainjuice.pokego.business.service.cp.CpRankResearchService;
+import jp.brainjuice.pokego.business.service.cp.CpResearchService;
+import jp.brainjuice.pokego.business.service.cp.ThreeGalarBirdsResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.research.cp.AfterEvoCpRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.CpIvRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.CpRankListRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.RocketRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.ThreeGalarBirdsRequest;
-import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.CpIvResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.CpRankListResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.RocketResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.ThreeGalarBirdsResponse;
+import jp.brainjuice.pokego.web.form.req.cp.AfterEvoCpRequest;
+import jp.brainjuice.pokego.web.form.req.cp.CpIvRequest;
+import jp.brainjuice.pokego.web.form.req.cp.CpRankListRequest;
+import jp.brainjuice.pokego.web.form.req.cp.CpRankRequest;
+import jp.brainjuice.pokego.web.form.req.cp.CpRequest;
+import jp.brainjuice.pokego.web.form.req.cp.ThreeGalarBirdsRequest;
+import jp.brainjuice.pokego.web.form.res.cp.AfterEvoCpResponse;
+import jp.brainjuice.pokego.web.form.res.cp.CpIvResponse;
+import jp.brainjuice.pokego.web.form.res.cp.CpRankListResponse;
+import jp.brainjuice.pokego.web.form.res.cp.CpRankResponse;
+import jp.brainjuice.pokego.web.form.res.cp.CpResponse;
+import jp.brainjuice.pokego.web.form.res.cp.ThreeGalarBirdsResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -57,15 +48,6 @@ public class CpResearchController {
 	private AfterEvoCpResearchService afterEvoCpResearchService;
 	private ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse;
 
-	private RaidResearchService raidResearchService;
-	private ResearchServiceExecutor<RaidResponse> raidResRse;
-
-	private FRTaskResearchService fRTaskResearchService;
-	private ResearchServiceExecutor<FRTaskResponse> fRTaskResRse;
-
-	private RocketResearchService rocketResearchService;
-	private ResearchServiceExecutor<RocketResponse> rocketResRse;
-
 	private CpIvResearchService cpIvResearchService;
 	private ResearchServiceExecutor<CpIvResponse> cpIvResRse;
 
@@ -80,9 +62,6 @@ public class CpResearchController {
 			CpRankResearchService cpRankResearchService, ResearchServiceExecutor<CpRankResponse> cpRankResRse,
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
 			AfterEvoCpResearchService afterEvoCpResearchService, ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse,
-			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
-			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
-			RocketResearchService rocketResearchService, ResearchServiceExecutor<RocketResponse> rocketResRse,
 			CpIvResearchService cpIvResearchService, ResearchServiceExecutor<CpIvResponse> cpIvResRse,
 			ThreeGalarBirdsResearchService threeGalarBirdsResearchService, ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse,
 			ValidationService validationService) {
@@ -99,15 +78,6 @@ public class CpResearchController {
 		// 進化後CP
 		this.afterEvoCpResearchService = afterEvoCpResearchService;
 		this.afterEvoCpResRse = afterEvoCpResRse;
-		// レイドボスCP算出
-		this.raidResearchService = raidResearchService;
-		this.raidResRse = raidResRse;
-		// フィールドリサーチ、タマゴCP算出
-		this.fRTaskResearchService = fRTaskResearchService;
-		this.fRTaskResRse = fRTaskResRse;
-		// シャドウCP算出
-		this.rocketResearchService = rocketResearchService;
-		this.rocketResRse = rocketResRse;
 		// 野生個体値
 		this.cpIvResearchService = cpIvResearchService;
 		this.cpIvResRse = cpIvResRse;
@@ -191,78 +161,6 @@ public class CpResearchController {
 		AfterEvoCpResponse afterEvoCpRes = new AfterEvoCpResponse();
 		afterEvoCpResRse.execute(afterEvoCpRequest, afterEvoCpRes, afterEvoCpResearchService);
 		return afterEvoCpRes;
-	}
-
-	/**
-	 * レイドボスのCP最高値・最低値を求めるAPIです。
-	 *
-	 * @param raidReq
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/raid")
-	public RaidResponse raid(RaidRequest raidReq) throws Exception {
-
-		validationService.validation(raidReq);
-
-		RaidResponse raidRes = new RaidResponse();
-		raidResRse.execute(raidReq, raidRes, raidResearchService);
-		return raidRes;
-	}
-
-	/**
-	 * フィールドリサーチタスクのCP最高値・最低値を求めるAPIです。
-	 *
-	 * @param raidReq
-	 * @param req
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/fRTask")
-	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq) throws Exception {
-
-		validationService.validation(fRTaskReq);
-
-		FRTaskResponse fRTaskRes = new FRTaskResponse();
-		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
-		return fRTaskRes;
-	}
-
-	/**
-	 * タマゴCP最高値・最低値を求めるAPIです。<br>
-	 * フィールドリサーチと全く同じなので、処理を使いまわします。
-	 *
-	 * @param raidReq
-	 * @param req
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/eggs")
-	public FRTaskResponse eggs(FRTaskRequest fRTaskReq) throws Exception {
-
-		validationService.validation(fRTaskReq);
-
-		FRTaskResponse fRTaskRes = new FRTaskResponse();
-		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
-		return fRTaskRes;
-	}
-
-	/**
-	 * ロケット団勝利ボーナスで獲得できるポケモンのCP最高値・最低値を求めるAPIです。
-	 *
-	 * @param raidReq
-	 * @param req
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/rocket")
-	public RocketResponse shadow(RocketRequest rocketReq) throws Exception {
-
-		validationService.validation(rocketReq);
-
-		RocketResponse shadowRes = new RocketResponse();
-		rocketResRse.execute(rocketReq, shadowRes, rocketResearchService);
-		return shadowRes;
 	}
 
 	/**

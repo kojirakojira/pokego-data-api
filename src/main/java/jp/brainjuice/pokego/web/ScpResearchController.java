@@ -8,21 +8,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.scp.AfterEvoScpRankResearchService;
-import jp.brainjuice.pokego.business.service.research.scp.ScpRankListResearchService;
-import jp.brainjuice.pokego.business.service.research.scp.ScpRankMaxMinResearchService;
-import jp.brainjuice.pokego.business.service.research.scp.ScpRankResearchService;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.scp.AfterEvoScpRankResearchService;
+import jp.brainjuice.pokego.business.service.scp.ScpRankListResearchService;
+import jp.brainjuice.pokego.business.service.scp.ScpRankMaxMinResearchService;
+import jp.brainjuice.pokego.business.service.scp.ScpRankResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.research.scp.AfterEvoScpRankRequest;
-import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankListRequest;
-import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankMaxMinRequest;
-import jp.brainjuice.pokego.web.form.req.research.scp.ScpRankRequest;
-import jp.brainjuice.pokego.web.form.res.research.scp.AfterEvoScpRankResponse;
-import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankListResponse;
-import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankMaxMinResponse;
-import jp.brainjuice.pokego.web.form.res.research.scp.ScpRankResponse;
+import jp.brainjuice.pokego.web.form.req.scp.AfterEvoScpRankRequest;
+import jp.brainjuice.pokego.web.form.req.scp.ScpRankListRequest;
+import jp.brainjuice.pokego.web.form.req.scp.ScpRankMaxMinRequest;
+import jp.brainjuice.pokego.web.form.req.scp.ScpRankRequest;
+import jp.brainjuice.pokego.web.form.res.scp.AfterEvoScpRankResponse;
+import jp.brainjuice.pokego.web.form.res.scp.ScpRankListResponse;
+import jp.brainjuice.pokego.web.form.res.scp.ScpRankMaxMinResponse;
+import jp.brainjuice.pokego.web.form.res.scp.ScpRankResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

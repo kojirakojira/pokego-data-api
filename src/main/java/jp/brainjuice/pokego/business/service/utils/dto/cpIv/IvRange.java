@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.service.utils.dto.cpIv;
 
-import jp.brainjuice.pokego.business.service.research.cp.CpIvResearchService;
+import jp.brainjuice.pokego.business.service.cp.CpIvResearchService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

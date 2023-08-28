@@ -7,9 +7,9 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
-import jp.brainjuice.pokego.web.form.req.research.ResearchRequest;
+import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

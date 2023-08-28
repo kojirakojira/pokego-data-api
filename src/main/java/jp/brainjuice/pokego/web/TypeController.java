@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import jp.brainjuice.pokego.business.service.IroiroTypeRankService;
-import jp.brainjuice.pokego.business.service.IroiroTypeRankService.IroiroTypeRankSearchPattern;
-import jp.brainjuice.pokego.business.service.XTypeService;
-import jp.brainjuice.pokego.business.service.research.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.research.others.TypeScoreResearchService;
+import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.type.IroiroTypeRankService;
+import jp.brainjuice.pokego.business.service.type.TypeScoreResearchService;
+import jp.brainjuice.pokego.business.service.type.XTypeService;
+import jp.brainjuice.pokego.business.service.type.IroiroTypeRankService.IroiroTypeRankSearchPattern;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.IroiroTypeRankRequest;
-import jp.brainjuice.pokego.web.form.req.XTypeRequest;
-import jp.brainjuice.pokego.web.form.req.research.others.TypeScoreRequest;
-import jp.brainjuice.pokego.web.form.res.IroiroTypeRankResponse;
-import jp.brainjuice.pokego.web.form.res.XTypeResponse;
-import jp.brainjuice.pokego.web.form.res.research.others.TypeScoreResponse;
+import jp.brainjuice.pokego.web.form.req.type.IroiroTypeRankRequest;
+import jp.brainjuice.pokego.web.form.req.type.TypeScoreRequest;
+import jp.brainjuice.pokego.web.form.req.type.XTypeRequest;
+import jp.brainjuice.pokego.web.form.res.type.IroiroTypeRankResponse;
+import jp.brainjuice.pokego.web.form.res.type.TypeScoreResponse;
+import jp.brainjuice.pokego.web.form.res.type.XTypeResponse;
 
 @RestController
 @RequestMapping("/api")
