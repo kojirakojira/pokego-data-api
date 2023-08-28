@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
@@ -18,9 +19,14 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 
 	private PokemonGoUtils pokemonGoUtils;
 
+	private CatchCpUtils catchCpUtils;
+
 	@Autowired
-	public RaidResearchService(PokemonGoUtils pokemonGoUtils) {
+	public RaidResearchService(
+			PokemonGoUtils pokemonGoUtils,
+			CatchCpUtils catchCpUtils) {
 		this.pokemonGoUtils = pokemonGoUtils;
+		this.catchCpUtils = catchCpUtils;
 	}
 
 	@Override
@@ -28,6 +34,17 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 
 		GoPokedex goPokedex = sv.getGoPokedex();
 		boolean isShadow = ((Boolean) sv.get(ParamsEnum.shadow)).booleanValue();
+
+		{
+			// メガシンカ後のポケモンの場合は、メガシンカ前のポケモンを取得する。
+			GoPokedex befMegaGp = catchCpUtils.getGoPokedexForMega(goPokedex, res);
+			if (befMegaGp != null) {
+				// nullでなかったらgoPokedexはメガシンカ後。メガシンカ前のポケモンで後続処理を進める。
+				goPokedex = befMegaGp;
+				res.setMega(true);
+				res.setBefMegaGp(befMegaGp);
+			}
+		}
 
 		// 個体値の振れ幅を取得する。
 		IvRange ir = isShadow ? new RaidShadowIvRange() : new RaidIvRange();
@@ -45,8 +62,6 @@ public class RaidResearchService implements ResearchService<RaidResponse> {
 		res.setWbMinCp(pokemonGoUtils.calcCp(goPokedex, minIv, minIv, minIv, plWb));
 
 		res.setShadow(isShadow);
-
-		res.setMessage("");
 	}
 
 }

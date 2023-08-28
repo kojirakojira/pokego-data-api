@@ -12,11 +12,17 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 
 public class PokemonEditUtils {
 
+	/** ノーマル */
 	private static final String N = "N";
+	/** ガラル地方 */
 	private static final String G = "G";
+	/** アローラ地方 */
 	private static final String A = "A";
+	/** ヒスイ地方 */
 	private static final String H = "H";
+	/** パルデア地方 */
 	private static final String P = "P";
+	/** メガシンカ */
 	private static final String M = "M";
 
 	/**
@@ -63,6 +69,16 @@ public class PokemonEditUtils {
 	}
 
 	/**
+	 * 図鑑IDから連番を取得する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public static String getSerialNumber(String pokedexId) {
+		return pokedexId.substring(5);
+	}
+
+	/**
 	 * メガシンカのpokedexIdかどうかを判定する。
 	 *
 	 * @param pokedexId
@@ -70,6 +86,27 @@ public class PokemonEditUtils {
 	 */
 	public static boolean isMega(String pokedexId) {
 		return M.equals(getSubspecies(pokedexId));
+	}
+
+	/**
+	 * メガシンカ前のポケモンのpokedexIdを取得する。
+	 * 指定されたpokedexIdがメガシンカ後のポケモン出ない場合は、nullを返却する。
+	 *
+	 * TODO: リージョンフォームのポケモンがメガシンカするようになったら、考慮が必要。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	public static String getPokedexIdBeforeMegaEvo(String pokedexId) {
+
+		if (!isMega(pokedexId)) {
+			return null;
+		}
+
+		String pokedexNo = getStrPokedexNo(pokedexId);
+
+		// TODO: 連番は絶対に"01"である前提の仕様。
+		return pokedexNo + N + "01";
 	}
 
 	/**

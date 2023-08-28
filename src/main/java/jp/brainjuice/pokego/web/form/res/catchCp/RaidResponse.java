@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.web.form.res.catchCp;
 
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RaidResponse extends ResearchResponse {
+
+	private boolean mega = false;
+	private GoPokedex befMegaGp;
 
 	private boolean shadow;
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
@@ -24,9 +25,14 @@ public class RocketResearchService implements ResearchService<RocketResponse> {
 
 	private PokemonGoUtils pokemonGoUtils;
 
+	private CatchCpUtils catchCpUtils;
+
 	@Autowired
-	public RocketResearchService(PokemonGoUtils pokemonGoUtils) {
+	public RocketResearchService(
+			PokemonGoUtils pokemonGoUtils,
+			CatchCpUtils catchCpUtils) {
 		this.pokemonGoUtils = pokemonGoUtils;
+		this.catchCpUtils = catchCpUtils;
 	}
 
 	@Override
@@ -34,6 +40,17 @@ public class RocketResearchService implements ResearchService<RocketResponse> {
 
 		GoPokedex goPokedex = sv.getGoPokedex();
 		boolean isSakaki = ((Boolean) sv.get(ParamsEnum.sakaki)).booleanValue();
+
+		{
+			// メガシンカ後のポケモンの場合は、メガシンカ前のポケモンを取得する。
+			GoPokedex befMegaGp = catchCpUtils.getGoPokedexForMega(goPokedex, res);
+			if (befMegaGp != null) {
+				// nullでなかったらgoPokedexはメガシンカ後。メガシンカ前のポケモンで後続処理を進める。
+				goPokedex = befMegaGp;
+				res.setMega(true);
+				res.setBefMegaGp(befMegaGp);
+			}
+		}
 
 		// 個体値の振れ幅を取得する。
 		IvRange ir = isSakaki ? new RocketSakakiIvRange() : new RocketIvRange();
@@ -51,8 +68,6 @@ public class RocketResearchService implements ResearchService<RocketResponse> {
 		res.setWbMinCp(pokemonGoUtils.calcCp(goPokedex, minIv, minIv, minIv, plWb));
 
 		res.setSakaki(isSakaki);
-
-		res.setMessage("");
 	}
 
 }
