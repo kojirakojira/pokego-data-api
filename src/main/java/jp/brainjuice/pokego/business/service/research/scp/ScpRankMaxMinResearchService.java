@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.service.research.scp;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,17 +27,17 @@ public class ScpRankMaxMinResearchService implements ResearchService<ScpRankMaxM
 
 		GoPokedex goPokedex = sv.getGoPokedex();
 		{
-			ArrayList<ScpRank> slList = scpRankCulculator.getSuperLeagueSummary(goPokedex);
+			List<ScpRank> slList = scpRankCulculator.getSuperLeagueSummary(goPokedex);
 			res.setScpSlRankMax(slList.get(0));
 			res.setScpSlRankMin(slList.get(slList.size() - 1));
 		}
 		{
-			ArrayList<ScpRank> hlList = scpRankCulculator.getHyperLeagueSummary(goPokedex);
+			List<ScpRank> hlList = scpRankCulculator.getHyperLeagueSummary(goPokedex);
 			res.setScpHlRankMax(hlList.get(0));
 			res.setScpHlRankMin(hlList.get(hlList.size() - 1));
 		}
 		{
-			ArrayList<ScpRank> mlList = scpRankCulculator.getMasterLeagueSummary(goPokedex);
+			List<ScpRank> mlList = scpRankCulculator.getMasterLeagueSummary(goPokedex);
 			res.setScpMlRankMax(mlList.get(0));
 			res.setScpMlRankMin(mlList.get(mlList.size() - 1));
 		}
