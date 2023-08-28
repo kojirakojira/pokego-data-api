@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShadowResponse extends ResearchResponse {
+public class RocketResponse extends ResearchResponse {
+
+	private boolean sakaki;
 
 	private int maxCp;
 	private int minCp;

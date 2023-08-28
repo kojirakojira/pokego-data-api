@@ -85,6 +85,8 @@ public class SearchValue {
 		situation(String.class),
 		/** シャドウか否か */
 		shadow(Boolean.class),
+		/** サカキか否か */
+		sakaki(Boolean.class),
 		;
 
 		@Getter(value = AccessLevel.PUBLIC)

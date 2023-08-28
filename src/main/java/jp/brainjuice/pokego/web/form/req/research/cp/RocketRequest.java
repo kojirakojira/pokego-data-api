@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ShadowRequest extends ResearchRequestImpl {
+public class RocketRequest extends ResearchRequestImpl {
 
+	private boolean sakaki;
 }

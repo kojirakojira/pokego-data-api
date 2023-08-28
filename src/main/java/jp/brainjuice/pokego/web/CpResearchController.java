@@ -16,7 +16,7 @@ import jp.brainjuice.pokego.business.service.research.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.FRTaskResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.RaidResearchService;
-import jp.brainjuice.pokego.business.service.research.cp.ShadowResearchService;
+import jp.brainjuice.pokego.business.service.research.cp.RocketResearchService;
 import jp.brainjuice.pokego.business.service.research.cp.ThreeGalarBirdsResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
@@ -27,7 +27,7 @@ import jp.brainjuice.pokego.web.form.req.research.cp.CpRankRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.CpRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.FRTaskRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.RaidRequest;
-import jp.brainjuice.pokego.web.form.req.research.cp.ShadowRequest;
+import jp.brainjuice.pokego.web.form.req.research.cp.RocketRequest;
 import jp.brainjuice.pokego.web.form.req.research.cp.ThreeGalarBirdsRequest;
 import jp.brainjuice.pokego.web.form.res.research.cp.AfterEvoCpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpIvResponse;
@@ -36,7 +36,7 @@ import jp.brainjuice.pokego.web.form.res.research.cp.CpRankResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.CpResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.FRTaskResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.RaidResponse;
-import jp.brainjuice.pokego.web.form.res.research.cp.ShadowResponse;
+import jp.brainjuice.pokego.web.form.res.research.cp.RocketResponse;
 import jp.brainjuice.pokego.web.form.res.research.cp.ThreeGalarBirdsResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,8 +63,8 @@ public class CpResearchController {
 	private FRTaskResearchService fRTaskResearchService;
 	private ResearchServiceExecutor<FRTaskResponse> fRTaskResRse;
 
-	private ShadowResearchService shadowResearchService;
-	private ResearchServiceExecutor<ShadowResponse> shadowResRse;
+	private RocketResearchService rocketResearchService;
+	private ResearchServiceExecutor<RocketResponse> rocketResRse;
 
 	private CpIvResearchService cpIvResearchService;
 	private ResearchServiceExecutor<CpIvResponse> cpIvResRse;
@@ -82,7 +82,7 @@ public class CpResearchController {
 			AfterEvoCpResearchService afterEvoCpResearchService, ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse,
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
-			ShadowResearchService shadowResearchService, ResearchServiceExecutor<ShadowResponse> shadowResRse,
+			RocketResearchService rocketResearchService, ResearchServiceExecutor<RocketResponse> rocketResRse,
 			CpIvResearchService cpIvResearchService, ResearchServiceExecutor<CpIvResponse> cpIvResRse,
 			ThreeGalarBirdsResearchService threeGalarBirdsResearchService, ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse,
 			ValidationService validationService) {
@@ -106,8 +106,8 @@ public class CpResearchController {
 		this.fRTaskResearchService = fRTaskResearchService;
 		this.fRTaskResRse = fRTaskResRse;
 		// シャドウCP算出
-		this.shadowResearchService = shadowResearchService;
-		this.shadowResRse = shadowResRse;
+		this.rocketResearchService = rocketResearchService;
+		this.rocketResRse = rocketResRse;
 		// 野生個体値
 		this.cpIvResearchService = cpIvResearchService;
 		this.cpIvResRse = cpIvResRse;
@@ -248,20 +248,20 @@ public class CpResearchController {
 	}
 
 	/**
-	 * シャドウのCP最高値・最低値を求めるAPIです。
+	 * ロケット団勝利ボーナスで獲得できるポケモンのCP最高値・最低値を求めるAPIです。
 	 *
 	 * @param raidReq
 	 * @param req
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/shadow")
-	public ShadowResponse shadow(ShadowRequest shadowReq) throws Exception {
+	@GetMapping("/rocket")
+	public RocketResponse shadow(RocketRequest rocketReq) throws Exception {
 
-		validationService.validation(shadowReq);
+		validationService.validation(rocketReq);
 
-		ShadowResponse shadowRes = new ShadowResponse();
-		shadowResRse.execute(shadowReq, shadowRes, shadowResearchService);
+		RocketResponse shadowRes = new RocketResponse();
+		rocketResRse.execute(rocketReq, shadowRes, rocketResearchService);
 		return shadowRes;
 	}
 
