@@ -1,66 +1,55 @@
 package jp.brainjuice.pokego.web;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
-import jp.brainjuice.pokego.business.service.general.AbundanceResearchService;
 import jp.brainjuice.pokego.business.service.others.EvolutionResearchService;
-import jp.brainjuice.pokego.business.service.race.RaceResearchService;
+import jp.brainjuice.pokego.business.service.others.UnimplPokemonService;
+import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.general.AbundanceRequest;
 import jp.brainjuice.pokego.web.form.req.others.EvolutionRequest;
-import jp.brainjuice.pokego.web.form.req.race.RaceRequest;
-import jp.brainjuice.pokego.web.form.res.general.AbundanceResponse;
 import jp.brainjuice.pokego.web.form.res.others.EvolutionResponse;
-import jp.brainjuice.pokego.web.form.res.race.RaceResponse;
+import jp.brainjuice.pokego.web.form.res.others.UnimplPokemonResponse;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * その他機能のコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class OthersResearchController {
-
-	private RaceResearchService raceResearchService;
-	private ResearchServiceExecutor<RaceResponse> raceResRse;
 
 	private EvolutionResearchService evolutionResearchService;
 	private ResearchServiceExecutor<EvolutionResponse> evolutionResRse;
 
-	private AbundanceResearchService abundanceResearchService;
-	private ResearchServiceExecutor<AbundanceResponse> abundanceResRse;
+	private UnimplPokemonService unimplPokemonService;
 
+	private ViewsCacheProvider viewsCacheProvider;
+
+	@Autowired
 	public OthersResearchController (
-			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
-			AbundanceResearchService abundanceResearchService, ResearchServiceExecutor<AbundanceResponse> abundanceResRse) {
-
-		// 種族値検索
-		this.raceResearchService = raceResearchService;
-		this.raceResRse = raceResRse;
+			UnimplPokemonService unimplPokemonService,
+			ViewsCacheProvider viewsCacheProvider) {
 
 		// 進化ツリー
 		this.evolutionResearchService = evolutionResearchService;
 		this.evolutionResRse = evolutionResRse;
 
-		// アバンダンス
-		this.abundanceResearchService = abundanceResearchService;
-		this.abundanceResRse = abundanceResRse;
-	}
+		this.unimplPokemonService = unimplPokemonService;
 
-	/**
-	 * 種族値検索用API
-	 *
-	 * @param raceReq
-	 * @return
-	 * @throws BadRequestException
-	 */
-	@GetMapping("/race")
-	public RaceResponse race(RaceRequest raceReq) throws BadRequestException {
-
-		RaceResponse raceRes = new RaceResponse();
-		raceResRse.execute(raceReq, raceRes, raceResearchService);
-		return raceRes;
+		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
 	/**
@@ -79,18 +68,34 @@ public class OthersResearchController {
 	}
 
 	/**
-	 * アバンダンス取得用API
+	 * 未実装ポケモン一覧取得用API
 	 *
-	 * @param abundanceReq
 	 * @return
-	 * @throws BadRequestException
 	 */
-	@GetMapping("/abundance")
-	public AbundanceResponse abundance(AbundanceRequest abundanceReq) throws BadRequestException {
+	@GetMapping("/unimplPokemon")
+	public UnimplPokemonResponse unimplPokemon() {
 
-		AbundanceResponse abundanceRes = new AbundanceResponse();
-		abundanceResRse.execute(abundanceReq, abundanceRes, abundanceResearchService);
-		return abundanceRes;
+		UnimplPokemonResponse res = new UnimplPokemonResponse();
+		unimplPokemonService.exec(res);
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
+		return res;
 	}
 
+
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<String> badRequestException(Exception e) {
+		String errMsg = "不正なアクセスです。";
+		log.error(errMsg, e);
+		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exception(Exception e) {
+		String errMsg = "処理中に想定外の問題が発生しました。";
+		log.error(errMsg, e);
+		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

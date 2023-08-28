@@ -22,6 +22,12 @@ import jp.brainjuice.pokego.web.form.res.catchCp.RaidResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RocketResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 捕獲時CPを算出するコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 @Slf4j

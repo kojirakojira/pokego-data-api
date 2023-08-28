@@ -31,6 +31,12 @@ import jp.brainjuice.pokego.web.form.res.cp.CpResponse;
 import jp.brainjuice.pokego.web.form.res.cp.ThreeGalarBirdsResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * CPを算出したり、個体値の一覧を取得したりするためのコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 @Slf4j

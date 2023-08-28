@@ -47,7 +47,7 @@ public class ViewsCacheProvider {
 	 *
 	 * @param jp
 	 */
-	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.research.ResearchService.exec(..))")
+	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.ResearchService.exec(..))")
 	public void addTempList(JoinPoint jp) {
 
 		if (((SearchValue) jp.getArgs()[0]).isEnableCount()) {

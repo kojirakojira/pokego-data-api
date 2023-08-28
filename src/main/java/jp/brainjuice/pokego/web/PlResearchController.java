@@ -18,6 +18,12 @@ import jp.brainjuice.pokego.web.form.res.pl.PlListResponse;
 import jp.brainjuice.pokego.web.form.res.pl.PlResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * PLに関する情報を取得するためのコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 @Slf4j

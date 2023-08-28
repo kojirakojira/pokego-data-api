@@ -18,6 +18,12 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
 
+/**
+ * 定数情報を取得するコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 public class ConstantsController {

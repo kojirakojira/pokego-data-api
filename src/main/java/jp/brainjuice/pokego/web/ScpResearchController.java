@@ -25,6 +25,12 @@ import jp.brainjuice.pokego.web.form.res.scp.ScpRankMaxMinResponse;
 import jp.brainjuice.pokego.web.form.res.scp.ScpRankResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * PvP順位(SCP)を算出したり、一覧を取得したりするためのコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 @Slf4j

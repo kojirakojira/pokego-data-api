@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.type.IroiroTypeRankService;
+import jp.brainjuice.pokego.business.service.type.IroiroTypeRankService.IroiroTypeRankSearchPattern;
 import jp.brainjuice.pokego.business.service.type.TypeScoreResearchService;
 import jp.brainjuice.pokego.business.service.type.XTypeService;
-import jp.brainjuice.pokego.business.service.type.IroiroTypeRankService.IroiroTypeRankSearchPattern;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.type.IroiroTypeRankRequest;
@@ -24,6 +25,12 @@ import jp.brainjuice.pokego.web.form.res.type.IroiroTypeRankResponse;
 import jp.brainjuice.pokego.web.form.res.type.TypeScoreResponse;
 import jp.brainjuice.pokego.web.form.res.type.XTypeResponse;
 
+/**
+ * タイプ情報を取得するためのコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
 @RestController
 @RequestMapping("/api")
 public class TypeController {
@@ -37,6 +44,7 @@ public class TypeController {
 
 	private ViewsCacheProvider viewsCacheProvider;
 
+	@Autowired
 	public TypeController (
 			TypeScoreResearchService typeScoreResearchService, ResearchServiceExecutor<TypeScoreResponse> typeScoreResRse,
 			XTypeService xTypeService,
