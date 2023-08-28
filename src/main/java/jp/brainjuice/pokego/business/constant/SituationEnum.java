@@ -13,9 +13,12 @@ import lombok.Getter;
 public enum SituationEnum implements ConstantEnumInterface {
 
 	wild("野生"),
-	frTask("フィールドリサーチタスク"),
-	raid("レイドバトル"),
-	egg("タマゴ"),
+	frTask("フィールドリサーチタスクのクリアボーナス"),
+	raid("レイドバトル勝利ボーナス"),
+	raidShadow("レイドバトル勝利ボーナス（シャドウ）"),
+	egg("タマゴ孵化"),
+	rocket("ロケット団勝利ボーナス"),
+	rocketSakaki("ロケット団勝利ボーナス（サカキ戦）"),
 	non("絞り込みなし"),
 	;
 

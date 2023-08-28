@@ -17,6 +17,9 @@ import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidShadowIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketSakakiIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.WildIvRange;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.VersatilityIv;
@@ -55,8 +58,11 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 		IvRange ir = switch (situation) {
 		case wild -> new WildIvRange();
 		case frTask -> new FrTaskIvRange();
-		case egg -> new EggIvRange();
 		case raid -> new RaidIvRange();
+		case raidShadow -> new RaidShadowIvRange();
+		case egg -> new EggIvRange();
+		case rocket -> new RocketIvRange();
+		case rocketSakaki -> new RocketSakakiIvRange();
 		case non -> new AllIvRange();
 		default -> throw new IllegalArgumentException("Unexpected value: " + situation); // 起こらないパターン。
 		};
