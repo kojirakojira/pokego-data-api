@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.web;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -101,11 +102,17 @@ public class SubFuncController {
 	@GetMapping("/ogpType")
 	public OgpTypeResponse ogpType(OgpTypeRequest ogpTypeReq) {
 
-		OgpTypeResponse ogpPokemonRes = new OgpTypeResponse();
+		OgpTypeResponse ogpTypeRes = new OgpTypeResponse();
 
-		ogpInfoService.execTypeInfo(ogpTypeReq.getType1(), ogpTypeReq.getType2(), ogpPokemonRes);
+		if (!StringUtils.isEmpty(ogpTypeReq.getType1()) || !StringUtils.isEmpty(ogpTypeReq.getType2())) {
+			// タイプから検索する場合
+			ogpInfoService.execTypeInfo(ogpTypeReq.getType1(), ogpTypeReq.getType2(), ogpTypeRes);
+		} else if (!StringUtils.isEmpty(ogpTypeReq.getId())) {
+			// pokedexIdから検索する場合
+			ogpInfoService.execTypeInfo(ogpTypeReq.getId(), ogpTypeRes);
+		}
 
-		return ogpPokemonRes;
+		return ogpTypeRes;
 	}
 
 

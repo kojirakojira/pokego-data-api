@@ -10,6 +10,7 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
+import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.web.form.res.sub.OgpPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.sub.OgpTypeResponse;
 
@@ -22,6 +23,12 @@ public class OgpInfoService {
 		this.goPokedexRepository = goPokedexRepository;
 	}
 
+	/**
+	 * OGPで使用する情報を取得する。（ポケモン）
+	 *
+	 * @param pokedexId
+	 * @param res
+	 */
 	public void execPokemonInfo(String pokedexId, OgpPokemonResponse res) {
 
 		if (StringUtils.isEmpty(pokedexId)) {
@@ -44,6 +51,13 @@ public class OgpInfoService {
 
 	}
 
+	/**
+	 * OGPで使用する情報を取得する。（タイプ）
+	 *
+	 * @param type1
+	 * @param type2
+	 * @param ogpTypeResponse
+	 */
 	public void execTypeInfo(String type1, String type2, OgpTypeResponse ogpTypeResponse) {
 
 		Optional<String> type1Op = Optional.of(type1);
@@ -59,5 +73,20 @@ public class OgpInfoService {
 				(type2Op.isPresent() ? TypeEnum.valueOf(type2Op.get()) : null));
 
 		ogpTypeResponse.setType(ttk.toJpnString());
+	}
+
+	public void execTypeInfo(String pid, OgpTypeResponse ogpTypeResponse) {
+
+
+		Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(pid);
+
+		if (!goPokedexOp.isPresent()) {
+			ogpTypeResponse.setType("");
+		}
+
+		GoPokedex gp = goPokedexOp.get();
+		String type1 = BjUtils.replaceEmpty(gp.getType1());
+		String type2 = BjUtils.replaceEmpty(gp.getType2());
+		ogpTypeResponse.setType(type1 + (type2.isEmpty() ? "" : ", " + type2));
 	}
 }
