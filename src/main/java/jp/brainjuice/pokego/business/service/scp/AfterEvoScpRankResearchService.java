@@ -17,7 +17,7 @@ import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.AfterEvoIv;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
-import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.scp.AfterEvoScpRankResponse;
 
@@ -34,7 +34,7 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	private EvolutionInfo evolutionInfo;
+	private EvolutionProvider evolutionProvider;
 
 	private ScpRankCalculator scpRankCalculator;
 
@@ -42,11 +42,11 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 	public AfterEvoScpRankResearchService(
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			ScpRankCalculator scpRankCalculator) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
-		this.evolutionInfo = evolutionInfo;
+		this.evolutionProvider = evolutionProvider;
 		this.scpRankCalculator = scpRankCalculator;
 	}
 
@@ -122,7 +122,7 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 
 			while (true) {
 				List<String> hieList = searchPidList.stream()
-						.flatMap(pid -> evolutionInfo.getAfterEvolution(pid).stream())
+						.flatMap(pid -> evolutionProvider.getAfterEvolution(pid).stream())
 						.collect(Collectors.toList());
 
 				if (hieList.isEmpty()) break;

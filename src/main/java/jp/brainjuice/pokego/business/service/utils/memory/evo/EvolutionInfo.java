@@ -1,35 +1,36 @@
-package jp.brainjuice.pokego.business.service.utils.memory;
+package jp.brainjuice.pokego.business.service.utils.memory.evo;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.Evolution;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
-import jp.brainjuice.pokego.utils.BjCsvMapper;
-import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class EvolutionInfo {
+class EvolutionInfo {
+
+	private EvolutionList evoList;
+
+	/** 進化前が複数する例外的なポケモンのマップ */
+	private EvoExceptionsMap exceptionsMap;
 
 	/** 進化前が存在しないポケモンのセット */
 	private final Set<String> noEvoSet = new HashSet<>();
@@ -40,25 +41,16 @@ public class EvolutionInfo {
 	/** 最終進化のポケモンのセット（進化なしのポケモン含む） */
 	private final Set<String> finalEvoSet = new HashSet<>();
 
-	/** 進化前が複数する例外的なポケモンのマップ */
-	private final Map<String, List<String>> exceptionsMap = new HashMap<>();
+	static final String ROOT = "root";
 
-	private final List<Evolution> evoList = new ArrayList<>();
-
-	private static final String FILE_NAME = "pokemon/pokemon-evolution.csv";
-
-	private static final String EXCEPTIONS_FILE_NAME = "pokemon/pokemon-evolution-exceptions.yml";
-
-	private static final String ROOT = "root";
-
-	private static final String NOT_EXISTS_MSG = "pokemon.csvに定義したポケモンがpokemon-evolution.csvに定義されていません。{0}";
-
-	private static final String COSTS_CANDY_MSG = "アメ{0}個";
-
-	private static final String UNIMPL_UNKNOWN_MSG = "未実装のため不明";
-
-	public EvolutionInfo(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
-		init(goPokedexRepository);
+	@Autowired
+	EvolutionInfo(
+			EvolutionList evoList,
+			EvoExceptionsMap evoExceptionsMap,
+			GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+		init(evoList, evoExceptionsMap, goPokedexRepository);
+		this.exceptionsMap = evoExceptionsMap;
+		this.evoList = evoList;
 	}
 
 	/**
@@ -67,7 +59,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public String getBeforeEvolution(String pokedexId) {
+	String getBeforeEvolution(String pokedexId) {
 
 		if (noEvoSet.contains(pokedexId)) {
 			// 進化前が存在しない場合
@@ -83,7 +75,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<String> getAfterEvolution(String pokedexId) {
+	List<String> getAfterEvolution(String pokedexId) {
 
 		return bfEvoMap.entrySet().stream()
 				.filter(entry -> pokedexId.equals(entry.getValue()))
@@ -98,12 +90,12 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public boolean isAfterEvolution(String pokedexId) {
+	boolean isAfterEvolution(String pokedexId) {
 
 		// Stream#anyMatch(e -> true)でStream版のisEmpty()になる。
 		return bfEvoMap.entrySet().stream()
-				.filter(entry -> pokedexId.equals(entry.getValue())).anyMatch(e -> true);
-
+				.filter(entry -> pokedexId.equals(entry.getValue()))
+				.anyMatch(e -> true);
 	}
 
 	/**
@@ -112,36 +104,25 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<String> getAnotherFormList(String pokedexId) {
-
-		final List<String> anotherFormList = new ArrayList<>();
+	List<String> getAnotherFormList(String pokedexId) {
 
 		// pokedexIdの前半4桁は図鑑№
 		String pokedexNo = PokemonEditUtils.getStrPokedexNo(pokedexId);
 
-		// 進化前が存在するポケモンのMapから、図鑑№が一致するポケモンを洗い出す。
-		bfEvoMap.forEach((k, v) -> {
-			if (pokedexNo.equals(PokemonEditUtils.getStrPokedexNo(k))) {
-				anotherFormList.add(k);
-			}
-		});
+		Stream<String> anotherFormStream = Stream.concat(
+				bfEvoMap.entrySet().stream().map(Map.Entry::getKey), // 進化前が存在するポケモンのMap
+				noEvoSet.stream()) // 進化しないポケモンのSet
+				.filter(pid -> pokedexNo.equals(PokemonEditUtils.getStrPokedexNo(pid))); // 図鑑№が一致するポケモンを洗い出す。
 
-		// 進化しないポケモンのSetから、図鑑№が一致するポケモンを洗い出す。
-		noEvoSet.stream().filter(pokeId -> pokedexNo.equals(PokemonEditUtils.getStrPokedexNo(pokeId))).forEach(anotherFormList::add);
-
-		/** 同じpokedexId、ダミーのpokedexIdは排除する。 */
 		// 削除する対象のリスト
-		final List<String> removeList = new ArrayList<>();
-		// 例外のダミーのpokedexIdを追加。
-		exceptionsMap.forEach((k, v) -> {
-			removeList.addAll(v);
-		});
-		// 検索対象のpokedexIdも追加。
-		removeList.add(pokedexId);
-		// すべて削除
-		anotherFormList.removeAll(removeList);
+		List<String> removeList = Stream.concat(
+				exceptionsMap.entrySet().stream().flatMap(entry -> entry.getValue().stream()), // 例外のダミーのpokedexIdを追加
+				Stream.of(pokedexId)) // 自身も追加
+				.collect(Collectors.toList());
 
-		return anotherFormList;
+		return anotherFormStream
+				.filter(pid -> !removeList.contains(pid))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -150,7 +131,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public String getFirstInEvoTree(String pokedexId) {
+	String getFirstInEvoTree(String pokedexId) {
 
 		// 進化前を取得
 		String bf = getBeforeEvolution(pokedexId);
@@ -174,7 +155,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<String> getLastInEvoTree(String pokedexId) {
+	List<String> getLastInEvoTree(String pokedexId) {
 
 		// ヒエラルキーの整理のために使用するクラス
 		final TempHierarchyInfo thi = new TempHierarchyInfo();
@@ -212,31 +193,27 @@ public class EvolutionInfo {
 	 * １つ下の階層に掘り進める。
 	 *
 	 * @param thi
-	 * @return
 	 */
-	private Map<String, List<String>> digHierarchyInfo(TempHierarchyInfo thi) {
+	private void digHierarchyInfo(TempHierarchyInfo thi) {
 
-		final Map<String, List<String>> retMap = new HashMap<>();
+		List<String> finEvoList = new ArrayList<>();
+		List<String> afNotFinEvoList = new ArrayList<>();
 
-		// 最終進化でないポケモンのリスト
-		final List<String> notFinalEvoList = new ArrayList<>();
-
-		thi.getNotFinalEvoList().forEach(pokeId -> {
-			if (isAfterEvolution(pokeId)) {
-				// 最終進化でない
-				List<String> afterList = getAfterEvolution(pokeId);
-				notFinalEvoList.addAll(afterList);
-				retMap.put(pokeId, afterList);
+		// 最終進化でないポケモンをループさせる
+		for (String pid: thi.getNotFinalEvoList()) {
+			if (isAfterEvolution(pid)) {
+				// 最終進化でない場合
+				List<String> afterList = getAfterEvolution(pid);
+				afNotFinEvoList.addAll(afterList);
 			} else {
-				// 最終進化
-				thi.getFinalEvoList().add(pokeId);
+				// 最終進化の場合
+				finEvoList.add(pid);
 			}
-		});
+		}
 
-		// 最終進化でないポケモンを更新する。
-		thi.setNotFinalEvoList(notFinalEvoList);
-
-		return retMap;
+		// 最終進化でないポケモン、最終進化のポケモンをそれぞれ更新する。
+		thi.setNotFinalEvoList(afNotFinEvoList);
+		thi.setFinalEvoList(finEvoList);
 
 	}
 
@@ -250,7 +227,7 @@ public class EvolutionInfo {
 	@Data
 	private class TempHierarchyInfo {
 		/** 最終進化ポケモンリスト */
-		private final List<String> finalEvoList = new ArrayList<>();
+		private List<String> finalEvoList = new ArrayList<>();
 		/** 最終進化でないポケモンのリスト */
 		private List<String> notFinalEvoList = new ArrayList<>();
 	}
@@ -261,7 +238,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public boolean isFinalEvolution(String pokedexId) {
+	boolean isFinalEvolution(String pokedexId) {
 		return finalEvoSet.contains(pokedexId);
 	}
 
@@ -270,7 +247,7 @@ public class EvolutionInfo {
 	 *
 	 * @return
 	 */
-	public Set<String> getFinalEvoSet() {
+	Set<String> getFinalEvoSet() {
 		return new HashSet<String>(finalEvoSet);
 	}
 
@@ -280,10 +257,11 @@ public class EvolutionInfo {
 	 * @param goPokedexList
 	 * @return
 	 */
-	public List<GoPokedex> filterFinalEvoList(List<GoPokedex> goPokedexList) {
+	List<GoPokedex> filterFinalEvoList(List<GoPokedex> goPokedexList) {
 
-		return goPokedexList.stream().filter(
-				poke -> finalEvoSet.contains(poke.getPokedexId())).collect(Collectors.toList());
+		return goPokedexList.stream()
+				.filter(gp -> finalEvoSet.contains(gp.getPokedexId()))
+				.collect(Collectors.toList());
 	}
 
 
@@ -294,33 +272,29 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<String> getBfAfEvoList(String pokedexId) {
+	List<String> getBfAfEvoList(String pokedexId) {
 
-		final List<String> retList = new ArrayList<>();
+		List<String> retList = new ArrayList<>();
 
-		// 進化ツリーの一番最初のポケモン
-		final String firstPokeId = getFirstInEvoTree(pokedexId);
-
-		List<String> hieList = new ArrayList<>();
-		hieList.add(firstPokeId);
+		// 進化ツリー上の一番最初のポケモンをhieListに追加して初期化。
+		String firstPokeId = getFirstInEvoTree(pokedexId);
+		List<String> hieList = Arrays.asList(firstPokeId);
 
 		while (!hieList.isEmpty()) {
-			final List<String> tmpList = new ArrayList<>();
-
-			hieList.forEach(pokeId -> {
-				tmpList.addAll(getAfterEvolution(pokeId));
-			});
 
 			retList.addAll(hieList);
 
-			hieList = tmpList;
+			// 進化後のポケモンをすべて取得
+			hieList = hieList.stream()
+					.flatMap(pid -> getAfterEvolution(pid).stream())
+					.collect(Collectors.toList());
 		}
-		final List<String> removeList = new ArrayList<>();
+
 		// 例外のダミーのpokedexIdを削除対象に追加。
-		exceptionsMap.forEach((k, v) -> {
-			removeList.addAll(v);
-		});
-		removeList.add(pokedexId);
+		List<String> removeList = Stream.concat(
+				exceptionsMap.entrySet().stream().flatMap(entry -> entry.getValue().stream()), // 例外のダミーのpokedexIdを追加
+				Stream.of(pokedexId)) // 自身も追加
+				.collect(Collectors.toList());
 		retList.removeAll(removeList);
 
 		return retList;
@@ -332,7 +306,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<String> getAllInEvoTree(String pokedexId) {
+	List<String> getAllInEvoTree(String pokedexId) {
 
 		// 別のすがたを取得 -> 進化前、進化後を取得 -> 別のすがたを取得 -> Setに変換 -> Listに変換。
 		return Stream.concat(getAnotherFormList(pokedexId).stream(), Stream.of(pokedexId))
@@ -350,7 +324,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public int basePokedexNo(String pokedexId) {
+	int basePokedexNo(String pokedexId) {
 		List<String> allPokeIdList = getAllInEvoTree(pokedexId);
 		allPokeIdList.sort(PokemonEditUtils.getPokedexIdComparator());
 		return PokemonEditUtils.getPokedexNo(allPokeIdList.get(0));
@@ -364,47 +338,47 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public List<List<List<Hierarchy>>> getEvoTrees(String pokedexId) {
+	List<List<List<Hierarchy>>> getEvoTrees(String pokedexId) {
 
-		final List<List<List<Hierarchy>>> treeList = new ArrayList<>();
+		List<List<List<Hierarchy>>> treeList = null;
 
 		// 例外ポケモンの場合はダミーのpokedexIdを取得
 		List<String> excList = exceptionsMap.get(pokedexId);
 
+		// 進化ツリーを取得する。
 		if (excList == null) {
-			// 例外でない場合
-			treeList.add(getEvoTree(pokedexId));
+			// 例外（進化前が複数）のポケモンが存在しない場合
+			treeList = Arrays.asList(getEvoTree(pokedexId));
 		} else {
-			// 例外の場合（ガーメイル）
-			// 検索対象のpokedexIdも追加して並び替え
-			excList = new ArrayList<>(excList);
-			excList.add(pokedexId);
-			Collections.sort(excList, PokemonEditUtils.getPokedexIdComparator());
-			// ツリー取得
-			excList.forEach(pokeId -> {
-				treeList.add(getEvoTree(pokeId));
-			});
+			// 例外のポケモン（ガーメイル等）
+			treeList = Stream.concat(excList.stream(), Stream.of(pokedexId))
+					.sorted(PokemonEditUtils.getPokedexIdComparator())
+					.map(pid -> getEvoTree(pid))
+					.collect(Collectors.toList());
 		}
 
 		/** ダミーのpokedexIdを正規のpokedexIdに変換する。*/
 		// 直列化
 		final List<Hierarchy> hieList = new ArrayList<>();
-		treeList.forEach(yList -> {
-			yList.forEach(xList -> {
+		for (List<List<Hierarchy>> yList: treeList) {
+			for (List<Hierarchy> xList: yList) {
 				hieList.addAll(xList);
-			});
-		});
+			}
+		}
+
 		// 例外マップを見て正規のpokedexIdに変換する。
-		exceptionsMap.forEach((k, v) -> {
-			hieList.forEach(hie -> {
-				if (v.contains(hie.getId())) {
-					hie.setId(k);
+		for (Hierarchy hie: hieList) {
+			for (Map.Entry<String, List<String>> excEntry: exceptionsMap.entrySet()) {
+				// excEntryはKeyが正規のpokedexId, ValueがダミーのpokedexId
+				if (excEntry.getValue().contains(hie.getId())) {
+					hie.setId(excEntry.getKey());
 				}
-				if (v.contains(hie.getBid())) {
-					hie.setBid(k);
+				if (excEntry.getValue().contains(hie.getBid())) {
+					hie.setBid(excEntry.getKey());
 				}
-			});
-		});
+
+			}
+		}
 
 		return treeList;
 	}
@@ -424,7 +398,8 @@ public class EvolutionInfo {
 		Map<Integer, Map<String, String>> hieMap = getEvoHierarchy(pokedexId);
 
 		/** 進化ツリーをList<List<Hierarchy>>の形式に変換する */
-		hieMap.entrySet().stream().forEach(hieEntry -> {
+		for (Map.Entry<Integer, Map<String, String>> hieEntry: hieMap.entrySet()) {
+
 			List<Hierarchy> xList = hieEntry.getValue().entrySet().stream()
 					.map(entry -> new Hierarchy(
 							0, // x軸は一旦0で初期化
@@ -432,11 +407,12 @@ public class EvolutionInfo {
 							0, // x軸の距離も一旦0で初期化
 							entry.getKey(),
 							entry.getValue(),
-							getCosts(entry.getKey(), entry.getValue()),
-							canGoEvo(entry.getKey(), entry.getValue())))
+							evoList.getCosts(entry.getKey(), entry.getValue()),
+							evoList.canGoEvo(entry.getKey(), entry.getValue())))
 					.collect(Collectors.toList());
 			yList.add(xList);
-		});
+		}
+
 
 		/** 並び替え、x軸の位置、進化前のポケモンのx軸の距離を設定する。 */
 		for (int y = 0, ySize = yList.size(); y < ySize; y++) {
@@ -543,7 +519,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public Map<Integer, Map<String, String>> getEvoHierarchy(String pokedexId) {
+	Map<Integer, Map<String, String>> getEvoHierarchy(String pokedexId) {
 
 		final Map<Integer, Map<String, String>> retMap = new HashMap<>();
 
@@ -596,7 +572,7 @@ public class EvolutionInfo {
 	 * @param pokedexId
 	 * @return
 	 */
-	public Map<String, Object> getEvoTreeModel(String pokedexId) {
+	Map<String, Object> getEvoTreeModel(String pokedexId) {
 
 		final Map<String, Object> retMap = new HashMap<String, Object>();
 
@@ -688,182 +664,33 @@ public class EvolutionInfo {
 	}
 
 	/**
-	 * その進化ツリー上のすべての注釈（evoAnnotation）を取得する。
-	 * @param pids
-	 * @return
-	 */
-	public List<String> getEvoAnnotations(Collection<String> pids) {
-
-		List<String> retList = new ArrayList<>();
-		for (String pid: pids) {
-			for (Evolution evo: evoList) {
-				if (pid.equals(evo.getPokedexId()) && !evo.getEvoAnnotations().isEmpty()) {
-					retList.add(evo.getEvoAnnotations());
-					break;
-				}
-			}
-		}
-		return retList;
-	}
-
-	/**
-	 * 進化条件をリスト形式で取得する。
-	 *
-	 * @param id 図鑑ID
-	 * @param bid 進化前ポケモンの図鑑ID
-	 * @return
-	 */
-	private List<String> getCosts(String id, String bid) {
-
-		List<String> retList = new ArrayList<>();
-
-		if (ROOT.equals(bid)) {
-			// rootの場合は進化前は存在しない。
-			return retList;
-		}
-
-		// 対象のEvolutionを取得
-		Evolution evo = evoList.stream()
-				.filter(ev -> Objects.equals(ev.getPokedexId(), id) && Objects.equals(ev.getBeforePokedexId(), bid))
-				.findFirst().get();
-
-		// 進化アイテム
-		BjUtils.addList(evo.getEvolutionItems(), retList);
-
-		// 相棒としてのアクション
-		BjUtils.addList(evo.getBuddy(), retList);
-
-		// ルアーモジュール
-		BjUtils.addList(evo.getLureModules(), retList);
-
-		// 交換
-		BjUtils.addList(evo.getTradeEvolution(), retList);
-
-		// 特殊な条件
-		BjUtils.addList(evo.getSpecialAction(), retList);
-
-		// アメ
-		BjUtils.addList(
-				evo.getCandy() == 0 ? "" : String.valueOf(evo.getCandy()), // アメ0個は、アメが進化条件にない、または未入力である。
-				retList,
-				(str) -> MessageFormat.format(COSTS_CANDY_MSG, str));
-
-		if (retList.isEmpty() && !evo.isImplFlg()) {
-			// 進化条件が無し、かつ未実装だった場合
-			retList.add(UNIMPL_UNKNOWN_MSG);
-		}
-
-		return retList;
-	}
-
-	/**
-	 * ポケモンGOにおいて進化できるかどうかを取得する。
-	 *
-	 * @param id
-	 * @param bid
-	 * @return
-	 */
-	private boolean canGoEvo(String id, String bid) {
-
-		if (ROOT.equals(bid)) {
-			// rootの場合は進化前は存在しない。
-			return false;
-		}
-
-		// 対象のEvolutionを取得
-		Evolution evo = evoList.stream()
-				.filter(ev -> Objects.equals(ev.getPokedexId(), id) && Objects.equals(ev.getBeforePokedexId(), bid))
-				.findFirst().get();
-
-		return evo.isCanGoEvo();
-	}
-
-	/**
 	 * 起動時に実行。
 	 *
 	 * @throws PokemonDataInitException
 	 */
-	private void init(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+	private void init(
+			EvolutionList evoList,
+			EvoExceptionsMap exceptionsMap,
+			GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
 
-		// CSVファイルの内容をメモリに抱える。
-		try {
-			List<Evolution> evolutionList = BjCsvMapper.mapping(FILE_NAME, Evolution.class);
-
-			// pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
-			checkAllExists(evolutionList, goPokedexRepository);
-
-			// EvolutionにimplFlgをセット
-			goPokedexRepository.findAll().stream().forEach(gp -> {
-				for (Evolution evo: evolutionList) {
-					if (gp.getPokedexId().equals(evo.getPokedexId())) {
-						evo.setImplFlg(gp.isImplFlg());
-						break;
-					}
-				}
-			});
-			// フィールドにEvolutionのリストをセット
-			evoList.addAll(evolutionList);
-
-			Set<String> noEvoSet = new HashSet<String>();
-			Map<String, String> bfEvoMap = new HashMap<String, String>();
-			evolutionList.forEach(evo -> {
-				if (evo.getBeforePokedexId().isEmpty()) {
-					// 進化前が存在しない場合
-					noEvoSet.add(evo.getPokedexId());
-				} else {
-					// 進化前が存在する場合
-					bfEvoMap.put(evo.getPokedexId(), evo.getBeforePokedexId());
-				}
-			});
-			this.noEvoSet.addAll(noEvoSet);
-			this.bfEvoMap.putAll(bfEvoMap);
-
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			throw new PokemonDataInitException(e);
-		}
-
-		// yamlファイルの内容をメモリに抱える。
-		try {
-			@SuppressWarnings("unchecked")
-			Map<String, List<String>> yamlMap = BjUtils.loadYaml(EXCEPTIONS_FILE_NAME, Map.class);
-			exceptionsMap.putAll(yamlMap);
-
-		} catch (Exception e) {
-			throw new PokemonDataInitException(e);
-		}
+		Set<String> noEvoSet = new HashSet<String>();
+		Map<String, String> bfEvoMap = new HashMap<String, String>();
+		evoList.forEach(evo -> {
+			if (evo.getBeforePokedexId().isEmpty()) {
+				// 進化前が存在しない場合
+				noEvoSet.add(evo.getPokedexId());
+			} else {
+				// 進化前が存在する場合
+				bfEvoMap.put(evo.getPokedexId(), evo.getBeforePokedexId());
+			}
+		});
+		this.noEvoSet.addAll(noEvoSet);
+		this.bfEvoMap.putAll(bfEvoMap);
 
 
 		this.finalEvoSet.addAll(createNoBfEvoMap(noEvoSet, bfEvoMap, exceptionsMap));
 
 		log.info("EvolutionInfo generated!!");
-	}
-
-	/**
-	 * pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
-	 *
-	 * @param evoList
-	 * @param goPokedexRepository
-	 * @return
-	 * @throws PokemonDataInitException
-	 */
-	private void checkAllExists(List<Evolution> evoList, GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
-
-		List<String> evoPidList = evoList.stream()
-				.map(Evolution::getPokedexId)
-				.collect(Collectors.toList());
-
-		List<GoPokedex> notExistsGpList = goPokedexRepository.findAll().stream()
-				.filter(gp -> !evoPidList.contains(gp.getPokedexId()))
-				.collect(Collectors.toList());
-
-		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
-		if (!notExistsGpList.isEmpty()) {
-			throw new PokemonDataInitException(
-					MessageFormat.format(
-							NOT_EXISTS_MSG,
-							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));
-		}
 	}
 
 	/**

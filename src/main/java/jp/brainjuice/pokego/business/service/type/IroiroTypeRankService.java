@@ -21,8 +21,8 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.TypeUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IroiroTypeRankElement;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
-import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.type.IroiroTypeRankResponse;
 import lombok.AllArgsConstructor;
@@ -37,17 +37,17 @@ public class IroiroTypeRankService {
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private EvolutionInfo evolutionInfo;
+	private EvolutionProvider evolutionProvider;
 
 	public IroiroTypeRankService(
 			TypeChartInfo typeChartInfo,
 			PokedexFilterInfoRepository pokedexFilterInfoRepository,
 			GoPokedexRepository goPokedexRepository,
-			EvolutionInfo evolutionInfo) {
+			EvolutionProvider evolutionProvider) {
 		this.typeChartInfo = typeChartInfo;
 		this.pokedexFilterInfoRepository = pokedexFilterInfoRepository;
 		this.goPokedexRepository = goPokedexRepository;
-		this.evolutionInfo = evolutionInfo;
+		this.evolutionProvider = evolutionProvider;
 	}
 
 	/** leastWeaknessで使用するダメージ倍率ごとの重み */
@@ -234,7 +234,7 @@ public class IroiroTypeRankService {
 				.map(entry -> Map.entry(
 						entry.getKey(),
 						entry.getValue().stream()
-						.collect(Collectors.groupingBy(pid -> evolutionInfo.basePokedexNo(pid))))) // 同系統のポケモンごとに括る。
+						.collect(Collectors.groupingBy(pid -> evolutionProvider.basePokedexNo(pid))))) // 同系統のポケモンごとに括る。
 				.sorted((o1, o2) -> o2.getValue().size() - o1.getValue().size()) // 降順に並び替える。
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,

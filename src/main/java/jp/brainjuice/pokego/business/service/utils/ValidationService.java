@@ -52,7 +52,7 @@ public class ValidationService {
 	 * @return
 	 * @throws Exception
 	 */
-	public void validation(ResearchRequest req) throws Exception {
+	public void validation(ResearchRequest req) throws BadRequestException {
 
 		StringBuffer sb = new StringBuffer();
 		ValidationItem validItem = new ValidationItem(); // インスタンスを使いまわす。
@@ -64,18 +64,23 @@ public class ValidationService {
 				if (clazz.getPackageName().equals(VALIDATION_PACKAGE_NAME)) {
 
 					// TODO: if文で連結させているが、この形式をとるかは要検討。
-					if (clazz == NotNull.class) {
+					try {
+						if (clazz == NotNull.class) {
 
-						execCheck(validItem.setAll(field.getName(), CheckPattern.NotNull, null, field.get(req)), sb);
-					} else if (clazz == Null.class) {
+							execCheck(validItem.setAll(field.getName(), CheckPattern.NotNull, null, field.get(req)), sb);
+						} else if (clazz == Null.class) {
 
-						execCheck(validItem.setAll(field.getName(), CheckPattern.Null, null, field.get(req)), sb);
-					} else if (clazz == Min.class) {
-						Min min = (Min) anno;
-						execCheck(validItem.setAll(field.getName(), CheckPattern.Min, min.value(), field.get(req)), sb);
-					} else if (clazz == Max.class) {
-						Max max = (Max) anno;
-						execCheck(validItem.setAll(field.getName(), CheckPattern.Max, max.value(), field.get(req)), sb);
+							execCheck(validItem.setAll(field.getName(), CheckPattern.Null, null, field.get(req)), sb);
+						} else if (clazz == Min.class) {
+							Min min = (Min) anno;
+							execCheck(validItem.setAll(field.getName(), CheckPattern.Min, min.value(), field.get(req)), sb);
+						} else if (clazz == Max.class) {
+							Max max = (Max) anno;
+							execCheck(validItem.setAll(field.getName(), CheckPattern.Max, max.value(), field.get(req)), sb);
+						}
+					} catch (InvocationTargetException | NoSuchMethodException |
+							SecurityException | IllegalAccessException | IllegalArgumentException e) {
+						throw new BadRequestException(sb.toString(), e);
 					}
 				}
 

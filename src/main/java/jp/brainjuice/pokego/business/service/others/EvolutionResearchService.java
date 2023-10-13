@@ -16,22 +16,22 @@ import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.others.EvolutionResponse;
 
 @Service
 public class EvolutionResearchService implements ResearchService<EvolutionResponse> {
 
-	private EvolutionInfo evolutionInfo;
+	private EvolutionProvider evolutionProvider;
 
 	private GoPokedexRepository goPokedexRepository;
 
 	@Autowired
 	public EvolutionResearchService(
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			GoPokedexRepository goPokedexRepository) {
-		this.evolutionInfo = evolutionInfo;
+		this.evolutionProvider = evolutionProvider;
 		this.goPokedexRepository = goPokedexRepository;
 	}
 
@@ -41,17 +41,17 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		String pokedexId = sv.getGoPokedex().getPokedexId();
 
 		// 進化ツリーの取得
-		List<List<List<Hierarchy>>> hieList = evolutionInfo.getEvoTrees(pokedexId);
+		List<List<List<Hierarchy>>> hieList = evolutionProvider.getEvoTrees(pokedexId);
 
 		// 進化ツリー上のポケモンを直列化する。
 		Set<String> treePokeIdSet = new LinkedHashSet<>();
 		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> treePokeIdSet.add(h.getId()))));
 
 		// 進化ツリー全体に係る注釈
-		List<String> evoTreeAnnoList = evolutionInfo.getEvoAnnotations(treePokeIdSet);
+		List<String> evoTreeAnnoList = evolutionProvider.getEvoAnnotations(treePokeIdSet);
 
 		// 別のすがた
-		List<String> anotherFormList = evolutionInfo.getAnotherFormList(pokedexId);
+		List<String> anotherFormList = evolutionProvider.getAnotherFormList(pokedexId);
 		// 別のすがたの進化前、進化後
 		Set<String> bfAfAotFormSet = makeBfAfAotFormSet(treePokeIdSet, anotherFormList);
 
@@ -84,12 +84,12 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 
 		// 直列化したポケモンをループさせ、進化ツリー上の別のすがたをすべて取得する。
 		Set<String> treeAotPokeIdSet = new HashSet<>();
-		treePokeIdSet.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionInfo.getAnotherFormList(pokeId)));
+		treePokeIdSet.forEach(pokeId -> treeAotPokeIdSet.addAll(evolutionProvider.getAnotherFormList(pokeId)));
 
 		// 進化ツリー上の別のすがたをすべて追加する。
 		bfAfAotFormSet.addAll(treeAotPokeIdSet);
 		// 進化ツリー上の別のすがたの進化前、進化後をすべて追加する。
-		treeAotPokeIdSet.forEach(pokeId -> bfAfAotFormSet.addAll(evolutionInfo.getBfAfEvoList(pokeId)));
+		treeAotPokeIdSet.forEach(pokeId -> bfAfAotFormSet.addAll(evolutionProvider.getBfAfEvoList(pokeId)));
 		// 進化ツリー上のポケモン、別のすがたと重複している場合は削除
 		bfAfAotFormSet.removeAll(treePokeIdSet);
 		bfAfAotFormSet.removeAll(anotherFormList);

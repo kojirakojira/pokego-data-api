@@ -17,7 +17,7 @@ import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
-import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.cp.AfterEvoCpResponse;
 
@@ -34,16 +34,16 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	private EvolutionInfo evolutionInfo;
+	private EvolutionProvider evolutionProvider;
 
 	@Autowired
 	public AfterEvoCpResearchService(
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
-			EvolutionInfo evolutionInfo) {
+			EvolutionProvider evolutionProvider) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
-		this.evolutionInfo = evolutionInfo;
+		this.evolutionProvider = evolutionProvider;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 
 			while (true) {
 				List<String> hieList = searchPidList.stream()
-						.flatMap(pid -> evolutionInfo.getAfterEvolution(pid).stream())
+						.flatMap(pid -> evolutionProvider.getAfterEvolution(pid).stream())
 						.collect(Collectors.toList());
 
 				if (hieList.isEmpty()) break;
@@ -147,7 +147,7 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	private List<String> getAnotherFormPidList(GoPokedex goPokedex, List<String> pidList) {
 
 		return Stream.concat(Stream.of(goPokedex.getPokedexId()), pidList.stream())
-				.flatMap(pid -> evolutionInfo.getAnotherFormList(pid).stream())
+				.flatMap(pid -> evolutionProvider.getAnotherFormList(pid).stream())
 				.sorted(PokemonEditUtils.getPokedexIdComparator())
 				.collect(Collectors.toList());
 	}

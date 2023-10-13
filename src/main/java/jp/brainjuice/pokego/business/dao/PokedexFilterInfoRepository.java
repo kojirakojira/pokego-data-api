@@ -25,8 +25,8 @@ import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.dao.entity.PokedexFilterInfo;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
-import jp.brainjuice.pokego.business.service.utils.memory.EvolutionInfo;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -124,16 +124,16 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 *
 	 * @param pokedexRepository
 	 * @param typeMap
-	 * @param evolutionInfo
+	 * @param evolutionProvider
 	 * @param pokemonEditUtils
 	 */
 	@Autowired
 	public PokedexFilterInfoRepository(
 			PokedexRepository pokedexRepository,
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			TooStrongPokemonList tooStrongPokemonList) {
 
-		init(pokedexRepository, evolutionInfo, tooStrongPokemonList);
+		init(pokedexRepository, evolutionProvider, tooStrongPokemonList);
 
 		log.info("PokedexFilterInfo table generated!!");
 	}
@@ -350,12 +350,12 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * すべてのポケモン情報を登録する。
 	 *
 	 * @param pokedexRepository
-	 * @param evolutionInfo
+	 * @param evolutionProvider
 	 * @param pokemonEditUtils
 	 */
 	public void init(
 			PokedexRepository pokedexRepository,
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			TooStrongPokemonList tooStrongPokemonList) {
 
 		List<Pokedex> pokeList = pokedexRepository.findAll();
@@ -367,7 +367,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 			pfi.setPokedexId(pid);
 			pfi.setType1(TypeEnum.getType(p.getType1()));
 			pfi.setType2(TypeEnum.getType(p.getType2()));
-			pfi.setFinalEvo(!evolutionInfo.isAfterEvolution(pid));
+			pfi.setFinalEvo(!evolutionProvider.isAfterEvolution(pid));
 			pfi.setMega(PokemonEditUtils.isMega(pid));
 			pfi.setImpled(p.isImplFlg());
 			pfi.setTooStrong(tooStrongPokemonList.contains(pid));

@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -11,6 +12,7 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 
 @SpringBootTest
 class PokemonApplicationTests {
@@ -23,6 +25,16 @@ class PokemonApplicationTests {
 
 	@Autowired
 	CpMultiplierMap cpMultiplierMap;
+
+	@Autowired
+	EvolutionProvider evolutionProvider;
+
+	@Test
+	public void testCase() {
+		List<String> lastList = evolutionProvider.getLastInEvoTree("0412N01");
+
+		System.out.println(lastList);
+	}
 
 	/**
 	 * 二分探索アルゴリズムのテスト

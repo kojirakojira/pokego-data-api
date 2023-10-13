@@ -20,6 +20,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.TypeUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
+import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 
 /**
@@ -36,10 +37,10 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	public TypeCommentMap(
 			TypeChartInfo typeChartInfo,
 			GoPokedexRepository goPokedexRepository,
-			EvolutionInfo evolutionInfo) throws PokemonDataInitException {
+			EvolutionProvider evolutionProvider) throws PokemonDataInitException {
 
 		// メッセージ作成
-		createMessageMap(typeChartInfo, goPokedexRepository, evolutionInfo);
+		createMessageMap(typeChartInfo, goPokedexRepository, evolutionProvider);
 	}
 
 	public LinkedHashSet<String> get(TypeEnum te1, TypeEnum te2) {
@@ -51,19 +52,19 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 *
 	 * @param typeChartInfo
 	 * @param goPokedexRepository
-	 * @param evolutionInfo
+	 * @param evolutionProvider
 	 * @throws PokemonDataInitException
 	 */
 	public void createMessageMap(
 			TypeChartInfo typeChartInfo,
 			GoPokedexRepository goPokedexRepository,
-			EvolutionInfo evolutionInfo) throws PokemonDataInitException {
+			EvolutionProvider evolutionProvider) throws PokemonDataInitException {
 
 		// 1種族しかない組み合わせ
-		onlyTwoType(goPokedexRepository, evolutionInfo, "{0}, {1}は1種族しか存在しない組み合わせです。（対象ポケモン：{2}）");
+		onlyTwoType(goPokedexRepository, evolutionProvider, "{0}, {1}は1種族しか存在しない組み合わせです。（対象ポケモン：{2}）");
 
 		// 最も定番の組み合わせ
-		mostPopularTwoType(goPokedexRepository, evolutionInfo, "{0}, {1}は最も定番の組み合わせで、{2}体のポケモンが該当します。（対象ポケモン：{3}）");
+		mostPopularTwoType(goPokedexRepository, evolutionProvider, "{0}, {1}は最も定番の組み合わせで、{2}体のポケモンが該当します。（対象ポケモン：{3}）");
 
 		// 存在しない組み合わせ
 		notExistsTwoType(goPokedexRepository, "{0}, {1}は、現在のポケモンにおいて存在しない組み合わせです。");
@@ -308,12 +309,12 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 * 1種族しか存在しないタイプの組み合わせのポケモンである旨を示すメッセージを作成する。
 	 *
 	 * @param goPokedexRepository
-	 * @param evolutionInfo
+	 * @param evolutionProvider
 	 * @param msgFormat
 	 */
 	private void onlyTwoType(
 			GoPokedexRepository goPokedexRepository,
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			String msgFormat) {
 
 		// GOポケモン図鑑を全て取得する
@@ -328,7 +329,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 					// key: pokedexNo, value pokedexIdのリストを保持するMapを一旦作成する。
 					Map<Integer, List<String>> pokeNoMap = entry.getValue().stream()
 							.map(GoPokedex::getPokedexId)
-							.collect(Collectors.groupingBy(pid -> evolutionInfo.basePokedexNo(pid))); // 同系統のポケモンごとに括る。
+							.collect(Collectors.groupingBy(pid -> evolutionProvider.basePokedexNo(pid))); // 同系統のポケモンごとに括る。
 					return pokeNoMap.size() == 1; // 同系統のポケモンが1件のポケモンのみに絞り込む。
 
 				})
@@ -355,12 +356,12 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	 * 最も定番の組み合わせのタイプである旨のメッセージを作成する。
 	 *
 	 * @param goPokedexRepository
-	 * @param evolutionInfo
+	 * @param evolutionProvider
 	 * @param msgFormat
 	 */
 	private void mostPopularTwoType(
 			GoPokedexRepository goPokedexRepository,
-			EvolutionInfo evolutionInfo,
+			EvolutionProvider evolutionProvider,
 			String msgFormat) {
 
 		// GOポケモン図鑑を全て取得する
@@ -378,7 +379,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 							return entry.getValue().stream()
 									.map(GoPokedex::getPokedexId)
 									.collect(Collectors.groupingBy(
-											pid -> evolutionInfo.basePokedexNo(pid))); // 同系統のポケモンごとに括る。(Map<pokedexNo, List<pokedexId>>)
+											pid -> evolutionProvider.basePokedexNo(pid))); // 同系統のポケモンごとに括る。(Map<pokedexNo, List<pokedexId>>)
 						}));
 
 		final int max = typeTreeMap.entrySet().stream()
