@@ -311,7 +311,10 @@ public class ScpRankCalculator {
 			scpRank.setSp(sp);
 			scpRank.setScp(scp);
 			scpRank.setPl(pl);
-			// rankとpercentはここではセットしない。
+			// percent
+			double iv = (double) iva + ivd + ivh;
+			scpRank.setPercent((iv / 45.0) * 100.0);
+			// rankはここではセットしない。
 		}
 
 		return scpRank;
@@ -340,32 +343,27 @@ public class ScpRankCalculator {
 	/**
 	 * ランキングを求めます。<br>
 	 * ※引数に渡すリストの並び順は、ランキングの高い順であることが前提です。<br>
-	 * ※ついでにステ積からパーセントを求めちゃいます。
 	 *
 	 * @param scpRankList
 	 */
 	private void ranking(List<ScpRank> scpRankList) {
 
-		double maxSp = scpRankList.get(0).getSp();
-
-		double beforePer = 0.0;
+		double beforeSp = 0.0;
 		int beforeRank = 0;
 		final int size = scpRankList.size();
 		for (int i = 0; i < size; i++) {
 			ScpRank sr = scpRankList.get(i);
-			// (ステ積 / 100%個体のステ積 * 100)の小数点第2位で四捨五入
-			sr.setPercent(sr.getSp() / maxSp * 100.0);
 
-			// 個体値（パーセント）が同じ場合は順位を同じにする。
-			if (beforePer == sr.getPercent()) {
-				// 1つ前の個体値とパーセントが一致する場合
+			// ステ積が同じ場合は順位を同じにする。
+			if (beforeSp == sr.getSp()) {
+				// 1つ前のステ積と一致する場合
 				sr.setRank(beforeRank);
 			} else {
 				// 一致しない場合
 				sr.setRank(i + 1);
 			}
 
-			beforePer = sr.getPercent();
+			beforeSp = sr.getSp();
 			beforeRank = sr.getRank();
 		}
 	}
