@@ -115,7 +115,7 @@ public class RaceController {
 
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なアクセスです。";
+		String errMsg = "不正なリクエストです。";
 		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 	}

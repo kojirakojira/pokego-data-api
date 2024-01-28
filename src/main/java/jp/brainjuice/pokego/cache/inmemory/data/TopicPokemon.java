@@ -8,6 +8,7 @@ import lombok.Data;
 public class TopicPokemon {
 
 	private String pokedexId;
+	private String image;
 	private String name;
 	private int count;
 }
