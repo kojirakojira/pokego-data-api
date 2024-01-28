@@ -11,7 +11,7 @@ import lombok.Data;
 public abstract class ResearchRequestImpl implements ResearchRequest {
 
 	/** idで検索する場合 */
-	private String id;
+	private String pid;
 	/** nameで検索する場合 */
 	private String name;
 

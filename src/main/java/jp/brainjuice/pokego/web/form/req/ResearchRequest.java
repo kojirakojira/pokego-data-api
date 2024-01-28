@@ -11,8 +11,8 @@ import java.util.List;
  */
 public interface ResearchRequest {
 
-	public String getId();
-	public void setId(String id);
+	public String getPid();
+	public void setPid(String pid);
 
 	public String getName();
 	public void setName(String name);

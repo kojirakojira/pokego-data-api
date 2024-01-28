@@ -54,8 +54,8 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 	 */
 	public void execute(ResearchRequest req, T res, ResearchService<T> researchService) throws BadRequestException {
 
-		if (req.getId() != null) {
-			Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(req.getId());
+		if (req.getPid() != null) {
+			Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(req.getPid());
 
 			if (!goPokedexOp.isPresent()) {
 				res.setSuccess(true);
@@ -76,7 +76,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 			res.setSuccess(true);
 		} else {
-			throw new BadRequestException(req.getId(), req.getName());
+			throw new BadRequestException(req.getPid(), req.getName());
 		}
 	}
 
