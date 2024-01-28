@@ -84,6 +84,7 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 			res.setMessage(NO_HIT_MSG);
 		}
 
+		res.setSituation(situation);
 		res.setCp(cp);
 		res.setWbFlg(wbFlg);
 	}
