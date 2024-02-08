@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class TypeScoreResponse extends ResearchResponse {
 
-	private boolean isExecutedType;
+	private boolean executedType;
 	private TypeEnum type1;
 	private TypeEnum type2;
 	private double attacker1Score;

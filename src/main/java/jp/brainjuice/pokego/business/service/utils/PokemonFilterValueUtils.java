@@ -17,9 +17,9 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
+import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
-import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 
 public class PokemonFilterValueUtils {
 
@@ -38,10 +38,10 @@ public class PokemonFilterValueUtils {
 		PokemonFilterValue filterValue = new PokemonFilterValue();
 		// タイプ１
 		filterValue.setType1(
-				req.getType1() == null ? null : TypeEnum.valueOf(req.getType1()));
+				StringUtils.isEmpty(req.getType1()) ? null : TypeEnum.valueOf(req.getType1()));
 		// タイプ２
 		filterValue.setType2(
-				req.getType2() == null ? null : TypeEnum.valueOf(req.getType2()));
+				StringUtils.isEmpty(req.getType2()) ? null : TypeEnum.valueOf(req.getType2()));
 		// 最終進化
 		filterValue.setFinalEvo(req.isFinEvo());
 		filterValue.setNegaFinalEvo(req.isNegaFinEvo());
