@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.business.service.utils.dto;
+package jp.brainjuice.pokego.business.service.utils.dto.evo;
 
 import java.util.List;
 

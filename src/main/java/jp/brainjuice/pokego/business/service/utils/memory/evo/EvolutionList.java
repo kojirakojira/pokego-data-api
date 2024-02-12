@@ -80,8 +80,8 @@ class EvolutionList extends ArrayList<Evolution> {
 			return retList;
 		}
 
-		// 除外対象かを確認する関数(true -> 除外対象)
-		Predicate<EvoCostType> validExclusionFunc = (ect) -> exclusionTypeSet != null && !exclusionTypeSet.contains(ect);
+		// 除外対象かを確認する関数(true -> 除外対象。第二引数がnullの場合はスルー)
+		Predicate<EvoCostType> validExclusionFunc = (ect) -> exclusionTypeSet == null || !exclusionTypeSet.contains(ect);
 
 		// 進化アイテム
 		if (validExclusionFunc.test(EvoCostType.evolutionItems)) {

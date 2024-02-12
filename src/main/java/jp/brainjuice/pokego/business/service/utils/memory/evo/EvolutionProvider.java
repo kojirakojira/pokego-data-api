@@ -8,8 +8,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.dto.evo.Evolution;
+import jp.brainjuice.pokego.business.service.utils.dto.evo.Hierarchy;
 
 /**
  * Evolution系機能に参照するためのProviderクラス
@@ -70,6 +70,10 @@ public class EvolutionProvider {
 
 	public List<List<List<Hierarchy>>> getEvoTrees(String pid) {
 		return evolutionInfo.getEvoTrees(pid);
+	}
+
+	public List<List<List<Hierarchy>>> convDispHierarchy(List<List<List<Hierarchy>>> hieList) {
+		return evolutionInfo.convDispHierarchy(hieList);
 	}
 
 	public List<String> getEvoAnnotations(Collection<String> pids) {

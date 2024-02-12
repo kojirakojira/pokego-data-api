@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
+import jp.brainjuice.pokego.business.service.utils.dto.evo.Hierarchy;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -661,6 +661,43 @@ class EvolutionInfo {
 
 		// ツリーの末端に到達したが、見つからなかった場合。
 		return null;
+	}
+
+	/**
+	 * 画面表示用のリストに変換する。引数にはEvolutionInfo#getEvoHierarchy(String)で取得した三次元リストを指定する。
+	 * x軸、y軸の二次元のリストが複数ある状態を引数に受け取り、その二次元リストの空欄部分にnullを追加する。
+	 *
+	 * @param hieList
+	 * @return
+	 */
+	List<List<List<Hierarchy>>> convDispHierarchy(List<List<List<Hierarchy>>> hieList) {
+
+		List<List<List<Hierarchy>>> retList = new ArrayList<>();
+
+		// リスト全体のループ
+		for (List<List<Hierarchy>> yList: hieList) {
+
+			// x座標の最大要素数（表の横幅）を求める。
+			int max = yList.stream()
+					.map(xList -> xList.size())
+					.max(Comparator.naturalOrder())
+					.get();
+
+			List<List<Hierarchy>> retYList = new ArrayList<>();
+			// y座標のループ
+			for (List<Hierarchy> xList: yList) {
+				// x座標の値を一旦すべて返却用のリストに追加する。
+				List<Hierarchy> retXList = new ArrayList<>(xList);
+				// 空欄部分にnullを追加する。
+				retXList.addAll(Collections.nCopies(max - xList.size(), null));
+
+				retYList.add(retXList);
+			}
+
+			retList.add(retYList);
+		}
+
+		return retList;
 	}
 
 	/**

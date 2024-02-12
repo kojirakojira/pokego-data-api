@@ -74,7 +74,7 @@ public class SubFuncController {
 	public PrevNextPokemonResponse prevNextPokemon(PrevNextPokemonRequest req) {
 
 		PrevNextPokemonResponse res = new PrevNextPokemonResponse();
-		prevNextPokemonService.exec(req.getId(), res);
+		prevNextPokemonService.exec(req.getPid(), res);
 
 		return res;
 	}

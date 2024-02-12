@@ -14,8 +14,8 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.evo.Hierarchy;
 import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.others.EvolutionResponse;
@@ -61,7 +61,8 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 
 
 		/** レスポンスのセット */
-		res.setEvoTreeInfo(hieList);
+		res.setPid(pokedexId);
+		res.setEvoTreeInfo(evolutionProvider.convDispHierarchy(hieList));
 		res.setEvoTreeAnnotations(evoTreeAnnoList);
 		// 並び替えてセット
 		anotherFormList.sort(PokemonEditUtils.getPokedexIdComparator());
