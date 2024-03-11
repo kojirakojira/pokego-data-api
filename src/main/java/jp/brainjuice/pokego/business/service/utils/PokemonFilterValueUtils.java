@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.business.service.utils;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +19,9 @@ import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
+import jp.brainjuice.pokego.web.form.res.elem.DispFilterParam;
 
 public class PokemonFilterValueUtils {
-
-	private static final String DISP_NAME = "name";
-	private static final String DISP_FILTER_VALUE = "filterValue";
-	private static final String DISP_NEGATE = "negate";
 
 	/**
 	 * PokemonFilterValueを生成する。
@@ -126,16 +122,16 @@ public class PokemonFilterValueUtils {
 	 * @param filterMap
 	 * @return
 	 */
-	public static List<Map<String, String>> convDisp(Map<FilterEnum, FilterParam> filterMap) {
+	public static List<DispFilterParam> convDisp(Map<FilterEnum, FilterParam> filterMap) {
 
-		List<Map<String, String>> retList = filterMap.entrySet().stream().map(entry -> {
-			Map<String, String> map = new HashMap<>();
+		List<DispFilterParam> retList = filterMap.entrySet().stream().map(entry -> {
+			DispFilterParam dfp = new DispFilterParam();
 			FilterEnum key = entry.getKey();
 			Object value = entry.getValue().getFilterValue();
 			boolean negate = entry.getValue().isNegate();
 
 			// nameのput
-			map.put(DISP_NAME, key.getJpn());
+			dfp.setName(key.getJpn());
 
 			// filterValueのput
 			String filterValue = "";
@@ -163,14 +159,14 @@ public class PokemonFilterValueUtils {
 				break;
 			}
 			}
-			map.put(DISP_FILTER_VALUE, filterValue);
+			dfp.setFilterValue(filterValue);
 
 			// negateのput
 			if (negate) {
-				map.put(DISP_NEGATE, "する");
+				dfp.setNegate("する");
 			}
 
-			return map;
+			return dfp;
 		}).collect(Collectors.toList());
 
 		return retList;

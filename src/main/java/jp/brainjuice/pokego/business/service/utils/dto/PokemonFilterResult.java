@@ -1,8 +1,8 @@
 package jp.brainjuice.pokego.business.service.utils.dto;
 
 import java.util.List;
-import java.util.Map;
 
+import jp.brainjuice.pokego.web.form.res.elem.DispFilterParam;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +27,5 @@ public class PokemonFilterResult {
 	private boolean hit;
 
 	/** 絞り込みをした検索値 */
-	private List<Map<String, String>> filteredItems;
+	private List<DispFilterParam> filteredItems;
 }

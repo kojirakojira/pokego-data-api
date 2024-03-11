@@ -671,7 +671,7 @@ public class PokemonGoUtils {
 				cpPredicate,
 				calcCpFunc,
 				0,
-				cpMultiplierList.size(),
+				cpMultiplierList.size() - 1,
 				cpMultiplierList);
 	}
 

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,8 @@ import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
+import jp.brainjuice.pokego.web.form.res.elem.Color;
+import jp.brainjuice.pokego.web.form.res.elem.TypeInfo;
 
 /**
  * 定数情報を取得するコントローラクラス
@@ -35,21 +38,14 @@ public class ConstantsController {
 	}
 
 	@GetMapping("/typeConst")
-	public Map<String, Map<String, Object>> typeConst() {
-		final Map<String, Map<String, Object>> typeMap = new LinkedHashMap<>();
-		for (TypeEnum type: TypeEnum.values()) {
-
-			final Map<String, Object> map = new HashMap<>();
-
-			map.put("jpn", type.getJpn());
-
-			TypeColorEnum color = TypeColorEnum.valueOf(type.name());
-			map.put("r", color.getR());
-			map.put("g", color.getG());
-			map.put("b", color.getB());
-			typeMap.put(type.name(), map);
-		}
-		return typeMap;
+	public List<TypeInfo> typeConst() {
+		List<TypeInfo> typeInfoList = Stream.of(TypeEnum.values())
+				.map(te -> {
+					TypeColorEnum color = TypeColorEnum.valueOf(te.name());
+					return new TypeInfo(te, te.getJpn(), new Color(color.getR(), color.getG(), color.getB()));
+				})
+				.collect(Collectors.toList());
+		return typeInfoList;
 	}
 
 	@GetMapping("/regionConst")
