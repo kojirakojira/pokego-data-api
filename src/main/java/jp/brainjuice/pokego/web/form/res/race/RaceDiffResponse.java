@@ -13,9 +13,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class RaceDiffResponse extends Response {
 
+	// nameArrから検索した場合はnull
 	private MultiSearchResult msr;
 	// allUniqueがfalseの場合はnull
 	private List<Race> raceArr;
 
 	private PokemonStatisticsInfo statistics;
+
+	private boolean searchedById;
 }

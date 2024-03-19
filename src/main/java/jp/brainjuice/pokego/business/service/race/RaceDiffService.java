@@ -50,23 +50,23 @@ public class RaceDiffService {
 
 	public boolean check(RaceDiffRequest req, RaceDiffResponse res) {
 
-		if (req.getIdArr() == null && req.getNameArr() == null) {
+		if (req.getPidArr() == null && req.getNameArr() == null) {
 			res.setSuccess(false);
-			res.setMessage("idとnameの少なくとも一方は指定してください。。");
+			res.setMessage("idとnameの少なくとも一方は指定してください。");
 			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
 
-		if (req.getIdArr() != null && !(2 <= req.getIdArr().size() && req.getIdArr().size() <= 6)) {
+		if (req.getPidArr() != null && !(2 <= req.getPidArr().size() && req.getPidArr().size() <= 6)) {
 			res.setSuccess(false);
-			res.setMessage("idは2～6で指定してください。");
+			res.setMessage("idは2～6個で指定してください。");
 			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
 
 		if (req.getNameArr() != null && !(2 <= req.getNameArr().size() && req.getNameArr().size() <= 6)) {
 			res.setSuccess(false);
-			res.setMessage("nameは2～6で指定してください。");
+			res.setMessage("nameは2～6個で指定してください。");
 			res.setMsgLevel(MsgLevelEnum.error);
 			return false;
 		}
@@ -82,7 +82,7 @@ public class RaceDiffService {
 	 */
 	public void exec(RaceDiffRequest req, RaceDiffResponse res) {
 
-		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(req.getIdArr());
+		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(req.getPidArr());
 
 		if (CollectionUtils.contains(goPokedexList.iterator(), null)) {
 			// 検索結果にnullが含まれている場合。
@@ -91,12 +91,13 @@ public class RaceDiffService {
 			res.setMsgLevel(MsgLevelEnum.error);
 			log.info(MessageFormat.format(
 					MSG_NO_RESULTS + " idList: {0}, goPokedexList: {1}",
-					req.getIdArr().toString(),
+					req.getPidArr().toString(),
 					goPokedexList.toString()));
 			return;
 		}
 
-		exec(goPokedexList, req.getIdArr(), res);
+		exec(goPokedexList, req.getPidArr(), res);
+		res.setSearchedById(true);
 	}
 
 	/**
@@ -117,6 +118,7 @@ public class RaceDiffService {
 		List<String> idList = goPokedexList.stream().map(gp -> gp.getPokedexId()).collect(Collectors.toList());
 
 		exec(goPokedexList, idList, res);
+		res.setSearchedById(false);
 	}
 
 	/**

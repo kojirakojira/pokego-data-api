@@ -90,7 +90,7 @@ public class RaceController {
 			return raceDiffRes;
 		}
 
-		if (raceDiffReq.getIdArr() != null) {
+		if (raceDiffReq.getPidArr() != null) {
 			// idでの検索
 			raceDiffService.exec(raceDiffReq, raceDiffRes);
 

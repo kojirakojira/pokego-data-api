@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class RaceDiffRequest {
 
-	private List<String> idArr;
+	private List<String> pidArr;
 	private List<String> nameArr;
-	private boolean finEvo = false;
 }
