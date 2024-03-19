@@ -28,6 +28,10 @@ public class PokemonUtils {
 
 	// 強ポケ補正の基準になるPL
 	private static final String TOO_STRONG_PL = "50.5";
+	// 強ポケ補正の補正値
+	private static final double TOO_STRONG_CORRECTION_VALUE = 0.91;
+	// 強ポケ補正の補正値（メガ）
+	private static final double TOO_STRONG_CORRECTION_VALUE_MEGA = 0.97;
 
 	/**
 	 * 起動時の依存関係の都合上存在しているコンストラクタ
@@ -145,8 +149,10 @@ public class PokemonUtils {
 		double baseHp = baseHp(hp);
 
 		if (correctFlg) {
+			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
 			// 個体値が高い個体の補正後は四捨五入
-			baseHp = tooStrongPokemonList.contains(pokedexId) ? Math.round(baseHp * 0.91) : baseHp;
+			baseHp = tooStrongPokemonList.contains(pokedexId) ? Math.round(baseHp * correctionValue) : baseHp;
 		}
 
 		// 小数点以下切り捨て
@@ -189,7 +195,9 @@ public class PokemonUtils {
 		double baseAttack = baseAttack(attack, spAttack, speed);
 
 		if (correctFlg) {
-			baseAttack = tooStrongPokemonList.contains(pokedexId) ? baseAttack * 0.91 : baseAttack;
+			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
+			baseAttack = tooStrongPokemonList.contains(pokedexId) ? baseAttack * correctionValue : baseAttack;
 		}
 
 		return (int) Math.round(baseAttack);
@@ -239,7 +247,9 @@ public class PokemonUtils {
 		double baseDefense = baseDefense(defense, spDefense, speed);
 
 		if (correctFlg) {
-			baseDefense = tooStrongPokemonList.contains(pokedexId) ? baseDefense * 0.91 : baseDefense;
+			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
+			baseDefense = tooStrongPokemonList.contains(pokedexId) ? baseDefense * correctionValue : baseDefense;
 		}
 
 		return (int) Math.round(baseDefense);

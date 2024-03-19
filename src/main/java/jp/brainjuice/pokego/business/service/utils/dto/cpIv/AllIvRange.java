@@ -10,6 +10,6 @@ public class AllIvRange extends IvRange {
 
 	public AllIvRange() {
 		// PLは1～51。天候ブーストの概念は当然なし。
-		super("1", "51", "1", "51", 0, 0, 15, 15);
+		super("1", "1", "51", "51", 0, 0, 15, 15);
 	}
 }

@@ -42,16 +42,22 @@ public class TooStrongPokemonList extends ArrayList<String> {
 
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 		pokeList.forEach(p -> {
-			// メガシンカを除く。
-			if (!PokemonEditUtils.isMega(p.getPokedexId())) {
-				int cp = pokemonUtils.calcBaseCpFromMain(p);
 
-				if (cp > 4000) {
-					// 原作→GOの単純変換でCPが4000を超えるポケモン
-					add(p.getPokedexId());
+			Pokedex pokedex = p;
 
-					log.debug(MessageFormat.format("{0}({1}):CP{2}", p.getName(), p.getRemarks(), cp));
-				}
+			if (PokemonEditUtils.isMega(p.getPokedexId())) {
+				// メガシンカの場合は、進化前のポケモンのcpが4000を超えているかどうかで判定する。
+				String pokedexId = PokemonEditUtils.getPokedexIdBeforeMegaEvo(p.getPokedexId());
+				pokedex = pokedexRepository.findById(pokedexId).get();
+			}
+
+			int cp = pokemonUtils.calcBaseCpFromMain(pokedex);
+
+			if (cp > 4000) {
+				// 原作→GOの単純変換でCPが4000を超えるポケモン
+				add(p.getPokedexId());
+
+				log.debug(MessageFormat.format("{0}({1}):CP{2}", p.getName(), p.getRemarks(), cp));
 			}
 		});
 
