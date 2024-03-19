@@ -17,4 +17,5 @@ public class RaceResponse extends ResearchResponse {
 	private PokemonStatisticsInfo statistics;
 	private boolean tooStrong;
 	private List<DispFilterParam> filteredItems;
+	private boolean included;
 }
