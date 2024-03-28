@@ -16,5 +16,5 @@ public class IroiroTypeRankResponse extends Response {
 	private List<IroiroTypeRankElement> typeRankList;
 	private LinkedHashSet<String> typeComments;
 	private String msgsHeader;
-	private boolean MsgDecoration;
+	private boolean msgDecoration;
 }

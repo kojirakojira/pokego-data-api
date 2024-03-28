@@ -1,7 +1,10 @@
 package jp.brainjuice.pokego.web.form.res.general;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
+import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,30 +14,28 @@ import lombok.EqualsAndHashCode;
 public class AbundanceResponse extends ResearchResponse {
 
 	private GoPokedex goPokedex;
-	// PL40時のcp
+	// CP(PL40)
 	private int cp40;
-	// CP
+	// CP(PL50)
+	private int cp50;
+	// CP(PL51)
 	private int maxCp;
 	// レイド
-	private int minRaidCp;
-	private int maxRaidCp;
-	private int minWbRaidCp;
-	private int maxWbRaidCp;
-	// シャドウ
-	private int minShadowCp;
-	private int maxShadowCp;
-	private int minWbShadowCp;
-	private int maxWbShadowCp;
+	private CatchCp raid;
+	// ロケット団
+	private CatchCp rocket;
 	// フィールドリサーチ
-	private int minFrTaskCp;
-	private int maxFrTaskCp;
+	@JsonProperty("fRTask")
+	private CatchCp fRTask;
 	// タマゴ
-	private int minEggCp;
-	private int maxEggCp;
+	private CatchCp egg;
 	// 強ポケ補正対象か否か
 	private boolean tooStrong;
 
 	// タイプから算出したポケモンの色
 	private Color type1Color;
 	private Color type2Color;
+
+	// メガシンカ（ゲンシカイキ含む）後か否か
+	private boolean mega;
 }

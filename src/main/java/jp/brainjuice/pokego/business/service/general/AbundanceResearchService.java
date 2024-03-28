@@ -7,9 +7,17 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FRTaskIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketIvRange;
 import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
 import jp.brainjuice.pokego.web.form.res.general.AbundanceResponse;
 
@@ -24,13 +32,17 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 
 	private PokemonGoUtils pokemonGoUtils;
 
+	private CatchCpUtils catchCpUtils;
+
 	private TooStrongPokemonList tooStrongPokemonList;
 
 	@Autowired
 	public AbundanceResearchService(
 			PokemonGoUtils pokemonGoUtils,
+			CatchCpUtils catchCpUtils,
 			TooStrongPokemonList tooStrongPokemonList) {
 		this.pokemonGoUtils = pokemonGoUtils;
+		this.catchCpUtils = catchCpUtils;
 		this.tooStrongPokemonList = tooStrongPokemonList;
 	}
 
@@ -42,27 +54,24 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setGoPokedex(goPokedex);
 		// CP(PL40)
 		res.setCp40(pokemonGoUtils.calcBaseCp(goPokedex.getAttack(), goPokedex.getDefense(), goPokedex.getHp()));
+		// CP(PL50)
+		res.setCp50(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "50"));
 		// 最大CP
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "51"));
 		// CP(レイド)
-		res.setMinRaidCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "20"));
-		res.setMaxRaidCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "20"));
-		res.setMinWbRaidCp(pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "25"));
-		res.setMaxWbRaidCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "25"));
-		// CP(シャドウ）
-		res.setMinShadowCp(pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, "8"));
-		res.setMaxShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "8"));
-		res.setMinWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, "13"));
-		res.setMaxWbShadowCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "13"));
+		IvRangeCp raid = catchCpUtils.getIvRangeCp(goPokedex, new RaidIvRange());
+		res.setRaid(new CatchCp(raid.getMin(), raid.getMax(), raid.getWbMin(), raid.getWbMax(), null, 0, 0));
+		// CP(ロケット団勝利ボーナス）
+		IvRangeCp rocket = catchCpUtils.getIvRangeCp(goPokedex, new RocketIvRange());
+		res.setRocket(new CatchCp(rocket.getMin(), rocket.getMax(), rocket.getWbMin(), rocket.getWbMax(), null, 0, 0));
 
-		int minFrTaskAndEggCp = pokemonGoUtils.calcCp(goPokedex, 10, 10, 10, "15");
-		int maxFrTaskAndEggCp = pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "15");
 		// CP(フィールドリサーチ)
-		res.setMinFrTaskCp(minFrTaskAndEggCp);
-		res.setMaxFrTaskCp(maxFrTaskAndEggCp);
+		IvRangeCp fRTask = catchCpUtils.getIvRangeCp(goPokedex, new FRTaskIvRange());
+		res.setFRTask(new CatchCp(fRTask.getMin(), fRTask.getMax(), fRTask.getWbMin(), fRTask.getWbMax(), null, 0, 0));
 		// CP(タマゴ)
-		res.setMinEggCp(minFrTaskAndEggCp);
-		res.setMaxEggCp(maxFrTaskAndEggCp);
+		IvRangeCp egg = catchCpUtils.getIvRangeCp(goPokedex, new EggIvRange());
+		res.setEgg(new CatchCp(egg.getMin(), egg.getMax(), egg.getWbMin(), egg.getWbMax(), null, 0, 0));
+
 		// 強ポケ補正の有無
 		res.setTooStrong(tooStrongPokemonList.contains(goPokedex.getPokedexId()));
 
@@ -75,5 +84,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType2());
 			res.setType2Color(new Color(c2.getR(), c2.getG(), c2.getB()));
 		}
+
+		boolean isMega = PokemonEditUtils.isMega(goPokedex.getPokedexId());
+		res.setMega(isMega);
 	}
 }
