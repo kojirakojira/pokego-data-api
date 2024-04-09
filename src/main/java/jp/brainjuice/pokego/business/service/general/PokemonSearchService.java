@@ -136,6 +136,7 @@ public class PokemonSearchService {
 
 		if (goPokedexList.isEmpty()) {
 			// 検索結果なしだった場合
+			result.setMsgLevel(MsgLevelEnum.error);
 			result.setMessage(MSG_NO_RESULTS);
 
 		} else {

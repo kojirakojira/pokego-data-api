@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.business.service.utils.dto;
 
 import java.util.List;
 
+import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.DispFilterParam;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class PokemonFilterResult {
 
 	private String message = "";
+
+	private MsgLevelEnum msgLevel = MsgLevelEnum.info;
 
 	/** 検索結果が1件かどうか */
 	private boolean unique;

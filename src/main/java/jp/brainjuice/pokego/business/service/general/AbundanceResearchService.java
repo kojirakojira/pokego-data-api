@@ -58,18 +58,22 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setCp50(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "50"));
 		// 最大CP
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "51"));
+
+		// CP算出用のGoPokedex。メガシンカの場合は、メガシンカ後のポケモンに置き換えて算出する。
+		GoPokedex cpTargetGp = catchCpUtils.getGoPokedexForMega(goPokedex).orElse(goPokedex);
+
 		// CP(レイド)
-		IvRangeCp raid = catchCpUtils.getIvRangeCp(goPokedex, new RaidIvRange());
+		IvRangeCp raid = catchCpUtils.getIvRangeCp(cpTargetGp, new RaidIvRange());
 		res.setRaid(new CatchCp(raid.getMin(), raid.getMax(), raid.getWbMin(), raid.getWbMax(), null, 0, 0));
 		// CP(ロケット団勝利ボーナス）
-		IvRangeCp rocket = catchCpUtils.getIvRangeCp(goPokedex, new RocketIvRange());
+		IvRangeCp rocket = catchCpUtils.getIvRangeCp(cpTargetGp, new RocketIvRange());
 		res.setRocket(new CatchCp(rocket.getMin(), rocket.getMax(), rocket.getWbMin(), rocket.getWbMax(), null, 0, 0));
 
 		// CP(フィールドリサーチ)
-		IvRangeCp fRTask = catchCpUtils.getIvRangeCp(goPokedex, new FRTaskIvRange());
+		IvRangeCp fRTask = catchCpUtils.getIvRangeCp(cpTargetGp, new FRTaskIvRange());
 		res.setFRTask(new CatchCp(fRTask.getMin(), fRTask.getMax(), fRTask.getWbMin(), fRTask.getWbMax(), null, 0, 0));
 		// CP(タマゴ)
-		IvRangeCp egg = catchCpUtils.getIvRangeCp(goPokedex, new EggIvRange());
+		IvRangeCp egg = catchCpUtils.getIvRangeCp(cpTargetGp, new EggIvRange());
 		res.setEgg(new CatchCp(egg.getMin(), egg.getMax(), egg.getWbMin(), egg.getWbMax(), null, 0, 0));
 
 		// 強ポケ補正の有無

@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.business.service.catchCp.utils;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,27 @@ public class CatchCpUtils {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 	}
+
+	/**
+	 * メガ進化後のポケモンの場合、メガシンカ前のポケモンを取得する。
+	 *
+	 * @param goPokedex
+	 * @param res
+	 * @return
+	 */
+	public Optional<GoPokedex> getGoPokedexForMega(GoPokedex goPokedex) {
+
+		String pid = goPokedex.getPokedexId();
+		boolean isMega = PokemonEditUtils.isMega(pid);
+
+		if (!isMega) {
+			return Optional.empty();
+		}
+
+		String befMegaPid = PokemonEditUtils.getPokedexIdBeforeMegaEvo(pid);
+		return goPokedexRepository.findById(befMegaPid);
+	}
+
 	/**
 	 * メガ進化後のポケモンの場合、メガシンカ前のポケモンを取得する。
 	 * また、レスポンスにメッセージをセットする。
@@ -36,20 +59,14 @@ public class CatchCpUtils {
 	 * @param res
 	 * @return
 	 */
-	public GoPokedex getGoPokedexForMega(GoPokedex goPokedex, Response res) {
+	public Optional<GoPokedex> getGoPokedexForMega(GoPokedex goPokedex, Response res) {
 
-		String pid = goPokedex.getPokedexId();
-		boolean isMega = PokemonEditUtils.isMega(pid);
+		Optional<GoPokedex> befGp = getGoPokedexForMega(goPokedex);
 
-		if (!isMega) {
-			return null;
+		if (!befGp.isPresent()) {
+			res.setMsgLevel(MsgLevelEnum.warn);
+			res.setMessage(MSG_MEGA_SELECTED);
 		}
-
-		String befMegaPid = PokemonEditUtils.getPokedexIdBeforeMegaEvo(pid);
-		GoPokedex befGp = goPokedexRepository.findById(befMegaPid).get();
-
-		res.setMsgLevel(MsgLevelEnum.warn);
-		res.setMessage(MSG_MEGA_SELECTED);
 
 		return befGp;
 	}

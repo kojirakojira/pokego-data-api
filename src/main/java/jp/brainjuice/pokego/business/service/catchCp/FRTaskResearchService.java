@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.business.service.catchCp;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +36,12 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 
 		{
 			// メガシンカ後のポケモンの場合は、メガシンカ前のポケモンを取得する。
-			GoPokedex befMegaGp = catchCpUtils.getGoPokedexForMega(goPokedex, res);
-			if (befMegaGp != null) {
+			Optional<GoPokedex> befMegaGp = catchCpUtils.getGoPokedexForMega(goPokedex, res);
+			if (!befMegaGp.isPresent()) {
 				// nullでなかったらgoPokedexはメガシンカ後。メガシンカ前のポケモンで後続処理を進める。
-				goPokedex = befMegaGp;
+				goPokedex = befMegaGp.get();
 				res.setMega(true);
-				res.setBefMegaGp(befMegaGp);
+				res.setBefMegaGp(befMegaGp.get());
 			}
 		}
 
