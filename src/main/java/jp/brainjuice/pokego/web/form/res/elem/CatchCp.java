@@ -1,5 +1,8 @@
 package jp.brainjuice.pokego.web.form.res.elem;
 
+import java.util.List;
+
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CatchCp {
 
-	private int min;
-	private int max;
-	private int wbMin;
-	private int wbMax;
+	private IvRangeCp normal;
 
-	private String otherName;
-	private int otherMin;
-	private int otherMax;
+	private List<IvRangeCp> others;
+
 }

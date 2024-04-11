@@ -52,6 +52,10 @@ public class EvolutionProvider {
 		return evolutionInfo.isAfterEvolution(pid);
 	}
 
+	public String getFirstInEvoTree(String pid) {
+		return evolutionInfo.getFirstInEvoTree(pid);
+	}
+
 	public List<String> getLastInEvoTree(String pid) {
 		return evolutionInfo.getLastInEvoTree(pid);
 	}

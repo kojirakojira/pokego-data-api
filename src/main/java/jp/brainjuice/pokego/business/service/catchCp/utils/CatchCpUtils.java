@@ -63,7 +63,7 @@ public class CatchCpUtils {
 
 		Optional<GoPokedex> befGp = getGoPokedexForMega(goPokedex);
 
-		if (!befGp.isPresent()) {
+		if (befGp.isPresent()) {
 			res.setMsgLevel(MsgLevelEnum.warn);
 			res.setMessage(MSG_MEGA_SELECTED);
 		}

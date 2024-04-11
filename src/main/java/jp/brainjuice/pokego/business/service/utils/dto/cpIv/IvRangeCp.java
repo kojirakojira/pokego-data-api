@@ -13,4 +13,6 @@ public class IvRangeCp {
 	private int max;
 	private int wbMin;
 	private int wbMax;
+
+	private String name = "normal"; // 状態名
 }

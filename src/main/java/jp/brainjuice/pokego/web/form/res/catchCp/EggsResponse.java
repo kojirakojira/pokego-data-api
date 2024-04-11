@@ -12,10 +12,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RocketResponse extends ResearchResponse {
+public class EggsResponse extends ResearchResponse {
 
-	private boolean mega = false;
-	private GoPokedex befMegaGp;
+	/** 進化前で算出したか、そのまま算出したか */
+	private boolean before = false;
+	private GoPokedex befGp;
 
 	private CatchCp catchCp;
 }

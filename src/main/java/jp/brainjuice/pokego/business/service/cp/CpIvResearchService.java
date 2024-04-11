@@ -13,7 +13,7 @@ import jp.brainjuice.pokego.business.service.utils.CpIvCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.AllIvRange;
-import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggsIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FRTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
@@ -60,7 +60,7 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 		case frTask -> new FRTaskIvRange();
 		case raid -> new RaidIvRange();
 		case raidShadow -> new RaidShadowIvRange();
-		case egg -> new EggIvRange();
+		case egg -> new EggsIvRange();
 		case rocket -> new RocketIvRange();
 		case rocketSakaki -> new RocketSakakiIvRange();
 		case non -> new AllIvRange();
