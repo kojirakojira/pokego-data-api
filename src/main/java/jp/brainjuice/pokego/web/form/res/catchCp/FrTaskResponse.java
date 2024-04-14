@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FRTaskResponse extends ResearchResponse {
+public class FrTaskResponse extends ResearchResponse {
 
 	private boolean mega = false;
 	private GoPokedex befMegaGp;

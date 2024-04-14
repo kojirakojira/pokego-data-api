@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.utils.dto.ValidationItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +51,7 @@ public class ValidationService {
 	 * @return
 	 * @throws Exception
 	 */
-	public void validation(ResearchRequest req) throws BadRequestException {
+	public void validation(Object req) throws BadRequestException {
 
 		StringBuffer sb = new StringBuffer();
 		ValidationItem validItem = new ValidationItem(); // インスタンスを使いまわす。

@@ -1,7 +1,5 @@
 package jp.brainjuice.pokego.web.form.res.general;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
 import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
@@ -25,8 +23,7 @@ public class AbundanceResponse extends ResearchResponse {
 	// ロケット団
 	private CatchCp rocket;
 	// フィールドリサーチ
-	@JsonProperty("fRTask")
-	private CatchCp fRTask;
+	private CatchCp frTask;
 	// タマゴ
 	private CatchCp egg;
 	// 強ポケ補正対象か否か

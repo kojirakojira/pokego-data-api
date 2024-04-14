@@ -19,7 +19,7 @@ public enum PageNameEnum {
 	searchAll("全ポケ絞り込み"),
 	raid("レイドボス勝利ボーナスCP"),
 	rocket("ロケット団勝利ボーナスCP"),
-	fRTask("フィールドリサーチCP"),
+	frTask("フィールドリサーチCP"),
 	eggs("タマゴCP"),
 	scpRank("PvP順位"),
 	scpRankList("PvP順位一覧"),

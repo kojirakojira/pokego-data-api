@@ -67,8 +67,7 @@ public class EvoCostResearchService {
 						(a, b) -> a,
 						LinkedHashMap::new));
 
-		res.setCandy(costs == Costs.candy);
-		res.setPoke(false);
+		res.setCosts(costs);
 		res.setCostTypeMap(costsGpMap);
 	}
 

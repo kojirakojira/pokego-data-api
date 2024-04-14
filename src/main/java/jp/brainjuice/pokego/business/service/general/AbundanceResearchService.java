@@ -12,7 +12,7 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggsIvRange;
-import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FRTaskIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketIvRange;
@@ -70,8 +70,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setRocket(new CatchCp(rocket, null));
 
 		// CP(フィールドリサーチ)
-		IvRangeCp fRTask = catchCpUtils.getIvRangeCp(cpTargetGp, new FRTaskIvRange());
-		res.setFRTask(new CatchCp(fRTask, null));
+		IvRangeCp frTask = catchCpUtils.getIvRangeCp(cpTargetGp, new FrTaskIvRange());
+		res.setFrTask(new CatchCp(frTask, null));
 		// CP(タマゴ)
 		IvRangeCp egg = catchCpUtils.getIvRangeCp(cpTargetGp, new EggsIvRange());
 		res.setEgg(new CatchCp(egg, null));

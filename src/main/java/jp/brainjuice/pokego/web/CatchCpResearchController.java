@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.catchCp.EggsResearchService;
-import jp.brainjuice.pokego.business.service.catchCp.FRTaskResearchService;
+import jp.brainjuice.pokego.business.service.catchCp.FrTaskResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RocketResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.catchCp.EggsRequest;
-import jp.brainjuice.pokego.web.form.req.catchCp.FRTaskRequest;
+import jp.brainjuice.pokego.web.form.req.catchCp.FrTaskRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RocketRequest;
 import jp.brainjuice.pokego.web.form.res.catchCp.EggsResponse;
-import jp.brainjuice.pokego.web.form.res.catchCp.FRTaskResponse;
+import jp.brainjuice.pokego.web.form.res.catchCp.FrTaskResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RaidResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RocketResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,8 @@ public class CatchCpResearchController {
 	private RaidResearchService raidResearchService;
 	private ResearchServiceExecutor<RaidResponse> raidResRse;
 
-	private FRTaskResearchService fRTaskResearchService;
-	private ResearchServiceExecutor<FRTaskResponse> fRTaskResRse;
+	private FrTaskResearchService frTaskResearchService;
+	private ResearchServiceExecutor<FrTaskResponse> frTaskResRse;
 
 	private EggsResearchService eggsResearchService;
 	private ResearchServiceExecutor<EggsResponse> eggsResRse;
@@ -53,7 +53,7 @@ public class CatchCpResearchController {
 	@Autowired
 	public CatchCpResearchController(
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
-			FRTaskResearchService fRTaskResearchService, ResearchServiceExecutor<FRTaskResponse> fRTaskResRse,
+			FrTaskResearchService frTaskResearchService, ResearchServiceExecutor<FrTaskResponse> frTaskResRse,
 			EggsResearchService eggsResearchService, ResearchServiceExecutor<EggsResponse> eggsResRse,
 			RocketResearchService rocketResearchService, ResearchServiceExecutor<RocketResponse> rocketResRse,
 			ValidationService validationService) {
@@ -62,8 +62,8 @@ public class CatchCpResearchController {
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
 		// フィールドリサーチ算出
-		this.fRTaskResearchService = fRTaskResearchService;
-		this.fRTaskResRse = fRTaskResRse;
+		this.frTaskResearchService = frTaskResearchService;
+		this.frTaskResRse = frTaskResRse;
 		// タマゴCP算出
 		this.eggsResearchService = eggsResearchService;
 		this.eggsResRse = eggsResRse;
@@ -99,14 +99,14 @@ public class CatchCpResearchController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/fRTask")
-	public FRTaskResponse fRTask(FRTaskRequest fRTaskReq) throws Exception {
+	@GetMapping("/frTask")
+	public FrTaskResponse frTask(FrTaskRequest frTaskReq) throws Exception {
 
-		validationService.validation(fRTaskReq);
+		validationService.validation(frTaskReq);
 
-		FRTaskResponse fRTaskRes = new FRTaskResponse();
-		fRTaskResRse.execute(fRTaskReq, fRTaskRes, fRTaskResearchService);
-		return fRTaskRes;
+		FrTaskResponse frTaskRes = new FrTaskResponse();
+		frTaskResRse.execute(frTaskReq, frTaskRes, frTaskResearchService);
+		return frTaskRes;
 	}
 
 	/**

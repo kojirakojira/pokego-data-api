@@ -6,6 +6,6 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FRTaskRequest extends ResearchRequestImpl {
+public class FrTaskRequest extends ResearchRequestImpl {
 
 }

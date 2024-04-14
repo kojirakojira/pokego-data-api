@@ -6,9 +6,9 @@ package jp.brainjuice.pokego.business.service.utils.dto.cpIv;
  * @author saibabanagchampa
  *
  */
-public class FRTaskIvRange extends IvRange {
+public class FrTaskIvRange extends IvRange {
 
-	public FRTaskIvRange() {
+	public FrTaskIvRange() {
 		// PLは15固定。天候ブーストの影響なし
 		super("15", null, "15", null, 10, null, 15, null);
 	}

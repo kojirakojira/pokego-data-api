@@ -9,23 +9,23 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FRTaskIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
-import jp.brainjuice.pokego.web.form.res.catchCp.FRTaskResponse;
+import jp.brainjuice.pokego.web.form.res.catchCp.FrTaskResponse;
 import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
 
 @Service
-public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
+public class FrTaskResearchService implements ResearchService<FrTaskResponse> {
 
 	private CatchCpUtils catchCpUtils;
 
 	@Autowired
-	public FRTaskResearchService(CatchCpUtils catchCpUtils) {
+	public FrTaskResearchService(CatchCpUtils catchCpUtils) {
 		this.catchCpUtils = catchCpUtils;
 	}
 
 	@Override
-	public void exec(SearchValue sv, FRTaskResponse res) {
+	public void exec(SearchValue sv, FrTaskResponse res) {
 
 		GoPokedex goPokedex = sv.getGoPokedex();
 
@@ -40,8 +40,8 @@ public class FRTaskResearchService implements ResearchService<FRTaskResponse> {
 			}
 		}
 
-		IvRangeCp fRTask = catchCpUtils.getIvRangeCp(goPokedex, new FRTaskIvRange());
-		res.setCatchCp(new CatchCp(fRTask, null));
+		IvRangeCp frTask = catchCpUtils.getIvRangeCp(goPokedex, new FrTaskIvRange());
+		res.setCatchCp(new CatchCp(frTask, null));
 	}
 
 }
