@@ -11,7 +11,7 @@ public class SimpPokemon {
 
 	private String pokedexId;
 	private String name;
-	private String image;
+	private String image1;
 	private String gen;
 	private String remarks;
 }

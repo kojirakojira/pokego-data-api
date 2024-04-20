@@ -43,7 +43,7 @@ public class UnimplPokemonService {
 				.map(gp -> new SimpPokemon(
 							gp.getPokedexId(),
 							gp.getName(),
-							gp.getImage(),
+							gp.getImage1(),
 							GenNameEnum.valueOf(gp.getGen()).getJpn(),
 							gp.getRemarks()))
 				.collect(Collectors.toList());

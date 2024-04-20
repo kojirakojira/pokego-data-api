@@ -39,9 +39,6 @@ public class GoPokedex extends Entity {
 	@Nonnull
 	private int hp;
 
-	/** 画像 */
-	private String image;
-
 	/** 備考 */
 	@Nonnull
 	private String remarks;
@@ -57,6 +54,14 @@ public class GoPokedex extends Entity {
 	/** 世代 */
 	@Nonnull
 	private String gen;
+
+	/** 画像1（アバター用） */
+	@Nonnull
+	private String image1;
+
+	/** 画像2（サムネイル用） */
+	@Nonnull
+	private String image2;
 
 	/** 実装フラグ */
 	@Nonnull

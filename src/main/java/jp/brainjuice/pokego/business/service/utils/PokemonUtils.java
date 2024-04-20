@@ -124,6 +124,8 @@ public class PokemonUtils {
 		goPokedex.setType1(pokedex.getType1());
 		goPokedex.setType2(pokedex.getType2());
 		goPokedex.setGen(pokedex.getGen());
+		goPokedex.setImage1(pokedex.getImage1());
+		goPokedex.setImage2(pokedex.getImage2());
 		goPokedex.setImplFlg(pokedex.isImplFlg());
 
 		return goPokedex;

@@ -59,6 +59,14 @@ public class Pokedex extends Entity {
 	@Nonnull
 	private String gen;
 
+	/** 画像1（アバター用） */
+	@Nonnull
+	private String image1;
+
+	/** 画像2（サムネイル用） */
+	@Nonnull
+	private String image2;
+
 	/** 実装フラグ */
 	@Nonnull
 	private boolean implFlg;

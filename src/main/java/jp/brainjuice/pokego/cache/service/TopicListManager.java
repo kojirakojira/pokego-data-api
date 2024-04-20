@@ -164,7 +164,7 @@ public class TopicListManager {
 					GoPokedex gp = goPokedexMap.get(entry.getKey());
 					return new TopicPokemon(
 							gp.getPokedexId(),
-							gp.getImage(),
+							gp.getImage1(),
 							PokemonEditUtils.appendRemarks(gp),
 							entry.getValue()); // TopicPokemonに変換。
 				})

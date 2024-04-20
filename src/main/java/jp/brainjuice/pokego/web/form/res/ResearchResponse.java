@@ -17,6 +17,7 @@ public abstract class ResearchResponse extends Response {
 	private PokemonSearchResult pokemonSearchResult;
 	private String pokedexId;
 	private String name;
-	private String image;
+	private String image1;
+	private String image2;
 	private String remarks;
 }

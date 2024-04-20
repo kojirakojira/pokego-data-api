@@ -43,7 +43,7 @@ public class OgpInfoService {
 		String image = "";
 		if (goPokedexOp.isPresent()) {
 			name = PokemonEditUtils.appendRemarks(goPokedexOp.get());
-			image = StringUtils.isEmpty(image) ? "" : goPokedexOp.get().getImage();
+			image = StringUtils.isEmpty(image) ? "" : goPokedexOp.get().getImage2();
 		}
 
 		res.setName(name);
