@@ -16,7 +16,7 @@ import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.SituationEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
+import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
 import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
 import jp.brainjuice.pokego.web.form.res.elem.TypeInfo;

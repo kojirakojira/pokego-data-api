@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.TypeUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.IroiroTypeRankElement;
@@ -33,19 +32,15 @@ public class IroiroTypeRankService {
 
 	private TypeChartInfo typeChartInfo;
 
-	private PokedexFilterInfoRepository pokedexFilterInfoRepository;
-
 	private GoPokedexRepository goPokedexRepository;
 
 	private EvolutionProvider evolutionProvider;
 
 	public IroiroTypeRankService(
 			TypeChartInfo typeChartInfo,
-			PokedexFilterInfoRepository pokedexFilterInfoRepository,
 			GoPokedexRepository goPokedexRepository,
 			EvolutionProvider evolutionProvider) {
 		this.typeChartInfo = typeChartInfo;
-		this.pokedexFilterInfoRepository = pokedexFilterInfoRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.evolutionProvider = evolutionProvider;
 	}
@@ -230,7 +225,7 @@ public class IroiroTypeRankService {
 
 		// key: TwoTypeKey, value: Map<PokedexNo, List<PokedexId>>>のMapを作成する。
 		LinkedHashMap<TwoTypeKey, Map<Integer, List<String>>> basePdxNoMap = ttkStream
-				.map(ttk -> Map.entry(ttk, pokedexFilterInfoRepository.findIdByType(ttk))) // Map<TwoTypeKey, List<PokedexId>
+				.map(ttk -> Map.entry(ttk, goPokedexRepository.findIdByType(ttk))) // Map<TwoTypeKey, List<PokedexId>
 				.map(entry -> Map.entry(
 						entry.getKey(),
 						entry.getValue().stream()

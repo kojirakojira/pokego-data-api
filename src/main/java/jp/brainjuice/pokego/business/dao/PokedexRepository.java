@@ -1,15 +1,9 @@
 package jp.brainjuice.pokego.business.dao;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
@@ -20,17 +14,14 @@ import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ポケモン情報をCSVから取得し、メモリに保持し管理するRepositoryです。<br>
- * Spring Data Jpaに近い仕様を目指してますが、ほぼハリボテです。
+ * 原作におけるポケモンの情報を取得するRepositoryクラス
  *
  * @author saibabanagchampa
  *
  */
 @Repository
 @Slf4j
-public class PokedexRepository implements CrudRepository<Pokedex, String> {
-
-	private final List<Pokedex> pokedexes = new ArrayList<Pokedex>();
+public class PokedexRepository extends InMemoryRepository<Pokedex, String> {
 
 	private static final String MSG_INVALID_TYPE_ERROR = "タイプの指定に誤りがあります。{0}";
 	private static final String MSG_INVALID_GEN_ERROR = "世代の指定に誤りがあります。{0}";
@@ -50,138 +41,11 @@ public class PokedexRepository implements CrudRepository<Pokedex, String> {
 	}
 
 	/**
-	 * 図鑑№からPokedexを検索します。
-	 *
-	 * @param pokedexId
-	 * @return
-	 */
-	public Optional<Pokedex> findById(String pokedexId) {
-
-		Optional<Pokedex> pokedexOp = Optional.empty();
-
-		if (StringUtils.isEmpty(pokedexId)) return pokedexOp;
-
-		for (Pokedex p: pokedexes) {
-			if (pokedexId.equals(p.getPokedexId())) {
-				pokedexOp = Optional.of(p.clone());
-				break;
-			}
-		}
-
-		return pokedexOp;
-	}
-
-	/**
-	 * すべてのPokedexを取得します。
-	 *
-	 * @return
-	 */
-	public List<Pokedex> findAll() {
-		return new ArrayList<>(pokedexes);
-	}
-
-	/**
-	 * 図鑑№のリストからPokedexを検索します。
-	 *
-	 * @param ids
-	 * @return
+	 * 主キーはpokedexId
 	 */
 	@Override
-	public Iterable<Pokedex> findAllById(Iterable<String> ids) {
-		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
-			for (Pokedex p: pokedexes) {
-				if (p.getPokedexId().equals(pid)) {
-					return p;
-				}
-			}
-			return null;
-		}).collect(Collectors.toList());
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public long count() {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void delete(Pokedex entity) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll() {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll(Iterable<? extends Pokedex> entities) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAllById(Iterable<? extends String> ids) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public boolean existsById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public <S extends Pokedex> S save(S entity) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	/**
-	 * すべてのPokedexを保存します。
-	 *
-	 * @param <S>
-	 * @param entities
-	 * @return
-	 */
-	@Override
-	public <S extends Pokedex> Iterable<S> saveAll(Iterable<S> entities) {
-		entities.forEach(pokedexes::add);
-		return entities;
+	protected String getKey(Pokedex t) {
+		return t.getPokedexId();
 	}
 
 	/**

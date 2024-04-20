@@ -1,13 +1,11 @@
 package jp.brainjuice.pokego.business.dao.entity;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
 
 /**
  * GOポケモン図鑑
@@ -15,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
  * @author saibabanagchampa
  *
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Slf4j
-public class GoPokedex implements Serializable, Cloneable {
+public class GoPokedex extends Entity {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
 	@Nonnull
@@ -63,16 +61,6 @@ public class GoPokedex implements Serializable, Cloneable {
 	/** 実装フラグ */
 	@Nonnull
 	private boolean implFlg;
-
-	public GoPokedex clone() {
-		GoPokedex goPokedex = null;
-		try {
-			goPokedex = (GoPokedex) super.clone();
-		} catch (CloneNotSupportedException e) {
-			log.error("Clone failed.", e);
-		}
-		return goPokedex;
-	}
 
 	/**
 	 * (非 Javadoc)

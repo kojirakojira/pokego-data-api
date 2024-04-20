@@ -2,31 +2,40 @@ package jp.brainjuice.pokego.business.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
+import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
+import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * メモリにて保持しているGoPokedexを管理するRepositoryです。<br>
- * Spring Data Jpaに近い仕様を目指してますが、ほぼハリボテです。
+ * ポケモンGOにおけるポケモンの情報を取得するRepositoryクラス
  *
  * @author saibabanagchampa
  *
  */
 @Repository
 @Slf4j
-public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
+public class GoPokedexRepository extends InMemoryRepository<GoPokedex, String> {
 
-	private final List<GoPokedex> goPokedexes = new ArrayList<>();
+	private PokedexSpecifications pokedexSpecifications;
+
+	/**
+	 * 主キーはpokedexId
+	 */
+	@Override
+	protected String getKey(GoPokedex t) {
+		return t.getPokedexId();
+	}
 
 	/**
 	 * Pokedexを変換し、DIに登録する。
@@ -37,48 +46,16 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	@Autowired
 	public GoPokedexRepository(
 			PokedexRepository pokedexRepository,
-			PokemonUtils pokemonUtils) {
+			PokemonUtils pokemonUtils,
+			PokedexSpecifications pokedexSpecifications) {
 
 		List<Pokedex> pokeList = pokedexRepository.findAll();
 		List<GoPokedex> goPokeList = pokeList.stream().map(p -> pokemonUtils.getGoPokedex(p)).collect(Collectors.toList());
 		saveAll(goPokeList);
 
+		this.pokedexSpecifications = pokedexSpecifications;
+
 		log.info("GoPokedex table generated!!");
-	}
-
-	@Override
-	public <S extends GoPokedex> Iterable<S> saveAll(Iterable<S> entities) {
-		entities.forEach(goPokedexes::add);
-		return entities;
-	}
-
-	@Override
-	public Optional<GoPokedex> findById(String id) {
-		Optional<GoPokedex> goPokedexOp = Optional.empty();
-		for (GoPokedex gp: goPokedexes) {
-			if (id.equals(gp.getPokedexId())) {
-				goPokedexOp = Optional.of(gp.clone());
-				break;
-			}
-		}
-		return goPokedexOp;
-	}
-
-	@Override
-	public List<GoPokedex> findAll() {
-		return new ArrayList<>(goPokedexes);
-	}
-
-	@Override
-	public List<GoPokedex> findAllById(Iterable<String> ids) {
-		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
-			for (GoPokedex p: goPokedexes) {
-				if (p.getPokedexId().equals(pid)) {
-					return p;
-				}
-			}
-			return null;
-		}).collect(Collectors.toList());
 	}
 
 	/**
@@ -90,10 +67,10 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	 */
 	public List<GoPokedex> findByNameIn(Iterable<String> names) {
 		List<GoPokedex> goPokedexList = new ArrayList<>();
-		goPokedexes.forEach(gp -> {
+		records.forEach(gp -> {
 			for (String n: names) {
 				if (gp.getName().contains(n)) {
-					goPokedexList.add(gp.clone());
+					goPokedexList.add((GoPokedex) gp.clone());
 					break;
 				}
 			}
@@ -110,10 +87,10 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	 */
 	public List<GoPokedex> findByRemarksIn(Iterable<String> remarks) {
 		List<GoPokedex> goPokedexList = new ArrayList<>();
-		goPokedexes.forEach(gp -> {
+		records.forEach(gp -> {
 			for (String n: remarks) {
 				if (gp.getRemarks().contains(n)) {
-					goPokedexList.add(gp.clone());
+					goPokedexList.add((GoPokedex) gp.clone());
 					break;
 				}
 			}
@@ -129,84 +106,51 @@ public class  GoPokedexRepository implements CrudRepository<GoPokedex, String> {
 	 */
 	public List<GoPokedex> findByImplFlg(boolean flg) {
 		List<GoPokedex> goPokedexList = new ArrayList<>();
-		goPokedexes.forEach(gp -> {
+		records.forEach(gp -> {
 			if (gp.isImplFlg() == flg) {
-				goPokedexList.add(gp.clone());
+				goPokedexList.add((GoPokedex) gp.clone());
 			}
 		});
 		return goPokedexList;
 	}
 
 	/**
-	 * @deprecated 未実装
+	 * @param type
+	 * @return
+	 * @see PokedexSpecifications
 	 */
-	@Override
-	public <S extends GoPokedex> S save(S entity) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public List<String> findIdByType(TypeEnum type) {
+		return pokedexSpecifications.findIdByType(type);
+	}
+
+
+	/**
+	 * @param twoTypeKey
+	 * @return
+	 * @see PokedexSpecifications
+	 */
+	public List<String> findIdByType(TwoTypeKey twoTypeKey) {
+		return pokedexSpecifications.findIdByType(twoTypeKey);
+	}
+
+
+	/**
+	 * @param values
+	 * @return
+	 * @see PokedexSpecifications
+	 */
+	public List<String> findIdByAny(Map<FilterEnum, FilterParam> values) {
+		return pokedexSpecifications.findIdByAny(values);
 	}
 
 	/**
-	 * @deprecated 未実装
+	 * @param values
+	 * @return
+	 * @see PokedexSpecifications
 	 */
-	@Override
-	public boolean existsById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public long count() {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void delete(GoPokedex entity) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAllById(Iterable<? extends String> ids) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll(Iterable<? extends GoPokedex> entities) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll() {
-		// TODO 自動生成されたメソッド・スタブ
-
+	public List<GoPokedex> findByAny(Map<FilterEnum, FilterParam> values) {
+		List<String> pidList =  pokedexSpecifications.findIdByAny(values);
+		return findAllById(pidList);
 	}
 
 }

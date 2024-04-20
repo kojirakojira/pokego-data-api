@@ -6,16 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
@@ -32,15 +29,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * pokedexIdの絞り込みをするためのリポジトリクラス。<br>
- * Spring Data Jpaに近い仕様を目指してますが、ほぼハリボテです。
+ * 独自の仕様なのでSpringのSpecificationとは全く別物です。
+ * PokedexまたはGoPokedexを絞り込むために使用するクラスです。
  *
  * @author saibabanagchampa
  *
  */
-@Repository
+@Component
 @Slf4j
-public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilterInfo, String> {
+public class PokedexSpecifications {
 
 	/** 絞り込み用Pokdexリスト */
 	private final List<PokedexFilterInfo> fPokedexes = new ArrayList<>();
@@ -128,7 +125,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * @param pokemonEditUtils
 	 */
 	@Autowired
-	public PokedexFilterInfoRepository(
+	public PokedexSpecifications(
 			PokedexRepository pokedexRepository,
 			EvolutionProvider evolutionProvider,
 			TooStrongPokemonList tooStrongPokemonList) {
@@ -144,7 +141,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * @param type
 	 * @return
 	 */
-	public List<String> findIdByType(TypeEnum type) {
+	List<String> findIdByType(TypeEnum type) {
 		return fPokedexes.stream()
 				.filter(pfi -> type.equals(pfi.getType1()) || type.equals(pfi.getType2()))
 				.map(pfi2 -> pfi2.getPokedexId())
@@ -157,7 +154,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * @param twoTypeKey
 	 * @return
 	 */
-	public List<String> findIdByType(TwoTypeKey twoTypeKey) {
+	List<String> findIdByType(TwoTypeKey twoTypeKey) {
 
 		TypeEnum type1 = twoTypeKey.getType1();
 		TypeEnum type2 = twoTypeKey.getType2();
@@ -178,7 +175,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	 * @see FilterParam
 	 */
 	@SuppressWarnings("unchecked")
-	public List<String> findByAny(Map<FilterEnum, FilterParam> values) {
+	List<String> findIdByAny(Map<FilterEnum, FilterParam> values) {
 
 		Stream<PokedexFilterInfo> stream = fPokedexes.stream();
 
@@ -251,102 +248,6 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 	}
 
 	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public <S extends PokedexFilterInfo> S save(S entity) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public <S extends PokedexFilterInfo> Iterable<S> saveAll(Iterable<S> entities) {
-		entities.forEach(fPokedexes::add);
-		return entities;
-	}
-
-	@Override
-	public Optional<PokedexFilterInfo> findById(String id) {
-		return fPokedexes.stream().filter(p -> p.getPokedexId().equals(id)).findAny();
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public boolean existsById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	@Override
-	public List<PokedexFilterInfo> findAll() {
-		return new ArrayList<>(fPokedexes);
-	}
-
-	@Override
-	public Iterable<PokedexFilterInfo> findAllById(Iterable<String> ids) {
-		return StreamSupport.stream(ids.spliterator(), false).map(pid -> {
-			for (PokedexFilterInfo p: fPokedexes) {
-				if (p.getPokedexId().equals(pid)) {
-					return p;
-				}
-			}
-			return null;
-		}).collect(Collectors.toList());
-	}
-
-	@Override
-	public long count() {
-		return fPokedexes.size();
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteById(String id) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void delete(PokedexFilterInfo entity) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAllById(Iterable<? extends String> ids) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll(Iterable<? extends PokedexFilterInfo> entities) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * @deprecated 未実装
-	 */
-	@Override
-	public void deleteAll() {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
 	 * すべてのポケモン情報を登録する。
 	 *
 	 * @param pokedexRepository
@@ -377,7 +278,7 @@ public class PokedexFilterInfoRepository implements CrudRepository<PokedexFilter
 			return pfi;
 		}).collect(Collectors.toList());
 
-		saveAll(pfiList);
+		pfiList.forEach(fPokedexes::add);
 	}
 
 }

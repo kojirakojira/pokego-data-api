@@ -13,8 +13,8 @@ import jp.brainjuice.pokego.business.constant.ConstantEnumInterface;
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
+import jp.brainjuice.pokego.business.dao.PokedexSpecifications;
+import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterValue;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
@@ -67,7 +67,7 @@ public class PokemonFilterValueUtils {
 	 *
 	 * @param filterValue
 	 * @return
-	 * @see PokedexFilterInfoRepository
+	 * @see PokedexSpecifications
 	 * @see SearchValue
 	 * @see PokemonFilterValue
 	 */

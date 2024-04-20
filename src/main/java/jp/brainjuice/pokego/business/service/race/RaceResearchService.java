@@ -7,9 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository;
-import jp.brainjuice.pokego.business.dao.PokedexFilterInfoRepository.FilterEnum;
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
+import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
@@ -30,8 +29,6 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private PokedexFilterInfoRepository pokedexFilterInfoRepository;
-
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
 	private TooStrongPokemonList tooStrongPokemonList;
@@ -42,13 +39,11 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 	public RaceResearchService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
-			PokedexFilterInfoRepository pokedexFilterInfoRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
 			TooStrongPokemonList tooStrongPokemonList,
 			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
-		this.pokedexFilterInfoRepository = pokedexFilterInfoRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.tooStrongPokemonList = tooStrongPokemonList;
 		this.pokemonUtils = pokemonUtils;
@@ -75,8 +70,8 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		res.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// 絞り込み検索の実行有無
-		List<String> filterList = pokedexFilterInfoRepository.findByAny(filterMap);
-		int pokedexCnt = (int) pokedexFilterInfoRepository.count();
+		List<String> filterList = goPokedexRepository.findIdByAny(filterMap);
+		int pokedexCnt = (int) goPokedexRepository.count();
 		boolean included = filterList.size() == pokedexCnt || filterList.contains(pokedexId);
 		if (!included) {
 			// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいない場合
