@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -30,20 +31,13 @@ public class GoPokedexRepository extends InMemoryRepository<GoPokedex, String> {
 	private PokedexSpecifications pokedexSpecifications;
 
 	/**
-	 * 主キーはpokedexId
-	 */
-	@Override
-	protected String getKey(GoPokedex t) {
-		return t.getPokedexId();
-	}
-
-	/**
 	 * Pokedexを変換し、DIに登録する。
 	 *
 	 * @param pokedexRepository
 	 * @param pokemonUtils
 	 */
 	@Autowired
+	@Lazy
 	public GoPokedexRepository(
 			PokedexRepository pokedexRepository,
 			PokemonUtils pokemonUtils,
@@ -56,6 +50,14 @@ public class GoPokedexRepository extends InMemoryRepository<GoPokedex, String> {
 		this.pokedexSpecifications = pokedexSpecifications;
 
 		log.info("GoPokedex table generated!!");
+	}
+
+	/**
+	 * 主キーはpokedexId
+	 */
+	@Override
+	protected String getKey(GoPokedex t) {
+		return t.getPokedexId();
 	}
 
 	/**
