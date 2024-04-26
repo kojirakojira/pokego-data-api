@@ -49,7 +49,7 @@ public class GoPokedexRepository extends InMemoryRepository<GoPokedex, String> {
 
 		this.pokedexSpecifications = pokedexSpecifications;
 
-		log.info("GoPokedex table generated!!");
+		log.info("GoPokedex table generated!! (Referenced file: none.)");
 	}
 
 	/**
@@ -88,16 +88,17 @@ public class GoPokedexRepository extends InMemoryRepository<GoPokedex, String> {
 	 * @return
 	 */
 	public List<GoPokedex> findByRemarksIn(Iterable<String> remarks) {
-		List<GoPokedex> goPokedexList = new ArrayList<>();
-		records.forEach(gp -> {
-			for (String n: remarks) {
-				if (gp.getRemarks().contains(n)) {
-					goPokedexList.add((GoPokedex) gp.clone());
-					break;
-				}
-			}
-		});
-		return goPokedexList;
+		return records.stream()
+				.filter(gp -> {
+					for (String n: remarks) {
+						if (gp.getRemarks().contains(n)) {
+							return true;
+						}
+					}
+					return false;
+				})
+				.map(gp -> (GoPokedex) gp.clone())
+				.collect(Collectors.toList());
 	}
 
 	/**

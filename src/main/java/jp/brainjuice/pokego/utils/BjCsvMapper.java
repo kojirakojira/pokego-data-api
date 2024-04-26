@@ -52,6 +52,13 @@ public class BjCsvMapper {
 	public static <E> List<E> mapping(String fileName, Class<E> clazz) throws IOException, CsvMappingException, Exception {
 
 		Resource resource = BjUtils.loadFile(fileName);
+
+		return mapping(resource, clazz);
+
+	}
+
+	public static <E> List<E> mapping(Resource resource, Class<E> clazz) throws IOException, CsvMappingException, Exception {
+
 		BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
 
 		// 行のリスト

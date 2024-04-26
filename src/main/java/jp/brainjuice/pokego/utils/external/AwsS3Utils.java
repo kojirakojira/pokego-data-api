@@ -12,12 +12,15 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import jp.brainjuice.pokego.utils.exception.FailedToSaveThumbnailException;
+import lombok.Getter;
 
 @Component
 public class AwsS3Utils {
@@ -29,10 +32,17 @@ public class AwsS3Utils {
 	private String secretAccessKey;
 
 	@Value("${aws.s3.endpoint}")
+	@Getter
 	private String endpoint;
 
 	@Value("${aws.s3.s3BacketName}")
+	@Getter
 	private String s3BacketName;
+
+	/** 環境ごとのファイル名の接尾辞。システム固有の運用上の仕様 */
+	@Value("${aws.s3.suffix}")
+	@Getter
+	private String suffix;
 
 	/**
 	 * AWS S3にファイルを保存します。<br>
@@ -70,6 +80,15 @@ public class AwsS3Utils {
 		return path;
 	}
 
+	public S3Object download(String path) {
+
+		AmazonS3 client = auth();
+
+		GetObjectRequest getReq = new GetObjectRequest(s3BacketName, path);
+		S3Object object = client.getObject(getReq);
+		return object;
+	}
+
 	/**
 	 * AWS S3に保存されているファイルの一覧を取得します。<br>
 	 * 引数には"ディレクトリ"を相対パスで指定することにより、絞り込みが可能です。<br>
@@ -103,23 +122,5 @@ public class AwsS3Utils {
 				.build();
 
 		return s3Client;
-	}
-
-	/**
-	 * エンドポイント取得
-	 *
-	 * @return
-	 */
-	public String getEndpoint() {
-		return this.endpoint;
-	}
-
-	/**
-	 * バケット名（ドメイン名）取得
-	 *
-	 * @return
-	 */
-	public String getS3BacketName() {
-		return this.s3BacketName;
 	}
 }

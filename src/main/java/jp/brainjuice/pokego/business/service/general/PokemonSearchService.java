@@ -1,13 +1,7 @@
 package jp.brainjuice.pokego.business.service.general;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,14 +9,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-
-import com.atilika.kuromoji.TokenizerBase.Mode;
-import com.atilika.kuromoji.ipadic.Token;
-import com.atilika.kuromoji.ipadic.Tokenizer;
-import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
-import com.ibm.icu.text.Transliterator;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
@@ -34,13 +21,13 @@ import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
+import jp.brainjuice.pokego.business.service.utils.dto.TokenizeResult;
+import jp.brainjuice.pokego.business.service.utils.memory.PokemonDictionaryInfo;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 @Service
 public class PokemonSearchService {
@@ -49,23 +36,7 @@ public class PokemonSearchService {
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	// Kuromoji形態素解析ライブラリのBuilderクラス
-	private Builder tokenizerBuilder;
-
-	// １つの単語がポケモンのグループを示す場合のポケモン名のリスト
-	private Map<String, List<String>> groupFamiliarNameMap = new HashMap<>();
-
-	// Kuromoji設定用のユーザ辞書
-	private static final String DIC_FILE_NAME = "pokemon/pokemon-dictionary.csv";
-	// １つの単語がポケモンのグループを示す場合の情報
-	private static final String GROUP_FAMILIAR_NAME_FILE_NAME = "pokemon/pokemon-dictionary-group-familiar-name.yml";
-
-
-	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
-	private Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
-
-	/** ひらがな→カタカナ */
-	private Transliterator transHiraToKana = Transliterator.getInstance("Hiragana-Katakana");
+	private PokemonDictionaryInfo pokemonDictionaryInfo;
 
 	private static final String MSG_RESULTS = "{0}件のポケモンがヒットしました！";
 
@@ -75,35 +46,14 @@ public class PokemonSearchService {
 
 	private static final String MSG_NO_ENTERED = "入力してください。";
 
-	@SuppressWarnings("unchecked")
 	@Autowired
 	public PokemonSearchService(
 			GoPokedexRepository goPokedexRepository,
-			PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
+			PokemonGoUtils pokemonGoUtils,
+			PokemonDictionaryInfo pokemonDictionaryInfo) throws PokemonDataInitException {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
-
-		// Tokenizerを初期化
-		try {
-			Resource pokeDic = BjUtils.loadFile(DIC_FILE_NAME);
-
-			tokenizerBuilder = new Tokenizer.Builder();
-			tokenizerBuilder.mode(Mode.SEARCH);
-			// ユーザ辞書に単語登録する。（カタカナをひらがなに変換した単語も登録する。
-			tokenizerBuilder.userDictionary(getUserDictionary(pokeDic));
-		} catch (IOException e) {
-			throw new PokemonDataInitException("検索用の形態素解析モジュールの初期化に失敗しました。", e);
-		}
-
-		try {
-			// pokemon-dictionry-group-familiar-name.ymlを読み込む
-			groupFamiliarNameMap = BjUtils.loadYaml(GROUP_FAMILIAR_NAME_FILE_NAME, Map.class);
-
-		} catch (IOException e) {
-			throw new PokemonDataInitException(
-					MessageFormat.format("{0}の読み込みに失敗しました。", GROUP_FAMILIAR_NAME_FILE_NAME),
-					e);
-		}
+		this.pokemonDictionaryInfo = pokemonDictionaryInfo;
 
 	}
 
@@ -220,8 +170,13 @@ public class PokemonSearchService {
 			return result;
 		}
 
+		// ひらがなをカタカナに置き換える。
+		// 例「あア亜１ｱ1」→「アア亜1ア1」
+		String transWords = BjUtils.transAnyNFKC(words);
+		transWords = BjUtils.transHiraToKana(transWords);
+
 		// 形態素解析をして検索
-		List<GoPokedex> goPokedexList = searchGeneral(words);
+		List<GoPokedex> goPokedexList = searchGeneral(transWords);
 		result.setSearched(true);
 
 		// 1件もヒットしなかった場合
@@ -229,7 +184,7 @@ public class PokemonSearchService {
 
 			if (words.length() <= 20) {
 				// すごく曖昧に検索する。
-				goPokedexList = searchFuzzy(words);
+				goPokedexList = searchFuzzy(transWords);
 				result.setMaybe(true);
 			} else {
 				// なんか負荷がかかりそうだから文字数が多いときは検索させない。
@@ -273,7 +228,7 @@ public class PokemonSearchService {
 	private List<GoPokedex> searchGeneral(String words) {
 
 		// 形態素解析で分解
-		TokenizeResult tokenizeResult = tokenize(words);
+		TokenizeResult tokenizeResult = pokemonDictionaryInfo.search(words);
 		List<String> pokemonList = tokenizeResult.getPokemonList();
 		List<String> otherList = tokenizeResult.getOtherList();
 		List<String> groupList = tokenizeResult.getGroupList();
@@ -301,11 +256,7 @@ public class PokemonSearchService {
 					.filter(o -> 2 < o.length())
 					.collect(Collectors.toList());
 
-			List<GoPokedex> remarksList = goPokedexRepository.findByRemarksIn(otherTmpList);
-
-			if (remarksList.size() <= 3) {
-				goPokedexList = remarksList;
-			}
+			goPokedexList = goPokedexRepository.findByRemarksIn(otherTmpList);
 
 		} else if (!otherList.isEmpty()) {
 			// ポケモン名以外の名詞が存在する場合
@@ -327,70 +278,6 @@ public class PokemonSearchService {
 	}
 
 	/**
-	 * 引数に検索ワードを指定し、Kuromojiの形態素解析で分割する。
-	 * 分割後、TokenizeResultを返却する。
-	 *
-	 * @param words
-	 * @return
-	 */
-	private TokenizeResult tokenize(String words) {
-
-		// Kuromoji Tokenizerの取得
-		Tokenizer tokenizer = tokenizerBuilder.build();
-
-		// 形態素解析をして分割する。
-		List<Token> tokens = tokenizer.tokenize(words);
-
-		// ポケモン名をリストで取得する。
-		List<String> pokemonList = tokens.stream()
-				.filter(t -> t.getPartOfSpeechLevel1().equals("pokemon"))
-				.map(t -> t.getReading())
-				.collect(Collectors.toList());
-
-		// ポケモン名以外の名詞を取得する。
-		List<String> otherList = tokens.stream()
-				.filter(t -> t.getPartOfSpeechLevel1().equals("名詞"))
-				.map(t -> t.getReading())
-				.collect(Collectors.toList());
-
-		// グループを示す単語（ブイズなど）からpokedexIdのリストを取得する。
-		List<String> groupList = tokens.stream()
-				.filter(t -> t.getPartOfSpeechLevel1().equals("group"))
-				.flatMap(t -> groupFamiliarNameMap.get(t.getReading()).stream())
-				.collect(Collectors.toList());
-
-		// ポケモン名をリストで取得する。
-		tokens.stream()
-		.filter(t -> t.getPartOfSpeechLevel1().equals("複合名詞"))
-		.forEach(t -> {
-			// 複合名詞の場合は、再帰呼び出しして分解していく。（※無限ループしないように辞書の定義には気を付けること。）
-			TokenizeResult compoundNounsResult = tokenize(t.getReading());
-			pokemonList.addAll(compoundNounsResult.getPokemonList());
-			otherList.addAll(compoundNounsResult.getOtherList());
-			groupList.addAll(compoundNounsResult.getGroupList());
-		});
-
-		return new TokenizeResult(pokemonList, otherList, groupList);
-	}
-
-	/**
-	 * Kuromojiの形態素解析アルゴリズムの結果を格納する。
-	 *
-	 * @author saibabanagchampa
-	 *
-	 */
-	@Data
-	@AllArgsConstructor
-	private class TokenizeResult {
-		// ユーザ辞書で品詞をpokemonにしたやつを入れる。
-		private List<String> pokemonList;
-		// ユーザ辞書で品詞を名詞にしたやつを入れる。
-		private List<String> otherList;
-		// ユーザ辞書で品詞をgroupにしたやつが入れる。
-		private List<String> groupList;
-	}
-
-	/**
 	 * 独自のロジックで曖昧に検索します。
 	 *
 	 * @param name
@@ -398,13 +285,8 @@ public class PokemonSearchService {
 	 */
 	private List<GoPokedex> searchFuzzy(String name) {
 
-		// ひらがなをカタカナに置き換える。
-		String transName;
-		transName = transAnyNFKC.transliterate(name);
-		transName = transHiraToKana.transliterate(transName);
-
 		// 2文字単位で分割する。
-		List<String> nameList = toFuzzyNameList(transName);
+		List<String> nameList = toFuzzyNameList(name);
 		// 検索
 		return goPokedexRepository.findByNameIn(nameList);
 
@@ -432,47 +314,5 @@ public class PokemonSearchService {
 		}
 
 		return list;
-	}
-
-	private InputStream getUserDictionary(Resource pokeDic) throws IOException {
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(pokeDic.getInputStream()));
-
-		List<String> lineList = new ArrayList<>();
-		{
-			String line;
-			while ((line = br.readLine()) != null) {
-				lineList.add(line);
-			}
-			br.close();
-		}
-
-		// カタカナ→ひらがな
-		Transliterator transKataToHira = Transliterator.getInstance("Katakana-Hiragana");
-
-		// デフォルトの単語から、カタカナをひらがなに変換した単語を作成し、StringBuilderに変換する。
-		StringBuilder sb = lineList.stream()
-				.filter(line -> line.charAt(0) != '#') // コメント行を省く。
-				.flatMap(line -> {
-					int firstCommaIdx = line.indexOf(",");
-					// 「単語」列のカタカナだけを、ひらがなに変換する。
-					String firstElem = line.substring(0, firstCommaIdx);
-					firstElem = transAnyNFKC.transliterate(firstElem);
-					firstElem = transKataToHira.transliterate(firstElem);
-					// 「単語」列に、無変換の別の列をくっつける
-					String hiraganaLine = firstElem + line.substring(firstCommaIdx);
-					// デフォルトの単語と、ひらがなに変換した単語の２つを単語登録する。
-					Stream<String> stream = Stream.of(line);
-					if (!line.equals(hiraganaLine)) {
-						// カタ→ひら変換前と変換後が一致しない場合のみ２つの単語を登録する。
-						stream = Stream.concat(stream, Stream.of(hiraganaLine));
-					}
-					return stream;
-				})
-				.map(line -> line + "\n") // 改行コードをいれて行扱いにする。
-				.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append);
-
-		// StringBuilder→InputStreamに変換して返却。
-		return new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
 	}
 }

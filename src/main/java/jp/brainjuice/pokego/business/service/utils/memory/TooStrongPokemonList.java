@@ -82,8 +82,8 @@ public class TooStrongPokemonList extends ArrayList<String> {
 			});
 		});
 
-		log.info("Identifier pokemon list: " + outputList.toString());
-		log.info("IdentifierPokemonList generated!!");
+		log.info("TooStrongPokemon list: " + outputList.toString());
+		log.info("TooStrongPokemonList generated!! (Referenced file: none.)");
 
 	}
 }

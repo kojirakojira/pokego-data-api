@@ -10,7 +10,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+
+import com.amazonaws.services.s3.model.S3Object;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -19,15 +23,19 @@ import jp.brainjuice.pokego.business.service.utils.dto.evo.Evolution;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
+import jp.brainjuice.pokego.utils.external.AwsS3Utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 class EvolutionList extends ArrayList<Evolution> {
 
-	static final String ROOT = "root";
+	private AwsS3Utils awsS3Utils;
 
-	private static final String FILE_NAME = "pokemon/pokemon-evolution.csv";
+	/** pokemon-evolution.csv */
+	private static final String S3_POKEMON_EVO_CSV_FILE_NAME = "pokego/data/evolution/pokemon-evolution{0}.csv";
+
+	static final String ROOT = "root";
 
 	private static final String NOT_EXISTS_MSG = "pokemon.csvに定義したポケモンがpokemon-evolution.csvに定義されていません。{0}";
 
@@ -38,7 +46,10 @@ class EvolutionList extends ArrayList<Evolution> {
 	private static final String UNIMPL_UNKNOWN_MSG = "未実装のため不明";
 
 	@Autowired
-	EvolutionList(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+	EvolutionList(
+			GoPokedexRepository goPokedexRepository,
+			AwsS3Utils awsS3Utils) throws PokemonDataInitException {
+		this.awsS3Utils = awsS3Utils;
 		init(goPokedexRepository);
 	}
 
@@ -170,8 +181,13 @@ class EvolutionList extends ArrayList<Evolution> {
 	 */
 	private void init(GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
 
+
+		String fileName = "";
 		try {
-			List<Evolution> evolutionList = BjCsvMapper.mapping(FILE_NAME, Evolution.class);
+			fileName = MessageFormat.format(S3_POKEMON_EVO_CSV_FILE_NAME, awsS3Utils.getSuffix());
+			S3Object object = awsS3Utils.download(fileName);
+			Resource resource = new InputStreamResource(object.getObjectContent());
+			List<Evolution> evolutionList = BjCsvMapper.mapping(resource, Evolution.class);
 
 			// pokemon.csvに定義したポケモンが、すべてpokemon-evolution.csvに定義されていることを確認する。
 			checkAllExists(evolutionList, goPokedexRepository);
@@ -192,6 +208,8 @@ class EvolutionList extends ArrayList<Evolution> {
 			log.error(e.getMessage(), e);
 			throw new PokemonDataInitException(e);
 		}
+
+		log.info(MessageFormat.format("EvolutionList generated!! (Referenced file: {0}{1})", awsS3Utils.getEndpoint(), fileName));
 	}
 
 	/**

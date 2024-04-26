@@ -22,6 +22,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
+import com.ibm.icu.text.Transliterator;
+
 import jp.brainjuice.pokego.filter.log.LogUtils;
 
 public final class BjUtils {
@@ -35,6 +37,15 @@ public final class BjUtils {
 	public static final String sdfMde = "MM/dd(E)";
 	public static final String sdfHm = "HH:mm";
 	public static final String dirFormat = "yyyyMMddHHmmss";
+
+	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
+	private static Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
+
+	/** ひらがな→カタカナ */
+	private static Transliterator transHiraToKana = Transliterator.getInstance("Hiragana-Katakana");
+
+	/** カタカナ→ひらがな */
+	private static Transliterator transKanaToHira = Transliterator.getInstance("Katakana-Hiragana");
 
 	/**
 	 * 引数に指定された文字が、空文字またはnullでない場合は数値に変換し返却する。
@@ -166,6 +177,36 @@ public final class BjUtils {
 	}
 
 	/**
+	 * ひらカタ漢字は全角に、ＡＢＣ１２３は半角に 変換する。
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static String transAnyNFKC(String value) {
+		return transAnyNFKC.transliterate(value);
+	}
+
+	/**
+	 * ひらがなをカタカナに置き換える。<br>
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static String transHiraToKana(String value) {
+		return transHiraToKana.transliterate(value);
+	}
+
+	/**
+	 * カタカナをひらがなに置き換える。<br>
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static String transKanaToHira(String value) {
+		return transKanaToHira.transliterate(value);
+	}
+
+	/**
 	 * 引数が空文字またはnullの場合、空文字に置き換えます。
 	 *
 	 * @param value
@@ -205,7 +246,7 @@ public final class BjUtils {
 	}
 
 	/**
-	 * resource配下に配置したYamlファイルを読み込み、ファイル内容を返却する。
+	 * resources配下に配置したYamlファイルを読み込み、ファイル内容を返却する。
 	 * @param <T>
 	 *
 	 * @param fileName
@@ -215,6 +256,20 @@ public final class BjUtils {
 	public static <T> T loadYaml(String fileName, Class<? extends T> clazz) throws IOException {
 
 		Resource resource = loadFile(fileName);
+		return convYaml(resource, clazz);
+	}
+
+	/**
+	 * Yaml形式のResource型から、第2引数で指定した型に変換する。
+	 *
+	 * @param <T>
+	 * @param resource
+	 * @param clazz
+	 * @return
+	 * @throws IOException
+	 */
+	public static <T> T convYaml(Resource resource, Class<? extends T> clazz) throws IOException {
+
 		InputStreamReader reader = new InputStreamReader(resource.getInputStream());
 
 		Yaml yaml = new Yaml();

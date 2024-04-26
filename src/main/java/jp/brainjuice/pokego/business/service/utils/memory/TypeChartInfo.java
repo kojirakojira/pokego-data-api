@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
+import com.ibm.icu.text.MessageFormat;
+
 import jp.brainjuice.pokego.business.constant.Type;
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -544,6 +546,6 @@ public class TypeChartInfo {
 		}
 
 
-		log.info("TypeChartInfo generated!!");
+		log.info(MessageFormat.format("TypeChartInfo generated!! (Referenced file: resources/{0})", FILE_NAME));
 	}
 }

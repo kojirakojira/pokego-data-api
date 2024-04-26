@@ -19,7 +19,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ポケモン統計情報を取得するクラスです。
+ * ポケモン統計情報を保持するクラスです。
  *
  * @author saibabanagchampa
  *
@@ -49,7 +49,8 @@ public class PokemonStatisticsInfo implements Cloneable {
 		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
 		// 全ポケモンを対象とした統計情報をDIに設定する。
 		create(pokedexList, goPokedexList);
-		log.info("PokemonStatisticsInfo generated!!");
+
+		log.info("PokemonStatisticsInfo generated!! (Referenced file: none.)");
 	}
 
 	/**

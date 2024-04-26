@@ -9,6 +9,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
+import com.ibm.icu.text.MessageFormat;
+
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 
-	private static final String FINE_NAME = "pokemon/cp-multiplier.yml";
+	private static final String CP_MULTIPLIER_FILE_NAME = "pokemon/cp-multiplier.yml";
 
 	/** indexで扱いたい場合に使用するリスト(ArrayList) */
 	private static List<Map.Entry<String, Double>> cpMultiplierList;
@@ -37,14 +39,14 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	public void init() throws PokemonDataInitException {
 
 		try {
-			CpMultiplierMap map = BjUtils.loadYaml(FINE_NAME, CpMultiplierMap.class);
+			CpMultiplierMap map = BjUtils.loadYaml(CP_MULTIPLIER_FILE_NAME, CpMultiplierMap.class);
 			this.putAll(map);
 
 			// indexで扱いたい場合に使用するリスト
 			cpMultiplierList = map.entrySet().stream()
 					.collect(Collectors.toList());
 
-			log.info("CpMultiplierMap generated!!");
+			log.info(MessageFormat.format("CpMultiplierMap generated!! (Referenced file: resources/{0})", CP_MULTIPLIER_FILE_NAME));
 		} catch (Exception e) {
 			throw new PokemonDataInitException(e);
 		}

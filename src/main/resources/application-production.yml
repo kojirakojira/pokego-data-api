@@ -46,3 +46,4 @@ aws:
     secretAccessKey: /r1U0s5skOPE6M2Xa74/8aeW7XJ4d0z4hub86twc
     endpoint: https://s3-us-west-1.amazonaws.com/static.brainjuice.jp/
     s3BacketName: static.brainjuice.jp
+    suffix: ""

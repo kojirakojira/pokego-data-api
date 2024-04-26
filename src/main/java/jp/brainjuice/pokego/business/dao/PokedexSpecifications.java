@@ -132,7 +132,7 @@ public class PokedexSpecifications {
 
 		init(pokedexRepository, evolutionProvider, tooStrongPokemonList);
 
-		log.info("PokedexSpecifications generated!!");
+		log.info("PokedexSpecifications generated!! (Referenced file: none.)");
 	}
 
 	/**
