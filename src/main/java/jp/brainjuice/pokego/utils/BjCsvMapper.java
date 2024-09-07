@@ -43,7 +43,7 @@ public class BjCsvMapper {
 	}
 
 	private static final String MSG_METHOD_INVOKE_ERROR = "カラム名の指定、もしくはデータの型に誤りがあります。行番号:{0}, 列番号:{1}";
-	private static final String MSG_INDEX_ERROR = "列の個数が一致しませんでした。行番号:{0}, 列番号:{1}";
+	private static final String MSG_INDEX_ERROR = "列の個数が一致しませんでした。行番号:{0}, 列番号:{1}, ヘッダの列数：{2}";
 	private static final String MSG_CSV_METHOD_ERROR = "CSVで定義したカラムが、指定したクラスに存在しません。メソッド名：{0}";
 	private static final String MSG_FAILED_CREATE_INSTANCE_ERROR = "インスタンスの生成に失敗しました。{0}";
 
@@ -122,12 +122,11 @@ public class BjCsvMapper {
 				throw e;
 			}
 
+			// 各項目を設定する。
+			String[] colArr = rowList.get(y).split(SEPARATOR, -1); // 末尾の空文字を除去しない。
 			try {
-				// 各項目を設定する。
-				String[] colArr = rowList.get(y).split(SEPARATOR, -1); // 末尾の空文字を除去しない。
 				if (colArr.length != setterList.size()) {
 					// 1行目と対象の行が一致していない場合
-					x = colArr.length;
 					throw new ArrayIndexOutOfBoundsException();
 				}
 
@@ -140,11 +139,11 @@ public class BjCsvMapper {
 							(Class<?>) setterList.get(x).get(1));
 				}
 			} catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				String msg = MessageFormat.format(MSG_METHOD_INVOKE_ERROR, y + 1, x);
+				String msg = MessageFormat.format(MSG_METHOD_INVOKE_ERROR, y + 1, x + 1);
 				log.error(msg);
 				throw new CsvMappingException(msg, e);
 			} catch (ArrayIndexOutOfBoundsException e) {
-				String msg = MessageFormat.format(MSG_INDEX_ERROR, y + 1, x);
+				String msg = MessageFormat.format(MSG_INDEX_ERROR, y + 1, colArr.length, setterList.size());
 				log.error(msg);
 				throw new CsvMappingException(msg, e);
 			} catch (Exception e) {
@@ -202,9 +201,13 @@ public class BjCsvMapper {
 		Object obj = null;
 		if (dataType == String.class) {
 			obj = value;
+		} else if (value.isEmpty()) {
+			obj = null;
 		} else {
+			// プリミティブ型の場合はラッパークラスを取得する。プリミティブ型でない場合は、ラッパークラスであるものとする。
+			Class<?> wrapperClazz = wrapperMap.containsKey(dataType) ? wrapperMap.get(dataType) : dataType;
 			// valueOfメソッドでString型のvalueから型変換する。
-			obj = wrapperMap.get(dataType).getMethod("valueOf", String.class).invoke(null, value);
+			obj = wrapperClazz.getMethod("valueOf", String.class).invoke(null, value);
 		}
 
 		// セッターを使用しインスタンスにセットする。

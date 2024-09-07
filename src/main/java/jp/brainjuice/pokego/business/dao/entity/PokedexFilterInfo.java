@@ -8,12 +8,14 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
+@ToString
 public class PokedexFilterInfo implements Serializable, Cloneable {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */

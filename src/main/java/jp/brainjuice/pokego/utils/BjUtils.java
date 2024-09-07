@@ -315,4 +315,19 @@ public final class BjUtils {
             return null;
         }
     }
+
+    /**
+     * 四捨五入用メソッド</br>
+     * 例：round(1, 4, 2) -> 0.3
+     *
+     * @param divisor 割られる数
+     * @param divident 割る数
+     * @param roundDigit 四捨五入する小数点以下桁
+     * @return
+     */
+    public static float round(float divisor, float divident, int roundDigit) {
+
+    	float num = (float) Math.pow(10.0, roundDigit - 1);
+    	return Math.round((divisor / divident) * num) / num;
+    }
 }
