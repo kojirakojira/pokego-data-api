@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.filter.firebase;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -12,6 +11,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.core.io.Resource;
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 
 import jp.brainjuice.pokego.filter.firebase.exception.FirebaseAuthenticationException;
+import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -35,11 +37,10 @@ public class FirebaseAuthenticationFilter implements Filter {
 
 		try {
 			// firebaseの初期設定
-			FileInputStream serviceAccount =
-					new FileInputStream("./brain-juice-5ac93-firebase-adminsdk-jrctm-89d698e161.json");
+			Resource serviceAccount = BjUtils.loadFile("./brain-juice-5ac93-firebase-adminsdk-jrctm-89d698e161.json");
 
 			FirebaseOptions options = FirebaseOptions.builder()
-					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+					.setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
 					.setDatabaseUrl("https://brain-juice-5ac93.firebaseio.com")
 					.build();
 
