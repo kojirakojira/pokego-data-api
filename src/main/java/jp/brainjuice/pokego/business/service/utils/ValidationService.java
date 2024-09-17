@@ -7,13 +7,12 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.List;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
 import org.springframework.stereotype.Service;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jp.brainjuice.pokego.business.service.utils.dto.ValidationItem;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
@@ -24,10 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ValidationService {
 
-	private static final String VALIDATION_PACKAGE_NAME = "javax.validation.constraints";
+	private static final String VALIDATION_PACKAGE_NAME = "jakarta.validation.constraints";
 
 	/**
-	 * 現在実装中のチェックパターンです。列挙名はjavax.validationのアノテーション名と対応します。
+	 * 現在実装中のチェックパターンです。列挙名はjakarta.validationのアノテーション名と対応します。
 	 * @author saibabanagchampa
 	 *
 	 */
@@ -39,9 +38,9 @@ public class ValidationService {
 	}
 
 	/**
-	 * パッケージ名:"javax.validation.constraints"のアノテーションが第1引数のRequest継承クラスのフィールドに付与されている場合、<br>
+	 * パッケージ名:"jakarta.validation.constraints"のアノテーションが第1引数のRequest継承クラスのフィールドに付与されている場合、<br>
 	 * 専用のチェックロジックを実行します。<br>
-	 * ※この独自仕様は、javax.validationにおいて、メソッドの継承が許可されていないことに起因しています。<br>
+	 * ※この独自仕様は、jakarta.validationにおいて、メソッドの継承が許可されていないことに起因しています。<br>
 	 * 詳細：java.validation.ConstraintDeclarationException: HV000151<br>
 	 * <br>
 	 * チェックエラーの場合、BadRequestExceptionをスローします。

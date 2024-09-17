@@ -2,16 +2,14 @@ package jp.brainjuice.pokego.cache.service;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
@@ -35,7 +33,6 @@ public class ViewsCacheProvider {
 
 	private ViewsCacheManager viewsCacheManager;
 
-	@Autowired
 	public ViewsCacheProvider(
 			ViewsCacheManager viewsCacheManager) {
 		this.viewsCacheManager = viewsCacheManager;

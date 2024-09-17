@@ -1,10 +1,9 @@
 package jp.brainjuice.pokego.filter.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jp.brainjuice.pokego.utils.BjJwtUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +43,7 @@ public class BrainJuiceInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	@Override
+//	@Override
 	public void afterCompletion(HttpServletRequest req, HttpServletResponse res, Object handler,
 			Exception ex) throws Exception {
 

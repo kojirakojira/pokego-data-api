@@ -2,10 +2,10 @@ package jp.brainjuice.pokego.utils.exception;
 
 import java.text.MessageFormat;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * リクエストのパラメータに誤りがある場合にスローします。

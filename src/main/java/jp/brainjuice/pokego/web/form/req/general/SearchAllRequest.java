@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.web.form.req.general;
 
-import javax.validation.constraints.Null;
-
+import jakarta.validation.constraints.Null;
 import jp.brainjuice.pokego.web.form.req.ResearchRequestImpl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

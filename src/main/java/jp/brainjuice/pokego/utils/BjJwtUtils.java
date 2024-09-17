@@ -3,9 +3,8 @@ package jp.brainjuice.pokego.utils;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import jp.brainjuice.pokego.filter.jwt.SecurityConst;
 
 public class BjJwtUtils {

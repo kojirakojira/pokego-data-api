@@ -2,15 +2,6 @@ package jp.brainjuice.pokego.filter.firebase;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.Resource;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -19,6 +10,14 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jp.brainjuice.pokego.filter.firebase.exception.FirebaseAuthenticationException;
 import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
