@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -30,14 +31,9 @@ public class RedisConfig {
 	@Value("${redis.env.url}")
 	private String envUrl;
 
-//	private BjTopicEventSubscriber bjTopicEventSubscriber;
-//
 	private static final String CONNECTED_MESSAGE_FORMAT = "Redis is connected in {0} mode. {1}={2}";
-//
-//	@Autowired
-//	public CacheConfig(BjTopicEventSubscriber bjTopicEventSubscriber) {
-//		this.bjTopicEventSubscriber = bjTopicEventSubscriber;
-//	}
+
+	private static final String DUMMY_USERNAME = "h";
 
 	/**
 	 * デフォルトキャッシュ設定
@@ -45,7 +41,7 @@ public class RedisConfig {
 	 * @return
 	 */
 	@Bean
-	public RedisCacheConfiguration cacheConfiguration() {
+	RedisCacheConfiguration cacheConfiguration() {
 		return RedisCacheConfiguration
 				.defaultCacheConfig()
 				// TODO: Spring Data Redisのバグのため効いていないっぽい。（https://techhelpnotes.com/java-spring-boot-redis-crud-repository-findbyid-or-findall-always-returns-optional-empty-null/）
@@ -82,13 +78,14 @@ public class RedisConfig {
 //    }
 
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
+    LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
 		String envRedisUrl = System.getenv(envUrl);
 		URI uri = new URI(envRedisUrl);
 
 		String host = uri.getHost();
 		int port = uri.getPort();
-		String password = uri.getUserInfo().split(":", 2)[1];
+
+		String userInfo = uri.getUserInfo();
 
 		LettuceConnectionFactory factory;
 //		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
@@ -103,7 +100,21 @@ public class RedisConfig {
 		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
 		conf.setHostName(host);
 		conf.setPort(port);
-		conf.setPassword(password);
+
+
+		if (!StringUtils.isEmpty(userInfo)) {
+
+			String[] userInfoArr = userInfo.split(":", 2);
+
+			String username = userInfoArr[0];
+			if (!DUMMY_USERNAME.equals(username)) {
+				conf.setUsername(username);
+			}
+
+			String password = userInfoArr[1];
+			conf.setPassword(password);
+		}
+
 		factory = new LettuceConnectionFactory(conf);
 		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
 //		}
@@ -131,7 +142,7 @@ public class RedisConfig {
 	 * @return
 	 */
 	@Bean
-	public RedisTemplate<String, Object> objectRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+	RedisTemplate<String, Object> objectRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         //
@@ -150,7 +161,7 @@ public class RedisConfig {
 	 * @return
 	 */
 	@Bean
-	public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+	RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
 
 		RedisTemplate<byte[], byte[]> template = new RedisTemplate<byte[], byte[]>();
 		template.setConnectionFactory(redisConnectionFactory);
