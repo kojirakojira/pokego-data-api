@@ -114,7 +114,9 @@ public class AwsS3Utils {
 	 */
 	private AmazonS3 auth() {
 
-		AWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretAccessKey);
+		String envAccessKeyId = System.getenv(accessKey);
+		String envSecretAccessKey = System.getenv(secretAccessKey);
+		AWSCredentials awsCreds = new BasicAWSCredentials(envAccessKeyId, envSecretAccessKey);
 
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
 				.withRegion(Regions.US_WEST_1)

@@ -42,8 +42,8 @@ redis:
 # AWS
 aws:
   s3:
-    accessKey: AKIA3GIM5NDHYCBEOTGQ
-    secretAccessKey: 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
+    accessKey: S3_ACCESS_KEY_ID
+    secretAccessKey: S3_SECRET_ACCESS_KEY
     endpoint: https://s3-us-west-1.amazonaws.com/static.brainjuice.jp/
     s3BacketName: static.brainjuice.jp
     suffix: ""
