@@ -4,7 +4,19 @@ server:
   port: ${PORT:8080}
   # フロント側のorigin（区切り文字:"|"）
   client.origin: localhost:3000|brainjuice-app-staging.herokuapp.com|brainjuice.jp
-  
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/POKEMON
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate.ddl-auto: validate
+    properties.hibernate:
+      session_factory.statement_inspector: jp.brainjuice.pokego.business.dao.inspector.SqlInspector
+      use_sql_comments: true
+
 #spring:
 #  datasource:
 #    url: jdbc:postgresql://localhost:5432/pokemon
@@ -30,9 +42,10 @@ logging:
     root: INFO
     org:
       springframework.web.client.RestTemplate: INFO
-#      hibernate:
-#        SQL: INFO
-#        type.descriptor.sql.BasicBinder: INFO
+      hibernate:
+        SQL: DEBUG
+        type.descriptor.sql.BasicBinder: TRACE
+    jp.brainjuice.pokego.business.dao.inspector.SqlInspector: DEBUG
 
 # Redis
 redis:

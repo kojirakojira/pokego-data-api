@@ -3,7 +3,7 @@ package jp.brainjuice.pokego.web.form.res.race;
 import java.util.List;
 
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
-import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.res.Response;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import lombok.Data;

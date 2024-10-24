@@ -19,11 +19,11 @@ import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
 import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
 import jp.brainjuice.pokego.cache.dao.entity.TempView;
-import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
-import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
-import jp.brainjuice.pokego.cache.inmemory.data.TopicPage;
-import jp.brainjuice.pokego.cache.inmemory.data.TopicPokemon;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPage;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPokemon;
 import lombok.extern.slf4j.Slf4j;
 
 /**

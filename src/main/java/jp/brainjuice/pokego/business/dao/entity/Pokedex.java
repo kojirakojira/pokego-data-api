@@ -1,76 +1,90 @@
 package jp.brainjuice.pokego.business.dao.entity;
 
-import javax.annotation.Nonnull;
+import java.io.Serializable;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jp.brainjuice.pokego.business.constant.GenNameEnum;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Pokedex extends Entity {
+@Table(name = "pokedex")
+public class Pokedex implements Serializable {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
+	@Id
+	@Column(name = "pokedex_id", nullable = false, columnDefinition = "bpchar")
 	private String pokedexId;
 
 	/** ポケモン */
-	@Nonnull
+	@Column(nullable = false, length = 20)
 	private String name;
 
 	/** HP */
-	@Nonnull
+	@Column(nullable = false)
 	private int hp;
 
 	/** こうげき */
-	@Nonnull
+	@Column(nullable = false)
 	private int attack;
 
 	/** ぼうぎょ */
-	@Nonnull
+	@Column(nullable = false)
 	private int defense;
 
 	/** とくこう */
-	@Nonnull
+	@Column(name = "special_attack", nullable = false)
 	private int specialAttack;
 
 	/** とくぼう */
-	@Nonnull
+	@Column(name = "special_defense", nullable = false)
 	private int specialDefense;
 
 	/** すばやさ */
-	@Nonnull
+	@Column(nullable = false)
 	private int speed;
 
 	/** 備考 */
+	@Column(nullable = false, length = 256)
 	private String remarks;
 
 	/** タイプ１ */
-	@Nonnull
-	private String type1;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 10)
+	private TypeEnum type1;
 
 	/** タイプ２ */
-	@Nonnull
-	private String type2;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10)
+	private TypeEnum type2;
 
 	/** 世代 */
-	@Nonnull
-	private String gen;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 16)
+	private GenNameEnum gen;
 
 	/** 画像1（アバター用） */
-	@Nonnull
+	@Column(length = 256)
 	private String image1;
 
 	/** 画像2（サムネイル用） */
-	@Nonnull
+	@Column(length = 256)
 	private String image2;
 
 	/** 実装フラグ */
-	@Nonnull
+	@Column(name = "impl_flg", nullable = false, length = 20)
 	private boolean implFlg;
 
 }

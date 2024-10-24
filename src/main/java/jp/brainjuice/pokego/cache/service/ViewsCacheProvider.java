@@ -11,9 +11,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
-import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 
 /**
  * 閲覧情報にアクセスするためのプロバイダクラスです。

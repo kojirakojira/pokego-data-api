@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
-import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
+import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.form.res.elem.PlCp;
 import jp.brainjuice.pokego.web.form.res.pl.PlListResponse;
 

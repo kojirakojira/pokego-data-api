@@ -24,9 +24,9 @@ import jp.brainjuice.pokego.business.service.utils.dto.XTypeElement;
 import jp.brainjuice.pokego.business.service.utils.dto.type.AttackPattern;
 import jp.brainjuice.pokego.business.service.utils.dto.type.BattlePattern;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo.EmphasisEnum;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeCommentMap;
+import jp.brainjuice.pokego.cache.inmemory.TypeChartInfo;
+import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
+import jp.brainjuice.pokego.cache.inmemory.TypeChartInfo.EmphasisEnum;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.type.XTypeResponse;
 

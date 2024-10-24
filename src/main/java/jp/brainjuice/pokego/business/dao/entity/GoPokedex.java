@@ -1,11 +1,18 @@
 package jp.brainjuice.pokego.business.dao.entity;
 
-import javax.annotation.Nonnull;
+import java.io.Serializable;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jp.brainjuice.pokego.business.constant.GenNameEnum;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -14,60 +21,77 @@ import lombok.ToString;
  * @author saibabanagchampa
  *
  */
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @ToString
-public class GoPokedex extends Entity {
+@Table(name = "go_pokedex")
+public class GoPokedex implements Serializable {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
-	@Nonnull
+	@Id
+	@Column(name = "pokedex_id", nullable = false, columnDefinition = "bpchar")
 	private String pokedexId;
 
 	/** ポケモン */
-	@Nonnull
+	@Column(nullable = false, length = 20)
 	private String name;
 
 	/** こうげき */
-	@Nonnull
+	@Column(nullable = false)
 	private int attack;
 
 	/** ぼうぎょ */
-	@Nonnull
+	@Column(nullable = false)
 	private int defense;
 
 	/** HP */
-	@Nonnull
+	@Column(nullable = false)
 	private int hp;
 
 	/** 備考 */
-	@Nonnull
+	@Column(nullable = false, length = 256)
 	private String remarks;
 
 	/** タイプ１ */
-	@Nonnull
-	private String type1;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 10)
+	private TypeEnum type1;
 
 	/** タイプ２ */
-	@Nonnull
-	private String type2;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10)
+	private TypeEnum type2;
 
 	/** 世代 */
-	@Nonnull
-	private String gen;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 16)
+	private GenNameEnum gen;
 
 	/** 画像1（アバター用） */
-	@Nonnull
+	@Column(length = 256)
 	private String image1;
 
 	/** 画像2（サムネイル用） */
-	@Nonnull
+	@Column(length = 256)
 	private String image2;
 
 	/** 実装フラグ */
-	@Nonnull
+	@Column(name = "impl_flg", nullable = false)
 	private boolean implFlg;
+
+	/** リージョン、メガ（図鑑IDの5桁目） */
+	@Column(nullable = false, columnDefinition = "bpchar")
+	private String region;
+
+	/** 強ポケ補正対象か否か */
+	@Column(name = "too_strong", nullable = false)
+	private boolean tooStrong;
+
+	/** 最終進化か否か */
+	@Column(name = "fin_evo", nullable = false)
+	private boolean finEvo;
 
 	/**
 	 * (非 Javadoc)

@@ -18,9 +18,9 @@ public class EvolutionResponse extends ResearchResponse {
 	 * ツリーリストは、ガーメイルのような進化前が複数存在する場合にのみ登場する。
 	 */
 	private String pid;
-	private List<List<List<Hierarchy>>> evoTreeInfo;
+	private List<List<List<Hierarchy>>> evolTreeInfo;
 	private List<String> anotherForms;
 	private List<String> bfAfAotForms;
 	private Map<String, Race> raceMap;
-	private List<String> evoTreeAnnotations;
+	private List<String> evolTreeAnnotations;
 }

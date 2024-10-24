@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.business.service;
 
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
 
 /**

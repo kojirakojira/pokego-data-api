@@ -21,6 +21,11 @@ public class TwoTypeKey {
 	private TypeEnum type1;
 	private TypeEnum type2;
 
+	public TwoTypeKey(String type1, String type2) {
+		setType1(TypeEnum.valueOf(type1));
+		setType2(type2 == null ? null : TypeEnum.valueOf(type2));
+	}
+
 	public String toJpnString() {
 
 		StringBuilder sb = new StringBuilder();

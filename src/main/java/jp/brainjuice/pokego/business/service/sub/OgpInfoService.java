@@ -85,8 +85,8 @@ public class OgpInfoService {
 		}
 
 		GoPokedex gp = goPokedexOp.get();
-		String type1 = BjUtils.replaceEmpty(gp.getType1());
-		String type2 = BjUtils.replaceEmpty(gp.getType2());
+		String type1 = BjUtils.replaceEmpty(gp.getType1().name());
+		String type2 = BjUtils.replaceEmpty(gp.getType2().name());
 		ogpTypeResponse.setType(type1 + (type2.isEmpty() ? "" : ", " + type2));
 	}
 }

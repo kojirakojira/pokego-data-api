@@ -3,8 +3,8 @@ package jp.brainjuice.pokego.cache.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
 
 /**
  * TopicListManagerにアクセスするためのプロバイダクラスです。<br>

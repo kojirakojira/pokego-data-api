@@ -24,9 +24,9 @@ import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
 import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
-import jp.brainjuice.pokego.cache.inmemory.ViewTempInfo;
-import jp.brainjuice.pokego.cache.inmemory.ViewTempList;
-import jp.brainjuice.pokego.cache.inmemory.data.PageNameEnum;
+import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempInfo;
+import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 import lombok.extern.slf4j.Slf4j;
 
 /**

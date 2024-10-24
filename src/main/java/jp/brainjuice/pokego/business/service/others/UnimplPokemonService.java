@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.utils.BjUtils;
@@ -44,7 +43,7 @@ public class UnimplPokemonService {
 							gp.getPokedexId(),
 							gp.getName(),
 							gp.getImage1(),
-							GenNameEnum.valueOf(gp.getGen()).getJpn(),
+							gp.getGen().getJpn(),
 							gp.getRemarks()))
 				.collect(Collectors.toList());
 		res.setUnimplList(simpPokemonList);

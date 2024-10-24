@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.web.form.res.general;
 
-import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterResult;
 import jp.brainjuice.pokego.web.form.res.Response;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

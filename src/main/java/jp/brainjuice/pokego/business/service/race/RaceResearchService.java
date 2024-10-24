@@ -3,21 +3,20 @@ package jp.brainjuice.pokego.business.service.race;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.PokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
-import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.pokeFilter.FilterEnum;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterService;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.race.RaceResponse;
@@ -31,21 +30,20 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
-	private TooStrongPokemonList tooStrongPokemonList;
+	private PokemonFilterService pokemonFilterService;
 
 	private PokemonUtils pokemonUtils;
 
-	@Autowired
 	public RaceResearchService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
-			TooStrongPokemonList tooStrongPokemonList,
+			PokemonFilterService pokemonFilterService,
 			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
-		this.tooStrongPokemonList = tooStrongPokemonList;
+		this.pokemonFilterService = pokemonFilterService;
 		this.pokemonUtils = pokemonUtils;
 	}
 
@@ -63,14 +61,14 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		Race race = new Race(pokedex, goPokedex);
 		res.setRace(race);
 
-		res.setTooStrong(tooStrongPokemonList.contains(pokedexId));
+		res.setTooStrong(goPokedex.isTooStrong());
 
 		// 絞り込み検索
 		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(sv.getFilterValue());
 		res.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// 絞り込み検索の実行有無
-		List<String> filterList = goPokedexRepository.findIdByAny(filterMap);
+		List<String> filterList = pokemonFilterService.findIdByAny(filterMap);
 		int pokedexCnt = (int) goPokedexRepository.count();
 		boolean included = filterList.size() == pokedexCnt || filterList.contains(pokedexId);
 		if (!included) {

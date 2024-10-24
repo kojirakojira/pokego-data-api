@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.dto.evo.Evolution;
-import jp.brainjuice.pokego.business.service.utils.memory.evo.EvoCostType;
-import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
+import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.cache.inmemory.dto.EvoCostType;
 import jp.brainjuice.pokego.web.form.res.elem.EvolutionEdge;
 import jp.brainjuice.pokego.web.form.res.others.EvoCostResponse;
 
@@ -32,7 +31,6 @@ public class EvoCostResearchService {
 		othrCosts
 	}
 
-	@Autowired
 	public EvoCostResearchService(
 			EvolutionProvider evolutionProvider,
 			GoPokedexRepository goPokedexRepository) {
@@ -77,7 +75,7 @@ public class EvoCostResearchService {
 		String bPid = evo.getBeforePokedexId();
 		GoPokedex gp = goPokedexRepository.findById(pid).orElseThrow(() -> new RuntimeException(pid));
 		GoPokedex bGp = goPokedexRepository.findById(bPid).orElseThrow(() -> new RuntimeException(pid));
-		List<String> annoList = costs == Costs.candy ? evolutionProvider.getCosts(evo, Set.of(EvoCostType.candy)) : new ArrayList<>();
+		List<String> annoList = costs == Costs.candy ? evolutionProvider.getCosts(evo, Set.of(EvoCostType.candy), gp.isImplFlg()) : new ArrayList<>();
 
 		EvolutionEdge ee = new EvolutionEdge(pid, bPid, gp, bGp, annoList);
 

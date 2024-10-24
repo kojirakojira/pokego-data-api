@@ -8,21 +8,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexSpecifications.FilterEnum;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.pokeFilter.FilterEnum;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterResult;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterService;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
-import jp.brainjuice.pokego.business.service.utils.dto.PokemonFilterResult;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.TokenizeResult;
-import jp.brainjuice.pokego.business.service.utils.memory.PokemonDictionaryInfo;
+import jp.brainjuice.pokego.cache.inmemory.PokemonDictionaryInfo;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
@@ -38,6 +39,8 @@ public class PokemonSearchService {
 
 	private PokemonDictionaryInfo pokemonDictionaryInfo;
 
+	private PokemonFilterService pokemonFilterService;
+
 	private static final String MSG_RESULTS = "{0}件のポケモンがヒットしました！";
 
 	private static final String MSG_MAYBE = "なんだかよく分からなかったのでいい感じに検索しました！";
@@ -46,14 +49,15 @@ public class PokemonSearchService {
 
 	private static final String MSG_NO_ENTERED = "入力してください。";
 
-	@Autowired
 	public PokemonSearchService(
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
-			PokemonDictionaryInfo pokemonDictionaryInfo) throws PokemonDataInitException {
+			PokemonDictionaryInfo pokemonDictionaryInfo,
+			PokemonFilterService pokemonFilterService) throws PokemonDataInitException {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.pokemonDictionaryInfo = pokemonDictionaryInfo;
+		this.pokemonFilterService = pokemonFilterService;
 
 	}
 
@@ -74,7 +78,7 @@ public class PokemonSearchService {
 		result.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// GoPokedexの取得
-		List<GoPokedex> goPokedexList = goPokedexRepository.findByAny(filterMap);
+		List<GoPokedex> goPokedexList = pokemonFilterService.findByAny(filterMap);
 
 
 		if (goPokedexList.isEmpty()) {
@@ -236,7 +240,8 @@ public class PokemonSearchService {
 		/* 以下、GoPokedexの検索アルゴリズム */
 
 		// ポケモン名からGoPokedexリストを取得
-		List<GoPokedex> goPokedexList = goPokedexRepository.findByNameIn(pokemonList);
+		List<GoPokedex> goPokedexList = goPokedexRepository.findByNameLikeIn(
+				pokemonList.stream().map(p -> MessageFormat.format("%{0}%", p)).toList());
 
 		// groupListが空でない場合、goPokedexListにがっちゃんこする。
 		if (!groupList.isEmpty()) {
@@ -256,7 +261,7 @@ public class PokemonSearchService {
 					.filter(o -> 2 < o.length())
 					.collect(Collectors.toList());
 
-			goPokedexList = goPokedexRepository.findByRemarksIn(otherTmpList);
+			goPokedexList = goPokedexRepository.findByRemarksContaining(otherTmpList);
 
 		} else if (!otherList.isEmpty()) {
 			// ポケモン名以外の名詞が存在する場合
@@ -274,7 +279,8 @@ public class PokemonSearchService {
 			}
 		}
 
-		return goPokedexList;
+		// 昇順に並び替えて返却
+		return goPokedexList.stream().sorted(PokemonEditUtils.getPokedexComparator(1)).toList();
 	}
 
 	/**
@@ -288,7 +294,7 @@ public class PokemonSearchService {
 		// 2文字単位で分割する。
 		List<String> nameList = toFuzzyNameList(name);
 		// 検索
-		return goPokedexRepository.findByNameIn(nameList);
+		return goPokedexRepository.findByNameLikeIn(nameList);
 
 	}
 

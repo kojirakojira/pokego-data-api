@@ -15,7 +15,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
-import jp.brainjuice.pokego.business.service.utils.memory.PokemonStatisticsInfo;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.req.race.RaceDiffRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.Race;

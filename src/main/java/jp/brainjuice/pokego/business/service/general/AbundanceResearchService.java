@@ -1,22 +1,19 @@
 package jp.brainjuice.pokego.business.service.general;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggsIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketIvRange;
-import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
 import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
 import jp.brainjuice.pokego.web.form.res.general.AbundanceResponse;
@@ -34,16 +31,11 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 
 	private CatchCpUtils catchCpUtils;
 
-	private TooStrongPokemonList tooStrongPokemonList;
-
-	@Autowired
 	public AbundanceResearchService(
 			PokemonGoUtils pokemonGoUtils,
-			CatchCpUtils catchCpUtils,
-			TooStrongPokemonList tooStrongPokemonList) {
+			CatchCpUtils catchCpUtils) {
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.catchCpUtils = catchCpUtils;
-		this.tooStrongPokemonList = tooStrongPokemonList;
 	}
 
 	@Override
@@ -77,15 +69,15 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setEgg(new CatchCp(egg, null));
 
 		// 強ポケ補正の有無
-		res.setTooStrong(tooStrongPokemonList.contains(goPokedex.getPokedexId()));
+		res.setTooStrong(goPokedex.isTooStrong());
 
 		// ポケモンの色
 		// タイプ1の色を設定
-		final TypeColorEnum c1 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType1());
+		final TypeColorEnum c1 = TypeColorEnum.valueOf(goPokedex.getType1());
 		res.setType1Color(new Color(c1.getR(), c1.getG(), c1.getB()));
 		// タイプ2の色を設定
-		if (!StringUtils.isEmpty(goPokedex.getType2())) {
-			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType2());
+		if (goPokedex.getType2() != null) {
+			final TypeColorEnum c2 = TypeColorEnum.valueOf(goPokedex.getType2().name());
 			res.setType2Color(new Color(c2.getR(), c2.getG(), c2.getB()));
 		}
 

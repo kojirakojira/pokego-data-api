@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.business.service.utils.dto;
 
 import java.util.List;
 
-import jp.brainjuice.pokego.business.service.utils.memory.PokemonDictionaryInfo;
+import jp.brainjuice.pokego.cache.inmemory.PokemonDictionaryInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

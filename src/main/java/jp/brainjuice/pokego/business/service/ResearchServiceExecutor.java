@@ -2,14 +2,14 @@ package jp.brainjuice.pokego.business.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.general.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
@@ -22,7 +22,6 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 	private PokemonSearchService pokemonSearchService;
 
-	@Autowired
 	public ResearchServiceExecutor(
 			GoPokedexRepository goPokedexRepository,
 			PokemonSearchService pokemonSearchService) {
@@ -52,6 +51,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 	 * @param researchService
 	 * @throws BadRequestException
 	 */
+	@Transactional(readOnly = true)
 	public void execute(ResearchRequest req, T res, ResearchService<T> researchService) throws BadRequestException {
 
 		if (req.getPid() != null) {

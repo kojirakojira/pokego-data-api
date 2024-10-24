@@ -13,17 +13,17 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 public class PokemonEditUtils {
 
 	/** ノーマル */
-	private static final String N = "N";
+	public static final String N = "N";
 	/** ガラル地方 */
-	private static final String G = "G";
+	public static final String G = "G";
 	/** アローラ地方 */
-	private static final String A = "A";
+	public static final String A = "A";
 	/** ヒスイ地方 */
-	private static final String H = "H";
+	public static final String H = "H";
 	/** パルデア地方 */
-	private static final String P = "P";
+	public static final String P = "P";
 	/** メガシンカ */
-	private static final String M = "M";
+	public static final String M = "M";
 
 	/**
 	 * 亜種コードの順序
@@ -190,7 +190,7 @@ public class PokemonEditUtils {
 	/**
 	 * 図鑑IDを並び替える用のComparatorを取得します。
 	 *
-	 * @param order 正の数の場合：昇順、負の数の場合：降順
+	 * @param order 0以上の場合：昇順、負の数の場合：降順
 	 * @return
 	 */
 	public static Comparator<GoPokedex> getPokedexComparator(int order) {
@@ -199,14 +199,14 @@ public class PokemonEditUtils {
 			// 図鑑№の昇順
 			final int pokedexNo1 = getPokedexNo(o1.getPokedexId());
 			final int pokedexNo2 = getPokedexNo(o2.getPokedexId());
-			if (pokedexNo1 < pokedexNo2) return order > 0 ? -1 : 1;
-			if (pokedexNo1 > pokedexNo2) return order > 0 ? 1 : -1;
+			if (pokedexNo1 < pokedexNo2) return order >= 0 ? -1 : 1;
+			if (pokedexNo1 > pokedexNo2) return order >= 0 ? 1 : -1;
 
 			// 亜種コードの昇順
 			final String subspecies1 = getSubspecies(o1.getPokedexId());
 			final String subspecies2 = getSubspecies(o2.getPokedexId());
-			if (subspeciesMap.get(subspecies1) < subspeciesMap.get(subspecies2)) return order > 0 ? -1 : 1;
-			if (subspeciesMap.get(subspecies1) > subspeciesMap.get(subspecies2)) return order > 0 ? 1 : -1;
+			if (subspeciesMap.get(subspecies1) < subspeciesMap.get(subspecies2)) return order >= 0 ? -1 : 1;
+			if (subspeciesMap.get(subspecies1) > subspeciesMap.get(subspecies2)) return order >= 0 ? 1 : -1;
 
 			// 連番の昇順
 			return getSerial(o1.getPokedexId()) - getSerial(o2.getPokedexId());

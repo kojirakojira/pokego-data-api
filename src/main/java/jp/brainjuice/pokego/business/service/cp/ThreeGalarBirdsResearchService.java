@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.CpIvCalculator;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.WildIvRange;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;

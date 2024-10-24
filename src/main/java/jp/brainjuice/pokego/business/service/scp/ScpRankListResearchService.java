@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.ResearchService;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
 import jp.brainjuice.pokego.web.form.res.scp.ScpRankListResponse;
 

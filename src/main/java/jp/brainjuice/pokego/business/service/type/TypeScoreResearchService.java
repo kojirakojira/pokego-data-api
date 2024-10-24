@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
-import jp.brainjuice.pokego.business.service.utils.dto.SearchValue;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeChartInfo;
-import jp.brainjuice.pokego.business.service.utils.memory.TypeCommentMap;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.cache.inmemory.TypeChartInfo;
+import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
 import jp.brainjuice.pokego.web.form.res.type.TypeScoreResponse;
 
 @Service
@@ -27,8 +27,8 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 	@Override
 	public void exec(SearchValue sv, TypeScoreResponse res) {
 		GoPokedex goPokedex = sv.getGoPokedex();
-		TypeEnum type1 = TypeEnum.getType(goPokedex.getType1());
-		TypeEnum type2 = TypeEnum.getType(goPokedex.getType2());
+		TypeEnum type1 = goPokedex.getType1();
+		TypeEnum type2 = goPokedex.getType2();
 
 		exec(type1, type2, res);
 		res.setExecutedType(false); // ポケモンから実行

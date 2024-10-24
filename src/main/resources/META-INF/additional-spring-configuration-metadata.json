@@ -1,0 +1,57 @@
+{"properties": [
+  {
+    "name": "spring.jpa.properties.hibernate.use_sql_comments",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.jpa.properties.hibernate.use_sql_comments'"
+  },
+  {
+    "name": "spring.jpa.properties.hibernate.session_factory.statement_inspector",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.jpa.properties.hibernate.session_factory.statement_inspector'"
+  },
+  {
+    "name": "server.client.origin",
+    "type": "java.lang.String",
+    "description": "A description for 'server.client.origin'"
+  },
+  {
+    "name": "server.name",
+    "type": "java.lang.String",
+    "description": "A description for 'server.name'"
+  },
+  {
+    "name": "jwt.uuid",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.uuid'"
+  },
+  {
+    "name": "redis.env.url",
+    "type": "java.lang.String",
+    "description": "A description for 'redis.env.url'"
+  },
+  {
+    "name": "aws.s3.access-key",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.access-key'"
+  },
+  {
+    "name": "aws.s3.secretAccessKey",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.secretAccessKey'"
+  },
+  {
+    "name": "aws.s3.endpoint",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.endpoint'"
+  },
+  {
+    "name": "aws.s3.s3BacketName",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.s3BacketName'"
+  },
+  {
+    "name": "aws.s3.suffix",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.suffix'"
+  }
+]}

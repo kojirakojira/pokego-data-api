@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
+import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
 import lombok.Getter;
 

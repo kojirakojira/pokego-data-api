@@ -76,7 +76,7 @@ public class ChargedAttackRepository extends InMemoryRepository<ChargedAttack, S
 			throw new PokemonDataInitException(e);
 		}
 
-		log.info(MessageFormat.format("Moves(Charged Attack) table generated!! (Referenced file: {0}{1})", awsS3Utils.getEndpoint(), fileName));
+		log.info(MessageFormat.format("Moves(Charged Attack) table generated!! (Referenced file: {0})", fileName));
 	}
 
 	/*

@@ -11,8 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.memory.CpMultiplierMap;
-import jp.brainjuice.pokego.business.service.utils.memory.evo.EvolutionProvider;
+import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 
 @SpringBootTest
 class PokemonApplicationTests {
@@ -31,7 +31,7 @@ class PokemonApplicationTests {
 
 	@Test
 	public void testCase() {
-		List<String> lastList = evolutionProvider.getLastInEvoTree("0412N01");
+		List<String> lastList = evolutionProvider.getLeaf("0412N01");
 
 		System.out.println(lastList);
 	}

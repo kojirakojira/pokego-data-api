@@ -3,24 +3,23 @@ package jp.brainjuice.pokego.utils.external;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-
-import jp.brainjuice.pokego.utils.exception.FailedToSaveThumbnailException;
 import lombok.Getter;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Component
 public class AwsS3Utils {
@@ -44,49 +43,16 @@ public class AwsS3Utils {
 	@Getter
 	private String suffix;
 
-	/**
-	 * AWS S3にファイルを保存します。<br>
-	 * pathを指定する場合は、後ろに"/"を付けてください。
-	 *
-	 * @param multiFile
-	 * @param path ファイルを保存するパス
-	 * @return
-	 * @throws FailedToSaveThumbnailException
-	 */
-//	@Async
-	public String upload(MultipartFile multiFile, String path) throws FailedToSaveThumbnailException {
+	public Resource download(String path) {
 
-		if (multiFile == null) {
-			return null;
-		}
+		S3Client client = auth();
 
-		AmazonS3 client = auth();
-
-		path = path + multiFile.getOriginalFilename();
-
-		try {
-			// ヘッダにバイト数をセット
-			ObjectMetadata om = new ObjectMetadata();
-			om.setContentLength(multiFile.getBytes().length);
-
-			final PutObjectRequest putRequest = new PutObjectRequest(s3BacketName, path, multiFile.getInputStream(), om);
-
-			client.putObject(putRequest);
-
-		} catch (Exception e) {
-			throw new FailedToSaveThumbnailException(e);
-		}
-
-		return path;
-	}
-
-	public S3Object download(String path) {
-
-		AmazonS3 client = auth();
-
-		GetObjectRequest getReq = new GetObjectRequest(s3BacketName, path);
-		S3Object object = client.getObject(getReq);
-		return object;
+		GetObjectRequest req = GetObjectRequest.builder()
+				.bucket(s3BacketName)
+				.key(path)
+				.build();
+		ResponseInputStream<GetObjectResponse> inputStream = client.getObject(req);
+		return new InputStreamResource(inputStream);
 	}
 
 	/**
@@ -97,13 +63,16 @@ public class AwsS3Utils {
 	 * @param prefix
 	 * @return
 	 */
-	public List<S3ObjectSummary> getImageList(String prefix) {
+	public List<S3Object> getImageList(String prefix) {
 
-		AmazonS3 client = auth();
+		S3Client client = auth();
 
-		ObjectListing objListing = client.listObjects(s3BacketName, prefix);
-		List<S3ObjectSummary> objList = objListing.getObjectSummaries();
+		ListObjectsRequest listObjects = ListObjectsRequest.builder()
+				.bucket(s3BacketName)
+				.build();
 
+		ListObjectsResponse res = client.listObjects(listObjects);
+		List<S3Object> objList = res.contents();
 		return objList;
 	}
 
@@ -112,15 +81,16 @@ public class AwsS3Utils {
 	 *
 	 * @return
 	 */
-	private AmazonS3 auth() {
+	private S3Client auth() {
 
 		String envAccessKeyId = System.getenv(accessKey);
 		String envSecretAccessKey = System.getenv(secretAccessKey);
-		AWSCredentials awsCreds = new BasicAWSCredentials(envAccessKeyId, envSecretAccessKey);
+		AwsCredentials credentials = AwsBasicCredentials.create(envAccessKeyId, envSecretAccessKey);
+		AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
 
-		AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-				.withRegion(Regions.US_WEST_1)
-				.withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+		S3Client s3Client = S3Client.builder()
+				.region(Region.US_WEST_1)
+				.credentialsProvider(credentialsProvider)
 				.build();
 
 		return s3Client;

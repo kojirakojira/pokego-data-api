@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.sub.OgpInfoService;
 import jp.brainjuice.pokego.business.service.sub.PrevNextPokemonService;
-import jp.brainjuice.pokego.cache.inmemory.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.TopicPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
+import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;

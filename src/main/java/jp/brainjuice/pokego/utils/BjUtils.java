@@ -214,7 +214,7 @@ public final class BjUtils {
 	 */
 	public static String replaceEmpty(String value) {
 
-		if (StringUtils.isEmpty(value)) {
+		if (value == null) {
 			return "";
 		}
 		return value;

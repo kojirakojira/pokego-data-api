@@ -1,0 +1,74 @@
+package jp.brainjuice.pokego.business.dao.init;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import jp.brainjuice.pokego.business.dao.EvolutionRepository;
+import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.Evolution;
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
+import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 整合性チェック。GoPokedexとEvolutionは1対1で紐づく。
+ */
+@Component("EvolutionConsistencyCheck")
+@Slf4j
+public class EvolutionConsistencyCheck {
+
+	private static final String NOT_EXISTS_MSG = "pokemon.csvに定義したポケモンがpokemon-evolution.csvに定義されていません。{0}";
+
+	public EvolutionConsistencyCheck(
+			GoPokedexRepository goPokedexRepository,
+			EvolutionRepository evolutionRepository) throws PokemonDataInitException {
+		check(goPokedexRepository, evolutionRepository);
+	}
+
+	private void check(
+			GoPokedexRepository goPokedexRepository,
+			EvolutionRepository evolutionRepository) throws PokemonDataInitException {
+
+		try {
+
+			List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
+			List<Evolution> evolutionList = evolutionRepository.findAll();
+			checkAllExists(evolutionList, goPokedexList);
+
+
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			throw new PokemonDataInitException(e);
+		}
+	}
+
+	/**
+	 * GoPokedexに生成されたポケモンが、すべてEvolutionに定義されていることを確認する。
+	 *
+	 * @param evoList
+	 * @param goPokedexList
+	 * @throws PokemonDataInitException
+	 */
+	private void checkAllExists(List<Evolution> evoList, List<GoPokedex> goPokedexList) throws PokemonDataInitException {
+
+		List<String> evoPidList = evoList.stream()
+				.map(Evolution::getPokedexId)
+				.collect(Collectors.toList());
+
+		List<GoPokedex> notExistsGpList = goPokedexList.stream()
+				.filter(gp -> !evoPidList.contains(gp.getPokedexId()))
+				.collect(Collectors.toList());
+
+		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
+		if (!notExistsGpList.isEmpty()) {
+			throw new PokemonDataInitException(
+					MessageFormat.format(
+							NOT_EXISTS_MSG,
+							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));
+		}
+	}
+}

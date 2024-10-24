@@ -212,9 +212,13 @@ public class Type {
 		@Getter
 		private final int b;
 
-		public static TypeColorEnum getTypeColorForJpn(String jpn) {
-			return TypeColorEnum.valueOf((TypeEnum.getType(jpn)).name());
+		public static TypeColorEnum valueOf(TypeEnum type) {
+			return TypeColorEnum.valueOf(type.name());
 		}
+
+//		public static TypeColorEnum getTypeColorForJpn(String jpn) {
+//			return TypeColorEnum.valueOf((TypeEnum.getType(jpn)).name());
+//		}
 
 	}
 }

@@ -10,34 +10,36 @@ import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MdcXRequestIdFilter implements Filter {
 
 	/** logback内から取得する際のキー */
-    public static final String KEY = "x-request-id";
+	public static final String KEY = "x-request-id";
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        LogUtils.debug("MdcXRequestIdFilter Initialized...");
-    }
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		log.info("MdcXRequestIdFilter Initialized...");
+	}
 
-    @Override
-    public void doFilter(
-    		ServletRequest servletRequest,
-    		ServletResponse servletResponse,
-    		FilterChain filterChain) throws IOException, ServletException {
+	@Override
+	public void doFilter(
+			ServletRequest servletRequest,
+			ServletResponse servletResponse,
+			FilterChain filterChain) throws IOException, ServletException {
 
-    	//UUIDの発行
-        UUID uuid = UUID.randomUUID();
+		//UUIDの発行
+		UUID uuid = UUID.randomUUID();
 
-        try {
-        	// MDCに追加
-            MDC.put(KEY, uuid.toString());
-            filterChain.doFilter(servletRequest, servletResponse);
-        } finally {
-            MDC.remove(KEY);
-        }
-    }
+		try {
+			// MDCに追加
+			MDC.put(KEY, uuid.toString());
+			filterChain.doFilter(servletRequest, servletResponse);
+		} finally {
+			MDC.remove(KEY);
+		}
+	}
 
 	@Override
 	public void destroy() {

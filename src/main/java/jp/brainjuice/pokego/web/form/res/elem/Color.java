@@ -1,8 +1,7 @@
 package jp.brainjuice.pokego.web.form.res.elem;
 
-import org.apache.commons.lang3.StringUtils;
-
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,18 +23,18 @@ public class Color {
 	 */
 	public Color(GoPokedex goPokedex) {
 
-		final String type1 = goPokedex.getType1();
-		final String type2 = goPokedex.getType2();
+		final TypeEnum type1 = goPokedex.getType1();
+		final TypeEnum type2 = goPokedex.getType2();
 
-		final TypeColorEnum c1 = TypeColorEnum.getTypeColorForJpn(type1);
-		if (StringUtils.isEmpty(type2)) {
+		final TypeColorEnum c1 = TypeColorEnum.valueOf(type1);
+		if (type2 == null) {
 			// タイプ１のみの場合。
 			setR(c1.getR());
 			setG(c1.getG());
 			setB(c1.getB());
 		} else {
 			// タイプ２がある場合。
-			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(type2);
+			final TypeColorEnum c2 = TypeColorEnum.valueOf(type2);
 			setR((c1.getR() + c2.getR()) / 2);
 			setG((c1.getG() + c2.getG()) / 2);
 			setB((c1.getB() + c2.getB()) / 2);

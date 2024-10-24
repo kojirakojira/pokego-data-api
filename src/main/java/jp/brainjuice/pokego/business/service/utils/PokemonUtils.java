@@ -1,15 +1,18 @@
 package jp.brainjuice.pokego.business.service.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import jp.brainjuice.pokego.business.dao.RaceExceptionsRepository;
+import jp.brainjuice.pokego.business.dao.TooStrongRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
-import jp.brainjuice.pokego.business.service.utils.memory.TooStrongPokemonList;
+import jp.brainjuice.pokego.business.dao.entity.RaceExceptions;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PokemonUtils {
 
-	private TooStrongPokemonList tooStrongPokemonList;
+	private TooStrongRepository tooStrongRepository;
 
 	private PokemonGoUtils pokemonGoUtils;
 
 	private Map<String, Object> raceExMap;
-
-	private static final String FILE_NAME = "pokemon/race-exceptions.yml";
 
 	// 強ポケ補正の基準になるPL
 	private static final String TOO_STRONG_PL = "50.5";
@@ -39,19 +40,22 @@ public class PokemonUtils {
 	 * @param pokemonGoUtils
 	 * @throws PokemonDataInitException
 	 */
-	public PokemonUtils (PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
+	public PokemonUtils (
+			PokemonGoUtils pokemonGoUtils,
+			RaceExceptionsRepository raceExceptionsRepository) throws PokemonDataInitException {
 		this.pokemonGoUtils = pokemonGoUtils;
 
-		init();
+		init(raceExceptionsRepository);
 	}
 
 	@Autowired
-	public PokemonUtils(TooStrongPokemonList tooStrongPokemonList,
-			PokemonGoUtils pokemonGoUtils) throws PokemonDataInitException {
-		this.tooStrongPokemonList = tooStrongPokemonList;
+	public PokemonUtils(TooStrongRepository tooStrongRepository,
+			PokemonGoUtils pokemonGoUtils,
+			RaceExceptionsRepository raceExceptionsRepository) throws PokemonDataInitException {
+		this.tooStrongRepository = tooStrongRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 
-		init();
+		init(raceExceptionsRepository);
 	}
 
 	/**
@@ -73,17 +77,34 @@ public class PokemonUtils {
 	 *
 	 * @throws PokemonDataInitException
 	 */
-	@SuppressWarnings("unchecked")
-	public void init() throws PokemonDataInitException {
+	public void init(RaceExceptionsRepository raceExceptionsRepository) throws PokemonDataInitException {
 
-		raceExMap = new HashMap<String, Object>();
+
 		try {
-			raceExMap.putAll(BjUtils.loadYaml(FILE_NAME, Map.class));
+			List<RaceExceptions> reList =  raceExceptionsRepository.findAll();
 
-			// 未設定の場合、空を設定する。
-			Stream.of(RaceEx.values()).forEach(raceEx -> {
-				raceExMap.putIfAbsent(raceEx.name(), new HashMap<>());
-			});
+			raceExMap = reList.stream()
+					.map(re -> Map.entry(re.getPokedexId(), re))
+					.collect(Collectors.toMap(
+							Map.Entry::getKey,
+							entry -> {
+								Map<String, Object> map = new HashMap<>();
+								RaceExceptions re = entry.getValue();
+								if (re.getAttack() != null) {
+									map.put(RaceEx.ATTACK.name(), re.getAttack());
+								}
+								if (re.getDefense() != null) {
+									map.put(RaceEx.DEFENSE.name(), re.getDefense());
+								}
+								if (re.getHp() != null) {
+									map.put(RaceEx.HP.name(), re.getHp());
+								}
+								if (re.getNotExistsOrigin() != null) {
+									map.put(RaceEx.NOT_EXISTS_ORIGIN.name(), re.getNotExistsOrigin());
+								}
+								return map;
+							}));
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PokemonDataInitException(e);
@@ -124,8 +145,8 @@ public class PokemonUtils {
 		goPokedex.setType1(pokedex.getType1());
 		goPokedex.setType2(pokedex.getType2());
 		goPokedex.setGen(pokedex.getGen());
-		goPokedex.setImage1(pokedex.getImage1());
-		goPokedex.setImage2(pokedex.getImage2());
+		goPokedex.setImage1(BjUtils.replaceEmpty(pokedex.getImage1()));
+		goPokedex.setImage2(BjUtils.replaceEmpty(pokedex.getImage2()));
 		goPokedex.setImplFlg(pokedex.isImplFlg());
 
 		return goPokedex;
@@ -154,7 +175,7 @@ public class PokemonUtils {
 			double correctionValue = PokemonEditUtils.isMega(pokedexId)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
 			// 個体値が高い個体の補正後は四捨五入
-			baseHp = tooStrongPokemonList.contains(pokedexId) ? Math.round(baseHp * correctionValue) : baseHp;
+			baseHp = tooStrongRepository.existsById(pokedexId) ? Math.round(baseHp * correctionValue) : baseHp;
 		}
 
 		// 小数点以下切り捨て
@@ -199,7 +220,7 @@ public class PokemonUtils {
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedexId)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
-			baseAttack = tooStrongPokemonList.contains(pokedexId) ? baseAttack * correctionValue : baseAttack;
+			baseAttack = tooStrongRepository.existsById(pokedexId) ? baseAttack * correctionValue : baseAttack;
 		}
 
 		return (int) Math.round(baseAttack);
@@ -251,7 +272,7 @@ public class PokemonUtils {
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedexId)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
-			baseDefense = tooStrongPokemonList.contains(pokedexId) ? baseDefense * correctionValue : baseDefense;
+			baseDefense = tooStrongRepository.existsById(pokedexId) ? baseDefense * correctionValue : baseDefense;
 		}
 
 		return (int) Math.round(baseDefense);
