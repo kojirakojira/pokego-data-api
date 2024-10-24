@@ -33,5 +33,6 @@ build/
 .vscode/
 
 ### Docker ###
-docker-local/
-!docker-local/postgres/init
+docker-local/postgres/*
+docker-local/volumes/*
+!docker-local/postgres/init/
