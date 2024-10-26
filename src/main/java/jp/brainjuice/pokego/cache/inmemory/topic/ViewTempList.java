@@ -28,12 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ViewTempList extends ArrayList<ViewTempInfo> {
 
-	private static final String VIEW_ADD_START_LOG = "Start add ViewTempList. Page(SearchPattern): {0}, PokedexId: {1}, IP: {2}";
+	private static final String VIEW_ADD_START_LOG = "Start add ViewTempList.(Add instance on memory.) Page(SearchPattern): {0}, PokedexId: {1}, IP: {2}";
 	private static final String VIEW_ADD_END_LOG = "End add ViewTempList. ({0})";
 	private static final String VIEW_ADD_END_LOG_ADDED = "Added!!";
 	private static final String VIEW_ADD_END_LOG_NOT_ADDED = "Not added.";
 
-	private static final String VIEW_REMOVE_START_LOG = "> Start remove ViewTempList.";
+	private static final String VIEW_REMOVE_START_LOG = "> Start remove ViewTempList.(Remove instance on memory.)";
 	private static final String VIEW_REMOVE_END_LOG = "> End remove ViewTempList. ({0})";
 	private static final String VIEW_REMOVE_END_LOG_REMOVED = "removed!!";
 	private static final String VIEW_REMOVE_END_LOG_NOT_REMOVED = "Not removed.";

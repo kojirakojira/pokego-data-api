@@ -3,8 +3,8 @@ package jp.brainjuice.pokego.cache;
 public enum BjRedisEnum {
 
 	/** イベントID */
-	pageViews,
+	pageTempView,
 	/** ポケモンごとの閲覧数 */
-	pokemonViews,
+	pokemonTempViews,
 
 }

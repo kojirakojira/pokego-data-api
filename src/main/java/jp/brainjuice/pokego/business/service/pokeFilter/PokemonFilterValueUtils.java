@@ -17,52 +17,12 @@ import jp.brainjuice.pokego.business.dao.GoPokedexSpecifications;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.elem.DispFilterParam;
 
 /**
  * ポケモンの絞り込み機能を使用するためのユーティリティクラス
  */
 public class PokemonFilterValueUtils {
-
-	/**
-	 * PokemonFilterValueを生成する。
-	 *
-	 * @param req
-	 * @return
-	 */
-	public static PokemonFilterValue createPokemonFilterValue(ResearchRequest req) {
-
-		PokemonFilterValue filterValue = new PokemonFilterValue();
-		// タイプ１
-		filterValue.setType1(
-				StringUtils.isEmpty(req.getType1()) ? null : TypeEnum.valueOf(req.getType1()));
-		// タイプ２
-		filterValue.setType2(
-				StringUtils.isEmpty(req.getType2()) ? null : TypeEnum.valueOf(req.getType2()));
-		// 最終進化
-		filterValue.setFinalEvo(req.isFinEvo());
-		filterValue.setNegaFinalEvo(req.isNegaFinEvo());
-		// メガシンカ
-		filterValue.setMega(req.isMega());
-		filterValue.setNegaMega(req.isNegaMega());
-		// 実装済み
-		filterValue.setImpled(req.isImpled());
-		filterValue.setNegaImpled(req.isNegaImpled());
-		// 強ポケ補正
-		filterValue.setTooStrong(req.isTooStrong());
-		filterValue.setNegaTooStrong(req.isNegaTooStrong());
-		// 地域
-		filterValue.setRegionList(
-				req.getRegion() == null ? null : req.getRegion().stream().map(RegionEnum::valueOf).collect(Collectors.toList()));
-		filterValue.setNegaRegion(req.isNegaRegion());
-		// 世代
-		filterValue.setGenList(
-				req.getGen() == null ? null : req.getGen().stream().map(GenNameEnum::valueOf).collect(Collectors.toList()));
-		filterValue.setNegaGen(req.isNegaGen());
-
-		return filterValue;
-	}
 
 	/**
 	 * リクエストから取得した絞り込み用の検索値をPokedexFilterInfoRepositoryで検索する用のマップに変換する。

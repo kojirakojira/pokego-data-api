@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 話題の○○のリストを管理するクラスです。<br>
- * Redisサーバからメモリ上のTopic○○に反映させます。
+ * Redisサーバからメモリ上のTopic○○Listに反映させます。
  *
  * @author saibabanagchampa
  * @see ViewsCacheProvider
@@ -49,12 +48,11 @@ public class TopicListManager {
 
 	private TopicPokemonList topicPokemonList;
 
-	private static final String START_MSG_UPDATE_TOPIC_LIST = "Start update TopicList schedule. TopicPageList: {0}, TopicPokemonList: {1}";
+	private static final String START_MSG_UPDATE_TOPIC_LIST = "Start update TopicList schedule(Redis -> memory). TopicPageList: {0}, TopicPokemonList: {1}";
 	private static final String END_MSG_UPDATE_TOPIC_LIST = "End update TopicList schedule. TopicPageList: {0}, TopicPokemonList: {1}";
 
 	private static final String MSG_TEMP_VIEW_LIST = "> TempViewList: {0}";
 
-	@Autowired
 	public TopicListManager(
 			PageTempViewRedisRepository pageTempViewRedisRepository,
 			PokemonTempViewRedisRepository pokemonTempViewRedisRepository,

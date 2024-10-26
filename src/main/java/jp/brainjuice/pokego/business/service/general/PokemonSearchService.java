@@ -14,8 +14,9 @@ import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.pokeFilter.FilterEnum;
+import jp.brainjuice.pokego.business.service.pokeFilter.GoPokedexFilterService;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterResult;
-import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterService;
+import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValue;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
@@ -39,7 +40,7 @@ public class PokemonSearchService {
 
 	private PokemonDictionaryInfo pokemonDictionaryInfo;
 
-	private PokemonFilterService pokemonFilterService;
+	private GoPokedexFilterService goPokedexFilterService;
 
 	private static final String MSG_RESULTS = "{0}件のポケモンがヒットしました！";
 
@@ -53,11 +54,11 @@ public class PokemonSearchService {
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
 			PokemonDictionaryInfo pokemonDictionaryInfo,
-			PokemonFilterService pokemonFilterService) throws PokemonDataInitException {
+			GoPokedexFilterService goPokedexFilterService) throws PokemonDataInitException {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.pokemonDictionaryInfo = pokemonDictionaryInfo;
-		this.pokemonFilterService = pokemonFilterService;
+		this.goPokedexFilterService = goPokedexFilterService;
 
 	}
 
@@ -72,13 +73,13 @@ public class PokemonSearchService {
 		PokemonFilterResult result = new PokemonFilterResult();
 
 		// 絞り込み検索値の取得
-		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(PokemonFilterValueUtils.createPokemonFilterValue(req));
+		Map<FilterEnum, FilterParam> filterMap = PokemonFilterValueUtils.mapping(new PokemonFilterValue(req));
 
 		// 画面表示用の絞り込み検索値のセット
 		result.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// GoPokedexの取得
-		List<GoPokedex> goPokedexList = pokemonFilterService.findByAny(filterMap);
+		List<GoPokedex> goPokedexList = goPokedexFilterService.findByAny(filterMap);
 
 
 		if (goPokedexList.isEmpty()) {

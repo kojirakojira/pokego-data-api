@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValue;
-import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,7 +41,7 @@ public class SearchValue {
 		setGoPokedex(goPokedex);
 
 		// 絞り込み検索値のセット
-		setFilterValue(PokemonFilterValueUtils.createPokemonFilterValue(req));
+		setFilterValue(new PokemonFilterValue(req));
 
 		// Requestの値をParamsMapにセット
 		ParamsMap paramsMap = new ParamsMap();

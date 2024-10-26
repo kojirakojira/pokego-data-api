@@ -15,20 +15,29 @@ import jp.brainjuice.pokego.business.dao.GoPokedexSpecifications;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 
+/**
+ * GoPokedexを絞り込むために使用するサービス
+ */
 @Service
-public class PokemonFilterService {
+public class GoPokedexFilterService {
 
 	private GoPokedexRepository goPokedexRepository;
 
 	private GoPokedexSpecifications goPokedexSpecifications;
 
-	public PokemonFilterService(
+	public GoPokedexFilterService(
 			GoPokedexRepository goPokedexRepository,
 			GoPokedexSpecifications goPokedexSpecifications) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.goPokedexSpecifications = goPokedexSpecifications;
 	}
 
+	/**
+	 * 指定した条件で絞り込み、GoPokedexを検索する。
+	 *
+	 * @param filterMap
+	 * @return
+	 */
 	public List<GoPokedex> findByAny(Map<FilterEnum, FilterParam> filterMap) {
 
 		if (filterMap == null || filterMap.isEmpty()) {
@@ -41,6 +50,12 @@ public class PokemonFilterService {
 		return goPokedex;
 	}
 
+	/**
+	 * 指定した条件で絞り込み、pokedexIdを検索する。
+	 *
+	 * @param filterMap
+	 * @return
+	 */
 	public List<String> findIdByAny(Map<FilterEnum, FilterParam> filterMap) {
 
 		if (filterMap == null || filterMap.isEmpty()) {
@@ -55,6 +70,12 @@ public class PokemonFilterService {
 				.toList();
 	}
 
+	/**
+	 * Specificationを生成する。
+	 *
+	 * @param filterMap
+	 * @return
+	 */
 	public Specification<GoPokedex> generateSpecification(Map<FilterEnum, FilterParam> filterMap) {
 
 		if (filterMap == null || filterMap.isEmpty()) {
@@ -80,20 +101,16 @@ public class PokemonFilterService {
 				spec = appendAndExpression(spec, gpSpec.tooStrongEqual(!negate));
 				break;
 			case gen:
-				if (value instanceof List) {
-					@SuppressWarnings("unchecked")
-					List<GenNameEnum> genList = (List<GenNameEnum>) value;
-					Specification<GoPokedex> inSpec = negate ? gpSpec.genNotIn(genList) : gpSpec.genIn(genList);
-					spec = appendAndExpression(spec, inSpec);
-				}
+				@SuppressWarnings("unchecked")
+				List<GenNameEnum> genList = (List<GenNameEnum>) value;
+				Specification<GoPokedex> genInSpec = negate ? gpSpec.genNotIn(genList) : gpSpec.genIn(genList);
+				spec = appendAndExpression(spec, genInSpec);
 				break;
 			case region:
-				if (value instanceof List) {
-					@SuppressWarnings("unchecked")
-					List<RegionEnum> genList = (List<RegionEnum>) value;
-					Specification<GoPokedex> inSpec = negate ? gpSpec.regionNotIn(genList) : gpSpec.regionIn(genList);
-					spec = appendAndExpression(spec, inSpec);
-				}
+				@SuppressWarnings("unchecked")
+				List<RegionEnum> regionList = (List<RegionEnum>) value;
+				Specification<GoPokedex> regionInSpec = negate ? gpSpec.regionNotIn(regionList) : gpSpec.regionIn(regionList);
+				spec = appendAndExpression(spec, regionInSpec);
 				break;
 			case twoType:
 				@SuppressWarnings("unchecked")
@@ -110,6 +127,13 @@ public class PokemonFilterService {
 		return spec;
 	}
 
+	/**
+	 * WHERE句、AND句を状態に応じて連結させる。
+	 *
+	 * @param base
+	 * @param append
+	 * @return
+	 */
 	private Specification<GoPokedex> appendAndExpression(Specification<GoPokedex> base, Specification<GoPokedex> append) {
 		return base == null ? Specification.where(append) : base.and(append);
 	}

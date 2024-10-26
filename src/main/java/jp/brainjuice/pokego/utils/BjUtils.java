@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -129,7 +130,8 @@ public final class BjUtils {
 	}
 
 	/**
-	 * 環境変数にNOW_DATE="yyyy-MM-dd HH:mm:ss"を設定した場合、現在日付を変更できます。
+	 * 現在日時を取得する。
+	 * ※環境変数にBRAINJUICE_NOW_DATE="yyyy-MM-dd HH:mm:ss"を設定した場合、現在日付を変更できる。
 	 *
 	 * @return
 	 */
@@ -141,6 +143,16 @@ public final class BjUtils {
 			now = parseDate(env, sdfYmdhms);
 		}
 		return now;
+	}
+
+	/**
+	 * 現在日付（時間を含まない）を取得する。日付を扱う場合は必ずこのメソッドもしくは{@link BjUtils#now()}を使用すること。
+	 *
+	 * @return
+	 */
+	public static LocalDate nowLocalDate() {
+
+		return toLocalDateTime(now()).toLocalDate();
 	}
 
 	/**
@@ -157,6 +169,22 @@ public final class BjUtils {
 		}
 
 		return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+	}
+
+	/**
+	 * LocalDateTime→Date変換<br>
+	 * （LocalDateTime→ZonedDateTime→Instant→Date）
+	 *
+	 * @param localDateTime
+	 * @return
+	 */
+	public static Date toDate(LocalDate localDate) {
+
+		if (localDate == null) {
+			return null;
+		}
+
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 	/**

@@ -1,7 +1,5 @@
 package jp.brainjuice.pokego.cache.service;
 
-import java.util.Map;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -111,29 +109,6 @@ public class ViewsCacheProvider {
 		viewsTempList.add(page, pokedexId, ip);
 
 	}
-
-	/**
-	 * ページごとの閲覧数をRedisサーバからすべて取得します。
-	 *
-	 * @return
-	 */
-	public Map<PageNameEnum, Integer> findPageViewsAll() {
-
-		Map<PageNameEnum, Integer> rtnMap = viewsCacheManager.findPageViewsAll();
-		return rtnMap;
-	}
-
-	/**
-	 * ポケモンごとの閲覧数をRedisサーバからすべて取得します。
-	 *
-	 * @return
-	 */
-	public Map<String, Integer> findPokemonViewsAll() {
-
-		Map<String, Integer> rtnMap = viewsCacheManager.findPokemonViewsAll();
-		return rtnMap;
-	}
-
 
 	/**
 	 * リリース後、古いキャッシュが残り不備が発生する場合、このAPIを使用する。（ページ一時情報用）

@@ -12,7 +12,7 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.pokeFilter.FilterEnum;
-import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterService;
+import jp.brainjuice.pokego.business.service.pokeFilter.GoPokedexFilterService;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
@@ -30,7 +30,7 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private PokemonStatisticsInfo pokemonStatisticsInfo;
 
-	private PokemonFilterService pokemonFilterService;
+	private GoPokedexFilterService goPokedexFilterService;
 
 	private PokemonUtils pokemonUtils;
 
@@ -38,12 +38,12 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
-			PokemonFilterService pokemonFilterService,
+			GoPokedexFilterService goPokedexFilterService,
 			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
-		this.pokemonFilterService = pokemonFilterService;
+		this.goPokedexFilterService = goPokedexFilterService;
 		this.pokemonUtils = pokemonUtils;
 	}
 
@@ -68,19 +68,22 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		res.setFilteredItems(PokemonFilterValueUtils.convDisp(filterMap));
 
 		// 絞り込み検索の実行有無
-		List<String> filterList = pokemonFilterService.findIdByAny(filterMap);
-		int pokedexCnt = (int) goPokedexRepository.count();
-		boolean included = filterList.size() == pokedexCnt || filterList.contains(pokedexId);
-		if (!included) {
-			// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいない場合
-			res.setMessage("選択したポケモンが絞り込み条件の対象外でした。絞り込みは実行されませんでした。\n");
-			res.setMsgLevel(MsgLevelEnum.warn);
+		boolean included = true;
+		List<String> filterList = null;
+		if (filterMap.size() > 0) {
+			filterList = goPokedexFilterService.findIdByAny(filterMap);
+			included = filterList.contains(pokedexId);
+			if (!included) {
+				// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいない場合
+				res.setMessage("選択したポケモンが絞り込み条件の対象外でした。絞り込みは実行されませんでした。\n");
+				res.setMsgLevel(MsgLevelEnum.warn);
+			}
 		}
 		res.setIncluded(included);
 
 		// 統計情報
 		PokemonStatisticsInfo statistics;
-		if (filterList.size() != pokedexCnt && filterList.contains(pokedexId)) {
+		if (filterMap.size() > 0 && filterList.contains(pokedexId)) {
 			// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいる場合
 
 			// 最終進化のみで絞り込む場合は、最終進化用の統計情報を再生成する。

@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.cache.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
@@ -8,7 +7,7 @@ import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
 
 /**
  * TopicListManagerにアクセスするためのプロバイダクラスです。<br>
- * Redisサーバからメモリ上のTopic○○に反映させます。
+ * Redisサーバからメモリ上のTopic○○ListWに反映させます。
  *
  * @author saibabanagchampa
  * @see TopicListManager
@@ -18,7 +17,6 @@ public class TopicListProvider {
 
 	private TopicListManager topicListManager;
 
-	@Autowired
 	public TopicListProvider(TopicListManager topicListManager) {
 		this.topicListManager = topicListManager;
 	}

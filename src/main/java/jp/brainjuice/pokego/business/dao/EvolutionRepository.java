@@ -86,7 +86,7 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 
 
 	/**
-	 * 指定したポケモンの最終進化系をすべて取得する。（メガシンカは含まない。）
+	 * 指定したポケモンの最終進化をすべて取得する。（メガシンカは含まない。）
 	 *
 	 * @param pid
 	 * @return
@@ -107,13 +107,7 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 	@Meta(comment = "find leaf by id")
 	List<String> findLeafById(@Param("pid") String pid);
 
-	/**
-	 * 指定したpokedexIdの進化ツリーを取得する。<br>
-	 * 進化ツリー全体のpokedexId, beforePokedexIdを取得する。
-	 *
-	 * @param pid
-	 * @return
-	 */
+
 	@Query(value = "WITH RECURSIVE tree AS ("
 			+ "  SELECT pokedex_id, before_pokedex_id"
 			+ "    FROM evolution"
@@ -139,7 +133,13 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 			+ "  SELECT * FROM tree", nativeQuery = true)
 	@Meta(comment = "find evol tree pk by id")
 	List<Object[]> getEvolTreePkByIdRaw(@Param("pid") String pid);
-
+	/**
+	 * 指定したpokedexIdの進化ツリーを取得する。<br>
+	 * 進化ツリー全体のpokedexId, beforePokedexIdを取得する。
+	 *
+	 * @param pid
+	 * @return
+	 */
 	default List<EvolutionPk> getEvolTreePkById(String pid) {
 		return getEvolTreePkByIdRaw(pid).stream()
 				.map(objs -> new EvolutionPk((String) objs[0], (String) objs[1]))
@@ -148,7 +148,7 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 
 	/**
 	 * 指定したpokedexIdの進化ツリーを取得する。<br>
-	 * 進化ツリー全体のpokedexId, beforePokedexIdを取得する。
+	 * ガラルニャースの場合、ガラルニャースとニャイキングを取得する。
 	 *
 	 * @param pid
 	 * @return
@@ -184,7 +184,8 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 
 
 	/**
-	 * 1系統のすべてのポケモンを取得する。
+	 * 1系統のすべてのポケモンを取得する。<br>
+	 * ニャースの場合、ニャース（全リージョン）、ペルシアン、ニャイキング。全て。
 	 * rootのポケモンの図鑑Noを取得して、そこからleaf側に探索していく。
 	 *
 	 * @param pid

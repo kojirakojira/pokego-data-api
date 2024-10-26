@@ -2,35 +2,44 @@ package jp.brainjuice.pokego.cache.service;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.cache.BjRedisEnum;
 import jp.brainjuice.pokego.cache.dao.PageTempViewRedisRepository;
+import jp.brainjuice.pokego.cache.dao.PageViewRepository;
 import jp.brainjuice.pokego.cache.dao.PokemonTempViewRedisRepository;
+import jp.brainjuice.pokego.cache.dao.PokemonViewRepository;
 import jp.brainjuice.pokego.cache.dao.entity.PageTempView;
+import jp.brainjuice.pokego.cache.dao.entity.PageView;
 import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
+import jp.brainjuice.pokego.cache.dao.entity.PokemonView;
 import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempInfo;
 import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
-import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
+import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Redisサーバ上の閲覧情報を管理するためのクラスです。
+ * 閲覧情報を管理するためのクラスです。<br>
+ * Redisに一時敵に保存した閲覧情報は、最終的にPostgreSQL上に保存します。<br>
+ * ＜流れ＞<br>
+ * 1.ページを閲覧する→メモリに保存(ViewTempList)
+ * 2.15分ごとにRedisとPostgresに送信する。
+ * 3.15分ごとに、15分以上経過した閲覧情報がないか確認し、存在した場合削除する。
+ *
+ * TopicListでは、2.の手順で追加したRedisサーバの情報を参照する。<br>
+ * （Redisでは存続期間を設定していて、一定時間経った閲覧情報から順に削除されていく。）
  *
  * @author saibabanagchampa
  *
@@ -41,7 +50,9 @@ public class ViewsCacheManager {
 
 	private ViewTempList viewTempList;
 
-	private RedisTemplate<String, String> redisTemplate;
+	private PageViewRepository pageViewRepository;
+
+	private PokemonViewRepository pokemonViewRepository;
 
 	/** Redis上の一時的なページ閲覧情報を管理するためのリポジトリ */
 	private PageTempViewRedisRepository pageTempViewRedisRepository;
@@ -51,84 +62,26 @@ public class ViewsCacheManager {
 	private static final String START_MSG_SCHEDULE = "Start ViewInfo(page, pokemon) schedule.";
 	private static final String END_MSG_SCHEDULE = "End ViewInfo(page. pokemon) schedule.";
 
-	private static final String START_MSG_INCR_VIEWS_COUNT_INFO = "> Start incr ViewsCount.";
+	private static final String START_MSG_INCR_VIEWS_COUNT_INFO = "> Start incr ViewsCount.(memory -> PostgreSQL)";
 	private static final String END_MSG_INCR_VIEWS_COUNT_INFO = "> End incr ViewsCount. page:{0}, pokemon:{1}";
 
-	private static final String START_MSG_SEND_VIEW_TEMP_INFO = "> Start send ViewTempInfo.";
+	private static final String START_MSG_SEND_VIEW_TEMP_INFO = "> Start send ViewTempInfo.(memory -> Redis)";
 	private static final String END_MSG_SEND_VIEW_TEMP_INFO = "> End send ViewTempInfo. page:{0}, pokemon:{1}";
 
-	private static final String DELETE_ALL_TEMP_PAGE_INFO = "Delete All PageTempView.";
-	private static final String DELETE_ALL_TEMP_POKEMON_INFO = "Delete All PokemonTempView.";
+	private static final String DELETE_ALL_TEMP_PAGE_INFO = "Delete All PageTempView.(Redis)";
+	private static final String DELETE_ALL_TEMP_POKEMON_INFO = "Delete All PokemonTempView.(Redis)";
 
-	@Autowired
 	public ViewsCacheManager(
 			ViewTempList viewTempList,
-			RedisTemplate<String, String> redisTemplate,
+			PageViewRepository pageViewRepository,
+			PokemonViewRepository pokemonViewRepository,
 			PageTempViewRedisRepository pageTempViewRedisRepository,
 			PokemonTempViewRedisRepository pokemonTempViewRedisRepository) {
 		this.viewTempList = viewTempList;
-		this.redisTemplate = redisTemplate;
+		this.pokemonViewRepository = pokemonViewRepository;
+		this.pageViewRepository = pageViewRepository;
 		this.pageTempViewRedisRepository = pageTempViewRedisRepository;
 		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
-	}
-
-	/**
-	 * ページごとの閲覧数をRedisサーバからすべて取得します。
-	 *
-	 * @return
-	 */
-	Map<PageNameEnum, Integer> findPageViewsAll() {
-
-		// キーの一覧を取得する(command="keys pageViews:*")
-		Set<String> pageViewKeys = redisTemplate.keys(BjRedisEnum.pageViews.name().concat(":*"));
-
-		Map<String, Integer> rtnMap = getViewsMap(pageViewKeys);
-
-		// キーをString型からPageNameEnum型に変換して返却する。
-		return rtnMap.entrySet()
-				.stream()
-				.collect(Collectors.toMap(
-						entry -> PageNameEnum.valueOf(entry.getKey()),
-						Map.Entry::getValue));
-	}
-
-	/**
-	 * ポケモンごとの閲覧数をRedisサーバからすべて取得します。
-	 *
-	 * @return
-	 */
-	Map<String, Integer> findPokemonViewsAll() {
-
-		// キーの一覧を取得する(command="keys pokemonViews:*")
-		Set<String> pageViewKeys = redisTemplate.keys(BjRedisEnum.pokemonViews.name().concat(":*"));
-
-		Map<String, Integer> rtnMap = getViewsMap(pageViewKeys);
-
-		return rtnMap;
-	}
-
-	/**
-	 * Keyの一覧をもとにRedisサーバからValueを取得します。
-	 *
-	 * @param pageViewKeys
-	 * @return
-	 */
-	private Map<String, Integer> getViewsMap(Set<String> pageViewKeys) {
-
-		Map<String, Integer> rtnMap = new HashMap<>();
-
-		// Keyのリスト（順番を担保）
-		List<String> keyList = new ArrayList<String>(pageViewKeys);
-		// Valueのリスト（multiGetはコレクションの順番ごとに取得される。返却値の型はArrayList。）
-		// command="mget key1 key2..."
-		List<String> views = redisTemplate.opsForValue().multiGet(pageViewKeys);
-
-		// 順番ごとに2つのリストをループさせMapを作成する。
-		for (int i = 0; i < keyList.size(); i++) {
-			rtnMap.put(keyList.get(i), Integer.parseInt(views.get(i)));
-		}
-
-		return rtnMap;
 	}
 
 	/**
@@ -155,18 +108,18 @@ public class ViewsCacheManager {
 		// 集計対象の閲覧情報の取得
 		List<ViewTempInfo> aggregateTargetList = viewTempList.getAggregateTargetList();
 
-		// 閲覧数の加算
-		incrViewsCount(aggregateTargetList);
-
 		// キャッシュサーバへの閲覧情報の一時保存
 		sendViewsTempInfo(aggregateTargetList);
+
+		// 閲覧数の加算
+		incrViewsCount(aggregateTargetList);
 
 		log.info(END_MSG_SCHEDULE);
 
 	}
 
 	/**
-	 * キャッシュサーバ(Redisサーバ)上のページ、ポケモンごとの閲覧数を加算する。
+	 * PostgreSQL上のページ、ポケモンごとの閲覧数を加算する。
 	 *
 	 * ページのRedis上のキー名：pageViews
 	 * ポケモンのRedis上のキー名：pokemonViews
@@ -206,15 +159,16 @@ public class ViewsCacheManager {
 
 		});
 
-		/** 閲覧数をインクリメント */
-		// 現在のRedis上の閲覧数を加算する。
-		ValueOperations<String, String> vOps = redisTemplate.opsForValue();
-		pageViewMap.forEach((k, v) -> {
-			vOps.increment(BjRedisEnum.pageViews.name() + ":" + k, (long) v.size());
-		});
-		pokemonViewMap.forEach((k, v) -> {
-			vOps.increment(BjRedisEnum.pokemonViews.name() + ":" + k, (long) v.size());
-		});
+
+		/** 閲覧数を加算する */
+		// 今日の閲覧数を取得する。
+		Date today = BjUtils.toDate(BjUtils.nowLocalDate());
+		List<PageView> pageViewList = pageViewRepository.findAllByYmd(today);
+		List<PokemonView> pokemonViewList = pokemonViewRepository.findAllByYmd(today);
+
+		// 加算する。
+		pageViewRepository.saveAll(createUpdatePageRecords(pageViewMap, pageViewList, today));
+		pokemonViewRepository.saveAll(createUpdatePokemonRecords(pokemonViewMap, pokemonViewList, today));
 
 		log.debug(MessageFormat.format(END_MSG_INCR_VIEWS_COUNT_INFO, pageViewMap, pokemonViewMap));
 
@@ -255,6 +209,77 @@ public class ViewsCacheManager {
 		pokemonTempViewRedisRepository.saveAll(pokemonTempViewList);
 
 		log.info(MessageFormat.format(END_MSG_SEND_VIEW_TEMP_INFO, pageTempViewList, pokemonTempViewList));
+	}
+
+	/**
+	 * 一時閲覧数から加算したPageViewの一覧を生成する。
+	 *
+	 * @param pageViewMap
+	 * @param pageViewList
+	 * @param today
+	 * @return
+	 */
+	private List<PageView> createUpdatePageRecords(Map<String, Set<ViewTempInfo>> pageViewMap, List<PageView> pageViewList, Date today) {
+
+		return pageViewMap.entrySet().stream()
+				.map(entry -> {
+					String page = entry.getKey();
+					int viewCount = entry.getValue().size(); // 加算する閲覧数
+
+					Optional<PageView> pvOpt = pageViewList.stream()
+							.filter(pvRecords -> page.equals(pvRecords.getPage())).findAny();
+					PageView pv;
+					if (pvOpt.isPresent()) {
+						// 既に閲覧数のレコードが存在する。
+						pv = pvOpt.get();
+						pv.setViewCount(pv.getViewCount() + viewCount); // 加算する
+					} else {
+						// 該当のpageのレコードは今日初。
+						pv = new PageView();
+						pv.setPage(page);
+						pv.setYmd(today);
+						pv.setViewCount(viewCount); // 閲覧数をセット
+					}
+					return pv;
+				})
+				.toList();
+	}
+
+	/**
+	 * 一時閲覧数から加算したPokemonViewの一覧を生成する。
+	 *
+	 * @param pokemonViewMap
+	 * @param pokemonViewList
+	 * @param today
+	 * @return
+	 */
+	private List<PokemonView> createUpdatePokemonRecords(
+			Map<String, Set<ViewTempInfo>> pokemonViewMap,
+			List<PokemonView> pokemonViewList,
+			Date today) {
+
+		return pokemonViewMap.entrySet().stream()
+				.map(entry -> {
+					String pid = entry.getKey();
+					int viewCount = entry.getValue().size(); // 加算する閲覧数
+
+					Optional<PokemonView> pvOpt = pokemonViewList.stream()
+							.filter(pvRecords -> pid.equals(pvRecords.getPokedexId())).findAny();
+					PokemonView pv;
+					if (pvOpt.isPresent()) {
+						// 既に閲覧数のレコードが存在する。
+						pv = pvOpt.get();
+						pv.setViewCount(pv.getViewCount() + viewCount); // 加算する
+					} else {
+						// 該当のpageのレコードは今日初。
+						pv = new PokemonView();
+						pv.setPokedexId(pid);
+						pv.setYmd(today);
+						pv.setViewCount(viewCount); // 閲覧数をセット
+					}
+					return pv;
+				})
+				.toList();
 	}
 
 	/**

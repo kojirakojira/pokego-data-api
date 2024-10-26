@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import jp.brainjuice.pokego.cache.BjRedisEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ import lombok.Data;
  * 3日で期限切れにする。（過去3日間での閲覧数を求めるために使用する。）
  *
  * @author saibabanagchampa
+ * @see BjRedisEnum.pokemonTempView
  *
  */
 @Data
