@@ -15,4 +15,4 @@ CREATE TABLE evolution (
   CONSTRAINT evolution_pk PRIMARY KEY(pokedex_id, before_pokedex_id)
 );
 
-CREATE INDEX evolution_before_pid_pk ON evolution (before_pokedex_id);
+CREATE INDEX IF NOT EXISTS evolution_before_pid_pk ON evolution (before_pokedex_id);
