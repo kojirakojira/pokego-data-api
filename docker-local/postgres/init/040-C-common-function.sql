@@ -9,7 +9,7 @@ RETURNS boolean AS $$
   BEGIN
     RETURN SUBSTRING(v_pokedex_id, 5, 1) = 'M';
   END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
 
 /**
  * メガシンカ前のポケモンのpokedex_idを取得する。
@@ -23,7 +23,7 @@ RETURNS bpchar AS $$
     IF is_mega(v_pokedex_id) THEN
       RETURN SUBSTRING(v_pokedex_id, 1, 4) || 'N01';
     END IF;
-    
+
     RETURN v_pokedex_id;
   END;
 $$ LANGUAGE plpgsql;

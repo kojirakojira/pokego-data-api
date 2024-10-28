@@ -1208,3 +1208,5 @@ INSERT INTO pokedex (pokedex_id, name, hp, attack, defense, special_attack, spec
     ('1009N01', 'ウネルミナモ', 99, 83, 91, 125, 83, 109, '', 'water', 'dragon', 'g9', null, null, FALSE),
     ('1010N01', 'テツノイサハ', 90, 130, 88, 70, 108, 104, '', 'grass', 'psychic', 'g9', null, null, FALSE)
 ;
+
+COMMIT;

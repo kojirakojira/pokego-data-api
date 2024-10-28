@@ -7,8 +7,8 @@
  * v_correct_flg: 強ポケ補正フラグ
  */
 CREATE OR REPLACE FUNCTION calc_go_hp(
-  v_pokedex_id bpchar, 
-  v_hp integer, 
+  v_pokedex_id bpchar,
+  v_hp integer,
   v_correct_flg boolean)
 RETURNS INTEGER AS $$
   DECLARE
