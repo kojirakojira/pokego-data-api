@@ -4,20 +4,29 @@
 
 ## 環境構築方法
 
-前提として、このプロジェクトでは以下8つの環境変数を設定する必要がある。
+前提として、このプロジェクトでは以下の環境変数を設定する。
 
 - REDIS_URL
-  - 例：redis://h:{password}@localhost:6379
-  - Redis用のURLを指定する。username,passwordは省略可能。usernameに"h"を指定した場合は無視される。（Redisのver3, 4らへんの仕様上そうしている。）
+  1. 例：redis://h:{password}@localhost:6379
+  1. Redis用のURLを指定する。username,passwordは省略可能。usernameに"h"を指定した場合は無視される。（Redisのver3, 4らへんの仕様上そうしている。）
+- DATABASE_URL
+  1. 以下を設定する。"jdbc:"は不要。<br> postgres://\<username\>:\<password\>@\<hostname\>:\<port\>/\<dbname\>
+- DATABASE_USERNAME（省略可能）
+  1. 設定した場合、優先的に参照される。（DATABASE_URL内のusernameは無視される。）
+- DATABASE_PASSWORD（省略可能）
+  1. 設定した場合、優先的に参照される。（DATABASE_URL内のpasswordは無視される。）
 - S3_ACCESS_KEY_ID
-  - AWS S3サーバにアクセス可能なIAMユーザのアクセスキーを指定する。
+  1. AWS S3サーバにアクセス可能なIAMユーザのアクセスキーを指定する。
 - S3_SECRET_ACCESS_KEY
-  - AWS S3サーバにアクセス可能なIAMユーザのシークレットアクセスキーを指定する。
+  1. AWS S3サーバにアクセス可能なIAMユーザのシークレットアクセスキーを指定する。
 - SPRING_PROFILES_ACTIVE（省略可能）
-  - staging または productionを指定する。
-  - 指定しない場合はデフォルトのappliation.ymlを参照する。
+  1. staging または productionを指定する。
+  1. 指定しない場合はデフォルトのappliation.ymlを参照する。
 - JWT_UUID（省略可能）
-  - UUIDを生成して指定する。現状、JWT認証を使用する機能はまだ設けていないため設定しなくてもOK。
+  1. UUIDを生成して指定する。現状、JWT認証を使用する機能はまだ設けていないため設定しなくてもOK。
+- BRAINJUICE_NOW_DATE（省略可能）
+  1. 日付を変更したい場合に指定する。
+  1. フォーマット："yyyy-MM-dd HH:mm:ss"
 
 ### ローカル環境
 

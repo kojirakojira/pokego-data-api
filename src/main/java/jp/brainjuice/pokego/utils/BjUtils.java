@@ -40,6 +40,8 @@ public final class BjUtils {
 	public static final String sdfHm = "HH:mm";
 	public static final String dirFormat = "yyyyMMddHHmmss";
 
+	private static final String BRAINJUICE_NOW_DATE = "BRAINJUICE_NOW_DATE";
+
 	/** ひらカタ漢字は全角に、ＡＢＣ１２３は半角に */
 	private static Transliterator transAnyNFKC = Transliterator.getInstance("Any-NFKC");
 
@@ -139,7 +141,7 @@ public final class BjUtils {
 	public static Date now() {
 
 		Date now = new Date();
-		String env = System.getenv("BRAINJUICE_NOW_DATE");
+		String env = System.getenv(BRAINJUICE_NOW_DATE);
 		if (!StringUtils.isEmpty(env)) {
 			now = parseDate(env, sdfYmdhms);
 		}
