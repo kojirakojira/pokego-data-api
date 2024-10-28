@@ -59,7 +59,7 @@ public class JpaConfig {
         // 「postgresql://<username>:<password>@<host>:<port>/<dbname>」の形式でも指定可能。
         String user = !StringUtils.isEmpty(username) ? username
         		: (queryMap.get("user") != null ? queryMap.get("user") : dbUri.getUserInfo().split(":")[0]);
-        String pass = !StringUtils.isEmpty(password) ? username
+        String pass = !StringUtils.isEmpty(password) ? password
         		: (queryMap.get("password") != null ? queryMap.get("password") : dbUri.getUserInfo().split(":")[1]);
 
         String jdbcUrl = MessageFormat.format(
