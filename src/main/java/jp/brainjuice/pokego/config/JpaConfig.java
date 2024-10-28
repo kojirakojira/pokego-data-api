@@ -14,8 +14,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.ibm.icu.text.MessageFormat;
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @EnableJpaRepositories(basePackages = { "jp.brainjuice.pokego.business.dao", "jp.brainjuice.pokego.cache.dao.jpa" })
+@Slf4j
 public class JpaConfig {
 
 	@Value("${spring.datasource.url}")
@@ -36,6 +39,8 @@ public class JpaConfig {
 	 */
 	@Bean
     DataSource dataSource() throws URISyntaxException {
+
+		log.info(MessageFormat.format("databaseUrl: {0}, username: {1}, password: {2}", databaseUrl, username, password));
 
         URI dbUri = new URI(databaseUrl);
 
