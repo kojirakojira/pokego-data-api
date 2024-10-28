@@ -83,9 +83,7 @@ public class AwsS3Utils {
 	 */
 	private S3Client auth() {
 
-		String envAccessKeyId = System.getenv(accessKey);
-		String envSecretAccessKey = System.getenv(secretAccessKey);
-		AwsCredentials credentials = AwsBasicCredentials.create(envAccessKeyId, envSecretAccessKey);
+		AwsCredentials credentials = AwsBasicCredentials.create(accessKey, secretAccessKey);
 		AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
 
 		S3Client s3Client = S3Client.builder()

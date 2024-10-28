@@ -25,8 +25,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.ibm.icu.text.Transliterator;
 
-import jp.brainjuice.pokego.filter.log.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class BjUtils {
 
 	public static final Locale locale = Locale.JAPAN;
@@ -95,7 +96,7 @@ public final class BjUtils {
 			date = sdf.parse(str);
 		} catch (ParseException pe) {
 			date = null;
-			LogUtils.getLog(BjUtils.class).debug("Conversion failed. Text: " + str, pe);
+			log.debug("Conversion failed. Text: " + str, pe);
 		}
 		return date;
 	}

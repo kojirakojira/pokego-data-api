@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache.dao.entity;
+package jp.brainjuice.pokego.cache.dao.redis.entity;
 
 import java.io.Serializable;
 import java.util.Date;

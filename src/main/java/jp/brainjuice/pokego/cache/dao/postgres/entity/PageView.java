@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache.dao.entity;
+package jp.brainjuice.pokego.cache.dao.postgres.entity;
 
 import java.util.Date;
 

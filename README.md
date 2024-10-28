@@ -4,18 +4,20 @@
 
 ## 環境構築方法
 
-前提として、このプロジェクトでは以下4つの環境変数を設定する必要がある。
+前提として、このプロジェクトでは以下8つの環境変数を設定する必要がある。
 
 - REDIS_URL
-   - 例：redis://h:{password}@localhost:6379
-   - Redis用のURLを指定する。username,passwordは省略可能。usernameに"h"を指定した場合は無視される。（Redisのver3, 4らへんの仕様上そうしている。）
+  - 例：redis://h:{password}@localhost:6379
+  - Redis用のURLを指定する。username,passwordは省略可能。usernameに"h"を指定した場合は無視される。（Redisのver3, 4らへんの仕様上そうしている。）
 - S3_ACCESS_KEY_ID
-   - AWS S3サーバにアクセス可能なIAMユーザのアクセスキーを指定する。
+  - AWS S3サーバにアクセス可能なIAMユーザのアクセスキーを指定する。
 - S3_SECRET_ACCESS_KEY
-   - AWS S3サーバにアクセス可能なIAMユーザのシークレットアクセスキーを指定する。
+  - AWS S3サーバにアクセス可能なIAMユーザのシークレットアクセスキーを指定する。
 - SPRING_PROFILES_ACTIVE（省略可能）
-    - staging または productionを指定する。
-    - 指定しない場合はデフォルトのappliation.ymlを参照する。
+  - staging または productionを指定する。
+  - 指定しない場合はデフォルトのappliation.ymlを参照する。
+- JWT_UUID（省略可能）
+  - UUIDを生成して指定する。現状、JWT認証を使用する機能はまだ設けていないため設定しなくてもOK。
 
 ### ローカル環境
 

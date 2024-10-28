@@ -7,33 +7,19 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/POKEMON
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL:postgresql://localhost:5432/POKEMON}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: validate
     properties.hibernate:
       session_factory.statement_inspector: jp.brainjuice.pokego.business.dao.inspector.SqlInspector
       use_sql_comments: true
+    open-in-view: false
 
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/pokemon
-#    username: postgres
-#    password: password
-#    driverClassName: org.postgresql.Driver
-
-#spring:
-#  datasource:
-#    url: jdbc:h2:./pokemonH2Db
-#    driverClassName: org.h2.Driver
-#    initialization-mode: never
-#    schema: classpath:schema.sql
-#    data: classpath:data.sql
-#  h2.console.enabled: false
     
-jwt.uuid: 00855fa1-4320-5cfb-0396-597a06af3ff2
+jwt.uuid: ${JWT_UUID:}
 
 # ロギング
 logging:
@@ -41,22 +27,22 @@ logging:
   level:
     root: INFO
     org:
-      springframework.web.client.RestTemplate: INFO
+      "[springframework.web.client.RestTemplate]": INFO
       hibernate:
         SQL: DEBUG
-        type.descriptor.sql.BasicBinder: TRACE
-    jp.brainjuice.pokego.business.dao.inspector.SqlInspector: DEBUG
+        "[type.descriptor.sql.BasicBinder]": TRACE
+    "[jp.brainjuice.pokego.business.dao.inspector.SqlInspector]": DEBUG
 
 # Redis
 redis:
   env:
-    url: REDIS_URL
+    url: ${REDIS_URL}
 
 # AWS
 aws:
   s3:
-    accessKey: S3_ACCESS_KEY_ID
-    secretAccessKey: S3_SECRET_ACCESS_KEY
+    accessKey: ${S3_ACCESS_KEY_ID}
+    secretAccessKey: ${S3_SECRET_ACCESS_KEY}
     endpoint: https://s3-us-west-1.amazonaws.com/static.brainjuice.jp/
     s3BacketName: static.brainjuice.jp
     suffix: -test

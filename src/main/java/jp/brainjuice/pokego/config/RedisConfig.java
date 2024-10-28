@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache;
+package jp.brainjuice.pokego.config;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,6 +15,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableCaching
-//@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
+@EnableRedisRepositories(basePackages = { "jp.brainjuice.pokego.cache.dao.redis" })
 @Slf4j
 public class RedisConfig {
 
@@ -79,8 +80,7 @@ public class RedisConfig {
 
     @Bean
     LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
-		String envRedisUrl = System.getenv(envUrl);
-		URI uri = new URI(envRedisUrl);
+		URI uri = new URI(envUrl);
 
 		String host = uri.getHost();
 		int port = uri.getPort();
@@ -116,7 +116,7 @@ public class RedisConfig {
 		}
 
 		factory = new LettuceConnectionFactory(conf);
-		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", envUrl, envRedisUrl));
+		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", "REDIS_URL", envUrl));
 //		}
 
 		return factory;

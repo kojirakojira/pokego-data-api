@@ -1,8 +1,8 @@
-package jp.brainjuice.pokego.cache.dao;
+package jp.brainjuice.pokego.cache.dao.redis;
 
 import org.springframework.data.repository.CrudRepository;
 
-import jp.brainjuice.pokego.cache.dao.entity.PokemonTempView;
+import jp.brainjuice.pokego.cache.dao.redis.entity.PokemonTempView;
 
 /**
  *

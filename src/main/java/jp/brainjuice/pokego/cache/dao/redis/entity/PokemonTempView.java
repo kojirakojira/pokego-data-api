@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache.dao.entity;
+package jp.brainjuice.pokego.cache.dao.redis.entity;
 
 import java.util.Date;
 
@@ -10,23 +10,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * ページの閲覧情報<br>
+ * ポケモンの閲覧情報<br>
  * Redisサーバ上に保存するためのBeanクラス。<br>
  * 3日で期限切れにする。（過去3日間での閲覧数を求めるために使用する。）
  *
  * @author saibabanagchampa
- * @see BjRedisEnum.pageTempView
+ * @see BjRedisEnum.pokemonTempView
  *
  */
 @Data
 @AllArgsConstructor
-@RedisHash(value = "pageTempView", timeToLive = 259200L)
-public class PageTempView implements TempView {
+@RedisHash(value = "pokemonTempView", timeToLive = 259200L)
+public class PokemonTempView implements TempView {
 
-	/** id = (page + UUID) */
+	/** id = (pokedexId + UUID) */
 	@Id
 	private String id;
-	/** =page =SearchPattern */
+	/** =pokedexId */
 	private String key;
 	private String ip;
 	private Date viewTime;

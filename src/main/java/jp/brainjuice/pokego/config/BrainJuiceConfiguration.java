@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.filter;
+package jp.brainjuice.pokego.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,16 +6,16 @@ import org.springframework.context.annotation.Configuration;
 import jp.brainjuice.pokego.filter.interceptor.BrainJuiceInterceptor;
 
 /**
- * InterceptorをBean定義
+ * Bean定義
  *
- * @author amuka
+ * @author saibabanagchampa
  *
  */
 @Configuration
 public class BrainJuiceConfiguration {
 
 	@Bean
-	public BrainJuiceInterceptor brainJuiceHandlerInterceptor() throws Exception {
+	BrainJuiceInterceptor brainJuiceHandlerInterceptor() throws Exception {
 		return new BrainJuiceInterceptor();
 	}
 

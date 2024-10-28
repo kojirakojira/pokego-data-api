@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache.dao;
+package jp.brainjuice.pokego.cache.dao.jpa;
 
 import java.util.Date;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Meta;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import jp.brainjuice.pokego.cache.dao.entity.PageView;
+import jp.brainjuice.pokego.cache.dao.postgres.entity.PageView;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 
 /**
