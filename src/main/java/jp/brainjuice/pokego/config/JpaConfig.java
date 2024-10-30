@@ -27,14 +27,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JpaConfig {
 
-	@Value("${spring.datasource.url}")
 	private String databaseUrl;
 
-	@Value("${spring.datasource.username}")
 	private String username;
 
-	@Value("${spring.datasource.password}")
 	private String password;
+
+	public JpaConfig(
+			@Value("${spring.datasource.url}") String databaseUrl,
+			@Value("${spring.datasource.username}") String username,
+			@Value("${spring.datasource.password}") String password) {
+
+		this.databaseUrl = databaseUrl;
+		this.username = username;
+		this.password = password;
+
+		log.info(MessageFormat.format("databaseUrl: {0}, username: {1}, password: {2}", databaseUrl, username, password));
+	}
 
 	/**
 	 * Heroku PostgreSQLのために追加。HerokuのDATABASE_URLには、prefix:"jdbc:"が付かない。<br>
@@ -45,8 +54,6 @@ public class JpaConfig {
 	 */
 	@Bean
     DataSource dataSource() throws URISyntaxException {
-
-		log.info(MessageFormat.format("databaseUrl: {0}, username: {1}, password: {2}", databaseUrl, username, password));
 
 		// databaseUrlにjdbc:がある場合は一旦排除する。
 		URI dbUri = new URI(

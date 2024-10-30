@@ -3,6 +3,7 @@ package jp.brainjuice.pokego.config;
 import java.text.MessageFormat;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,16 +79,14 @@ public class RedisConfig {
 	 *
 	 * @return
 	 */
-//	@Bean
-//	LettuceClientConfigurationBuilderCustomizer lettuceClientConfigurationBuilderCustomizer() {
-//		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, envUrl));
-//
-//		return clientConfigurationBuilder -> {
-//			if (clientConfigurationBuilder.build().isUseSsl()) {
-//				clientConfigurationBuilder.useSsl().disablePeerVerification();
-//			}
-//		};
-//	}
+	@Bean
+	LettuceClientConfigurationBuilderCustomizer lettuceClientConfigurationBuilderCustomizer() {
+		return clientConfigurationBuilder -> {
+			if (clientConfigurationBuilder.build().isUseSsl()) {
+				clientConfigurationBuilder.useSsl().disablePeerVerification();
+			}
+		};
+	}
 
     /**
      * 期限切れのTempViewを除去するイベントリスナー（らしい）
