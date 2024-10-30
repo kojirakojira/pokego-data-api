@@ -1,18 +1,12 @@
 package jp.brainjuice.pokego.config;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -20,6 +14,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.ibm.icu.text.MessageFormat;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,9 +28,7 @@ public class RedisConfig {
 	@Value("${redis.env.url}")
 	private String envUrl;
 
-	private static final String CONNECTED_MESSAGE_FORMAT = "Redis is connected in {0} mode. {1}={2}";
-
-	private static final String DUMMY_USERNAME = "h";
+	private static final String CONNECTED_MESSAGE_FORMAT = "Redis is connected. REDIS_URL={0}";
 
 	/**
 	 * デフォルトキャッシュ設定
@@ -78,49 +72,22 @@ public class RedisConfig {
 //        return container;
 //    }
 
-    @Bean
-    LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
-		URI uri = new URI(envUrl);
+	/**
+	 * 接続情報をRedisに設定する。<br>
+	 * REDIS_URLで指定したURLがうまいこと設定されるらしい。
+	 *
+	 * @return
+	 */
+	@Bean
+	LettuceClientConfigurationBuilderCustomizer lettuceClientConfigurationBuilderCustomizer() {
+		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, envUrl));
 
-		String host = uri.getHost();
-		int port = uri.getPort();
-
-		String userInfo = uri.getUserInfo();
-
-		LettuceConnectionFactory factory;
-//		String env = System.getenv(BjConfigEnum.System.SPRING_PROFILES_ACTIVE.name());
-		// 本番環境でのみクラスターモード
-//		if ("production".equals(env)) {
-//			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-//			clusterConfiguration.clusterNode(host, port);
-//			clusterConfiguration.setPassword(password);
-//			factory = new LettuceConnectionFactory(clusterConfiguration);
-//			log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "cluster", envUrl, envRedisUrl));
-//		} else {
-		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-		conf.setHostName(host);
-		conf.setPort(port);
-
-
-		if (!StringUtils.isEmpty(userInfo)) {
-
-			String[] userInfoArr = userInfo.split(":", 2);
-
-			String username = userInfoArr[0];
-			if (!DUMMY_USERNAME.equals(username)) {
-				conf.setUsername(username);
+		return clientConfigurationBuilder -> {
+			if (clientConfigurationBuilder.build().isUseSsl()) {
+				clientConfigurationBuilder.useSsl().disablePeerVerification();
 			}
-
-			String password = userInfoArr[1];
-			conf.setPassword(password);
-		}
-
-		factory = new LettuceConnectionFactory(conf);
-		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, "normal", "REDIS_URL", envUrl));
-//		}
-
-		return factory;
-    }
+		};
+	}
 
     /**
      * 期限切れのTempViewを除去するイベントリスナー（らしい）
