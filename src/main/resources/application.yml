@@ -30,11 +30,30 @@ logging:
   level:
     root: INFO
     org:
-      "[springframework.web.client.RestTemplate]": INFO
+      springframework:
+        web:
+          client:
+            RestTemplate: INFO
+        data:
+          redis:
+            core: DEBUG
+            connection: DEBUG
       hibernate:
         SQL: DEBUG
-        "[type.descriptor.sql.BasicBinder]": TRACE
-    "[jp.brainjuice.pokego.business.dao.inspector.SqlInspector]": DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    jp:
+      brainjuice:
+        pokego:
+          business:
+            dao:
+              inspector:
+                SqlInspector: DEBUG
+          config:
+            RedisAspect: DEBUG
+          
 
 # Redis
 redis:

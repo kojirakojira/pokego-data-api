@@ -7,6 +7,10 @@ import org.hibernate.resource.jdbc.spi.StatementInspector;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * SQLの呼び出し元をログ出力する。<br>
+ * {@link @Aspect}を使用せずに処理が差し込まれているため注意すること。
+ */
 @Slf4j
 public class SqlInspector implements StatementInspector {
 

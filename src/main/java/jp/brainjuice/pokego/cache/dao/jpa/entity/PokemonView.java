@@ -1,4 +1,4 @@
-package jp.brainjuice.pokego.cache.dao.postgres.entity;
+package jp.brainjuice.pokego.cache.dao.jpa.entity;
 
 import java.util.Date;
 
@@ -19,17 +19,17 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "page_view")
-public class PageView {
+@Table(name = "pokemon_view")
+public class PokemonView {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "page_view_seq")
-	@SequenceGenerator(name = "page_view_seq", sequenceName = "page_view_seq", initialValue = 1, allocationSize = 1)
-	@Column(name = "page_view_id")
-	private Integer pageViewId;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pokemon_view_seq")
+	@SequenceGenerator(name = "pokemon_view_seq", sequenceName = "pokemon_view_seq", initialValue = 1, allocationSize = 1)
+	@Column(name = "pokemon_view_id")
+	private Integer pokemonViewId;
 
-	@Column(nullable = false)
-	private String page;
+	@Column(name = "pokedex_id", nullable = false, columnDefinition = "bpchar")
+	private String pokedexId;
 
 	@Column(nullable = false)
 	private Date ymd;

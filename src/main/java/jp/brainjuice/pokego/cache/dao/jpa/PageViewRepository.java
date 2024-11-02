@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Meta;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import jp.brainjuice.pokego.cache.dao.postgres.entity.PageView;
+import jp.brainjuice.pokego.cache.dao.jpa.entity.PageView;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 
 /**

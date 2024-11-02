@@ -8,9 +8,9 @@
 
 - REDIS_URL
   1. 例：redis://h:{password}@localhost:6379
-  1. Redis用のURLを指定する。username,passwordは省略可能。usernameに"h"を指定した場合は無視される。（Redisのver3, 4らへんの仕様上そうしている。）
+  1. Redis用のURLを指定する。
 - DATABASE_URL
-  1. 以下を設定する。"jdbc:"は不要。<br> postgres://\<username\>:\<password\>@\<hostname\>:\<port\>/\<dbname\>
+  1. 以下を設定する。"jdbc:"は無くても良い。クエリパラメータでの指定も可能。<br> postgres://\<username\>:\<password\>@\<hostname\>:\<port\>/\<dbname\>
 - DATABASE_USERNAME（省略可能）
   1. 設定した場合、優先的に参照される。（DATABASE_URL内のusernameは無視される。）
 - DATABASE_PASSWORD（省略可能）
