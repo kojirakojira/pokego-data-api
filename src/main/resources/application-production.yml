@@ -57,7 +57,7 @@ logging:
 # Redis
 redis:
   env:
-    url: ${REDIS_URL}
+    url: ${REDIS_TLS_URL}
 
 # AWS
 aws:

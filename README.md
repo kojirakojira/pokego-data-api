@@ -6,9 +6,9 @@
 
 前提として、このプロジェクトでは以下の環境変数を設定する。
 
-- REDIS_URL
+- REDIS_URL（省略可能）
   1. 例：redis://h:{password}@localhost:6379
-  1. Redis用のURLを指定する。
+  1. Redis用のURLを指定する。指定しなかった場合、LettuceConnectionFactoryの仕様で、localhost:6379に接続する。
 - DATABASE_URL
   1. 以下を設定する。"jdbc:"は無くても良い。クエリパラメータでの指定も可能。<br> postgres://\<username\>:\<password\>@\<hostname\>:\<port\>/\<dbname\>
 - DATABASE_USERNAME（省略可能）

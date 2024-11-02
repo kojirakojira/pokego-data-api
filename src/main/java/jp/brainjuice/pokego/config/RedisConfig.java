@@ -1,13 +1,17 @@
 package jp.brainjuice.pokego.config;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -24,12 +28,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisConfig {
 
-	private static final String CONNECTED_MESSAGE_FORMAT = "Redis Configuration Builder start. REDIS_URL={0}";
+	private String envUrl;
+
+	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created. redis.env.url={0} "
+			+ "(For more details, please check the application.yml specific to that environment.)";
+
+	private static final String DEFAULT_MESSAGE_FORMAT = "Redis connection factory created. Because there was no URL defined, destination server is localhost:6379.";
+
+	// redisバージョン6以降の仕様（らしい）
+	private static final String DUMMY_USERNAME = "h";
 
 	public RedisConfig(@Value("${redis.env.url}") String envUrl) {
-		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, envUrl));
-		log.info(MessageFormat.format("Redis Configuration Builder start. REDIS_TLS_URL={0}", System.getenv("REDIS_TLS_URL")));
-		log.info(MessageFormat.format("Redis Configuration Builder start. REDIS_TEMPORARY_URL={0}", System.getenv("REDIS_TEMPORARY_URL")));
 	}
 
 
@@ -76,8 +85,7 @@ public class RedisConfig {
 //    }
 
 	/**
-	 * 接続情報をRedisに設定する。<br>
-	 * REDIS_URLで指定したURLがうまいこと設定されるらしい。
+	 * SSL/TLSの設定。
 	 *
 	 * @return
 	 */
@@ -88,6 +96,46 @@ public class RedisConfig {
 				clientConfigurationBuilder.useSsl().disablePeerVerification();
 			}
 		};
+	}
+
+	@Bean
+	LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
+
+		if (StringUtils.isEmpty(envUrl)) {
+			// 存在しない場合はlocalhost:6379(LettuceConnectionFacotry上のデフォルト値)で設定する。
+			log.info(DEFAULT_MESSAGE_FORMAT);
+			return new LettuceConnectionFactory();
+		}
+
+		URI uri = new URI(envUrl);
+
+		String host = uri.getHost();
+		int port = uri.getPort();
+
+		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
+		conf.setHostName(host);
+		conf.setPort(port);
+
+		String userInfo = uri.getUserInfo();
+
+		if (!StringUtils.isEmpty(userInfo)) {
+
+			String[] userInfoArr = userInfo.split(":", 2);
+
+			String username = userInfoArr[0];
+			if (!StringUtils.isEmpty(username) && !DUMMY_USERNAME.equals(username)) {
+				conf.setUsername(username);
+			}
+
+			String password = userInfoArr[1];
+			conf.setPassword(password);
+		}
+
+		LettuceConnectionFactory factory = new LettuceConnectionFactory(conf);
+
+		log.info(MessageFormat.format(CONN_CREATED_MESSAGE_FORMAT, envUrl));
+
+		return factory;
 	}
 
     /**

@@ -36,8 +36,8 @@ logging:
             RestTemplate: INFO
         data:
           redis:
-            core: DEBUG
-            connection: DEBUG
+            core: INFO
+            connection: INFO
       hibernate:
         SQL: DEBUG
         type:
@@ -52,13 +52,12 @@ logging:
               inspector:
                 SqlInspector: DEBUG
           config:
-            RedisAspect: DEBUG
-          
+            RedisAspect: INFO
 
 # Redis
 redis:
   env:
-    url: ${REDIS_URL}
+    url: ${REDIS_URL:}
 
 # AWS
 aws:
