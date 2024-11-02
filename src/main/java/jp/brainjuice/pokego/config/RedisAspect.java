@@ -18,17 +18,15 @@ public class RedisAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
-        // 引数をログ出力
         log.debug("Redis operation: {} with args: {}", methodName, args);
 
-        // メソッドの実行
         Object result;
         try {
             result = joinPoint.proceed();
-            log.info("Redis operation: {} completed with result: {}", methodName, result);
-        } catch (Throwable throwable) {
-            log.error("Redis operation: {} failed", methodName, throwable);
-            throw throwable;
+            log.debug("Redis operation: {} completed with result: {}", methodName, result);
+        } catch (Throwable e) {
+            log.error("Redis operation: {} failed", methodName, e);
+            throw e;
         }
 
         return result;

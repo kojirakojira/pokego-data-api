@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -25,11 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisConfig {
 
-	private static final String CONNECTED_MESSAGE_FORMAT = "Redis is connected. REDIS_URL={0}";
+	private static final String CONNECTED_MESSAGE_FORMAT = "Redis Configuration Builder start. REDIS_URL={0}";
 
 	public RedisConfig(@Value("${redis.env.url}") String envUrl) {
 		log.info(MessageFormat.format(CONNECTED_MESSAGE_FORMAT, envUrl));
+		log.info(MessageFormat.format("Redis Configuration Builder start. REDIS_TLS_URL={0}", System.getenv("REDIS_TLS_URL")));
+		log.info(MessageFormat.format("Redis Configuration Builder start. REDIS_TEMPORARY_URL={0}", System.getenv("REDIS_TEMPORARY_URL")));
 	}
+
 
 	/**
 	 * デフォルトキャッシュ設定
@@ -127,10 +129,10 @@ public class RedisConfig {
 	 * @return
 	 */
 	@Bean
-	RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+	RedisTemplate<?, ?> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
 
 		RedisTemplate<byte[], byte[]> template = new RedisTemplate<byte[], byte[]>();
-		template.setConnectionFactory(redisConnectionFactory);
+		template.setConnectionFactory(lettuceConnectionFactory);
 		return template;
 	}
 }

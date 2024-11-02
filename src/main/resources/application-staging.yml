@@ -30,11 +30,29 @@ logging:
   level:
     root: INFO
     org:
-      "[springframework.web.client.RestTemplate]": INFO
+      springframework:
+        web:
+          client:
+            RestTemplate: INFO
+        data:
+          redis:
+            core: INFO
+            connection: INFO
       hibernate:
         SQL: INFO
-        "[type.descriptor.sql.BasicBinder]": INFO
-    "[jp.brainjuice.pokego.business.dao.inspector.SqlInspector]": INFO
+        type:
+          descriptor:
+            sql:
+              BasicBinder: INFO
+    jp:
+      brainjuice:
+        pokego:
+          business:
+            dao:
+              inspector:
+                SqlInspector: INFO
+          config:
+            RedisAspect: INFO
 
 # Redis
 redis:
