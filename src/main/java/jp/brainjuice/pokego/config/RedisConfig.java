@@ -1,17 +1,13 @@
 package jp.brainjuice.pokego.config;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.MessageFormat;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -28,19 +24,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisConfig {
 
-	private String envUrl;
+//	private String envUrl;
 
 	private static final String CONN_URL_FORMAT = "redis.env.url={0} (If it's not what you expected, check your application.yml.)";
 
-	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created.";
+//	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created.";
+//
+//	private static final String DEFAULT_MESSAGE_FORMAT = "Redis connection factory created. Because there was no URL defined, destination server is localhost:6379.";
+//
+//	// redisバージョン6以降の仕様（らしい）
+//	private static final String DUMMY_USERNAME = "h";
 
-	private static final String DEFAULT_MESSAGE_FORMAT = "Redis connection factory created. Because there was no URL defined, destination server is localhost:6379.";
-
-	// redisバージョン6以降の仕様（らしい）
-	private static final String DUMMY_USERNAME = "h";
-
-	public RedisConfig(@Value("${redis.env.url}") String envUrl) {
-		this.envUrl = envUrl;
+	public RedisConfig(@Value("${spring.data.redis.url}") String envUrl) {
 		log.info(MessageFormat.format(CONN_URL_FORMAT, envUrl));
 	}
 
@@ -94,52 +89,52 @@ public class RedisConfig {
 	 */
 	@Bean
 	LettuceClientConfigurationBuilderCustomizer lettuceClientConfigurationBuilderCustomizer() {
-		return clientConfigurationBuilder -> {
-			if (clientConfigurationBuilder.build().isUseSsl()) {
-				clientConfigurationBuilder.useSsl().disablePeerVerification();
+		return builder -> {
+			// Heroku Redis用の設定
+			if (builder.build().isUseSsl()) {
+				builder.useSsl().disablePeerVerification();
 			}
 		};
 	}
 
-	@Bean
-	LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
-
-		if (StringUtils.isEmpty(envUrl)) {
-			// 存在しない場合はlocalhost:6379(LettuceConnectionFacotry上のデフォルト値)で設定する。
-			log.info(DEFAULT_MESSAGE_FORMAT);
-			return new LettuceConnectionFactory();
-		}
-
-		URI uri = new URI(envUrl);
-
-		String host = uri.getHost();
-		int port = uri.getPort();
-
-		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-		conf.setHostName(host);
-		conf.setPort(port);
-
-		String userInfo = uri.getUserInfo();
-
-		if (!StringUtils.isEmpty(userInfo)) {
-
-			String[] userInfoArr = userInfo.split(":", 2);
-
-			String username = userInfoArr[0];
-			if (!StringUtils.isEmpty(username) && !DUMMY_USERNAME.equals(username)) {
-				conf.setUsername(username);
-			}
-
-			String password = userInfoArr[1];
-			conf.setPassword(password);
-		}
-
-		LettuceConnectionFactory factory = new LettuceConnectionFactory(conf);
-
-		log.info(CONN_CREATED_MESSAGE_FORMAT);
-
-		return factory;
-	}
+//	@Bean
+//	LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
+//
+//		if (StringUtils.isEmpty(envUrl)) {
+//			// 存在しない場合はlocalhost:6379(LettuceConnectionFacotry上のデフォルト値)で設定する。
+//			log.info(DEFAULT_MESSAGE_FORMAT);
+//			return new LettuceConnectionFactory();
+//		}
+//
+//		URI uri = new URI(envUrl);
+//
+//		String host = uri.getHost();
+//		int port = uri.getPort();
+//		RedisStandaloneConfiguration redisConf = new RedisStandaloneConfiguration();
+//		redisConf.setHostName(host);
+//		redisConf.setPort(port);
+//
+//		String userInfo = uri.getUserInfo();
+//
+//		if (!StringUtils.isEmpty(userInfo)) {
+//
+//			String[] userInfoArr = userInfo.split(":", 2);
+//
+//			String username = userInfoArr[0];
+//			if (!StringUtils.isEmpty(username) && !DUMMY_USERNAME.equals(username)) {
+//				redisConf.setUsername(username);
+//			}
+//
+//			String password = userInfoArr[1];
+//			redisConf.setPassword(password);
+//		}
+//
+//		LettuceConnectionFactory factory = new LettuceConnectionFactory(redisConf);
+//
+//		log.info(CONN_CREATED_MESSAGE_FORMAT);
+//
+//		return factory;
+//	}
 
     /**
      * 期限切れのTempViewを除去するイベントリスナー（らしい）
