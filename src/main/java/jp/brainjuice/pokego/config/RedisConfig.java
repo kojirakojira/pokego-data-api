@@ -30,8 +30,9 @@ public class RedisConfig {
 
 	private String envUrl;
 
-	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created. redis.env.url={0} "
-			+ "(For more details, please check the application.yml specific to that environment.)";
+	private static final String CONN_URL_FORMAT = "redis.env.url={0} (If it's not what you expected, check your application.yml.)";
+
+	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created.";
 
 	private static final String DEFAULT_MESSAGE_FORMAT = "Redis connection factory created. Because there was no URL defined, destination server is localhost:6379.";
 
@@ -39,6 +40,8 @@ public class RedisConfig {
 	private static final String DUMMY_USERNAME = "h";
 
 	public RedisConfig(@Value("${redis.env.url}") String envUrl) {
+		this.envUrl = envUrl;
+		log.info(MessageFormat.format(CONN_URL_FORMAT, envUrl));
 	}
 
 
@@ -133,7 +136,7 @@ public class RedisConfig {
 
 		LettuceConnectionFactory factory = new LettuceConnectionFactory(conf);
 
-		log.info(MessageFormat.format(CONN_CREATED_MESSAGE_FORMAT, envUrl));
+		log.info(CONN_CREATED_MESSAGE_FORMAT);
 
 		return factory;
 	}
