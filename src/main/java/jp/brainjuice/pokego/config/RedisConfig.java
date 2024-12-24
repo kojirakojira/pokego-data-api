@@ -24,16 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisConfig {
 
-//	private String envUrl;
-
 	private static final String CONN_URL_FORMAT = "redis.env.url={0} (If it's not what you expected, check your application.yml.)";
 
-//	private static final String CONN_CREATED_MESSAGE_FORMAT = "Redis connection factory created.";
-//
-//	private static final String DEFAULT_MESSAGE_FORMAT = "Redis connection factory created. Because there was no URL defined, destination server is localhost:6379.";
-//
-//	// redisバージョン6以降の仕様（らしい）
-//	private static final String DUMMY_USERNAME = "h";
 
 	public RedisConfig(@Value("${spring.data.redis.url}") String envUrl) {
 		log.info(MessageFormat.format(CONN_URL_FORMAT, envUrl));
@@ -96,45 +88,6 @@ public class RedisConfig {
 			}
 		};
 	}
-
-//	@Bean
-//	LettuceConnectionFactory redisConnectionFactory() throws URISyntaxException {
-//
-//		if (StringUtils.isEmpty(envUrl)) {
-//			// 存在しない場合はlocalhost:6379(LettuceConnectionFacotry上のデフォルト値)で設定する。
-//			log.info(DEFAULT_MESSAGE_FORMAT);
-//			return new LettuceConnectionFactory();
-//		}
-//
-//		URI uri = new URI(envUrl);
-//
-//		String host = uri.getHost();
-//		int port = uri.getPort();
-//		RedisStandaloneConfiguration redisConf = new RedisStandaloneConfiguration();
-//		redisConf.setHostName(host);
-//		redisConf.setPort(port);
-//
-//		String userInfo = uri.getUserInfo();
-//
-//		if (!StringUtils.isEmpty(userInfo)) {
-//
-//			String[] userInfoArr = userInfo.split(":", 2);
-//
-//			String username = userInfoArr[0];
-//			if (!StringUtils.isEmpty(username) && !DUMMY_USERNAME.equals(username)) {
-//				redisConf.setUsername(username);
-//			}
-//
-//			String password = userInfoArr[1];
-//			redisConf.setPassword(password);
-//		}
-//
-//		LettuceConnectionFactory factory = new LettuceConnectionFactory(redisConf);
-//
-//		log.info(CONN_CREATED_MESSAGE_FORMAT);
-//
-//		return factory;
-//	}
 
     /**
      * 期限切れのTempViewを除去するイベントリスナー（らしい）
