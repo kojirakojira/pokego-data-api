@@ -20,7 +20,7 @@ spring:
       session_factory.statement_inspector: jp.brainjuice.pokego.business.dao.inspector.SqlInspector
       use_sql_comments: true
     open-in-view: false
-  data.redis.url: ${REDIS_URL:}
+  data.redis.url: ${REDIS_URL:redis://localhost:6379}
 
     
 jwt.uuid: ${JWT_UUID:}
