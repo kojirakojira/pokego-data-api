@@ -122,7 +122,7 @@ public class RaceDiffService {
 	}
 
 	/**
-	 * 当サービスの主処理
+	 * 主処理
 	 *
 	 * @param goPokedexList
 	 * @param idList
@@ -138,12 +138,13 @@ public class RaceDiffService {
 
 		List<Race> raceList = new ArrayList<>();
 		for (int i = 0; i < idList.size(); i++) {
-			Race race = new Race(pokedexList.get(i), goPokedexList.get(i));
+			Race race = new Race(pokedexList.get(i), goPokedexList.get(i), pokemonStatisticsInfo);
 			raceList.add(race);
 		}
 		res.setRaceArr(raceList);
 
-		res.setStatistics(pokemonStatisticsInfo.clone());
+		res.setGoTotalCount(pokemonStatisticsInfo.getGoPokedexStats().getGoHpStats().getList().size());
+		res.setOriTotalCount(pokemonStatisticsInfo.getPokedexStats().getHpStats().getList().size());;
 
 		res.setSuccess(true);
 	}

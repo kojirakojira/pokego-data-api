@@ -3,7 +3,6 @@ package jp.brainjuice.pokego.web.form.res.race;
 import java.util.List;
 
 import jp.brainjuice.pokego.business.service.utils.dto.MultiSearchResult;
-import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.web.form.res.Response;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import lombok.Data;
@@ -18,7 +17,13 @@ public class RaceDiffResponse extends Response {
 	// allUniqueがfalseの場合はnull
 	private List<Race> raceArr;
 
-	private PokemonStatisticsInfo statistics;
-
 	private boolean searchedById;
+
+	/** GOにおけるポケモン数（絞り込みをした場合はその数） */
+	private int goTotalCount;
+	/**
+	 * 原作におけるポケモン数（絞り込みをした場合はその数。
+	 * アーマードミュウツーのようなポケモンを含む場合、GOと総数が異なる。）
+	 */
+	private int oriTotalCount;
 }
