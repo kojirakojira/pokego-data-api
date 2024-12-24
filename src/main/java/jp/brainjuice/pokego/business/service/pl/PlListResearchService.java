@@ -37,9 +37,9 @@ public class PlListResearchService implements ResearchService<PlListResponse> {
 		cpMultiplierMap.forEach((k, v) -> {
 			int cp = pokemonGoUtils.calcCp(
 					goPokedex,
-					((Integer) sv.get(ParamsEnum.iva)).intValue(),
-					((Integer) sv.get(ParamsEnum.ivd)).intValue(),
-					((Integer) sv.get(ParamsEnum.ivh)).intValue(),
+					sv.get(ParamsEnum.iva, int.class),
+					sv.get(ParamsEnum.ivd, int.class),
+					sv.get(ParamsEnum.ivh, int.class),
 					k);
 			// noは一旦nullで作成
 			plList.add(new PlCp(null, k, cp));
@@ -56,9 +56,9 @@ public class PlListResearchService implements ResearchService<PlListResponse> {
 		}
 
 		res.setPlList(plList);
-		res.setIva(((Integer) sv.get(ParamsEnum.iva)).intValue());
-		res.setIvd(((Integer) sv.get(ParamsEnum.ivd)).intValue());
-		res.setIvh(((Integer) sv.get(ParamsEnum.ivh)).intValue());
+		res.setIva(sv.get(ParamsEnum.iva, int.class));
+		res.setIvd(sv.get(ParamsEnum.ivd, int.class));
+		res.setIvh(sv.get(ParamsEnum.ivh, int.class));
 	}
 
 }

@@ -10,10 +10,8 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValue;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -68,25 +66,25 @@ public class SearchValue {
 	@AllArgsConstructor
 	public enum ParamsEnum {
 		/** 個体値（こうげき） */
-		iva(Integer.class),
+		iva,
 		/** 個体値（ぼうぎょ） */
-		ivd(Integer.class),
+		ivd,
 		/** 個体値（hp） */
-		ivh(Integer.class),
+		ivh,
 		/** 個体値（hp） */
-		pl(String.class),
+		pl,
 		/** CP */
-		cp(Integer.class),
+		cp,
 		/** リーグ */
-		league(String.class),
+		league,
 		/** 天候ブースト */
-		wbFlg(Boolean.class),
+		wbFlg,
 		/** ポケモンを捕まえるときのシチュエーション */
-		situation(String.class),
+		situation,
+		/** statisticsをレスポンスで返却するかのフラグ */
+		statsRequired,
 		;
 
-		@Getter(value = AccessLevel.PUBLIC)
-		private Class<?> dataType;
 	}
 
 	/**
@@ -95,8 +93,8 @@ public class SearchValue {
 	 * @param key
 	 * @return
 	 */
-	public Object get(ParamsEnum key) {
-		return key.getDataType().cast(getParamsMap().get(key));
+	public <T> T get(ParamsEnum key, Class<T> clazz) {
+		return (T) getParamsMap().get(key, clazz);
 	}
 
 	public class ParamsMap extends HashMap<String, Object> {
@@ -108,8 +106,9 @@ public class SearchValue {
 		 * @return
 		 * @see ParamsEnum
 		 */
-		public Object get(ParamsEnum key) {
-			return key.getDataType().cast(super.get(key.name()));
+		@SuppressWarnings("unchecked")
+		public <T> T get(ParamsEnum key, Class<T> clazz) {
+			return (T) super.get(key.name());
 		}
 
 		/**

@@ -45,10 +45,10 @@ public class CpResearchService implements ResearchService<CpResponse> {
 	@Override
 	public void exec(SearchValue sv, CpResponse cpResponse) {
 
-		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
-		String pl = (String) sv.get(ParamsEnum.pl);
+		int iva = sv.get(ParamsEnum.iva, int.class);
+		int ivd = sv.get(ParamsEnum.ivd, int.class);
+		int ivh = sv.get(ParamsEnum.ivh, int.class);
+		String pl = sv.get(ParamsEnum.pl, String.class);
 
 		cpResponse.setGoPokedex(sv.getGoPokedex());
 		cpResponse.setIva(iva);

@@ -50,10 +50,10 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	public void exec(SearchValue sv, AfterEvoCpResponse res) {
 
 		GoPokedex sp = sv.getGoPokedex();
-		int spCp = ((Integer) sv.get(ParamsEnum.cp)).intValue();
-		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
+		int spCp = sv.get(ParamsEnum.cp, int.class);
+		int iva = sv.get(ParamsEnum.iva, int.class);
+		int ivd = sv.get(ParamsEnum.ivd, int.class);
+		int ivh = sv.get(ParamsEnum.ivh, int.class);
 
 		res.setSearchPokemon(sp);
 		res.setCp(spCp);

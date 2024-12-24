@@ -54,10 +54,10 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 	public void exec(SearchValue sv, AfterEvoScpRankResponse res) {
 
 		GoPokedex sp = sv.getGoPokedex();
-		Integer spCp = sv.get(ParamsEnum.cp) == null ? null: (Integer) sv.get(ParamsEnum.cp); // 仕様上nullが有り得る
-		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
+		Integer spCp = sv.get(ParamsEnum.cp, Integer.class) == null ? null: sv.get(ParamsEnum.cp, Integer.class).intValue(); // 仕様上nullが有り得る
+		int iva = sv.get(ParamsEnum.iva, int.class);
+		int ivd = sv.get(ParamsEnum.ivd, int.class);
+		int ivh = sv.get(ParamsEnum.ivh, int.class);
 
 		res.setSearchPokemon(sp);
 		res.setCp(spCp);

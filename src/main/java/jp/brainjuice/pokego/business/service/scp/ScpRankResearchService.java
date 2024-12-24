@@ -23,9 +23,9 @@ public class ScpRankResearchService implements ResearchService<ScpRankResponse> 
 	@Override
 	public void exec(SearchValue sv, ScpRankResponse res) {
 
-		int iva = (int) sv.get(ParamsEnum.iva);
-		int ivd = (int) sv.get(ParamsEnum.ivd);
-		int ivh = (int) sv.get(ParamsEnum.ivh);
+		int iva = sv.get(ParamsEnum.iva, int.class);
+		int ivd = sv.get(ParamsEnum.ivd, int.class);
+		int ivh = sv.get(ParamsEnum.ivh, int.class);
 
 		GoPokedex goPokedex = sv.getGoPokedex();
 

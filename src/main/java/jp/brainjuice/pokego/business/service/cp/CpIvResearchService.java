@@ -50,9 +50,9 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 	public void exec(SearchValue sv, CpIvResponse res) {
 
 		GoPokedex gp = sv.getGoPokedex();
-		int cp = ((Integer) sv.get(ParamsEnum.cp)).intValue();
-		boolean wbFlg = ((Boolean) sv.get(ParamsEnum.wbFlg)).booleanValue();
-		SituationEnum situation = SituationEnum.valueOf((String) sv.get(ParamsEnum.situation));
+		int cp = sv.get(ParamsEnum.cp, int.class);
+		boolean wbFlg = sv.get(ParamsEnum.wbFlg, boolean.class);
+		SituationEnum situation = SituationEnum.valueOf(sv.get(ParamsEnum.situation, String.class));
 
 		// シチュエーションに応じたIvRangeの生成
 		IvRange ir = switch (situation) {

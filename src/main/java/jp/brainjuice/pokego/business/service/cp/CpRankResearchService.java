@@ -24,9 +24,9 @@ public class CpRankResearchService implements ResearchService<CpRankResponse> {
 	@Override
 	public void exec(SearchValue sv, CpRankResponse res) {
 
-		int iva = ((Integer) sv.get(ParamsEnum.iva)).intValue();
-		int ivd = ((Integer) sv.get(ParamsEnum.ivd)).intValue();
-		int ivh = ((Integer) sv.get(ParamsEnum.ivh)).intValue();
+		int iva = sv.get(ParamsEnum.iva, int.class);
+		int ivd = sv.get(ParamsEnum.ivd, int.class);
+		int ivh = sv.get(ParamsEnum.ivh, int.class);
 		GoPokedex goPokedex = sv.getGoPokedex();
 
 		res.setIva(iva);

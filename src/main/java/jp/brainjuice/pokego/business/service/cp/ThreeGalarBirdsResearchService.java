@@ -48,8 +48,8 @@ public class ThreeGalarBirdsResearchService implements ResearchService<ThreeGala
 			return;
 		}
 
-		int cp = ((Integer) sv.get(ParamsEnum.cp)).intValue();
-		boolean wbFlg = ((Boolean) sv.get(ParamsEnum.wbFlg)).booleanValue();
+		int cp = sv.get(ParamsEnum.cp, int.class);
+		boolean wbFlg = sv.get(ParamsEnum.wbFlg, boolean.class);
 		IvRange ir = new WildIvRange();
 
 		List<Map.Entry<String, Double>> rangeList = cpIvCalculator.subListByRange(gp, cp, wbFlg, ir);
