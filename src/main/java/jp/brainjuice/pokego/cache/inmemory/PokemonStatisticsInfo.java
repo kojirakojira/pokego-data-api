@@ -3,6 +3,7 @@ package jp.brainjuice.pokego.cache.inmemory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,19 +37,23 @@ public class PokemonStatisticsInfo implements Cloneable {
 	private GoPokedexStats goPokedexStats;
 
 	/**
-	 * DIで生成する用のコンストラクタ
+	 * DIで生成する用のコンストラクタ。
+	 * 全ポケモンを対象とするポケモン統計情報はキャッシュとして保持する。
 	 *
 	 * @param pokedexRepository
 	 * @param goPokedexRepository
 	 */
 	@Autowired
 	public PokemonStatisticsInfo(
-			PokedexRepository pokedexRepository, GoPokedexRepository goPokedexRepository) {
+			PokedexRepository pokedexRepository,
+			GoPokedexRepository goPokedexRepository,
+			RaceExceptionsMap raceExceptionsMap) {
 
 		List<Pokedex> pokedexList = pokedexRepository.findAll();
 		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
+
 		// 全ポケモンを対象とした統計情報をDIに設定する。
-		create(pokedexList, goPokedexList);
+		create(pokedexList, goPokedexList, raceExceptionsMap);
 
 		log.info("PokemonStatisticsInfo generated!! (Referenced file: none.)");
 	}
@@ -56,11 +61,14 @@ public class PokemonStatisticsInfo implements Cloneable {
 	/**
 	 * DI以外で生成する用のコンストラクタ
 	 *
-	 * @param iterable
-	 * @param iterable2
+	 * @param pokedexList
+	 * @param goPokedexList
 	 */
-	public PokemonStatisticsInfo(Iterable<Pokedex> iterable, Iterable<GoPokedex> iterable2) {
-		create(iterable, iterable2);
+	public PokemonStatisticsInfo(
+			List<Pokedex> pokedexList,
+			List<GoPokedex> goPokedexList,
+			RaceExceptionsMap raceExceptionsMap) {
+		create(pokedexList, goPokedexList, raceExceptionsMap);
 	}
 
 	/**
@@ -204,16 +212,23 @@ public class PokemonStatisticsInfo implements Cloneable {
 	/**
 	 * ポケモン統計情報を生成し、フィールドへセットします。
 	 *
-	 * @param iterable
-	 * @param iterable2
+	 * @param pokedexList
+	 * @param goPokedexList
+	 * @param raceExceptionsMap
 	 */
-	public void create(Iterable<Pokedex> iterable, Iterable<GoPokedex> iterable2) {
+	public void create(
+			List<Pokedex> pokedexList,
+			List<GoPokedex> goPokedexList,
+			RaceExceptionsMap raceExceptionsMap) {
 
 		// 原作
-		setPokedexStats(new PokedexStats(iterable));
+		List<Pokedex> pList = pokedexList.stream()
+				.filter(p -> raceExceptionsMap.existsOrigin(p.getPokedexId()))
+				.collect(Collectors.toList());
+		setPokedexStats(new PokedexStats(pList));
 
 		// ポケモンGO
-		setGoPokedexStats(new GoPokedexStats(iterable2));
+		setGoPokedexStats(new GoPokedexStats(goPokedexList));
 
 		log.debug(this.toString());
 

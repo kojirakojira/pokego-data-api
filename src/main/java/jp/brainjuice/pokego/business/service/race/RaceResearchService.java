@@ -15,8 +15,10 @@ import jp.brainjuice.pokego.business.service.pokeFilter.FilterEnum;
 import jp.brainjuice.pokego.business.service.pokeFilter.GoPokedexFilterService;
 import jp.brainjuice.pokego.business.service.pokeFilter.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.utils.PokemonUtils;
 import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
+import jp.brainjuice.pokego.cache.inmemory.RaceExceptionsMap;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.elem.Race;
 import jp.brainjuice.pokego.web.form.res.race.RaceResponse;
@@ -32,6 +34,8 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 
 	private GoPokedexFilterService goPokedexFilterService;
 
+	private RaceExceptionsMap raceExceptionsMap;
+
 	private PokemonUtils pokemonUtils;
 
 	public RaceResearchService(
@@ -39,11 +43,13 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
 			GoPokedexFilterService goPokedexFilterService,
+			RaceExceptionsMap raceExceptionsMap,
 			PokemonUtils pokemonUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.goPokedexFilterService = goPokedexFilterService;
+		this.raceExceptionsMap = raceExceptionsMap;
 		this.pokemonUtils = pokemonUtils;
 	}
 
@@ -57,9 +63,6 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 			pokedex = pokedexRepository.findById(pokedexId).get();
 		}
 		GoPokedex goPokedex = sv.getGoPokedex();
-
-		Race race = new Race(pokedex, goPokedex);
-		res.setRace(race);
 
 		res.setTooStrong(goPokedex.isTooStrong());
 
@@ -81,7 +84,7 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 		}
 		res.setIncluded(included);
 
-		// 統計情報
+		// ポケモン統計情報
 		PokemonStatisticsInfo statistics;
 		if (filterMap.size() > 0 && filterList.contains(pokedexId)) {
 			// 絞り込みがおこなわれている場合、かつ検索したポケモンが絞り込み後のポケモンにいる場合
@@ -89,12 +92,21 @@ public class RaceResearchService implements ResearchService<RaceResponse> {
 			// 最終進化のみで絞り込む場合は、最終進化用の統計情報を再生成する。
 			statistics = new PokemonStatisticsInfo(
 					pokedexRepository.findAllById(filterList),
-					goPokedexRepository.findAllById(filterList));
+					goPokedexRepository.findAllById(filterList),
+					raceExceptionsMap);
 		} else {
 			// 全ポケモンを対象の統計情報はDIにある。
 			statistics = pokemonStatisticsInfo.clone();
 		}
-		res.setStatistics(statistics);
+		if (sv.get(ParamsEnum.statsRequired, boolean.class)) {
+			res.setStatistics(statistics);
+		}
+
+		Race race = new Race(pokedex, goPokedex, statistics);
+		res.setRace(race);
+
+		res.setGoTotalCount(statistics.getGoPokedexStats().getGoHpStats().getList().size());
+		res.setOriTotalCount(statistics.getPokedexStats().getHpStats().getList().size());
 	}
 
 }

@@ -8,4 +8,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class RaceRequest extends ResearchRequestImpl {
 
+	private boolean statsRequired;
 }

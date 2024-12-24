@@ -1,7 +1,13 @@
 package jp.brainjuice.pokego.web.form.res.elem;
 
+import java.util.List;
+
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo.GoPokedexStats;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo.PokedexStats;
+import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo.Statistics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,9 +28,10 @@ public class Race {
 	private String remarks;
 	private Pokedex pokedex;
 	private GoPokedex goPokedex;
-//	private Color color;
-//	private Color type1Color;
-//	private Color type2Color;
+	/** nullの場合もある。 */
+	private RaceOriRank oriRank;
+	/** nullの場合もある。 */
+	private RaceGoRank goRank;
 
 	public Race(Pokedex pokedex, GoPokedex goPokedex) {
 
@@ -35,17 +42,44 @@ public class Race {
 		setPokedex(pokedex);
 		setGoPokedex(goPokedex);
 
-//		// タイプ1の色を設定
-//		final TypeColorEnum c1 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType1());
-//		setType1Color(new Color(c1.getR(), c1.getG(), c1.getB()));
-//		// タイプ2の色を設定
-//		if (!StringUtils.isEmpty(goPokedex.getType2())) {
-//			final TypeColorEnum c2 = TypeColorEnum.getTypeColorForJpn(goPokedex.getType2());
-//			setType2Color(new Color(c2.getR(), c2.getG(), c2.getB()));
-//		}
-//
-//		// ポケモンの色（タイプから算出））
-//		setColor(new Color(goPokedex));
+	}
 
+	/**
+	 * 種族値をセットする。
+	 * ※順位もセットする。
+	 *
+	 * @param pokedex
+	 * @param goPokedex
+	 * @param statistics
+	 */
+	public Race(Pokedex pokedex, GoPokedex goPokedex, PokemonStatisticsInfo statistics) {
+
+		this(pokedex, goPokedex);
+
+		{
+			GoPokedexStats goStats = statistics.getGoPokedexStats();
+			int hpRank = rank(goPokedex.getHp(), goStats.getGoHpStats());
+			int atRank = rank(goPokedex.getAttack(), goStats.getGoAtStats());
+			int dfRank = rank(goPokedex.getDefense(), goStats.getGoDfStats());
+			setGoRank(new RaceGoRank(hpRank, atRank, dfRank));
+		}
+
+		{
+			PokedexStats oriStats = statistics.getPokedexStats();
+			int hpRank = rank(pokedex.getHp(), oriStats.getHpStats());
+			int atRank = rank(pokedex.getAttack(), oriStats.getAtStats());
+			int dfRank = rank(pokedex.getDefense(), oriStats.getDfStats());
+			int spAtRank = rank(pokedex.getSpecialAttack(), oriStats.getSpAtStats());
+			int spDfRank = rank(pokedex.getSpecialDefense(), oriStats.getSpDfStats());
+			int spRank = rank(pokedex.getSpeed(), oriStats.getSpStats());
+			setOriRank(new RaceOriRank(hpRank, atRank, dfRank, spAtRank, spDfRank, spRank));
+		}
+
+	}
+
+	private int rank(int num, Statistics stats) {
+
+		List<Integer> list = stats.getList();
+		return list.size() - list.lastIndexOf(Integer.valueOf(num));
 	}
 }

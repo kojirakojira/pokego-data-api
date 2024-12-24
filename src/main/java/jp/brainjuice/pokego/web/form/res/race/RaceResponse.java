@@ -18,4 +18,12 @@ public class RaceResponse extends ResearchResponse {
 	private boolean tooStrong;
 	private List<DispFilterParam> filteredItems;
 	private boolean included;
+
+	/** GOにおけるポケモン数（絞り込みをした場合はその数） */
+	private int goTotalCount;
+	/**
+	 * 原作におけるポケモン数（絞り込みをした場合はその数。
+	 * アーマードミュウツーのようなポケモンではGOと数が異なる。）
+	 */
+	private int oriTotalCount;
 }
