@@ -34,5 +34,8 @@ build/
 
 ### Docker ###
 docker-local/postgres/*
-docker-local/volumes/*
+docker-local/volumes/postgres/*
+docker-local/volumes/redis/*
+!docker-local/volumes/redis/.gitkeep
+!docker-local/volumes/postgres/.gitkeep
 !docker-local/postgres/init/
