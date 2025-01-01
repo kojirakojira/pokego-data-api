@@ -29,7 +29,8 @@ RETURNS INTEGER AS $$
     -- すばやさ補正値を掛ける
     RETURN tmp_scaled_attack * calc_speed_mod(v_speed);
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;
 
 /**
  * 原作こうげき、とくこう、すばやさからGOのこうげきを算出する。
@@ -91,4 +92,5 @@ RETURNS INTEGER AS $$
     RETURN round(tmp_attack);
 
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;

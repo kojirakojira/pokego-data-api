@@ -54,7 +54,8 @@ RETURNS INTEGER AS $$
     RETURN tmp_hp;
 
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;
 
 
 /**
@@ -71,4 +72,5 @@ RETURNS DOUBLE PRECISION AS $$
     SELECT v_speed INTO attack_d;
     RETURN 1 + (attack_d - 75) / 500;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;

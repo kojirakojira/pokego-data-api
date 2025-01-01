@@ -14,7 +14,8 @@ RETURNS DOUBLE PRECISION AS $$
   BEGIN
     RETURN v_attack::double precision * (|/ v_defense::double precision ) * (|/ v_hp::double precision );
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;
 
 /**
  * GOのHP、こうげき、ぼうぎょとCP MultiplierからCPを算出する。
@@ -41,4 +42,5 @@ RETURNS DOUBLE PRECISION AS $$
 
     RETURN tmp_cp;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;

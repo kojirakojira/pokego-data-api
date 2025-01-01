@@ -9,7 +9,8 @@ RETURNS boolean AS $$
   BEGIN
     RETURN SUBSTRING(v_pokedex_id, 5, 1) = 'M';
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;
 
 /**
  * メガシンカ前のポケモンのpokedex_idを取得する。
@@ -26,4 +27,5 @@ RETURNS bpchar AS $$
 
     RETURN v_pokedex_id;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path TO public, pg_catalog, pg_temp;
