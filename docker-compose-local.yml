@@ -1,12 +1,13 @@
 services:
   postgres:
-    image: postgres:alpine3.20
+    image: postgres:17.2-alpine
     ports:
       - 5432:5432
+#    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     volumes:
       - dbdata:/var/lib/postgresql/data
       - ./docker-local/postgres/init:/docker-entrypoint-initdb.d
-#      - ./postgres/init:/docker-entrypoint-initdb.d
+#      - ./docker-local/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
