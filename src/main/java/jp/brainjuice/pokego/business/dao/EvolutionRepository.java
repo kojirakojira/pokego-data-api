@@ -187,22 +187,22 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 	 * 1系統のすべてのポケモンを取得する。<br>
 	 * ニャースの場合、ニャース（全リージョン）、ペルシアン、ニャイキング。全て。
 	 * rootのポケモンの図鑑Noを取得して、そこからleaf側に探索していく。
+	 * ※メガ進化(9999M99)を引数に渡すと、メガ進化前のポケモンに進化前が存在するとバグるため気をつけること。
 	 *
 	 * @param pid
 	 * @return
 	 */
 	@Query(value = "WITH RECURSIVE tree AS ("
-			+ "  SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id ~~* any("
-			+ "    ("
-			+ "      WITH RECURSIVE root AS ("
-			+ "        SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id = :pid"
-			+ "        UNION ALL"
-			+ "        SELECT evo.pokedex_id, evo.before_pokedex_id"
-			+ "          FROM evolution evo"
-			+ "          INNER JOIN root r ON evo.pokedex_id = r.before_pokedex_id"
+			+ "  SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id ~~ any("
+			+ "    WITH RECURSIVE root AS ("
+			+ "      SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id = :pid"
+			+ "      UNION ALL"
+			+ "      SELECT evo.pokedex_id, evo.before_pokedex_id"
+			+ "        FROM evolution evo"
+			+ "        INNER JOIN root r ON evo.pokedex_id = r.before_pokedex_id"
 			+ "    )"
 			+ "    SELECT DISTINCT substring(pokedex_id, 1, 4) || '%' FROM root WHERE before_pokedex_id = 'root'"
-			+ "  ))"
+			+ "  )"
 			+ "  UNION ALL"
 			+ "  SELECT evo2.pokedex_id, evo2.before_pokedex_id"
 			+ "    FROM evolution evo2"

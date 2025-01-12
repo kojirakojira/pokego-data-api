@@ -224,21 +224,6 @@ class EvolutionInfo {
 
 		List<EvolutionPk> pkList = evolList.stream().map(EvolutionPk::new).toList();
 
-//		List<Hierarchy> hieList = new ArrayList<>();
-//		for (Evolution evol: evolList) {
-//			GoPokedex goPokedex = gpList.stream()
-//					.filter(gp -> evol.getPokedexId().equals(gp.getPokedexId()))
-//					.findAny().orElseThrow();
-//
-//			hieList.add(new Hierarchy(
-//					0, // x軸は一旦0で初期化
-//					getY(evol.getPokedexId(), pkList), // 第何形態かを取得
-//					0, // x軸の距離も一旦0で初期化
-//					evol.getPokedexId(),
-//					evol.getBeforePokedexId(),
-//					evolutionUtility.getCosts(evol, goPokedex.isImplFlg()),
-//					evolutionUtility.canGoEvo(evol)));
-//		}
 		List<Hierarchy> hieList = evolList.stream()
 				.map(evol -> {
 					GoPokedex goPokedex = gpList.stream()
@@ -329,6 +314,13 @@ class EvolutionInfo {
 	 * @return
 	 */
 	private int getY(String pid, List<EvolutionPk> pkList) {
+		
+		if (pkList.stream()
+				.filter(pk -> PokemonEditUtils.isMega(pk.getPokedexId()))
+				.anyMatch(e -> true)) {
+			// メガ進化に進化前、進化後が存在することはない。
+			return 1;
+		}
 
 		return incrStageCallRecursively(pid, pkList, 0);
 	}
