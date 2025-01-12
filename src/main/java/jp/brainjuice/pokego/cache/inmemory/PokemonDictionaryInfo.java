@@ -95,7 +95,7 @@ public class PokemonDictionaryInfo {
 		List<String> otherList = tokens.stream()
 				.filter(t -> t.getPartOfSpeechLevel1().equals("名詞"))
 				.filter(t -> !t.getReading().equals("*"))
-				.map(t -> t.getReading())
+				.map(t -> t.getSurface())
 				.collect(Collectors.toList());
 
 		// グループを示す単語（ブイズなど）からpokedexIdのリストを取得する。

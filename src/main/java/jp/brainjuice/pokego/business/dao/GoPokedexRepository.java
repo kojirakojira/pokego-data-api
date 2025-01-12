@@ -31,8 +31,8 @@ public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, J
 	 * @return
 	 */
 	@Meta(comment = "find goPokedex by name like in")
-	@Query(value = "SELECT * FROM go_pokedex gp WHERE name ~~* :names", nativeQuery = true)
-	List<GoPokedex> findByNameLikeIn(Iterable<String> names);
+	@Query(value = "SELECT * FROM go_pokedex gp WHERE name LIKE ANY(:names)", nativeQuery = true)
+	List<GoPokedex> findByNameLikeIn(String[] names);
 
 	/**
 	 * 備考を部分一致で検索
@@ -41,8 +41,8 @@ public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, J
 	 * @return
 	 */
 	@Meta(comment = "find by remarks containing")
-	@Query(value = "SELECT * FROM go_pokedex WHERE remarks ~~* any(:remarks)", nativeQuery = true)
-	List<GoPokedex> findByRemarksContaining(List<String> remarks);
+	@Query(value = "SELECT * FROM go_pokedex WHERE remarks LIKE ANY(:remarks)", nativeQuery = true)
+	List<GoPokedex> findByRemarksContaining(String[] remarks);
 
 	/**
 	 * 実装フラグで絞り込んだGoPokedexを取得

@@ -275,6 +275,16 @@ public final class BjUtils {
 			list.add(editFunc.apply(str));
 		}
 	}
+	
+	/**
+	 * 部分一致検索用の文字列(%str%)を生成する。
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String wrapWithPercent(String str) {
+		return '%' + str + '%';
+	}
 
 	/**
 	 * resources配下に配置したYamlファイルを読み込み、ファイル内容を返却する。

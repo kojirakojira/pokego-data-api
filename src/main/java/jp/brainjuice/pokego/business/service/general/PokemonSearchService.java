@@ -181,7 +181,7 @@ public class PokemonSearchService {
 		transWords = BjUtils.transHiraToKana(transWords);
 
 		// 形態素解析をして検索
-		List<GoPokedex> goPokedexList = searchGeneral(transWords);
+		List<GoPokedex> goPokedexList = searchGeneral(words);
 		result.setSearched(true);
 
 		// 1件もヒットしなかった場合
@@ -227,7 +227,7 @@ public class PokemonSearchService {
 	/**
 	 * 入力された文字列を形態素解析で分解し、名詞（ポケモン名、それ以外）から検索をおこなう。
 	 *
-	 * @param words
+	 * @param transWords
 	 * @return
 	 */
 	private List<GoPokedex> searchGeneral(String words) {
@@ -242,7 +242,7 @@ public class PokemonSearchService {
 
 		// ポケモン名からGoPokedexリストを取得
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByNameLikeIn(
-				pokemonList.stream().map(p -> MessageFormat.format("%{0}%", p)).toList());
+				pokemonList.stream().map(BjUtils::wrapWithPercent).toArray(String[]::new));
 
 		// groupListが空でない場合、goPokedexListにがっちゃんこする。
 		if (!groupList.isEmpty()) {
@@ -257,12 +257,14 @@ public class PokemonSearchService {
 
 		if (goPokedexList.isEmpty()) {
 			// ポケモン名がヒットしなかった場合
-
-			List<String> otherTmpList = otherList.stream()
-					.filter(o -> 2 < o.length())
-					.collect(Collectors.toList());
-
-			goPokedexList = goPokedexRepository.findByRemarksContaining(otherTmpList);
+			
+			// まず、入力された文字列から、そのまま備考を検索する。
+			goPokedexList = searchRemarks(List.of(words));
+			
+			if (goPokedexList.isEmpty()) {
+				// ない場合は、形態素解析して、名詞判定された値から備考を検索する。
+				goPokedexList = searchRemarks(otherList);
+			}
 
 		} else if (!otherList.isEmpty()) {
 			// ポケモン名以外の名詞が存在する場合
@@ -293,12 +295,13 @@ public class PokemonSearchService {
 	private List<GoPokedex> searchFuzzy(String name) {
 
 		// 2文字単位で分割する。
-		List<String> nameList = toFuzzyNameList(name);
+		String[] nameArr = toFuzzyNameList(name).stream()
+				.map(BjUtils::wrapWithPercent)
+				.toArray(String[]::new);
 		// 検索
-		return goPokedexRepository.findByNameLikeIn(nameList);
+		return goPokedexRepository.findByNameLikeIn(nameArr);
 
 	}
-
 
 	/**
 	 * 文字を2文字ずつに区切ったリストを返却する。
@@ -321,5 +324,21 @@ public class PokemonSearchService {
 		}
 
 		return list;
+	}
+	
+	/**
+	 * 備考から部分一致検索します。
+	 * 
+	 * @param wordList
+	 * @return
+	 */
+	private List<GoPokedex> searchRemarks(List<String> wordList) {
+
+		String[] otherTmpArr = wordList.stream()
+				.filter(o -> 2 < o.length())
+				.map(BjUtils::wrapWithPercent)
+				.toArray(String[]::new);
+
+		return goPokedexRepository.findByRemarksContaining(otherTmpArr);
 	}
 }
