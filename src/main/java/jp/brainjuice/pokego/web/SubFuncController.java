@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.web;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jp.brainjuice.pokego.business.service.sub.AdminCommentService;
 import jp.brainjuice.pokego.business.service.sub.OgpInfoService;
 import jp.brainjuice.pokego.business.service.sub.PrevNextPokemonService;
 import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
@@ -40,6 +43,8 @@ public class SubFuncController {
 	private OgpInfoService ogpInfoService;
 
 	private TopicListProvider topicListProvider;
+	
+	private AdminCommentService adminCommentService;
 
 	private ViewsCacheProvider viewsCacheProvider;
 
@@ -48,6 +53,7 @@ public class SubFuncController {
 			PrevNextPokemonService prevNextPokemonService,
 			OgpInfoService ogpInfoService,
 			TopicListProvider topicListProvider,
+			AdminCommentService adminCommentService,
 			ViewsCacheProvider viewsCacheProvider) {
 
 		this.prevNextPokemonService = prevNextPokemonService;
@@ -55,6 +61,8 @@ public class SubFuncController {
 		this.ogpInfoService = ogpInfoService;
 
 		this.topicListProvider = topicListProvider;
+		
+		this.adminCommentService = adminCommentService;
 
 		this.viewsCacheProvider = viewsCacheProvider;
 
@@ -115,6 +123,17 @@ public class SubFuncController {
 		return ogpTypeRes;
 	}
 
+
+	/**
+	 * 話題の○○一覧を強制的に更新するAPI
+	 *
+	 * @return
+	 */
+	@GetMapping("/adminComment")
+	public List<String> adminComment() {
+
+		return adminCommentService.exec();
+	}
 
 	/**
 	 * 話題のページ取得用API
