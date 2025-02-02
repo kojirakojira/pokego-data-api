@@ -40,10 +40,6 @@ public class GoPokedexFilterService {
 	 */
 	public List<GoPokedex> findByAny(Map<FilterEnum, FilterParam> filterMap) {
 
-		if (filterMap == null || filterMap.isEmpty()) {
-			return new ArrayList<>();
-		}
-
 		Specification<GoPokedex> spec = generateSpecification(filterMap);
 		List<GoPokedex> goPokedex = goPokedexRepository.findAll(spec);
 
