@@ -945,7 +945,7 @@ INSERT INTO pokedex (pokedex_id, name, hp, attack, defense, special_attack, spec
     ('0773N01', 'シルヴァディ', 95, 95, 95, 95, 95, 95, '', 'normal', null, 'g7', null, null, FALSE),
     ('0774N01', 'メテノ', 60, 60, 100, 60, 100, 60, 'りゅうせいのすがた', 'rock', 'flying', 'g7', null, null, FALSE),
     ('0774N02', 'メテノ', 60, 100, 60, 100, 60, 120, 'コア', 'rock', 'flying', 'g7', null, null, FALSE),
-    ('0775N01', 'ネッコアラ', 65, 115, 65, 75, 95, 65, '', 'normal', null, 'g7', null, null, FALSE),
+    ('0775N01', 'ネッコアラ', 65, 115, 65, 75, 95, 65, '', 'normal', null, 'g7', null, null, TRUE),
     ('0776N01', 'バクガメス', 60, 78, 135, 91, 85, 36, '', 'fire', 'dragon', 'g7', null, null, TRUE),
     ('0777N01', 'トゲデマル', 65, 98, 63, 40, 73, 96, '', 'electric', 'steel', 'g7', null, null, TRUE),
     ('0778N01', 'ミミッキュ', 55, 90, 80, 50, 105, 96, '', 'ghost', 'fairy', 'g7', null, null, FALSE),
