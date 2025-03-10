@@ -17,6 +17,7 @@ public class TypeScoreResponse extends ResearchResponse {
 	private boolean executedType;
 	private TypeEnum type1;
 	private TypeEnum type2;
+	private double totalScore;
 	private double attacker1Score;
 	private double attacker2Score;
 	private double defenderScore;

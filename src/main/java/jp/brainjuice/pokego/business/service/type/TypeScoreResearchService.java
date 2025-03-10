@@ -60,10 +60,14 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 		res.setType2(type2);
 
 		// 評価
+		// 総合評価
+		res.setTotalScore(typeChartInfo.totalScore(type1, type2));
+		// こうげき
 		res.setAttacker1Score(typeChartInfo.attackerScore(type1));
 		if (type2 != null) {
 			res.setAttacker2Score(typeChartInfo.attackerScore(type2));
 		}
+		// ぼうぎょ
 		res.setDefenderScore(typeChartInfo.defenderScore(type1, type2));
 
 		// 倍率ごとのタイプリスト

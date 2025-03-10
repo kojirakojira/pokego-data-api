@@ -2,11 +2,11 @@ package jp.brainjuice.pokego.business.service.utils.dto.type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -41,31 +41,36 @@ public class TypeStrength {
 	 *
 	 * @return
 	 */
-	public Map<TypeEnum, Double> mapping() {
+	public Map<TypeEnum, TypeEffectiveEnum> mapping() {
+		
+		// Map<ダメージ倍率, TypeEffectiveEnum>
+		Map<Double, TypeEffectiveEnum> effectiveMap = Map.ofEntries(
+				Map.entry(Double.valueOf(TypeEffectiveEnum.HIGH.getDamageMultiplier()), TypeEffectiveEnum.HIGH),
+				Map.entry(Double.valueOf(TypeEffectiveEnum.NORMAL.getDamageMultiplier()), TypeEffectiveEnum.NORMAL),
+				Map.entry(Double.valueOf(TypeEffectiveEnum.LOW.getDamageMultiplier()), TypeEffectiveEnum.LOW),
+				Map.entry(Double.valueOf(TypeEffectiveEnum.VERY_LOW.getDamageMultiplier()), TypeEffectiveEnum.VERY_LOW)
+				);
 
-
-		final Map<TypeEnum, Double> map = new LinkedHashMap<>(18 * 4 / 3);
-
-		map.put(TypeEnum.normal, getNormal());
-		map.put(TypeEnum.fire, getFire());
-		map.put(TypeEnum.water, getWater());
-		map.put(TypeEnum.grass, getGrass());
-		map.put(TypeEnum.electric, getElectric());
-		map.put(TypeEnum.ice, getIce());
-		map.put(TypeEnum.fighting, getFighting());
-		map.put(TypeEnum.poison, getPoison());
-		map.put(TypeEnum.ground, getGround());
-		map.put(TypeEnum.flying, getFlying());
-		map.put(TypeEnum.psychic, getPsychic());
-		map.put(TypeEnum.bug, getBug());
-		map.put(TypeEnum.rock, getRock());
-		map.put(TypeEnum.ghost, getGhost());
-		map.put(TypeEnum.dragon, getDragon());
-		map.put(TypeEnum.dark, getDark());
-		map.put(TypeEnum.steel, getSteel());
-		map.put(TypeEnum.fairy, getFairy());
-
-		return map;
+		return Map.ofEntries(
+				Map.entry(TypeEnum.normal, effectiveMap.get(getNormal())),
+				Map.entry(TypeEnum.fire, effectiveMap.get(getFire())),
+				Map.entry(TypeEnum.water, effectiveMap.get(getWater())),
+				Map.entry(TypeEnum.grass, effectiveMap.get(getGrass())),
+				Map.entry(TypeEnum.electric, effectiveMap.get(getElectric())),
+				Map.entry(TypeEnum.ice, effectiveMap.get(getIce())),
+				Map.entry(TypeEnum.fighting, effectiveMap.get(getFighting())),
+				Map.entry(TypeEnum.poison, effectiveMap.get(getPoison())),
+				Map.entry(TypeEnum.ground, effectiveMap.get(getGround())),
+				Map.entry(TypeEnum.flying, effectiveMap.get(getFlying())),
+				Map.entry(TypeEnum.psychic, effectiveMap.get(getPsychic())),
+				Map.entry(TypeEnum.bug, effectiveMap.get(getBug())),
+				Map.entry(TypeEnum.rock, effectiveMap.get(getRock())),
+				Map.entry(TypeEnum.ghost, effectiveMap.get(getGhost())),
+				Map.entry(TypeEnum.dragon, effectiveMap.get(getDragon())),
+				Map.entry(TypeEnum.dark, effectiveMap.get(getDark())),
+				Map.entry(TypeEnum.steel, effectiveMap.get(getSteel())),
+				Map.entry(TypeEnum.fairy, effectiveMap.get(getFairy()))
+				);
 	}
 
 	/**

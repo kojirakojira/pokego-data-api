@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +22,8 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TypeStrength;
 import jp.brainjuice.pokego.utils.BjCsvMapper;
+import jp.brainjuice.pokego.utils.BjUtils;
+import jp.brainjuice.pokego.utils.exception.PokemonDataException;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,13 +43,47 @@ public class TypeChartInfo {
 	/** 相性表のファイル名 */
 	private static final String FILE_NAME = "pokemon/type-chart.csv";
 
+	// 重視する際の重み
+	private static final double ATK_WEIGHT = 2.0;
+	private static final double DEF_WEIGHT = 5.0;
+
+	// 重み(重みは正の値でないとバグる）
+	private static final double ATK_HIGH_WEIGHT = 7.0;
+	private static final double ATK_NORMAL_WEIGHT = 4.0;
+	private static final double ATK_LOW_WEIGHT = 2.0;
+	private static final double ATK_VERY_LOW_WEIGHT = 1.0;
+
+	private static final double DEF_MAX_WEIGHT = -5.0 + 5.0;
+	private static final double DEF_HIGH_WEIGHT = -2.5 + 5.0;
+	private static final double DEF_NORMAL_WEIGHT = 1.0 + 5.0;
+	private static final double DEF_LOW_WEIGHT = 2.0 + 5.0;
+	private static final double DEF_VERY_LOW_WEIGHT = 3.0 + 5.0;
+	private static final double DEF_MIN_WEIGHT = 4.0 + 5.0;
+	
+	// 評価スコアの最大値、最低値（総合評価）
+	private static final int TOTAL_MAX_SCORE = 5;
+	private static final int TOTAL_MIN_SCORE = 2;
+	private static final BiFunction<Double, Double, Function<Double, Double>> totalScoreFunc = (atk1, atk2) -> (def) -> (atk1 + atk2) / 2 + def;
+	
+	// 評価スコアの最大値、最低値（こうげき時）
+	private static final int ATK_MAX_SCORE = 5;
+	private static final int ATK_MIN_SCORE = 2;
+
+	// 評価スコアの最大値、最低値（ぼうぎょ時）
+	private static final int DEF_MAX_SCORE = 5;
+	private static final int DEF_MIN_SCORE = 2;
+
+	// 最大、最小の総合スコア(こうげき+ぼうぎょ)
+	private double maxTotalScore;
+	private double minTotalScore;
+
 	// 最大、最小の攻撃する側のスコア
-	private double maxAfScore;
-	private double minAfScore;
+	private double maxAtkScore;
+	private double minAtkScore;
 
 	// 最大、最小の攻撃を受ける側のスコア
-	private double maxDfScore;
-	private double minDfScore;
+	private double maxDefScore;
+	private double minDefScore;
 
 	/**
 	 * スコアを求める際、こうげき・ぼうぎょ偏重で求めたい場合に使用する。
@@ -143,14 +179,14 @@ public class TypeChartInfo {
 			retMap.put(tee, new ArrayList<>());
 		}
 
-		Map<TypeEnum, Double> strength1Map = getDefenderTypeStrength(type1).mapping();
-		Map<TypeEnum, Double> strength2Map = getDefenderTypeStrength(type2).mapping();
+		Map<TypeEnum, TypeEffectiveEnum> strength1Map = getDefenderTypeStrength(type1).mapping();
+		Map<TypeEnum, TypeEffectiveEnum> strength2Map = getDefenderTypeStrength(type2).mapping();
 
 		for (TypeEnum type: TypeEnum.values()) {
-			final double effective = strength1Map.get(type).doubleValue() * strength2Map.get(type).doubleValue();
+			final double effective = strength1Map.get(type).getDamageMultiplier() * strength2Map.get(type).getDamageMultiplier();
 
 			for (TypeEffectiveEnum tee: TypeEffectiveEnum.values()) {
-				if (Math.abs(tee.getDamageMultiplier() - effective) < 0.0001) {
+				if (BjUtils.doubleEquals(tee.getDamageMultiplier(), effective, 0.0001)) {
 					// (誤差を考慮した上で)倍率が一致するリストに追加する。
 					retMap.get(tee).add(type);
 					break;
@@ -172,12 +208,12 @@ public class TypeChartInfo {
 	 */
 	public List<TypeEnum> getAttackerTypes(TypeEnum type, TypeEffectiveEnum effective) {
 
-		final Map<TypeEnum, Double> strengthMap = getAttackerTypeStrength(type).mapping();
+		final Map<TypeEnum, TypeEffectiveEnum> strengthMap = getAttackerTypeStrength(type).mapping();
 
 		final double damageRate = effective.getDamageMultiplier();
 
 		return strengthMap.entrySet().stream()
-				.filter(e -> e.getValue().doubleValue() == damageRate)
+				.filter(e -> e.getValue().getDamageMultiplier() == damageRate)
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
 	}
@@ -192,12 +228,12 @@ public class TypeChartInfo {
 	 */
 	public List<TypeEnum> getDefenderTypes(TypeEnum type, TypeEffectiveEnum effective) {
 
-		final Map<TypeEnum, Double> strengthMap = getDefenderTypeStrength(type).mapping();
+		final Map<TypeEnum, TypeEffectiveEnum> strengthMap = getDefenderTypeStrength(type).mapping();
 
 		final double damageRate = effective.getDamageMultiplier();
 
 		return strengthMap.entrySet().stream()
-				.filter(e -> e.getValue().doubleValue() == damageRate)
+				.filter(e -> e.getValue().getDamageMultiplier() == damageRate)
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
 	}
@@ -289,11 +325,12 @@ public class TypeChartInfo {
 
 		BiFunction<TypeStrength, TypeEnum, Double> func = (ts, te) -> te == null ? 1.0 : ts.get(te);
 
+		//TODO: ロジックを見直す
 		// 重みは5.0とする。(最小倍率≒0.244のため、4.167倍より大きければ何でもよい。
-		double atkEmphasisMult = emphasis == EmphasisEnum.attack ? 5.0 : 1.0;
-		double defEmphasisMult = emphasis == EmphasisEnum.defense ? 5.0 : 1.0;
+		double atkEmphasisMult = emphasis == EmphasisEnum.attack ? ATK_WEIGHT : 1.0;
+		double defEmphasisMult = emphasis == EmphasisEnum.defense ? DEF_WEIGHT : 1.0;
 
-		// スコアを求めるFunction。こうげきスコアに対してぼうぎょスコアを除算する。
+		// スコアを求めるFunction。こうげきスコアに対してぼうぎょスコアさ減算する。
 		BiFunction<TypeEnum, TypeEnum, Double> func2 = (te1, te2) -> {
 					TypeStrength atTs = getAttackerTypeStrength(te1);
 					TypeStrength dfTs = getDefenderTypeStrength(te1);
@@ -337,8 +374,24 @@ public class TypeChartInfo {
 	 * @param type
 	 * @return
 	 */
-	public double score(TypeEnum type) {
-		double score = attackerScore(type) + defenderScore(type);
+	public double totalScore(TypeEnum type1, TypeEnum type2) {
+		double atkPoint1;
+		double atkPoint2;
+		double defPoint;
+		if (type1 == null || type2 == null || type1 == type2) {
+			// type1かtype2がnull、またはtype1とtype2が一致する場合は、単一タイプとして実行。
+			TypeEnum type = type1 == null ? type2 : type1;
+			atkPoint1 = getAttackerPoint(type);
+			atkPoint2 = atkPoint1;
+			defPoint = getDefenderPoint(type);
+		} else {
+			atkPoint1 = getAttackerPoint(type1);
+			atkPoint2 = getAttackerPoint(type2);
+			defPoint = getDefenderPoint(type1, type2);
+		}
+		double totalScore = totalScoreFunc.apply(atkPoint1, atkPoint2).apply(defPoint);
+		double score = 1 - ((maxTotalScore - totalScore) / (maxTotalScore - minTotalScore));
+		score = score * (TOTAL_MAX_SCORE - TOTAL_MIN_SCORE) + TOTAL_MIN_SCORE;
 		return ((double) Math.round(score * 10d)) / 10d;
 	}
 
@@ -350,7 +403,8 @@ public class TypeChartInfo {
 	 * @return
 	 */
 	public double attackerScore(TypeEnum type) {
-		double score = (getAttackerPoint(type) - minAfScore) * 5 / (maxAfScore - minAfScore);
+		double score = 1 - ((maxAtkScore - getAttackerPoint(type)) / (maxAtkScore - minAtkScore));
+		score = score * (ATK_MAX_SCORE - ATK_MIN_SCORE) + ATK_MIN_SCORE;
 		return ((double) Math.round(score * 10d)) / 10d;
 	}
 
@@ -362,7 +416,8 @@ public class TypeChartInfo {
 	 * @return
 	 */
 	public double defenderScore(TypeEnum type) {
-		double score = (maxDfScore - getDefenderPoint(type)) * 5 / (maxDfScore - minDfScore);
+		double score = 1 - ((maxDefScore - getDefenderPoint(type)) / (maxDefScore - minDefScore));
+		score = score * (DEF_MAX_SCORE - DEF_MIN_SCORE) + DEF_MIN_SCORE;
 		return ((double) Math.round(score * 10d)) / 10d;
 	}
 
@@ -380,9 +435,10 @@ public class TypeChartInfo {
 			TypeEnum type = type1 == null ? type2 : type1;
 			point = getDefenderPoint(type);
 		} else {
-			point = (getDefenderPoint(type1) + getDefenderPoint(type2)) / 2;
+			point = getDefenderPoint(type1, type2);
 		}
-		double score = (maxDfScore - point) * 5 / (maxDfScore - minDfScore);
+		double score = 1 - ((maxDefScore - point) / (maxDefScore - minDefScore));
+		score = score * (DEF_MAX_SCORE - DEF_MIN_SCORE) + DEF_MIN_SCORE;
 		return ((double) Math.round(score * 10d)) / 10d;
 	}
 
@@ -397,11 +453,22 @@ public class TypeChartInfo {
 		double score = 0d;
 		TypeStrength attackerTypeStrength = getAttackerTypeStrength(type);
 
-		Map<TypeEnum, Double> strengthMap = attackerTypeStrength.mapping();
-		for (Map.Entry<TypeEnum, Double> entry: strengthMap.entrySet()) {
-			score+=entry.getValue().doubleValue();
+		List<TypeEffectiveEnum> effectiveList = attackerTypeStrength.mapping().entrySet().stream()
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toList());
+		for (TypeEffectiveEnum effective: effectiveList) {
+			double s = switch (effective) {
+			case HIGH -> ATK_HIGH_WEIGHT; // ×1.6
+			case NORMAL -> ATK_NORMAL_WEIGHT; // ×1
+			case LOW -> ATK_LOW_WEIGHT; // ×0.625
+			case VERY_LOW -> ATK_VERY_LOW_WEIGHT; // ×0.390625
+			case MAX, MIN -> throw new PokemonDataException(MessageFormat.format("想定外の倍率が渡されました。({0)", effective)); // ×2.56, ×0.244140625
+			default -> throw new PokemonDataException(MessageFormat.format("想定外の倍率が渡されました。({0)", effective));
+			};
+			score+=s;
 		}
 
+		System.out.println(type.getJpn() + "," + score);
 		return score;
 	}
 
@@ -416,9 +483,75 @@ public class TypeChartInfo {
 		double score = 0d;
 		TypeStrength defenderTypeStrength = getDefenderTypeStrength(type);
 
-		Map<TypeEnum, Double> strengthMap = defenderTypeStrength.mapping();
-		for (Map.Entry<TypeEnum, Double> entry: strengthMap.entrySet()) {
-			score+=entry.getValue().doubleValue();
+		List<TypeEffectiveEnum> effectiveList = defenderTypeStrength.mapping().entrySet().stream()
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toList());
+		for (TypeEffectiveEnum effective: effectiveList) {
+			double s = switch (effective) {
+			case HIGH -> DEF_HIGH_WEIGHT; // ×1.6
+			case NORMAL -> DEF_NORMAL_WEIGHT; // ×1
+			case LOW -> DEF_LOW_WEIGHT; // ×0.625
+			case VERY_LOW -> DEF_VERY_LOW_WEIGHT; // ×0.390625
+			case MAX, MIN -> throw new PokemonDataException(MessageFormat.format("想定外の倍率が渡されました。({0)", effective)); // ×2.56, ×0.244140625
+			default -> throw new PokemonDataException(MessageFormat.format("想定外の倍率が渡されました。({0)", effective));
+			};
+			score+=s;
+		}
+
+		return score;
+	}
+
+	/**
+	 * 攻撃を受ける側における、すべてのタイプとの相性をスコア化する。<br>
+	 * スコアが低い方が強い。
+	 *
+	 * @param type1
+	 * @param type2
+	 * @return
+	 */
+	private double getDefenderPoint(TypeEnum type1, TypeEnum type2) {
+		double score = 0d;
+		
+		// タイプ1
+		TypeStrength defenderTypeStrength1 = getDefenderTypeStrength(type1);
+		List<TypeEffectiveEnum> effectiveList1 = defenderTypeStrength1.mapping().entrySet().stream()
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toList());
+		
+		// タイプ2
+		List<TypeEffectiveEnum> effectiveList2 = null;
+		// タイプ1とタイプ2が一致している時は、type2はないものとする。
+		if (type1 != type2 && type2 != null) {
+			TypeStrength defenderTypeStrength2 = getDefenderTypeStrength(type2);
+			effectiveList2 = defenderTypeStrength2.mapping().entrySet().stream()
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toList());
+		}
+		
+		// タイプ1で初期化
+		List<TypeEffectiveEnum> effectiveList = effectiveList1;
+		if (effectiveList2 != null) {
+			effectiveList = new ArrayList<>();
+			for (int i = 0; i < effectiveList1.size(); i++) {
+				double effective = 
+						effectiveList1.get(i).getDamageMultiplier() * 
+						effectiveList2.get(i).getDamageMultiplier();
+
+				effectiveList.add(TypeEffectiveEnum.lookup(effective));
+			}
+		}
+		
+		for (TypeEffectiveEnum effective: effectiveList) {
+			double s = switch (effective) {
+			case MAX -> DEF_MAX_WEIGHT; // ×2.56
+			case HIGH -> DEF_HIGH_WEIGHT; // ×1.6
+			case NORMAL -> DEF_NORMAL_WEIGHT; // ×1
+			case LOW -> DEF_LOW_WEIGHT; // ×0.625
+			case VERY_LOW -> DEF_VERY_LOW_WEIGHT; // ×0.390625
+			case MIN -> DEF_MIN_WEIGHT; // ×0.244140625
+			default -> throw new PokemonDataException(MessageFormat.format("想定外の倍率が渡されました。({0)", effective));
+			};
+			score+=s;
 		}
 
 		return score;
@@ -451,22 +584,20 @@ public class TypeChartInfo {
 
 		/* typeChartMapの各要素から受ける側の倍率を取得する。 */
 		// keyは攻撃する側のタイプ、valueは倍率。
-		final Map<TypeEnum, Double> strengthMap = new HashMap<>();
-		{
-
-			for (Map.Entry<TypeEnum, TypeStrength> entry: typeChartMap.entrySet()) {
-
-				// 各要素を取得し、putする。
-				final double strength = entry.getValue().get(type);
-				strengthMap.put(entry.getKey(), Double.valueOf(strength));
-			}
-		}
+		final Map<TypeEnum, Double> strengthMap = typeChartMap.entrySet().stream()
+				.collect(Collectors.toMap(
+						entry -> entry.getKey(), 
+						entry -> {
+							// 各要素を取得し、putする。
+							final double strength = entry.getValue().get(type);
+							return Double.valueOf(strength);
+						}));
 
 		// 返却値用のTypeStrengthのsetterにアクセスし、セットする。
-		final Set<Map.Entry<TypeEnum, Double>> entrySet = strengthMap.entrySet();
-		for (Map.Entry<TypeEnum, Double> entry: entrySet) {
+		strengthMap.entrySet().stream()
+		.forEach(entry -> {
 			typeStrength.set(entry.getKey(), entry.getValue().doubleValue());
-		}
+		});
 
 		return typeStrength;
 	}
@@ -517,31 +648,42 @@ public class TypeChartInfo {
 			throw new PokemonDataInitException(e);
 		}
 
-		maxAfScore = 0d;
-		minAfScore = 99d;
-		for (TypeEnum type: TypeEnum.values()) {
-			double score = getAttackerPoint(type);
-			if (maxAfScore < score) {
-				maxAfScore = score;
-			}
-			if (minAfScore > score) {
-				minAfScore = score;
-			}
-		}
-
-		maxDfScore = 0d;
-		minDfScore = 99d;
+		// こうげき
+		maxAtkScore = 0d;
+		minAtkScore = 999d;
+		// ぼうぎょ
+		maxDefScore = 0d;
+		minDefScore = 999d;
+		// 総合
+		maxTotalScore = 0d;
+		minTotalScore = 999d;
 		for (TypeEnum type1: TypeEnum.values()) {
-			double score1 = getDefenderPoint(type1);
+			double atkScore = getAttackerPoint(type1);
+			if (maxAtkScore < atkScore) {
+				maxAtkScore = atkScore;
+			}
+			if (minAtkScore > atkScore) {
+				minAtkScore = atkScore;
+			}
+			
 			for (TypeEnum type2: TypeEnum.values()) {
-				double score2 = getDefenderPoint(type2);
-				double score = type1 == type2 ? score1 : (score1 + score2) / 2;
-				if (maxDfScore < score) {
-					maxDfScore = score;
+				double defScore = getDefenderPoint(type1, type2);
+				if (maxDefScore < defScore) {
+					maxDefScore = defScore;
 				}
-				if (minDfScore > score) {
-					minDfScore = score;
+				if (minDefScore > defScore) {
+					minDefScore = defScore;
 				}
+
+				double atkScore2= getAttackerPoint(type2);
+				double totalScore = totalScoreFunc.apply(atkScore, atkScore2).apply(defScore);
+				if (maxTotalScore < totalScore) {
+					maxTotalScore = totalScore;
+				}
+				if (minTotalScore > totalScore) {
+					minTotalScore = totalScore;
+				}
+				
 			}
 		}
 

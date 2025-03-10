@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.constant;
 
+import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -157,6 +158,32 @@ public class Type {
 		/** ダメージ倍率 */
 		@Getter
 		private double damageMultiplier;
+		
+		/**
+		 * 倍率からTypeEffectiveEnumを取得する。
+		 * @param d
+		 * @return
+		 */
+		public static TypeEffectiveEnum lookup(double d) {
+
+			double epsilon = 1e-9;
+			TypeEffectiveEnum effectiveEnum = null;
+			
+			if (BjUtils.doubleEquals(TypeEffectiveEnum.MAX.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.MAX;
+			} else if (BjUtils.doubleEquals(TypeEffectiveEnum.HIGH.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.HIGH;
+			} else if (BjUtils.doubleEquals(TypeEffectiveEnum.NORMAL.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.NORMAL;
+			} else if (BjUtils.doubleEquals(TypeEffectiveEnum.LOW.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.LOW;
+			} else if (BjUtils.doubleEquals(TypeEffectiveEnum.VERY_LOW.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.VERY_LOW;
+			} else if (BjUtils.doubleEquals(TypeEffectiveEnum.MIN.getDamageMultiplier(), d, epsilon)) {
+				effectiveEnum = TypeEffectiveEnum.MIN;
+			}
+			return effectiveEnum;
+		}
 	}
 
 	/**

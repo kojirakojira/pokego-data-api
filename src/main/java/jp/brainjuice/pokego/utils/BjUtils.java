@@ -371,4 +371,16 @@ public final class BjUtils {
     	float num = (float) Math.pow(10.0, roundDigit - 1);
     	return Math.round((divisor / divident) * num) / num;
     }
+    
+    /**
+     * double型を比較する用のメソッド
+     * 
+     * @param a
+     * @param b
+     * @param epsilon 許容する精度。double型の有効桁数は約15桁。つまり、一応1e-15まで指定できる。
+     * @return
+     */
+    public static boolean doubleEquals(double a, double b, double epsilon) {
+    	return Math.abs(a - b) < epsilon;
+    }
 }
