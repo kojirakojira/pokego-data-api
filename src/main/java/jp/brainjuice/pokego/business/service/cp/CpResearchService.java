@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.cp;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.ResearchService;
@@ -18,7 +17,6 @@ public class CpResearchService implements ResearchService<CpResponse> {
 
 	private CpMultiplierMap cpMultiplierMap;
 
-	@Autowired
 	public CpResearchService(
 			PokemonGoUtils pokemonGoUtils,
 			CpMultiplierMap cpMultiplierMap) {

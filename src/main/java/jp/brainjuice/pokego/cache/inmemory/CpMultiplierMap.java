@@ -100,8 +100,9 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	 */
 	public int indexOf(String pl) {
 
+		DecimalFormat plFormat = new DecimalFormat("00.0");
 		Map.Entry<String, Double> targetEntry = cpMultiplierList.stream()
-				.filter(entry -> entry.getKey().equals(pl))
+				.filter(entry -> entry.getKey().equals(plFormat.format(Double.parseDouble(pl))))
 				.findFirst().get();
 		return cpMultiplierList.indexOf(targetEntry);
 	}

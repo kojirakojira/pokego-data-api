@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -23,7 +22,6 @@ public class ScpRankCalculator {
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	@Autowired
 	public ScpRankCalculator(
 			CpMultiplierMap cpMultiplierMap,
 			PokemonGoUtils pokemonGoUtils) {

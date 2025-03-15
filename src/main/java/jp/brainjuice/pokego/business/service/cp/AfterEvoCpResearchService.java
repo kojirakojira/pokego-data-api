@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
@@ -36,7 +35,6 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 
 	private EvolutionProvider evolutionProvider;
 
-	@Autowired
 	public AfterEvoCpResearchService(
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,

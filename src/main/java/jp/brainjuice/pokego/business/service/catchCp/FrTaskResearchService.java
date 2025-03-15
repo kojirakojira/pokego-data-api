@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.business.service.catchCp;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -19,7 +18,6 @@ public class FrTaskResearchService implements ResearchService<FrTaskResponse> {
 
 	private CatchCpUtils catchCpUtils;
 
-	@Autowired
 	public FrTaskResearchService(CatchCpUtils catchCpUtils) {
 		this.catchCpUtils = catchCpUtils;
 	}

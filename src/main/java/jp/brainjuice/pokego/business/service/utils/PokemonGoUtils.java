@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -35,7 +34,6 @@ public class PokemonGoUtils {
 	/** calcPlメソッドにおいて、CPに対応するPLが存在しない場合のメッセージ */
 	public static final String NOT_EXIST = "NOT_EXIST";
 
-	@Autowired
 	public PokemonGoUtils(CpMultiplierMap cpMultiplierMap) {
 		this.cpMultiplierMap = cpMultiplierMap;
 	}
@@ -349,12 +347,7 @@ public class PokemonGoUtils {
 	 */
 	private int calcCp(int attack, int defense, int hp, String pl, CpMultiplierMap cpMultiplierMap) {
 
-		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(cpMultiplierMap.get(pl).doubleValue(), 2.0)) / 10.0);
-
-		if (cp <= LOWEST_CP) {
-			cp = LOWEST_CP;
-		}
-		return cp;
+		return calcCp(attack, defense, hp, cpMultiplierMap.get(pl).doubleValue());
 	}
 
 	/**
@@ -369,6 +362,7 @@ public class PokemonGoUtils {
 	 */
 	private int calcCp(int attack, int defense, int hp, double multiplier) {
 
+		// 四捨五入
 		int cp = (int) Math.floor(calcPlainCp(attack, defense, hp) * (Math.pow(multiplier, 2.0)) / 10.0);
 
 		if (cp <= LOWEST_CP) {

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -31,7 +30,6 @@ public class ThreeGalarBirdsResearchService implements ResearchService<ThreeGala
 
 	private List<String> tgbPidList = Arrays.asList("0144G01", "0145G01", "0146G01");
 
-	@Autowired
 	public ThreeGalarBirdsResearchService(
 			CpIvCalculator cpIvCalculator) {
 		this.cpIvCalculator = cpIvCalculator;

@@ -3,7 +3,6 @@ package jp.brainjuice.pokego.business.service.cp;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.SituationEnum;
@@ -40,7 +39,6 @@ public class CpIvResearchService implements ResearchService<CpIvResponse> {
 
 	private static final String CP_OUT_OF_SCOPE_MSG = "ありえないCPが指定されました。";
 
-	@Autowired
 	public CpIvResearchService(
 			CpIvCalculator cpIvCalculator) {
 		this.cpIvCalculator = cpIvCalculator;

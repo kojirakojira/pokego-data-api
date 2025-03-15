@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
@@ -25,8 +24,8 @@ import jp.brainjuice.pokego.business.service.utils.dto.type.AttackPattern;
 import jp.brainjuice.pokego.business.service.utils.dto.type.BattlePattern;
 import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.cache.inmemory.TypeChartInfo;
-import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
 import jp.brainjuice.pokego.cache.inmemory.TypeChartInfo.EmphasisEnum;
+import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.type.XTypeResponse;
 
@@ -44,7 +43,6 @@ public class XTypeService {
 	private static final int OPP_TYPE1 = 2;
 	private static final int OPP_TYPE2 = 3;
 
-	@Autowired
 	public XTypeService(TypeChartInfo typeChartInfo,
 			TypeCommentMap typeCommentMap) {
 		this.typeChartInfo = typeChartInfo;

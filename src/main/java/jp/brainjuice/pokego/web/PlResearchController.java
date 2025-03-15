@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +34,6 @@ public class PlResearchController {
 	private PlListResearchService plListResearchService;
 	private ResearchServiceExecutor<PlListResponse> plListResRse;
 
-	@Autowired
 	public PlResearchController(
 			PlResearchService plResearchService, ResearchServiceExecutor<PlResponse> plResRse,
 			PlListResearchService plListResearchService, ResearchServiceExecutor<PlListResponse> plListResRse) {

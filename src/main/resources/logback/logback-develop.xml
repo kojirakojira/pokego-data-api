@@ -3,9 +3,9 @@
 	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 	<timestamp key="LOG_DATE" datePattern="yyyyMMdd"/>
-	<property name="COMMON_LOG_FILE" value="/logs/common/common" />
-	<property name="REQUEST_LOG_FILE" value="/logs/common/request" />
-	<property name="TRACE_LOG_FILE" value="/logs/trace/trace" />
+	<property name="COMMON_LOG_FILE" value="/Applications/Eclipse_2024-09.app/Contents/workspace/logs/common/common" />
+	<property name="REQUEST_LOG_FILE" value="/Applications/Eclipse_2024-09.app/Contents/workspace/logs/request/request" />
+	<property name="TRACE_LOG_FILE" value="/Applications/Eclipse_2024-09.app/Contents/workspace/logs/trace/trace" />
 
 	<appender name="COMMON" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder>

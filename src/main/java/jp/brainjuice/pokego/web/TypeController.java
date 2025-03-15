@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +43,6 @@ public class TypeController {
 
 	private ViewsCacheProvider viewsCacheProvider;
 
-	@Autowired
 	public TypeController (
 			TypeScoreResearchService typeScoreResearchService, ResearchServiceExecutor<TypeScoreResponse> typeScoreResRse,
 			XTypeService xTypeService,

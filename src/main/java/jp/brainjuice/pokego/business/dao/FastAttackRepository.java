@@ -25,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FastAttackRepository extends InMemoryRepository<FastAttack, String> {
 
-	private AwsS3Utils awsS3Utils;
-
 	private static final String MSG_FORMAT_ERROR = "{0}の指定に誤りがあります。（技名：{1}, 行：{2}, 値：{3}）";
 
 	/** fast-attacks.csv */
@@ -40,7 +38,6 @@ public class FastAttackRepository extends InMemoryRepository<FastAttack, String>
 	 * @throws PokemonDataInitException
 	 */
 	public FastAttackRepository(AwsS3Utils awsS3Utils) throws PokemonDataInitException {
-		this.awsS3Utils = awsS3Utils;
 		init();
 	}
 

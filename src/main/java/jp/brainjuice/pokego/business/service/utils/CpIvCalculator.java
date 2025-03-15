@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -19,7 +18,6 @@ public class CpIvCalculator {
 
 	private CpMultiplierMap cpMultiplierMap;
 
-	@Autowired
 	public CpIvCalculator(
 			PokemonGoUtils pokemonGoUtils,
 			CpMultiplierMap cpMultiplierMap) {

@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.scp;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -15,7 +14,6 @@ public class ScpRankResearchService implements ResearchService<ScpRankResponse> 
 
 	private ScpRankCalculator scpRankCulculator;
 
-	@Autowired
 	public ScpRankResearchService(ScpRankCalculator scpRankCulculator) {
 		this.scpRankCulculator = scpRankCulculator;
 	}

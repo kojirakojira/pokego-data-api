@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.business.service.cp;
 
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
@@ -17,7 +16,6 @@ public class CpRankListResearchService implements ResearchService<CpRankListResp
 
 	private PokemonGoUtils pokemonGoUtils;
 
-	@Autowired
 	public CpRankListResearchService(PokemonGoUtils pokemonGoUtils) {
 		this.pokemonGoUtils = pokemonGoUtils;
 	}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -36,7 +35,6 @@ public class RaceDiffService {
 
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
 
-	@Autowired
 	public RaceDiffService(
 			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,

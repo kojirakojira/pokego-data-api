@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.business.service.catchCp.utils;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
@@ -23,7 +22,6 @@ public class CatchCpUtils {
 
 	private static final String MSG_MEGA_SELECTED = "メガシンカ（ゲンシカイキ含む）前のポケモンで算出しています。";
 
-	@Autowired
 	public CatchCpUtils(
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils) {

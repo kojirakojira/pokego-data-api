@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.business.service.scp;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.ResearchService;
@@ -17,7 +16,6 @@ public class ScpRankListResearchService implements ResearchService<ScpRankListRe
 
 	private ScpRankCalculator scpRankCulculator;
 
-	@Autowired
 	public ScpRankListResearchService(
 			ScpRankCalculator scpRankCulculator) {
 		this.scpRankCulculator = scpRankCulculator;
@@ -27,7 +25,7 @@ public class ScpRankListResearchService implements ResearchService<ScpRankListRe
 	public void exec(SearchValue sv, ScpRankListResponse res) {
 
 		// leagueを取得
-		String league = (String) sv.getParamsMap().get(ParamsEnum.league);
+		String league = sv.getParamsMap().get(ParamsEnum.league, String.class);
 		// scpRankListを生成
 		List<ScpRank> scpRankList = scpRankCulculator.getSummary(
 				sv.getGoPokedex(),

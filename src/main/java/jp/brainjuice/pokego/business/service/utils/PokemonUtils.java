@@ -97,7 +97,7 @@ public class PokemonUtils {
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedexId)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
-			// 個体値が高い個体の補正後は四捨五入
+			// 強ポケ補正後は四捨五入
 			baseHp = tooStrongRepository.existsById(pokedexId) ? Math.round(baseHp * correctionValue) : baseHp;
 		}
 

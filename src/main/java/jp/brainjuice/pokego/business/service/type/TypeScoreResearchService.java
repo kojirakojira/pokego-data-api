@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.type;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -18,7 +17,6 @@ public class TypeScoreResearchService implements ResearchService<TypeScoreRespon
 
 	TypeCommentMap typeCommentMap;
 
-	@Autowired
 	public TypeScoreResearchService(TypeChartInfo typeChartInfo, TypeCommentMap typeCommentMap) {
 		this.typeChartInfo = typeChartInfo;
 		this.typeCommentMap = typeCommentMap;
