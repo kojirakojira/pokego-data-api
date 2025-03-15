@@ -468,7 +468,6 @@ public class TypeChartInfo {
 			score+=s;
 		}
 
-		System.out.println(type.getJpn() + "," + score);
 		return score;
 	}
 

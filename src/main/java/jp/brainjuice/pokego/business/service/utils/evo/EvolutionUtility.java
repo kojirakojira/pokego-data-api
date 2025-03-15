@@ -81,8 +81,10 @@ class EvolutionUtility {
 
 	/**
 	 * 進化条件をリスト形式で取得する。
-	 *
+	 * 
 	 * @param evo
+	 * @param exclusionTypeSet
+	 * @param implFlg
 	 * @return
 	 */
 	List<String> getCosts(Evolution evo, Set<EvoCostType> exclusionTypeSet, boolean implFlg) {
@@ -138,7 +140,7 @@ class EvolutionUtility {
 	}
 
 	/**
-	 * その進化ツリー上のすべての注釈（evoAnnotation）を取得する。
+	 * その進化ツリー上のすべての注釈（evolAnnotation）を取得する。
 	 * @param pids
 	 * @return
 	 */

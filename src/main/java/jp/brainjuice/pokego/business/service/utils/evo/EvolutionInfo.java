@@ -119,6 +119,20 @@ class EvolutionInfo {
 	}
 
 	/**
+	 * 進化ツリー上の最後のポケモンを取得する。<br>
+	 * ※ポケモンGOで進化できるポケモンのみ取得する。
+	 *
+	 * @param pokedexId
+	 * @return
+	 */
+	List<String> getLeafCanGoEvol(String pokedexId) {
+
+		List<String> leafList = evolutionRepository.findLeafByIdCanGoEvol(pokedexId);
+
+		return leafList;
+	}
+
+	/**
 	 * 最終進化のポケモンかを判定する。
 	 *
 	 * @param pokedexId

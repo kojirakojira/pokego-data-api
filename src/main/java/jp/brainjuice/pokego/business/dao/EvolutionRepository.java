@@ -108,6 +108,31 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 	List<String> findLeafById(@Param("pid") String pid);
 
 
+	/**
+	 * 指定したポケモンの最終進化をすべて取得する。（メガシンカは含まない。）<br>
+	 * ポケモンGOで進化できるポケモンだけを取得する。
+	 *
+	 * @param pid
+	 * @return
+	 */
+	@Query(value = "WITH RECURSIVE tree(i, pokedex_id, before_pokedex_id) AS ("
+			+ "  SELECT 0, pokedex_id, before_pokedex_id"
+			+ "    FROM evolution "
+			+ "    WHERE pokedex_id = :pid"
+			+ "  UNION ALL"
+			+ "  SELECT i + 1, evol.pokedex_id, evol.before_pokedex_id"
+			+ "    FROM evolution evol"
+			+ "    INNER JOIN tree t "
+			+ "    ON evol.before_pokedex_id = t.pokedex_id"
+			+ "    AND evol.can_go_evol = true"
+			+ ")"
+			+ "SELECT pokedex_id"
+			+ "  FROM tree t "
+			+ "  WHERE t.i = (SELECT MAX(i) FROM tree t2)", nativeQuery = true)
+	@Meta(comment = "find leaf by id")
+	List<String> findLeafByIdCanGoEvol(@Param("pid") String pid);
+
+
 	@Query(value = "WITH RECURSIVE tree AS ("
 			+ "  SELECT pokedex_id, before_pokedex_id"
 			+ "    FROM evolution"

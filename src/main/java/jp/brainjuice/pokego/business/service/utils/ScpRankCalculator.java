@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.utils;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,11 +54,11 @@ public class ScpRankCalculator {
 	}
 
 	// スーパーリーグ用CP制限判定用Predicate
-	private final Predicate<Integer> slCpLimitPredicate = (arg) -> { return arg.intValue() <= 1500; };
+	public static final Predicate<Integer> SL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 1500; };
 	// ハイパーリーグ用CP制限判定用Predicate
-	private final Predicate<Integer> hlCpLimitPredicate = (arg) -> { return arg.intValue() <= 2500; };
+	public static final Predicate<Integer> HL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 2500; };
 	// マスターリーグ用CP制限判定用Predicate
-	private final Predicate<Integer> mlCpLimitPredicate = (arg) -> { return true; };
+	public static final Predicate<Integer> ML_CP_LIMIT_PREDICATE = (arg) -> { return true; };
 
 
 	/**
@@ -97,7 +96,7 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getSuperLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, slCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, SL_CP_LIMIT_PREDICATE);
 
 		sort(scpRankList);
 
@@ -121,7 +120,7 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getHyperLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, hlCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, HL_CP_LIMIT_PREDICATE);
 
 		sort(scpRankList);
 
@@ -145,7 +144,7 @@ public class ScpRankCalculator {
 	 */
 	public ScpRank getMasterLeagueRank(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, mlCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, ML_CP_LIMIT_PREDICATE);
 
 		sort(scpRankList);
 
@@ -183,7 +182,7 @@ public class ScpRankCalculator {
 	 */
 	public List<ScpRank> getSuperLeagueSummary(GoPokedex goPokedex) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, slCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, SL_CP_LIMIT_PREDICATE);
 
 		scpRankList = getListWithLeague(LeagueEnum.sl, scpRankList);
 
@@ -202,7 +201,7 @@ public class ScpRankCalculator {
 	 */
 	public List<ScpRank> getHyperLeagueSummary(GoPokedex goPokedex) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, hlCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, HL_CP_LIMIT_PREDICATE);
 
 		scpRankList = getListWithLeague(LeagueEnum.hl, scpRankList);
 
@@ -221,7 +220,7 @@ public class ScpRankCalculator {
 	 */
 	public List<ScpRank> getMasterLeagueSummary(GoPokedex goPokedex) {
 
-		List<ScpRank> scpRankList = summary(goPokedex, mlCpLimitPredicate);
+		List<ScpRank> scpRankList = summary(goPokedex, ML_CP_LIMIT_PREDICATE);
 
 		scpRankList = getListWithLeague(LeagueEnum.ml, scpRankList);
 
@@ -242,13 +241,12 @@ public class ScpRankCalculator {
 	private List<ScpRank> summary(GoPokedex goPokedex, Predicate<Integer> cpLimitPredicate) {
 
 		List<ScpRank> scpRankList = new ArrayList<ScpRank>();
-		DecimalFormat plFormat = new DecimalFormat("0.#");
 		// 攻撃、防御、HPのループ
 		for(int iva = 0; iva <= 15; iva++) {
 			for (int ivd = 0; ivd <= 15; ivd++) {
 				for (int ivh = 0; ivh <= 15; ivh++) {
 
-					ScpRank scpRank = createScpRank(goPokedex, iva, ivd, ivh, plFormat, cpLimitPredicate);
+					ScpRank scpRank = createScpRank(goPokedex, iva, ivd, ivh, cpLimitPredicate);
 					if (scpRank == null) {
 						// 個体値が高すぎてPL:1で既にあり得ない個体値の場合はHPのループをスキップする。
 						break;
@@ -273,12 +271,11 @@ public class ScpRankCalculator {
 	 * @param plFormat
 	 * @return
 	 */
-	private ScpRank createScpRank(
+	public ScpRank createScpRank(
 			GoPokedex goPokedex,
 			int iva,
 			int ivd,
 			int ivh,
-			DecimalFormat plFormat,
 			Predicate<Integer> cpLimitPredicate) {
 
 		Function<Double, Integer> calcCpFunc = (pl) -> pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl);
