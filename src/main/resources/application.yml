@@ -32,8 +32,7 @@ logging:
     root: INFO
     org:
       springframework:
-        web:
-          client:
+        client:
             RestTemplate: INFO
         data:
           redis:
@@ -48,6 +47,9 @@ logging:
     jp:
       brainjuice:
         pokego:
+          filter:
+            log:
+              RequestLoggingFilter: DEBUG
           business:
             dao:
               inspector:

@@ -4,6 +4,7 @@
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 	<timestamp key="LOG_DATE" datePattern="yyyyMMdd"/>
 	<property name="COMMON_LOG_FILE" value="/logs/common/common" />
+	<property name="REQUEST_LOG_FILE" value="/logs/common/request" />
 	<property name="TRACE_LOG_FILE" value="/logs/trace/trace" />
 
 	<appender name="COMMON" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -12,6 +13,24 @@
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${COMMON_LOG_FILE}-%d{yyyyMMdd}.log</fileNamePattern>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}; %-5level; %X{x-request-id}; %logger{36}; - %msg%n</Pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>DENY</onMatch>
+		</filter>
+	</appender>
+
+	<appender name="REQUEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${REQUEST_LOG_FILE}-%d{yyyyMMdd}.log</fileNamePattern>
 			<maxHistory>10</maxHistory>
 		</rollingPolicy>
 
@@ -42,6 +61,11 @@
 			<onMismatch>DENY</onMismatch>
 		</filter>
 	</appender>
+
+	<logger name="jp.brainjuice.pokego.filter.log.RequestLoggingFilter">
+		<appender-ref ref="REQUEST" />
+	</logger>
+	
 	<root level="INFO">
 		<appender-ref ref="CONSOLE"/>
 		<appender-ref ref="COMMON"/>
