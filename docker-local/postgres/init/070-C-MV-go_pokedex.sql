@@ -24,4 +24,4 @@ CREATE MATERIALIZED VIEW go_pokedex AS
     LEFT JOIN evolution e
     ON p.pokedex_id = e.before_pokedex_id;
 
-CREATE INDEX IF NOT EXISTS go_pokedex_pk ON evolution (pokedex_id);
+CREATE INDEX IF NOT EXISTS go_pokedex_pk ON go_pokedex (pokedex_id);

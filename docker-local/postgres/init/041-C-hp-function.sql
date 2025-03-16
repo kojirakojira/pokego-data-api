@@ -46,12 +46,14 @@ RETURNS INTEGER AS $$
           -- 普通のポケモン
           SELECT tmp_hp * ts_correct_value INTO tmp_hp;
         END IF;
+		-- 強ポケ補正後は四捨五入
+		SELECT round(tmp_hp) INTO tmp_hp;
       END IF;
 
     END IF;
 
     -- 小数点以下切り捨て(double precision -> integerのキャスト。FLOORは何故か誤差が出る。)
-    RETURN tmp_hp;
+    RETURN FLOOR(tmp_hp);
 
   END;
 $$ LANGUAGE plpgsql

@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION calc_go_base_attack(
   v_attack integer, 
   v_sp_attack integer, 
   v_speed integer)
-RETURNS INTEGER AS $$
+RETURNS double precision AS $$
   DECLARE
     tmp_higher integer;
     tmp_lower integer;
@@ -84,6 +84,8 @@ RETURNS INTEGER AS $$
           -- 普通のポケモン
           SELECT tmp_attack * ts_correct_value INTO tmp_attack;
         END IF;
+		-- 強ポケ補正後は四捨五入
+		SELECT round(tmp_attack) INTO tmp_attack;
       END IF;
 
     END IF;
