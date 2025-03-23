@@ -9,7 +9,7 @@ import lombok.Data;
 public class MultiSearchResult {
 
 	private String message;
-	private MsgLevelEnum msgLevel;
+	private MsgLevelEnum msgLevel = MsgLevelEnum.info;
 	private boolean allUnique;
 	private List<PokemonSearchResult> psrArr;
 }

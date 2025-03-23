@@ -64,7 +64,8 @@ public class Race {
 			setGoRank(new RaceGoRank(hpRank, atRank, dfRank));
 		}
 
-		{
+		// 原作種族値が存在しないポケモンもいる。（アーマードミュウツーとか）
+		if (pokedex != null) {
 			PokedexStats oriStats = statistics.getPokedexStats();
 			int hpRank = rank(pokedex.getHp(), oriStats.getHpStats());
 			int atRank = rank(pokedex.getAttack(), oriStats.getAtStats());

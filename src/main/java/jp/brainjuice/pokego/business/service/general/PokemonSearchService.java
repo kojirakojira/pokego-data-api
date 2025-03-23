@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.dto.FilterParam;
@@ -26,10 +27,12 @@ import jp.brainjuice.pokego.business.service.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.business.service.utils.dto.TokenizeResult;
 import jp.brainjuice.pokego.cache.inmemory.PokemonDictionaryInfo;
 import jp.brainjuice.pokego.utils.BjUtils;
-import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import jp.brainjuice.pokego.web.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
+import jp.brainjuice.pokego.web.form.res.elem.PidAndName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Service
 public class PokemonSearchService {
@@ -111,6 +114,13 @@ public class PokemonSearchService {
 		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(goPokedex, cp);
 		return gpAndCp;
 	}
+	
+	@Data
+	@AllArgsConstructor
+	private class MultiSearchDto {
+		private String pid;
+		private PokemonSearchResult psr;
+	}
 
 	/**
 	 * GoPokedexに該当するポケモンが存在するか検索します。
@@ -118,16 +128,42 @@ public class PokemonSearchService {
 	 * @param nameList
 	 * @return
 	 */
-	public MultiSearchResult multiSearch(List<String> nameList) throws BadRequestException {
+	@Transactional(readOnly = true)
+	public MultiSearchResult multiSearch(List<PidAndName> pidAndNameList) {
 
 		MultiSearchResult res = new MultiSearchResult();
 		res.setMessage("");
 
-		// 1件ずつ検索していく。
-		List<PokemonSearchResult> psrList = nameList.stream()
-				.map(this::search)
-				.collect(Collectors.toList());
+		List<MultiSearchDto> msDtoList = pidAndNameList.stream()
+				.map(pan -> {
+					PokemonSearchResult psr = null;
+					if (StringUtils.isEmpty(pan.getPid())) {
+						psr = search(pan.getName());
+					}
+					return new MultiSearchDto(pan.getPid(), psr);
+				})
+				.toList();
+		
+		// 既にpidが確定しているもの
+		List<String> pidList = msDtoList.stream()
+				.map(MultiSearchDto::getPid)
+				.filter(StringUtils::isNotEmpty)
+				.toList();
+		final List<GoPokedex> gpList = goPokedexRepository.findAllById(pidList);
 
+		List<PokemonSearchResult> psrList = msDtoList.stream()
+				.map(msDto -> {
+					PokemonSearchResult psr = msDto.getPsr();
+					if (!StringUtils.isEmpty(msDto.getPid())) {
+						// pidがある場合は、psrが存在しない。
+						GoPokedex goPokedex = gpList.stream()
+								.filter(gp -> gp.getPokedexId().equals(msDto.getPid()))
+								.findAny().orElseThrow();
+						psr = createUniquePsr(goPokedex);
+					}
+					return psr;
+				})
+				.toList();
 		res.setPsrArr(psrList);
 
 		// 検索結果に応じた処理
@@ -135,7 +171,7 @@ public class PokemonSearchService {
 				.filter(psr -> !psr.isSearched())
 				.anyMatch(e -> true)) {
 
-			// 未入力のnameが存在する場合。(Stream#anyMatch(e -> true)でStream版のisEmpty()になる。）
+			// 未入力のnameが存在する場合
 			res.setMessage(MSG_NO_ENTERED);
 			res.setMsgLevel(MsgLevelEnum.error);
 
@@ -151,12 +187,30 @@ public class PokemonSearchService {
 				.filter(psr -> !psr.isUnique())
 				.anyMatch(e -> true)) {
 
-			// psrListが全て一意になる場合。（ユニークじゃないやつがない存在しない場合。）
+			// psrListが全て一意になる場合。（ユニークじゃないやつが存在しない場合。）
 			res.setAllUnique(true);
 
 		}
 
 		return res;
+	}
+	
+	/**
+	 * ユニークなpsrを生成する
+	 * 
+	 * @param goPokedex
+	 * @return
+	 */
+	public PokemonSearchResult createUniquePsr(GoPokedex goPokedex) {
+
+		PokemonSearchResult psr = new PokemonSearchResult();
+		psr.setUnique(true);
+		psr.setGoPokedex(goPokedex);
+		psr.setMaybe(false);
+		psr.setHit(true); // ヒットしたものとする
+		psr.setSearched(true); // 検索したものとする
+		
+		return psr;
 	}
 
 	/**
@@ -232,14 +286,13 @@ public class PokemonSearchService {
 	 */
 	private List<GoPokedex> searchGeneral(String words) {
 
-		// 形態素解析で分解
 		TokenizeResult tokenizeResult = pokemonDictionaryInfo.search(words);
-		List<String> pokemonList = tokenizeResult.getPokemonList();
-		List<String> otherList = tokenizeResult.getOtherList();
-		List<String> groupList = tokenizeResult.getGroupList();
+		// 形態素解析で分解
+		final List<String> pokemonList = tokenizeResult.getPokemonList();
+		final List<String> otherList = tokenizeResult.getOtherList();
+		final List<String> groupList = tokenizeResult.getGroupList();
 
 		/* 以下、GoPokedexの検索アルゴリズム */
-
 		// ポケモン名からGoPokedexリストを取得
 		List<GoPokedex> goPokedexList = goPokedexRepository.findByNameLikeIn(
 				pokemonList.stream().map(BjUtils::wrapWithPercent).toArray(String[]::new));

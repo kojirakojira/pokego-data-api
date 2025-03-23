@@ -48,11 +48,18 @@ public class PokemonDictionaryInfo {
 	public PokemonDictionaryInfo() throws PokemonDataInitException {
 		init();
 	}
+	
+	/**
+	 * Tokenizerを取得する。
+	 * 取得後はgetTokens(String, Tokenizer)を呼び出し、形態素解析をする。
+	 * 
+	 * @return
+	 */
+	public Tokenizer getTokenizer() {
+		return tokenizerBuilder.build();
+	}
 
-	public List<Token> getTokens(String words) {
-
-		// Kuromoji Tokenizerの取得
-		Tokenizer tokenizer = tokenizerBuilder.build();
+	public List<Token> getTokens(String words, Tokenizer tokenizer) {
 
 		// 形態素解析をして分割する。
 		return tokenizer.tokenize(words);
@@ -66,10 +73,23 @@ public class PokemonDictionaryInfo {
 	 * @return
 	 */
 	public TokenizeResult search(String words) {
+		
+		Tokenizer tokenizer = getTokenizer();
+		return search(words, tokenizer);
+	}
+
+	/**
+	 * 引数に検索ワードを指定し、Kuromojiの形態素解析で分割後、合致する条件を取得する。
+	 * 分割後、TokenizeResultを返却する。
+	 *
+	 * @param words
+	 * @return
+	 */
+	public TokenizeResult search(String words, Tokenizer tokenizer) {
 
 		log.debug("words: " + words);
 
-		List<Token> tokens = getTokens(words);
+		List<Token> tokens = getTokens(words, tokenizer);
 
 		return search(tokens);
 	}
