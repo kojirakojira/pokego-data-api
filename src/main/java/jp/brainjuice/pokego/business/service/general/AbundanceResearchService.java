@@ -2,11 +2,17 @@ package jp.brainjuice.pokego.business.service.general;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.utils.CatchCpUtils;
@@ -15,6 +21,7 @@ import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCpPl;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.DynamaxIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.EggsIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
@@ -44,6 +51,25 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 	private EvolutionProvider evolutionProvider;
 	
 	private ScpRankCalculator scpRankCalculator;
+	
+	/** {0}からメガシンカ */
+	private final String PRE_MEGA_MSG = "{0}からメガシンカ";
+	/** {0}に進化させればメガシンカ可能 */
+	private final String CAN_MEGA_IF_EVOL_MSG = "{0}に進化させればメガシンカ可能";
+	/** 区切り文字（か） */
+	private final String CAN_MEGA_IF_EVOL_MSG_OR_PARTS = "か、";
+	/** メガシンカ可能 */
+	private final String CAN_MEGA_MSG = "メガシンカ可能";
+	/** メガシンカ可能 */
+	private final String CANT_MEGA_MSG = "メガシンカ不可";
+	/** ダイマックス可能 */
+	private final String CAN_DYNAMAX_MSG = "ダイマックス可能";
+	/** ダイマックス不可 */
+	private final String CANT_DYNAMAX_MSG = "ダイマックス不可";
+	/** キョダイマックス可能 */
+	private final String CAN_GIGANTAMAX_MSG = "キョダイマックス可能";
+	/** キョダイマックス不可 */
+	private final String CANT_GIGANTAMAX_MSG = "キョダイマックス不可";
 
 	public AbundanceResearchService(
 			PokemonGoUtils pokemonGoUtils,
@@ -63,6 +89,15 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 	public void exec(SearchValue sv, AbundanceResponse res) {
 
 		GoPokedex goPokedex = sv.getGoPokedex();
+		String pokedexId = goPokedex.getPokedexId();
+
+		List<Evolution> evolTreeList = evolutionProvider.getEvolTreeAndMegaList(pokedexId);
+		List<GoPokedex> evolTreeGpList = goPokedexRepository.findAllById(
+				evolTreeList.stream()
+				.map(Evolution::getPokedexId)
+				.toList()
+				);
+		
 		// こうげき、ぼうぎょ、HP、タイプ
 		res.setGoPokedex(goPokedex);
 		// CP(PL40)
@@ -71,9 +106,13 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		res.setCp50(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "50"));
 		// 最大CP
 		res.setMaxCp(pokemonGoUtils.calcCp(goPokedex, 15, 15, 15, "51"));
-
-		// CP算出用のGoPokedex。メガシンカの場合は、メガシンカ後のポケモンに置き換えて算出する。
-		GoPokedex cpTargetGp = catchCpUtils.getGoPokedexForMega(goPokedex).orElse(goPokedex);
+		// CP算出用のGoPokedex。メガシンカの場合は、メガシンカ前のポケモンに置き換えて算出する。
+		GoPokedex cpTargetGp = goPokedex;
+		if (PokemonEditUtils.isMega(goPokedex)) {
+			cpTargetGp = evolTreeGpList.stream()
+					.filter(gp -> gp.getPokedexId().equals(goPokedex.getPreMegaPokedexId()))
+					.findFirst().orElseThrow();
+		}
 
 		// CP(レイド)
 		IvRangeCp raid = catchCpUtils.getIvRangeCp(cpTargetGp, new RaidIvRange());
@@ -86,9 +125,20 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		IvRangeCp frTask = catchCpUtils.getIvRangeCp(cpTargetGp, new FrTaskIvRange());
 		res.setFrTask(new CatchCp(frTask, null));
 		// CP(タマゴ)
-		IvRangeCp egg = catchCpUtils.getIvRangeCp(cpTargetGp, new EggsIvRange());
-		res.setEgg(new CatchCp(egg, null));
+		setEgg(cpTargetGp, evolTreeList, evolTreeGpList, res);
+		
+		// ダイマックス、キョダイマックス
+		if (goPokedex.isDynamaxImplFlg() || goPokedex.isGigantamaxImplFlg()) {
+			IvRangeCp dynamax = catchCpUtils.getIvRangeCp(goPokedex, new DynamaxIvRange());
+			CatchCp dynamaxCatchCp = new CatchCp(dynamax, null);
 
+			res.setDynamax(goPokedex.isDynamaxImplFlg() ? dynamaxCatchCp : null);
+
+			res.setGigantamax(goPokedex.isGigantamaxImplFlg() ? dynamaxCatchCp : null);
+		}
+		res.setDynamaxMsg(goPokedex.isDynamaxImplFlg() ? CAN_DYNAMAX_MSG : CANT_DYNAMAX_MSG);
+		res.setGigantamaxMsg(goPokedex.isGigantamaxImplFlg() ? CAN_GIGANTAMAX_MSG : CANT_GIGANTAMAX_MSG);
+			
 		// 強ポケ補正の有無
 		res.setTooStrong(goPokedex.isTooStrong());
 
@@ -101,36 +151,149 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 			final TypeColorEnum c2 = TypeColorEnum.valueOf(goPokedex.getType2().name());
 			res.setType2Color(new Color(c2.getR(), c2.getG(), c2.getB()));
 		}
-
-		boolean isMega = PokemonEditUtils.isMega(goPokedex.getPokedexId());
-		res.setMega(isMega);
 		
+		setMegaMsg(goPokedex, evolTreeGpList, res);
+
 		// スーパーリーグ、ハイパーリーグ制限内最大CP
-		setLeagueSafeCp(goPokedex, res);
+		setLeagueSafeCp(goPokedex, res, evolTreeList, evolTreeGpList);
 	}
 	
 	/**
-	 * 制限内最大CP
-	 * @param pokedexId
+	 * 
+	 * @param cpTargetGp
+	 * @param evolTreeList
+	 * @param evolTreeGpList
 	 * @param res
 	 */
-	private void setLeagueSafeCp(GoPokedex goPokedex, AbundanceResponse res) {
+	private void setEgg(
+			GoPokedex cpTargetGp, 
+			List<Evolution> evolTreeList, 
+			List<GoPokedex> evolTreeGpList, 
+			AbundanceResponse res) {
+
+		GoPokedex eggGp = cpTargetGp;
+		String cpTargetPid = cpTargetGp.getPokedexId();
+		// 第一形態のポケモンを取得
+		List<String> rootPidList = evolutionProvider.getRoot(cpTargetPid, evolTreeList);
+		List<GoPokedex> rootList = rootPidList.stream()
+				.map(pid -> {
+					return evolTreeGpList.stream()
+							.filter(gp -> gp.getPokedexId().equals(pid))
+							.findFirst().orElseThrow();
+				})
+				.toList();
+		Optional<GoPokedex> rootOp = rootList.stream()
+				.filter(gp -> !gp.getPokedexId().equals(cpTargetPid))
+				.findFirst();
+		if (rootOp.isPresent()) {
+			// ミノムッチの場合、くさきのミノのみ
+			eggGp = rootOp.get();
+			res.setEggGp(eggGp); // 進化前が存在した場合だけセットする。
+		}
+		IvRangeCp egg = catchCpUtils.getIvRangeCp(eggGp, new EggsIvRange());
+		res.setEgg(new CatchCp(egg, null));
+	}
+	
+	/**
+	 * メガシンカ用のメッセージをセットする
+	 * 
+	 * @param goPokedex
+	 * @param evolTreeGpList
+	 * @param res
+	 */
+	private void setMegaMsg(
+			GoPokedex goPokedex,
+			List<GoPokedex> evolTreeGpList,
+			AbundanceResponse res) {
+
+		boolean isMega = PokemonEditUtils.isMega(goPokedex);
+		res.setMega(isMega);
 		
-		String pokedexId = goPokedex.getPokedexId();
-		// 最終進化のポケモンを取得。検索元と検索後のpokedexIdが一致する場合は検索結果なしの扱い
-		List<String> evolList = evolutionProvider.getLeafCanGoEvol(pokedexId)
-				.stream()
-				.filter(pid -> !pokedexId.equals(pid))
+		if (isMega) {
+			// メガシンカの場合は、進化前のポケモン名を取得する。
+			String pokeName = evolTreeGpList.stream()
+					.filter(gp -> goPokedex.getPreMegaPokedexId().equals(gp.getPokedexId()))
+					.map(PokemonEditUtils::appendRemarks)
+					.findFirst().orElseThrow();
+
+			res.setCanMega(false);
+			res.setMegaMsg(MessageFormat.format(PRE_MEGA_MSG, pokeName));
+			return;
+		}
+		
+		// メガシンカ前のポケモンの図鑑IDを取得する。
+		List<String> preMegaPidList = evolTreeGpList.stream()
+				.filter(gp -> !StringUtils.isEmpty(gp.getPreMegaPokedexId()))
+				.map(GoPokedex::getPreMegaPokedexId)
+				.sorted()
+				.distinct()
 				.toList();
 		
-		if (evolList.isEmpty()) {
+		String msg;
+		boolean canMega = false;
+		if (preMegaPidList.isEmpty()) {
+			// メガシンカするポケモンが存在しない進化ツリーの場合
+			msg = CANT_MEGA_MSG;
+
+		} else if (preMegaPidList.contains(goPokedex.getPokedexId())) {
+			// リザードンパターン
+			// メガシンカ可能
+			canMega = true;
+			msg = CAN_MEGA_MSG;
+			
+		} else {
+			// ヒトカゲパターン
+			// 〜に進化させれば、メガシンカ可能
+			// ラルトスのように複数パターンにメガシンカするパターンも考慮している
+			String pokeNames = preMegaPidList.stream()
+					.map(pid -> {
+						return evolTreeGpList.stream()
+								.filter(gp -> gp.getPokedexId().equals(pid))
+								.findFirst().orElseThrow();
+					})
+					.map(PokemonEditUtils::appendRemarks)
+					.collect(Collectors.joining(CAN_MEGA_IF_EVOL_MSG_OR_PARTS));
+			msg = MessageFormat.format(CAN_MEGA_IF_EVOL_MSG, pokeNames);
+		}
+			
+		res.setCanMega(canMega);
+		res.setMegaMsg(msg);
+	}
+	
+	/** 
+	 * 制限内最大CP
+	 * @param goPokedex
+	 * @param res
+	 * @param lineageList
+	 * @param lineageGpList
+	 */
+	private void setLeagueSafeCp(
+			GoPokedex goPokedex, 
+			AbundanceResponse res, 
+			List<Evolution> lineageList,
+			List<GoPokedex> lineageGpList) {
+		
+		String pokedexId = goPokedex.getPokedexId();
+		// 最終進化のポケモンを取得
+		List<String> evolPidList = evolutionProvider.getLeafCanGoEvol(pokedexId, lineageList)
+				.stream()
+				.filter(pid -> !pokedexId.equals(pid)) // 検索元と検索後のpokedexIdが一致する場合は検索結果なし扱い
+				.toList();
+		
+		if (evolPidList.isEmpty()) {
 			// 進化後が存在しない場合
 			res.setSuperLeagueSafeCpList(new ArrayList<>());
 			res.setHyperLeagueSafeCpList(new ArrayList<>());
 			return;
 		}
-		
-		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(evolList);
+
+		List<GoPokedex> goPokedexList = evolPidList.stream()
+				.map(pid -> {
+					return lineageGpList.stream()
+							.filter(gp -> gp.getPokedexId().equals(pid))
+							.findFirst().orElseThrow();
+				})
+				.toList();
 		
 		List<GoPokedexAndCpPl> slLeagueSafeCp = goPokedexList.stream()
 				.map(gp -> {

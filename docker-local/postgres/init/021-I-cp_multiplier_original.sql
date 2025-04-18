@@ -1,3 +1,5 @@
+DELETE FROM cp_multiplier_original;
+
 INSERT INTO cp_multiplier_original (pl, multiplier)
   VALUES
 	(1, 0.094),

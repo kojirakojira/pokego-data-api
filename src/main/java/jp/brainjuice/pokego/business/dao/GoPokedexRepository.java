@@ -81,6 +81,39 @@ public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, J
 	boolean findImplFlgById(@Param("pid") String pid);
 
 
+	/**
+	 * ダイマックス、キョダイマックス可能なポケモンの一覧を取得する。
+	 *
+	 * @return
+	 */
+	@Meta(comment = "find by implFlg")
+	List<GoPokedex> findByDynamaxImplFlgTrueOrGigantamaxImplFlgTrue();
+	
+
+	@Query(value = "WITH RECURSIVE root AS ("
+			+ "  SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id = :pid"
+			+ "  UNION ALL"
+			+ "  SELECT evol.pokedex_id, evol.before_pokedex_id"
+			+ "    FROM evolution evol"
+			+ "    INNER JOIN root r ON evol.pokedex_id = r.before_pokedex_id"
+			+ ")"
+			+ "SELECT gp.*"
+			+ "  FROM root r"
+			+ "  inner join go_pokedex gp"
+			+ "  on r.pokedex_id = gp.pokedex_id"
+			+ "  WHERE r.before_pokedex_id = 'root'", nativeQuery = true)
+	@Meta(comment = "find go_pokedex root by id")
+	List<GoPokedex> findRootById(@Param("pid") String pid);
+	
+	/**
+	 * 
+	 * @param pid
+	 * @return
+	 */
+//	@Query(value = "")
+//	@Meta(comment = "find can mega gp by id in tree")
+//	List<GoPokedex> findCanMegaGpByIdInTree(@Param("pid") String pid);
+
 
     @Override
     @Deprecated

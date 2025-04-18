@@ -51,8 +51,17 @@ public class EvolutionProvider {
 	 * @param pid
 	 * @return
 	 */
-	public List<String> getAnotherFormList(String pid) {
-		return evolutionInfo.getAnotherFormList(pid);
+	public List<String> getAnotherFormPidList(String pid) {
+		return evolutionInfo.getAnotherFormPidList(pid);
+	}
+
+	/**
+	 * この{@link EvolutionInfo#getAnotherFormListIn(String) メソッド}を参照
+	 * @param pids
+	 * @return
+	 */
+	public List<Evolution> getAnotherFormListIn(List<String> pids) {
+		return evolutionInfo.getAnotherFormListIn(pids);
 	}
 
 	/**
@@ -83,6 +92,16 @@ public class EvolutionProvider {
 	}
 
 	/**
+	 * この{@link EvolutionInfo#getRoot(String, List) メソッド}を参照
+	 * @param pid
+	 * @param lineageList
+	 * @return
+	 */
+	public List<String> getRoot(String pid, List<Evolution> lineageList) {
+		return evolutionInfo.getRoot(pid, lineageList);
+	}
+
+	/**
 	 * この{@link EvolutionInfo#getLeaf(String) メソッド}を参照
 	 * @param pid
 	 * @return
@@ -98,6 +117,16 @@ public class EvolutionProvider {
 	 */
 	public List<String> getLeafCanGoEvol(String pid) {
 		return evolutionInfo.getLeafCanGoEvol(pid);
+	}
+
+	/**
+	 * この{@link EvolutionInfo#getLeafCanGoEvol(String, List) メソッド}を参照
+	 * @param pid
+	 * @param evolTreeLista
+	 * @return
+	 */
+	public List<String> getLeafCanGoEvol(String pid, List<Evolution> evolTreeList) {
+		return evolutionInfo.getLeafCanGoEvol(pid, evolTreeList);
 	}
 
 	/**
@@ -174,10 +203,19 @@ public class EvolutionProvider {
 
 	/**
 	 * この{@link EvolutionInfo#getLineageList(String) メソッド}を参照
+	 * @param goPokedex
+	 * @return
+	 */
+	public List<Evolution> getLineageList(GoPokedex goPokedex) {
+		return evolutionInfo.getLineageList(goPokedex);
+	}
+	
+	/**
+	 * この{@link EvolutionInfo#getEvoTreeAndMegaList(String) メソッド}を参照
 	 * @param pid
 	 * @return
 	 */
-	public List<Evolution> getLineageList(String pid) {
-		return evolutionInfo.getLineageList(pid);
+	public List<Evolution> getEvolTreeAndMegaList(String pid) {
+		return evolutionInfo.getEvolTreeAndMegaList(pid);
 	}
 }

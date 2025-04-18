@@ -53,6 +53,30 @@ class EvolutionInfo {
 	}
 
 	/**
+	 * 進化前のポケモンを取得する。<br>
+	 * 進化前が存在しない場合は、nullを返却する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getBeforeEvolution(String pokedexId, List<Evolution> evolTreeList) {
+
+		List<String> pidList = evolTreeList.stream()
+				.filter(evol -> evol.getPokedexId().equals(pokedexId))
+				.map(Evolution::getBeforePokedexId)
+				.toList();
+		
+		// 引数のevolTreeListが正しければ、必ず1件以上はヒットする。
+		if (ROOT.equals(pidList.get(0))) {
+			return null;
+		}
+		
+		return pidList;
+	}
+
+	/**
 	 * 進化後のポケモンを取得する。
 	 *
 	 * @param pokedexId
@@ -63,6 +87,39 @@ class EvolutionInfo {
 		List<String> pidList = evolutionRepository.findIdByBid(pokedexId);
 
 		return pidList;
+	}
+
+	/**
+	 * 進化後のポケモンを取得する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getAfterEvolution(String pokedexId, List<Evolution> evolTreeList) {
+
+		return evolTreeList.stream()
+				.filter(evol -> evol.getBeforePokedexId().equals(pokedexId))
+				.map(Evolution::getPokedexId)
+				.toList();
+	}
+
+	/**
+	 * 進化後のポケモンを取得する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getAfterEvolutionCanGoEvol(String pokedexId, List<Evolution> evolTreeList) {
+
+		return evolTreeList.stream()
+				.filter(evol -> evol.getBeforePokedexId().equals(pokedexId))
+				.filter(evol -> evol.isCanGoEvol())
+				.map(Evolution::getPokedexId)
+				.toList();
 	}
 
 	/**
@@ -77,14 +134,59 @@ class EvolutionInfo {
 	}
 
 	/**
+	 * 進化後のポケモンが存在するか判定する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	boolean isAfterEvolution(String pokedexId, List<Evolution> evolTreeList) {
+
+		return evolTreeList.stream()
+				.filter(evol -> evol.getBeforePokedexId().equals(pokedexId))
+				.allMatch(e -> true);
+	}
+
+	/**
+	 * 進化後のポケモンが存在するか判定する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	boolean isAfterEvolutionCanGoEvol(String pokedexId, List<Evolution> evolTreeList) {
+
+		return evolTreeList.stream()
+				.filter(evol -> evol.getBeforePokedexId().equals(pokedexId))
+				.filter(evol -> evol.isCanGoEvol())
+				.anyMatch(e -> true);
+	}
+
+	/**
 	 * 別の「すがた」を取得する。
 	 *
 	 * @param pokedexId
 	 * @return
 	 */
-	List<String> getAnotherFormList(String pokedexId) {
+	List<String> getAnotherFormPidList(String pokedexId) {
 
-		List<String> anoFormList = evolutionRepository.findAnoFormById(pokedexId);
+		List<String> anoFormList = evolutionRepository.findAnoFormPidById(pokedexId);
+
+		return anoFormList;
+
+	}
+
+	/**
+	 * 別の「すがた」を取得する。
+	 *
+	 * @param pids
+	 * @return
+	 */
+	List<Evolution> getAnotherFormListIn(List<String> pids) {
+
+		List<Evolution> anoFormList = evolutionRepository.findAnoFormByIdIn(pids);
 
 		return anoFormList;
 
@@ -101,6 +203,44 @@ class EvolutionInfo {
 	List<String> getRoot(String pokedexId) {
 
 		List<String> rootList = evolutionRepository.findRootById(pokedexId);
+
+		return rootList;
+	}
+
+	/**
+	 * 進化ツリー上の最初のポケモンを取得する。
+	 *
+	 * ガーメイルのような進化ツリーの場合は、2件以上になる。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getRoot(String pokedexId, List<Evolution> evolTreeList) {
+
+		List<String> pidList = List.of(pokedexId);
+		List<String> rootList = new ArrayList<>();
+		
+		boolean allReafFlg = true;
+		while (allReafFlg) {
+			
+			List<String> nextList = new ArrayList<>();
+			for (String pid: pidList) {
+				List<String> beforeList = getBeforeEvolution(pid, evolTreeList);
+				if (beforeList == null) {
+					rootList.add(pid);
+					continue;
+				}
+				nextList.addAll(beforeList);
+			}
+			
+			if (nextList.isEmpty()) {
+				allReafFlg = false;
+			}
+			
+			pidList = nextList;
+		}
 
 		return rootList;
 	}
@@ -128,6 +268,42 @@ class EvolutionInfo {
 	List<String> getLeafCanGoEvol(String pokedexId) {
 
 		List<String> leafList = evolutionRepository.findLeafByIdCanGoEvol(pokedexId);
+
+		return leafList;
+	}
+
+	/**
+	 * 進化ツリー上の最後のポケモンを取得する。<br>
+	 * ※ポケモンGOで進化できるポケモンのみ取得する。<br>
+	 * <strong>DBアクセスなし。</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getLeafCanGoEvol(String pokedexId, List<Evolution> evolTreeList) {
+
+		List<String> pidList = List.of(pokedexId);
+		List<String> leafList = new ArrayList<>();
+		
+		boolean allReafFlg = true;
+		while (allReafFlg) {
+			
+			List<String> nextList = new ArrayList<>();
+			for (String pid: pidList) {
+				if (isAfterEvolutionCanGoEvol(pid, evolTreeList)) {
+					nextList.addAll(getAfterEvolutionCanGoEvol(pid, evolTreeList));
+				} else {
+					leafList.add(pid);
+				}
+			}
+			
+			if (nextList.isEmpty()) {
+				allReafFlg = false;
+			}
+			
+			pidList = nextList;
+		}
 
 		return leafList;
 	}
@@ -163,31 +339,36 @@ class EvolutionInfo {
 				.collect(Collectors.toList());
 	}
 
-//	/**
-//	 * 同系統のすべてのポケモンを取得する。
-//	 *
-//	 * @param pokedexId
-//	 * @return
-//	 */
-//	List<String> getAllInEvoTree(String pokedexId) {
-//
-//		// 別のすがたを取得 -> 進化前、進化後を取得 -> 別のすがたを取得 -> Setに変換 -> Listに変換。
-//		return Stream.concat(getAnotherFormList(pokedexId).stream(), Stream.of(pokedexId))
-//				.flatMap(pid -> Stream.concat(getBfAfEvoList(pid).stream(), Stream.of(pid)))
-//				.flatMap(pid -> Stream.concat(getAnotherFormList(pid).stream(), Stream.of(pid)))
-//				.collect(Collectors.toSet()).stream()
-//				.collect(Collectors.toList());
-//
-//	}
-
 	/**
 	 * 1系統におけるすべてのポケモンを取得する。
+	 * @param goPokedex
+	 * @return
+	 */
+	List<Evolution> getLineageList(GoPokedex goPokedex) {
+
+		List<Evolution> lineageList;
+		String pokedexId = goPokedex.getPokedexId();
+		if (PokemonEditUtils.isMega(goPokedex)) {
+			// メガシンカに進化ツリーは存在しない。
+			lineageList = evolutionRepository.findByPokedexIdEquals(pokedexId);
+		} else {
+			lineageList = evolutionRepository.getLineageById(pokedexId);
+		}
+		return lineageList;
+	}
+	
+	/**
+	 * そのポケモンの進化ツリー上のポケモンを取得する。<br>
+	 * メガシンカ後のポケモンが存在する場合は、そのポケモンの情報も一緒に取得する。
+	 * 
 	 * @param pokedexId
 	 * @return
 	 */
-	List<Evolution> getLineageList(String pokedexId) {
-
-		return evolutionRepository.getLineageById(pokedexId);
+	List<Evolution> getEvolTreeAndMegaList(String pokedexId) {
+		
+		List<Evolution> evolTreeAndMegaList = evolutionRepository.getEvolTreeAndMegaById(pokedexId);
+		
+		return evolTreeAndMegaList;
 	}
 
 	/**
@@ -225,8 +406,9 @@ class EvolutionInfo {
 
 	/**
 	 * Hierarchyのリスト（進化ツリー）を取得する。<br>
-	 * 引数には、ツリー上のすべてのEvolutionとそれに対応するすべてのGoPokedexを渡すこと。
-	 * 異なるツリーのポケモンを複数指定しても問題ない。
+	 * 引数には、ツリー上のすべてのEvolutionとそれに対応するすべてのGoPokedexを渡すこと。<br>
+	 * 異なるツリーのポケモンを複数指定しても問題ない。<br>
+	 * メガ進化後のポケモンは
 	 *
 	 * @param evolList
 	 * @param gpList
@@ -235,18 +417,27 @@ class EvolutionInfo {
 	List<List<List<Hierarchy>>> getEvoTrees(List<Evolution> evolList, List<GoPokedex> gpList) {
 
 		List<List<List<Hierarchy>>> treeList = null;
+		
+		// evolListに完全に対応するgpListを作る
+		List<GoPokedex> trustedGpList = evolList.stream()
+				.map(evol -> {
+					return gpList.stream()
+							.filter(gp -> gp.getPokedexId().equals(evol.getPokedexId()))
+							.findFirst().orElseThrow();
+				})
+				.toList();
 
 		List<EvolutionPk> pkList = evolList.stream().map(EvolutionPk::new).toList();
 
 		List<Hierarchy> hieList = evolList.stream()
 				.map(evol -> {
-					GoPokedex goPokedex = gpList.stream()
+					GoPokedex goPokedex = trustedGpList.stream()
 							.filter(gp -> evol.getPokedexId().equals(gp.getPokedexId()))
 							.findAny().orElseThrow();
 
 					return new Hierarchy(
 							0, // x軸は一旦0で初期化
-							getY(evol.getPokedexId(), pkList), // 第何形態かを取得
+							computeY(evol.getPokedexId(), pkList, trustedGpList), // 第何形態かを取得
 							0, // x軸の距離も一旦0で初期化
 							evol.getPokedexId(),
 							evol.getBeforePokedexId(),
@@ -325,16 +516,10 @@ class EvolutionInfo {
 	 *
 	 * @param pid
 	 * @param pkList
+	 * @param trustedGpList pkListの要素と一致するGoPokedexのリスト
 	 * @return
 	 */
-	private int getY(String pid, List<EvolutionPk> pkList) {
-		
-		if (pkList.stream()
-				.filter(pk -> PokemonEditUtils.isMega(pk.getPokedexId()))
-				.anyMatch(e -> true)) {
-			// メガ進化に進化前、進化後が存在することはない。
-			return 1;
-		}
+	private int computeY(String pid, List<EvolutionPk> pkList, List<GoPokedex> trustedGpList) {
 
 		return incrStageCallRecursively(pid, pkList, 0);
 	}
@@ -357,7 +542,7 @@ class EvolutionInfo {
 				.map(EvolutionPk::getBeforePokedexId)
 				.findAny().orElseThrow();
 
-		if (!"root".equals(bfPid)) {
+		if (!ROOT.equals(bfPid)) {
 			// 再帰呼び出しする。
 			retStage = incrStageCallRecursively(bfPid, pkList, retStage);
 		}

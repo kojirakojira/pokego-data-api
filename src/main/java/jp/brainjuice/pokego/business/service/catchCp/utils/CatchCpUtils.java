@@ -38,14 +38,11 @@ public class CatchCpUtils {
 	 */
 	public Optional<GoPokedex> getGoPokedexForMega(GoPokedex goPokedex) {
 
-		String pid = goPokedex.getPokedexId();
-		boolean isMega = PokemonEditUtils.isMega(pid);
-
-		if (!isMega) {
+		if (!PokemonEditUtils.isMega(goPokedex)) {
 			return Optional.empty();
 		}
 
-		String befMegaPid = PokemonEditUtils.getPokedexIdBeforeMegaEvo(pid);
+		String befMegaPid = goPokedex.getPreMegaPokedexId();
 		return goPokedexRepository.findById(befMegaPid);
 	}
 

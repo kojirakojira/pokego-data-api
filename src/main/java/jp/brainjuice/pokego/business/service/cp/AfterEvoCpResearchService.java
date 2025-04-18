@@ -145,7 +145,7 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	private List<String> getAnotherFormPidList(GoPokedex goPokedex, List<String> pidList) {
 
 		return Stream.concat(Stream.of(goPokedex.getPokedexId()), pidList.stream())
-				.flatMap(pid -> evolutionProvider.getAnotherFormList(pid).stream())
+				.flatMap(pid -> evolutionProvider.getAnotherFormPidList(pid).stream())
 				.sorted(PokemonEditUtils.getPokedexIdComparator())
 				.collect(Collectors.toList());
 	}

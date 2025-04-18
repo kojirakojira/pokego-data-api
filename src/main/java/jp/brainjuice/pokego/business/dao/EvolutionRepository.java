@@ -12,6 +12,9 @@ import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.business.dao.entity.EvolutionPk;
 
 public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionPk> {
+	
+	@Meta(comment = "find by pokedex id equals")
+	List<Evolution> findByPokedexIdEquals(String pokedexId);
 
 	@Query("SELECT e.evolAnnotations"
 			+ " FROM Evolution e"
@@ -49,12 +52,45 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 	 * @param pid
 	 * @return
 	 */
+//	@Query("SELECT e"
+//			+ " FROM Evolution e"
+//			+ " WHERE e.pokedexId <> :pid"
+//			+ " AND e.pokedexId LIKE substring(:pid, 1, 4) || '%'")
+//	@Meta(comment = "find anoForm by id")
+//	List<Evolution> findAnoFormById(@Param("pid") String pid);
+
+	/**
+	 * 別のすがたのpokedexIdを取得する。
+	 *
+	 * @param pid
+	 * @return
+	 */
 	@Query("SELECT e.pokedexId"
 			+ " FROM Evolution e"
 			+ " WHERE e.pokedexId <> :pid"
 			+ " AND e.pokedexId LIKE substring(:pid, 1, 4) || '%'")
 	@Meta(comment = "find anoForm by id")
-	List<String> findAnoFormById(@Param("pid") String pid);
+	List<String> findAnoFormPidById(@Param("pid") String pid);
+
+
+	/**
+	 * 別のすがたのpokedexIdを取得する。
+	 *
+	 * @param pid
+	 * @return
+	 */
+	@Query(value = "WITH tmp_pids AS ("
+			+ "  SELECT"
+			+ "    substring(e.pokedex_id, 1, 4) || '%' AS pokedex_no,"
+			+ "    e.pokedex_id  from evolution e"
+			+ "  WHERE e.pokedex_id IN (:pids)"
+			+ ")"
+			+ "SELECT *"
+			+ "  FROM evolution e"
+			+ "  WHERE e.pokedex_id LIKE ANY(SELECT tp.pokedex_no FROM tmp_pids tp)"
+			+ "  AND e.pokedex_id NOT IN (SELECT tp.pokedex_id FROM tmp_pids tp)", nativeQuery = true)
+	@Meta(comment = "find anoForm by id in")
+	List<Evolution> findAnoFormByIdIn(@Param("pids") List<String> pids);
 
 	/**
 	 * IN句を使用し、指定したキーのEvolutionを取得する。
@@ -206,6 +242,52 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 			+ "  AND tree.before_pokedex_id = e.before_pokedex_id", nativeQuery = true)
 	@Meta(comment = "get evol tree by id")
 	List<Evolution> getEvolTreeById(@Param("pid") String pid);
+	
+	/**
+	 * 指定したpokedexIdの進化ツリーを取得する。<br>
+	 * メガシンカが存在する場合は、メガシンカのポケモンも取得する。
+	 * 
+	 * @param pid
+	 * @return
+	 */
+	@Query(value ="WITH RECURSIVE tree AS ("
+			+ "  SELECT pokedex_id, before_pokedex_id"
+			+ "    FROM evolution"
+			+ "    WHERE pokedex_id IN ("
+			+ "      WITH RECURSIVE root AS ("
+			+ "        SELECT pokedex_id, before_pokedex_id"
+			+ "          FROM evolution"
+			+ "          WHERE pokedex_id = get_pid_bf_mega(:pid)" // ① メガシンカ後のpidの場合、メガシンカ前に持ち直す
+			+ "        UNION ALL"
+			+ "        SELECT evol.pokedex_id, evol.before_pokedex_id"
+			+ "           FROM evolution evol"
+			+ "           INNER JOIN root r"
+			+ "           ON evol.pokedex_id = r.before_pokedex_id"
+			+ "      )"
+			+ "      SELECT pokedex_id FROM root WHERE before_pokedex_id = 'root'" // ② Rootまで辿る
+			+ "    )"
+			+ "  UNION ALL  SELECT evol2.pokedex_id, evol2.before_pokedex_id"
+			+ "    FROM evolution evol2"
+			+ "    INNER JOIN tree t"
+			+ "    ON evol2.before_pokedex_id = t.pokedex_id" // ③ RootからReaf側に辿っていく
+			+ ")"
+			+ "("
+			+ "  SELECT e.* FROM tree"
+			+ "    INNER JOIN evolution e"
+			+ "    ON tree.pokedex_id = e.pokedex_id"
+			+ "    AND tree.before_pokedex_id = e.before_pokedex_id" // ④-1. evolutionを取得
+			+ ")"
+			+ "UNION"
+			+ "("
+			+ "  SELECT e.* FROM tree t"
+			+ "    INNER JOIN go_pokedex gp"
+			+ "    ON gp.pre_mega_pokedex_id IS NOT NULL"
+			+ "    AND gp.pre_mega_pokedex_id = t.pokedex_id"
+			+ "    INNER JOIN evolution e"
+			+ "    ON e.pokedex_id = gp.pokedex_id" // ④-2. メガシンカ後のポケモンのevolutionを取得
+			+ ");", nativeQuery = true)
+	@Meta(comment = "get evol tree and mega by id")
+	List<Evolution> getEvolTreeAndMegaById(@Param("pid") String pid);
 
 
 	/**
@@ -243,6 +325,11 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 	List<Evolution> getLineageById(@Param("pid") String pid);
 
 
+	/**
+	 * この{@link EvolutionRepository#findAllBasePokedexNo() メソッド}を呼び出すこと。
+	 * 
+	 * @return
+	 */
 	@Query(value = "WITH RECURSIVE root AS ("
 			+ "  SELECT pokedex_id, before_pokedex_id, pokedex_id AS t_pid FROM evolution"
 			+ "  UNION ALL"
@@ -254,9 +341,10 @@ public interface EvolutionRepository extends JpaRepository<Evolution, EvolutionP
 			+ "  FROM root"
 			+ "  WHERE before_pokedex_id = 'root'", nativeQuery = true)
 	@Meta(comment = "find all base pokedex no raw")
+	@Deprecated(forRemoval = true)
 	List<Object[]> findAllBasePokedexNoRaw();
 	/**
-	 * 図鑑IDに対応する、第一形態の図鑑Noを取得する。
+	 * 図鑑IDに対応する、第一形態のポケモンの図鑑Noを取得する。
 	 * @return
 	 */
 	default List<BasePokedexNo> findAllBasePokedexNo() {

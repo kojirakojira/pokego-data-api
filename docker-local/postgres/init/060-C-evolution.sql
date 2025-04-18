@@ -16,3 +16,5 @@ CREATE TABLE evolution (
 );
 
 CREATE INDEX IF NOT EXISTS evolution_before_pid_pk ON evolution (before_pokedex_id);
+
+COMMIT;

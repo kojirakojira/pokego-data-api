@@ -16,5 +16,6 @@ CREATE TABLE pokedex (
   image1 varchar(256),
   image2 varchar(256),
   impl_flg boolean not null,
+  pre_mega_pokedex_id bpchar,
   CONSTRAINT pokedex_pk PRIMARY KEY(pokedex_id)
 );

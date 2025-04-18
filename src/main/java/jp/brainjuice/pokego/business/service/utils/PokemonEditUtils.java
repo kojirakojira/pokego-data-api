@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.dao.entity.Pokedex;
 
 public class PokemonEditUtils {
 
@@ -81,43 +82,21 @@ public class PokemonEditUtils {
 	/**
 	 * メガシンカのpokedexIdかどうかを判定する。
 	 *
-	 * @param pokedexId
+	 * @param pokedex
 	 * @return
 	 */
-	public static boolean isMega(String pokedexId) {
-		return M.equals(getSubspecies(pokedexId));
+	public static boolean isMega(Pokedex p) {
+		return !StringUtils.isEmpty(p.getPreMegaPokedexId());
 	}
 
 	/**
-	 * メガシンカ前のポケモンのpokedexIdを取得する。
-	 * 指定されたpokedexIdがメガシンカ後のポケモン出ない場合は、nullを返却する。
+	 * メガシンカのpokedexIdかどうかを判定する。
 	 *
-	 * TODO: リージョンフォームのポケモンがメガシンカするようになったら、考慮が必要。
-	 *
-	 * @param pokedexId
+	 * @param goPokedex
 	 * @return
 	 */
-	public static String getPokedexIdBeforeMegaEvo(String pokedexId) {
-
-		if (!isMega(pokedexId)) {
-			return null;
-		}
-
-		String pokedexNo = getStrPokedexNo(pokedexId);
-
-		// TODO: 連番は絶対に"01"である前提の仕様。
-		return pokedexNo + N + "01";
-	}
-
-	/**
-	 * メガシンカ、キョダイマックス等の特殊フォルムかどうかを判定する。
-	 * TODO: キョダイマックス実装後に見直す。
-	 *
-	 * @param pokedexId
-	 * @return
-	 */
-	public static boolean isSpecialForm(String pokedexId) {
-		return isMega(pokedexId);
+	public static boolean isMega(GoPokedex p) {
+		return !StringUtils.isEmpty(p.getPreMegaPokedexId());
 	}
 
 	/**

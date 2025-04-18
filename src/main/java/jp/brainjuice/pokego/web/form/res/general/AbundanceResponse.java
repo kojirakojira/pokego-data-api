@@ -29,6 +29,10 @@ public class AbundanceResponse extends ResearchResponse {
 	private CatchCp frTask;
 	// タマゴ
 	private CatchCp egg;
+	private GoPokedex eggGp;
+	// ダイマックス、キョダイマックス
+	private CatchCp dynamax;
+	private CatchCp gigantamax;
 	// 強ポケ補正対象か否か
 	private boolean tooStrong;
 
@@ -38,6 +42,14 @@ public class AbundanceResponse extends ResearchResponse {
 
 	// メガシンカ（ゲンシカイキ含む）後か否か
 	private boolean mega;
+	// メガシンカ（ゲンシカイキ含む）可能か
+	private boolean canMega;
+	// メガシンカ可能かを示すメッセージ
+	private String megaMsg;
+	// ダイマックス可能かを示すメッセージ
+	private String dynamaxMsg;
+	// キョダイマックス可能かを示すメッセージ
+	private String gigantamaxMsg;
 	
 	// そのポケモンを進化させた場合、最終進化後のポケモンのCPがリーグ制限に引っかからないギリギリのCP
 	// ホゲータの場合、ラウドボーンがCP1500,2500にならないギリギリのCP

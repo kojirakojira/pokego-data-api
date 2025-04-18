@@ -38,13 +38,14 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 	@Override
 	public void exec(SearchValue sv, EvolutionResponse res) {
 
-		String pokedexId = sv.getGoPokedex().getPokedexId();
+		GoPokedex goPokedex = sv.getGoPokedex();
+		String pokedexId = goPokedex.getPokedexId();
 
 		// その系統のすべてのポケモンのEvolutionを取得する。
-		List<Evolution> lineageList = evolutionProvider.getLineageList(pokedexId);
+		List<Evolution> lineageList = evolutionProvider.getLineageList(goPokedex);
 
 		// 別のすがた（そのポケモンのメガシンカ、別リージョン等）
-		List<String> anotherFormList = evolutionProvider.getAnotherFormList(pokedexId);
+		List<String> anotherFormList = evolutionProvider.getAnotherFormPidList(pokedexId);
 
 		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(
 				Stream.concat(

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.others.DynamaxImplPokemonService;
 import jp.brainjuice.pokego.business.service.others.EvoCostResearchService;
 import jp.brainjuice.pokego.business.service.others.EvoCostResearchService.Costs;
 import jp.brainjuice.pokego.business.service.others.EvolutionResearchService;
@@ -18,6 +19,7 @@ import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.others.EvoCostRequest;
 import jp.brainjuice.pokego.web.form.req.others.EvolutionRequest;
+import jp.brainjuice.pokego.web.form.res.others.DynamaxImplPokemonResponse;
 import jp.brainjuice.pokego.web.form.res.others.EvoCostResponse;
 import jp.brainjuice.pokego.web.form.res.others.EvolutionResponse;
 import jp.brainjuice.pokego.web.form.res.others.UnimplPokemonResponse;
@@ -40,6 +42,8 @@ public class OthersResearchController {
 	private EvoCostResearchService evoCostResearchService;
 
 	private UnimplPokemonService unimplPokemonService;
+	
+	private DynamaxImplPokemonService dynamaxImplPokemonService;
 
 	private ValidationService validationService;
 
@@ -49,6 +53,7 @@ public class OthersResearchController {
 			EvolutionResearchService evolutionResearchService, ResearchServiceExecutor<EvolutionResponse> evolutionResRse,
 			EvoCostResearchService evoCostResearchService,
 			UnimplPokemonService unimplPokemonService,
+			DynamaxImplPokemonService dynamaxImplPokemonService,
 			ValidationService validationService,
 			ViewsCacheProvider viewsCacheProvider) {
 
@@ -59,7 +64,11 @@ public class OthersResearchController {
 		// 進化コスト
 		this.evoCostResearchService = evoCostResearchService;
 
+		// 未実装ポケモン一覧
 		this.unimplPokemonService = unimplPokemonService;
+
+		// ダイマックス、キョダイマックス実装済みポケモン一覧
+		this.dynamaxImplPokemonService = dynamaxImplPokemonService;
 
 		this.validationService = validationService;
 		this.viewsCacheProvider = viewsCacheProvider;
@@ -109,6 +118,23 @@ public class OthersResearchController {
 
 		UnimplPokemonResponse res = new UnimplPokemonResponse();
 		unimplPokemonService.exec(res);
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+
+		return res;
+	}
+
+	/**
+	 * ダイマックス、キョダイマックス実装済みポケモン一覧取得用API
+	 *
+	 * @return
+	 */
+	@GetMapping("/dynamaxImplPokemon")
+	public DynamaxImplPokemonResponse dynamaxImplPokemon() {
+
+		DynamaxImplPokemonResponse res = new DynamaxImplPokemonResponse();
+		dynamaxImplPokemonService.exec(res);
 
 		// 閲覧数を手動で追加。
 		viewsCacheProvider.addTempList();

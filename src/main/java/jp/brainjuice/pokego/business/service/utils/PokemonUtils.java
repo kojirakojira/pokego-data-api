@@ -44,20 +44,14 @@ public class PokemonUtils {
 	public GoPokedex getGoPokedex(Pokedex pokedex) {
 
 		int attack = convGoAttack(
-				pokedex.getAttack(),
-				pokedex.getSpecialAttack(),
-				pokedex.getSpeed(),
-				pokedex.getPokedexId(),
+				pokedex,
 				true);
 
 		int defense = convGoDefense(
-				pokedex.getDefense(),
-				pokedex.getSpecialDefense(),
-				pokedex.getSpeed(),
-				pokedex.getPokedexId(),
+				pokedex,
 				true);
 
-		int hp = convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true);
+		int hp = convGoHp(pokedex, true);
 
 		GoPokedex goPokedex = new GoPokedex();
 		goPokedex.setPokedexId(pokedex.getPokedexId());
@@ -79,26 +73,26 @@ public class PokemonUtils {
 	/**
 	 * 原作→Go HP変換
 	 *
-	 * @param hp
-	 * @param pokedexId
+	 * @param pokedex
 	 * @param correctFlg 強キャラ補正フラグ
 	 * @return
 	 */
-	public int convGoHp(int hp, String pokedexId, boolean correctFlg) {
+	public int convGoHp(Pokedex pokedex, boolean correctFlg) {
 
+		String pid = pokedex.getPokedexId();
 		// 例外の固定値が存在する場合はその値を返却する。
-		Map<RaceEx, Object> raceExHpMap = raceExceptionsMap.get(pokedexId);
+		Map<RaceEx, Object> raceExHpMap = raceExceptionsMap.get(pid);
 		if (raceExHpMap != null && raceExHpMap.containsKey(RaceEx.HP)) {
 			return ((Integer) raceExHpMap.get(RaceEx.HP)).intValue();
 		}
 
-		double baseHp = baseHp(hp);
+		double baseHp = baseHp(pokedex.getHp());
 
 		if (correctFlg) {
-			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+			double correctionValue = PokemonEditUtils.isMega(pokedex)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
 			// 強ポケ補正後は四捨五入
-			baseHp = tooStrongRepository.existsById(pokedexId) ? Math.round(baseHp * correctionValue) : baseHp;
+			baseHp = tooStrongRepository.existsById(pid) ? Math.round(baseHp * correctionValue) : baseHp;
 		}
 
 		// 小数点以下切り捨て
@@ -122,27 +116,25 @@ public class PokemonUtils {
 	/**
 	 * 原作→Go 攻撃変換
 	 *
-	 * @param attack
-	 * @param spAttack
-	 * @param speed
-	 * @param pokedexId
+	 * @param pokedex
 	 * @param correctFlg 強キャラ補正フラグ
 	 * @return
 	 */
-	public int convGoAttack(int attack, int spAttack, int speed, String pokedexId, boolean correctFlg) {
+	public int convGoAttack(Pokedex pokedex, boolean correctFlg) {
 
+		String pid = pokedex.getPokedexId();
 		// 例外の固定値が存在する場合はその値を返却する。
-		Map<RaceEx, Object> raceExAtMap = raceExceptionsMap.get(pokedexId);
+		Map<RaceEx, Object> raceExAtMap = raceExceptionsMap.get(pid);
 		if (raceExAtMap != null && raceExAtMap.containsKey(RaceEx.ATTACK)) {
 			return ((Integer) raceExAtMap.get(RaceEx.ATTACK)).intValue();
 		}
 
-		double baseAttack = baseAttack(attack, spAttack, speed);
+		double baseAttack = baseAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed());
 
 		if (correctFlg) {
-			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+			double correctionValue = PokemonEditUtils.isMega(pokedex)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
-			baseAttack = tooStrongRepository.existsById(pokedexId) ? baseAttack * correctionValue : baseAttack;
+			baseAttack = tooStrongRepository.existsById(pid) ? baseAttack * correctionValue : baseAttack;
 		}
 
 		return (int) Math.round(baseAttack);
@@ -173,27 +165,25 @@ public class PokemonUtils {
 	/**
 	 * 原作→Go 防御変換
 	 *
-	 * @param defense
-	 * @param spDefense
-	 * @param speed
-	 * @param pokedexId
+	 * @param pokedex
 	 * @param correctFlg 強キャラ補正フラグ
 	 * @return
 	 */
-	public int convGoDefense(int defense, int spDefense, int speed, String pokedexId, boolean correctFlg) {
+	public int convGoDefense(Pokedex pokedex, boolean correctFlg) {
 
+		String pid = pokedex.getPokedexId();
 		// 例外の固定値が存在する場合はその値を返却する。
-		Map<RaceEx, Object> raceExDfMap = raceExceptionsMap.get(pokedexId);
+		Map<RaceEx, Object> raceExDfMap = raceExceptionsMap.get(pid);
 		if (raceExDfMap != null && raceExDfMap.containsKey(RaceEx.DEFENSE)) {
 			return ((Integer) raceExDfMap.get(RaceEx.DEFENSE)).intValue();
 		}
 
-		double baseDefense = baseDefense(defense, spDefense, speed);
+		double baseDefense = baseDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed());
 
 		if (correctFlg) {
-			double correctionValue = PokemonEditUtils.isMega(pokedexId)
+			double correctionValue = PokemonEditUtils.isMega(pokedex)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
-			baseDefense = tooStrongRepository.existsById(pokedexId) ? baseDefense * correctionValue : baseDefense;
+			baseDefense = tooStrongRepository.existsById(pid) ? baseDefense * correctionValue : baseDefense;
 		}
 
 		return (int) Math.round(baseDefense);
@@ -240,9 +230,9 @@ public class PokemonUtils {
 	 */
 	public int calcCpFromMain(Pokedex pokedex, String pl) {
 		return pokemonGoUtils.calcCp(
-				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true),
+				convGoAttack(pokedex, true),
+				convGoDefense(pokedex, true),
+				convGoHp(pokedex, true),
 				pl);
 	}
 
@@ -261,9 +251,9 @@ public class PokemonUtils {
 	public int calcBaseCpFromMain(Pokedex pokedex) {
 
 		return pokemonGoUtils.calcCp(
-				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), false),
-				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), false),
-				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), false), TOO_STRONG_PL);
+				convGoAttack(pokedex, false),
+				convGoDefense(pokedex, false),
+				convGoHp(pokedex, false), TOO_STRONG_PL);
 	}
 
 	/**
@@ -275,9 +265,9 @@ public class PokemonUtils {
 	 */
 	public int calcMaxIvCpFromMain(Pokedex pokedex, String pl) {
 		return pokemonGoUtils.calcMaxIvCp(
-				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true),
+				convGoAttack(pokedex, true),
+				convGoDefense(pokedex, true),
+				convGoHp(pokedex, true),
 				pl);
 	}
 
@@ -290,9 +280,9 @@ public class PokemonUtils {
 	 */
 	public int calcMaxCpFromMain(Pokedex pokedex) {
 		return pokemonGoUtils.calcMaxCp(
-				convGoAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoDefense(pokedex.getDefense(), pokedex.getSpecialDefense(), pokedex.getSpeed(), pokedex.getPokedexId(), true),
-				convGoHp(pokedex.getHp(), pokedex.getPokedexId(), true));
+				convGoAttack(pokedex, true),
+				convGoDefense(pokedex, true),
+				convGoHp(pokedex, true));
 	}
 
 	/**

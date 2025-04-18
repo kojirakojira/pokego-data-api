@@ -8,16 +8,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.catchCp.DynamaxResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.EggsResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.FrTaskResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RocketResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.form.req.catchCp.DynamaxRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.EggsRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.FrTaskRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RocketRequest;
+import jp.brainjuice.pokego.web.form.res.catchCp.DynamaxResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.EggsResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.FrTaskResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RaidResponse;
@@ -47,6 +50,9 @@ public class CatchCpResearchController {
 	private RocketResearchService rocketResearchService;
 	private ResearchServiceExecutor<RocketResponse> rocketResRse;
 
+	private DynamaxResearchService dynamaxResearchService;
+	private ResearchServiceExecutor<DynamaxResponse> dynamaxResRse;
+
 	private ValidationService validationService;
 
 	public CatchCpResearchController(
@@ -54,6 +60,7 @@ public class CatchCpResearchController {
 			FrTaskResearchService frTaskResearchService, ResearchServiceExecutor<FrTaskResponse> frTaskResRse,
 			EggsResearchService eggsResearchService, ResearchServiceExecutor<EggsResponse> eggsResRse,
 			RocketResearchService rocketResearchService, ResearchServiceExecutor<RocketResponse> rocketResRse,
+			DynamaxResearchService dynamaxResearchService, ResearchServiceExecutor<DynamaxResponse> dynamaxResRse,
 			ValidationService validationService) {
 
 		// レイドボスCP算出
@@ -68,6 +75,9 @@ public class CatchCpResearchController {
 		// シャドウCP算出
 		this.rocketResearchService = rocketResearchService;
 		this.rocketResRse = rocketResRse;
+		// ダイマックス、キョダイマックスCP算出
+		this.dynamaxResearchService = dynamaxResearchService;
+		this.dynamaxResRse = dynamaxResRse;
 		// 入力チェック
 		this.validationService = validationService;
 	}
@@ -142,6 +152,24 @@ public class CatchCpResearchController {
 		RocketResponse shadowRes = new RocketResponse();
 		rocketResRse.execute(rocketReq, shadowRes, rocketResearchService);
 		return shadowRes;
+	}
+
+	/**
+	 * ダイマックス、キョダイマックスのポケモンのCP最高値・最低値を求めるAPI
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/dynamax")
+	public DynamaxResponse dynamax(DynamaxRequest dynamaxReq) throws Exception {
+
+		validationService.validation(dynamaxReq);
+
+		DynamaxResponse dynamaxRes = new DynamaxResponse();
+		dynamaxResRse.execute(dynamaxReq, dynamaxRes, dynamaxResearchService);
+		return dynamaxRes;
 	}
 
 	@ExceptionHandler(BadRequestException.class)

@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
@@ -86,5 +87,9 @@ public class Pokedex implements Serializable {
 	/** 実装フラグ */
 	@Column(name = "impl_flg", nullable = false, length = 20)
 	private boolean implFlg;
+
+	/** 実装フラグ */
+	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
+	private String preMegaPokedexId;
 
 }

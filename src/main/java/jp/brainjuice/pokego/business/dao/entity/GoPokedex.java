@@ -8,12 +8,14 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * GOポケモン図鑑
@@ -27,7 +29,8 @@ import lombok.ToString;
 @Entity
 @ToString
 @Table(name = "go_pokedex")
-public class GoPokedex implements Serializable {
+@Slf4j
+public class GoPokedex implements Serializable, Cloneable {
 
 	/** 図鑑No(4) + 亜種コード(1) + 連番(2) */
 	@Id
@@ -93,6 +96,18 @@ public class GoPokedex implements Serializable {
 	@Column(name = "fin_evo", nullable = false)
 	private boolean finEvo;
 
+	/** ダイマックス実装済みフラグ */
+	@Column(name = "dynamax_impl_flg", nullable = false)
+	private boolean dynamaxImplFlg;
+
+	/** キョダイマックス実装済みフラグ */
+	@Column(name = "gigantamax_impl_flg", nullable = false)
+	private boolean gigantamaxImplFlg;
+
+	/** メガシンカする場合の、メガシンカ前の図鑑ID */
+	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
+	private String preMegaPokedexId;
+
 	/**
 	 * (非 Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -106,19 +121,29 @@ public class GoPokedex implements Serializable {
      * (非 Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-    public boolean equals(Object obj) {
+	@Override
+	public boolean equals(Object obj) {
 
-    	if (this == obj) {
-    		return true;
-    	}
+		if (this == obj) {
+			return true;
+		}
 
-    	if (!(obj instanceof GoPokedex)) {
-    		return false;
-    	}
+		if (!(obj instanceof GoPokedex)) {
+			return false;
+		}
 
-    	GoPokedex other = (GoPokedex) obj;
+		GoPokedex other = (GoPokedex) obj;
 
-    	return pokedexId != null && pokedexId.equals(other.getPokedexId());
-    }
+		return pokedexId != null && pokedexId.equals(other.getPokedexId());
+	}
+
+	public GoPokedex clone() {
+		GoPokedex gp = null;
+		try {
+			gp = (GoPokedex) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.", e);
+		}
+		return gp;
+	}
 }

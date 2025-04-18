@@ -24,7 +24,8 @@ public class LastUpdatedMap extends HashMap<Keys, Date> {
 	 * @author saibabanagchampa
 	 */
 	public enum Keys {
-		unimplPokemon // 未実装ポケモン一覧
+		unimplPokemon, // 未実装ポケモン一覧
+		dynamaxImplPokemon //ダイマックス、キョダイマックス実装済み一覧
 	}
 
 	/**

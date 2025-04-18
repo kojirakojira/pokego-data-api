@@ -267,14 +267,14 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 				.entrySet().stream()
 				.filter(entry -> entry.getValue().equals(1L)) // 1件だけのタイプに絞り込む
 				.map(Map.Entry::getKey)
-				.collect(Collectors.toList());
+				.toList();
 
 		// Map<2タイプ, 引数に指定されたダメージ倍率の内の、唯一のタイプ>
 		Map<TwoTypeKey, TypeEnum> twoTypeMap = typeListMap.entrySet().stream()
 				.filter(entry -> entry.getValue().stream()
 						.anyMatch(te -> onlyTypeList.contains(te))) // 1つしか存在しないタイプが含まれているEntryに絞り込む。
 				.collect(Collectors.toMap(
-						entry -> entry.getKey(),
+						Map.Entry::getKey,
 						entry -> {
 							return entry.getValue().stream()
 									.filter(te -> onlyTypeList.contains(te))
