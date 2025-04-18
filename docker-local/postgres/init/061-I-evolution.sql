@@ -1008,7 +1008,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0827N01', 'root', 0, null, null, null, null, null, null, FALSE), --クスネ
 	('0828N01', '0827N01', 50, null, null, null, null, null, null, TRUE), --フォクスライ
 	('0829N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒメンカ
-	('0830N01', '0829N01', 0, null, null, null, null, null, null, TRUE), --ワタシラガ
+	('0830N01', '0829N01', 50, null, null, null, null, null, null, TRUE), --ワタシラガ
 	('0831N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウールー
 	('0832N01', '0831N01', 50, null, null, null, null, null, null, TRUE), --バイウールー
 	('0833N01', 'root', 0, null, null, null, null, null, null, FALSE), --カムカメ
@@ -1030,7 +1030,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0849N01', '0848N01', 400, null, null, null, null, null, null, TRUE), --ストリンダー(ハイなすがた)
 	('0849N02', '0848N01', 400, null, null, null, null, null, null, TRUE), --ストリンダー(ローなすがた)
 	('0850N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤクデ
-	('0851N01', '0850N01', 0, null, null, null, null, null, null, TRUE), --マルヤクデ
+	('0851N01', '0850N01', 50, null, null, null, null, null, null, TRUE), --マルヤクデ
 	('0852N01', 'root', 0, null, null, null, null, null, null, FALSE), --タタッコ
 	('0853N01', '0852N01', 0, null, null, null, null, null, null, TRUE), --オトスパス
 	('0854N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤバチャ(がんさくフォルム)
@@ -1154,8 +1154,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0955N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒラヒナ
 	('0956N01', '0955N01', 0, null, null, null, null, null, null, TRUE), --クエスパトラ
 	('0957N01', 'root', 0, null, null, null, null, null, null, FALSE), --カヌチャン
-	('0958N01', '0957N01', 0, null, null, null, null, null, null, TRUE), --ナカヌチャン
-	('0959N01', '0958N01', 0, null, null, null, null, null, null, TRUE), --デカヌチャン
+	('0958N01', '0957N01', 25, null, null, null, null, null, null, TRUE), --ナカヌチャン
+	('0959N01', '0958N01', 100, null, null, null, null, null, null, TRUE), --デカヌチャン
 	('0960N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウミディグダ
 	('0961N01', '0960N01', 50, null, null, null, null, null, null, TRUE), --ウミトリオ
 	('0962N01', 'root', 0, null, null, null, null, null, null, FALSE), --オトシドリ

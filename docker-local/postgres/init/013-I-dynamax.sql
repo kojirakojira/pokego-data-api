@@ -937,7 +937,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0763N01', FALSE, FALSE), --アマージョ
 	('0764N01', FALSE, FALSE), --キュワワー
 	('0765N01', FALSE, FALSE), --ヤレユータン
-	('0766N01', FALSE, FALSE), --ナゲツケサル
+	('0766N01', TRUE, FALSE), --ナゲツケサル
 	('0767N01', FALSE, FALSE), --コソクムシ
 	('0768N01', FALSE, FALSE), --グソクムシャ
 	('0769N01', FALSE, FALSE), --スナバァ
