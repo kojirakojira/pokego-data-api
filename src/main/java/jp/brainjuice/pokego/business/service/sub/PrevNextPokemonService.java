@@ -9,6 +9,7 @@ import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.sub.PrevNextPokemonResponse;
 
@@ -25,7 +26,9 @@ public class PrevNextPokemonService {
 
 	public void exec(String pokedexId, PrevNextPokemonResponse res) {
 
-		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
+		List<GoPokedex> goPokedexList = goPokedexRepository.findAll().stream()
+				.sorted(PokemonEditUtils.getPokedexComparator(1))
+				.toList();
 
 		Optional<GoPokedex> targetGpOp = goPokedexList.stream()
 				.filter(gp -> gp.getPokedexId().equals(pokedexId))
@@ -35,6 +38,7 @@ public class PrevNextPokemonService {
 			res.setSuccess(false);
 			res.setMsgLevel(MsgLevelEnum.error);
 			res.setMessage(MessageFormat.format(TARGET_NOT_FOUND_MSG, pokedexId));
+			return;
 		}
 
 		int index = goPokedexList.indexOf(targetGpOp.get());

@@ -792,7 +792,7 @@ INSERT INTO pokedex
     ('0646N01', 'キュレム', 125, 130, 90, 130, 90, 95, '', 'dragon', 'ice', 'g5', null, null, TRUE, null),
     ('0646N02', 'キュレム', 125, 120, 90, 170, 100, 95, 'ホワイトキュレム', 'dragon', 'ice', 'g5', null, null, TRUE, null),
     ('0646N03', 'キュレム', 125, 170, 100, 120, 90, 95, 'ブラックキュレム', 'dragon', 'ice', 'g5', null, null, TRUE, null),
-    ('0647N01', 'ケルディオ', 91, 72, 90, 129, 90, 108, 'いつものすがた', 'water', 'fighting', 'g5', null, null, FALSE, null),
+    ('0647N01', 'ケルディオ', 91, 72, 90, 129, 90, 108, 'いつものすがた', 'water', 'fighting', 'g5', null, null, TRUE, null),
     ('0647N02', 'ケルディオ', 91, 72, 90, 129, 90, 108, 'かくごのすがた', 'water', 'fighting', 'g5', null, null, FALSE, null),
     ('0648N01', 'メロエッタ', 100, 77, 77, 128, 128, 90, 'ボイスフォルム', 'normal', 'psychic', 'g5', null, null, TRUE, null),
     ('0648N02', 'メロエッタ', 100, 128, 90, 77, 77, 128, 'ステップフォルム', 'normal', 'fighting', 'g5', null, null, FALSE, null),

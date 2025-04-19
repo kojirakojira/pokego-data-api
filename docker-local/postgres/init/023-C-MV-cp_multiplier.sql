@@ -13,6 +13,9 @@ CREATE MATERIALIZED VIEW cp_multiplier AS
       ON MOD(cpmo1.pl, 1) > 0
       AND (cpmo1.pl + 0.5) = cpmo3.pl;
 
+/**
+ * CREATE INDEX
+ */
 CREATE INDEX IF NOT EXISTS cp_multiplier_pk ON cp_multiplier (pl);
 
 COMMIT;

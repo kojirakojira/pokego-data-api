@@ -3,3 +3,5 @@
  */
 refresh materialized view too_strong;
 refresh materialized view go_pokedex;
+
+COMMIT;

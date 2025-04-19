@@ -29,6 +29,9 @@ CREATE MATERIALIZED VIEW go_pokedex AS
     left join dynamax d
     on p.pokedex_id = d.pokedex_id;
 
+/**
+ * CREATE INDEX
+ */
 CREATE INDEX IF NOT EXISTS go_pokedex_pk ON go_pokedex (pokedex_id);
 
 COMMIT;

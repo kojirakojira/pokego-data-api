@@ -39,3 +39,5 @@ RETURNS bpchar AS $$
   END;
 $$ LANGUAGE plpgsql
 SET search_path TO public, pg_catalog, pg_temp;
+
+COMMIT;
