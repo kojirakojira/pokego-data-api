@@ -41,7 +41,9 @@ public class RaceDiffService {
 
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
 	
-	private static final String MSG_NO_UNIQUE_NAMES = "ポケモン名はユニークになるように指定してください。";
+	private static final String MSG_NO_UNIQUE_NAMES = "指定されたポケモンに重複があります。";
+	
+	private static final String MSG_NO_UNIQUE_NAME = "重複があります。";
 
 	public RaceDiffService(
 			PokedexRepository pokedexRepository,
@@ -151,14 +153,14 @@ public class RaceDiffService {
 						.map(psr -> {
 							if (duplicateList.contains(psr.getGoPokedex().getPokedexId())) {
 								psr.setMsgLevel(MsgLevelEnum.error);
-								psr.setMessage("重複があります。");
+								psr.setMessage(MSG_NO_UNIQUE_NAME);
 							}
 							return psr;
 						})
 						.toList());
 				res.setMsr(msr);
 				res.setMsgLevel(MsgLevelEnum.error);
-				res.setMessage("指定されたポケモンに重複があります。");
+				res.setMessage(MSG_NO_UNIQUE_NAMES);
 				res.setSuccess(false);
 				return false;
 			}
@@ -232,6 +234,13 @@ public class RaceDiffService {
 	private void exec(List<GoPokedex> goPokedexList, List<String> idList, RaceDiffResponse res) {
 
 		final List<Pokedex> pokedexList = (List<Pokedex>) pokedexRepository.findAllById(idList);
+		
+		if (idList.size() > pokedexList.size()) {
+			res.setMsgLevel(MsgLevelEnum.error);
+			res.setMessage(MSG_NO_RESULTS);
+			res.setSuccess(false);
+			return;
+		}
 		
 		List<Race> raceList = idList.stream() // 検索した時のid順で作成
 				.map(pid -> {

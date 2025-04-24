@@ -21,6 +21,12 @@ public abstract class ResearchRequestImpl implements ResearchRequest {
 	/** メガシンカ */
 	private boolean mega;
 	private boolean negaMega;
+	/** ダイマックス */
+	private boolean dynamax;
+	private boolean negaDynamax;
+	/** キョダイマックス */
+	private boolean gigantamax;
+	private boolean negaGigantamax;
 	/** 実装済み */
 	private boolean impled;
 	private boolean negaImpled;

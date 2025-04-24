@@ -33,6 +33,14 @@ public enum FilterEnum {
 	 */
 	mega("メガシンカ"),
 	/**
+	 * ダイマックス<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
+	 */
+	dynamax("ダイマックス"),
+	/**
+	 * キョダイマックス<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
+	 */
+	gigantamax("キョダイマックス"),
+	/**
 	 * 実装済み<br>Boolean<br>※trueの場合のみ絞り込む。falseの場合は絞り込みは実施しない。
 	 */
 	impled("PokémonGO実装済み"),

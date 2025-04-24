@@ -36,6 +36,18 @@ public interface ResearchRequest {
 	public void setMega(boolean mega);
 	public boolean isNegaMega();
 	public void setNegaMega(boolean negaMega);
+	
+	/** ダイマックス */
+	public boolean isDynamax();
+	public void setDynamax(boolean dynamax);
+	public boolean isNegaDynamax();
+	public void setNegaDynamax(boolean negaDynamax);
+	
+	/** キョダイマックス */
+	public boolean isGigantamax();
+	public void setGigantamax(boolean gigantamax);
+	public boolean isNegaGigantamax();
+	public void setNegaGigantamax(boolean negaGigantamax);
 
 	/** 実装済み */
 	public boolean isImpled();

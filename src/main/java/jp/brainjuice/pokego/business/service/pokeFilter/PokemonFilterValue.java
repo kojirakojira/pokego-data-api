@@ -28,6 +28,12 @@ public class PokemonFilterValue {
 	/** メガシンカ */
 	private boolean mega;
 	private boolean negaMega;
+	/** ダイマックス */
+	private boolean dynamax;
+	private boolean negaDynamax;
+	/** キョダイマックス */
+	private boolean gigantamax;
+	private boolean negaGigantamax;
 	/** 実装済み */
 	private boolean impled;
 	private boolean negaImpled;
@@ -59,6 +65,12 @@ public class PokemonFilterValue {
 		// メガシンカ
 		setMega(req.isMega());
 		setNegaMega(req.isNegaMega());
+		// ダイマックス
+		setDynamax(req.isDynamax());
+		setNegaDynamax(req.isNegaDynamax());
+		// キョダイマックス
+		setGigantamax(req.isGigantamax());
+		setNegaGigantamax(req.isNegaGigantamax());
 		// 実装済み
 		setImpled(req.isImpled());
 		setNegaImpled(req.isNegaImpled());

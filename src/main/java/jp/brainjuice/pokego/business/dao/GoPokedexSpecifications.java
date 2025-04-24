@@ -3,13 +3,14 @@ package jp.brainjuice.pokego.business.dao;
 
 import java.util.List;
 
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
-
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
+
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -34,6 +35,10 @@ public class GoPokedexSpecifications {
 	private static final String TYPE2 = "type2";
 
 	private static final String GEN = "gen";
+
+	private static final String DYNAMAX = "dynamaxImplFlg";
+
+	private static final String GIGANTAMX = "gigantamaxImplFlg";
 
 	private static final String IMPL_FLG = "implFlg";
 
@@ -75,6 +80,28 @@ public class GoPokedexSpecifications {
 			String m = PokemonEditUtils.M;
 			return bool ? builder.equal(expression, m) : builder.notEqual(expression, m);
 		};
+	}
+
+	/**
+	 * ダイマックス
+	 * (イメージ：WHERE dynamax_impl_flg = true）
+	 *
+	 * @param bool
+	 * @return
+	 */
+	public Specification<GoPokedex> dynamaxEqual(boolean bool) {
+		return (root, query, builder) -> builder.equal(root.get(DYNAMAX), bool);
+	}
+
+	/**
+	 * キョダイマックス
+	 * (イメージ：WHERE gigantamax_impl_flg = true）
+	 *
+	 * @param bool
+	 * @return
+	 */
+	public Specification<GoPokedex> gigantamaxEqual(boolean bool) {
+		return (root, query, builder) -> builder.equal(root.get(GIGANTAMX), bool);
 	}
 
 

@@ -56,6 +56,14 @@ public class PokemonFilterValueUtils {
 		if (fv.isMega()) {
 			retMap.put(FilterEnum.mega, new FilterParam(fv.isMega(), fv.isNegaMega()));
 		}
+		// ダイマックス
+		if (fv.isDynamax()) {
+			retMap.put(FilterEnum.dynamax, new FilterParam(fv.isDynamax(), fv.isNegaDynamax()));
+		}
+		// キョダイマックス
+		if (fv.isGigantamax()) {
+			retMap.put(FilterEnum.gigantamax, new FilterParam(fv.isGigantamax(), fv.isNegaGigantamax()));
+		}
 		// 実装済み
 		if (fv.isImpled()) {
 			retMap.put(FilterEnum.impled, new FilterParam(fv.isImpled(), fv.isNegaImpled()));
@@ -106,9 +114,11 @@ public class PokemonFilterValueUtils {
 			}
 			case finEvo:
 			case mega:
+			case dynamax:
+			case gigantamax:
 			case impled:
 			case tooStrong:
-				// 最終進化、メガシンカ、実装済み、強ポケ補正
+				// 最終進化、メガシンカ、ダイマックス、キョダイマックス、実装済み、強ポケ補正
 				filterValue = (boolean) value && negate ? "否定による絞り込み" : "絞り込む";
 				break;
 

@@ -93,6 +93,12 @@ public class GoPokedexFilterService {
 			case mega:
 				spec = appendAndExpression(spec, gpSpec.megaEqual(!negate));
 				break;
+			case dynamax:
+				spec = appendAndExpression(spec, gpSpec.dynamaxEqual(!negate));
+				break;
+			case gigantamax:
+				spec = appendAndExpression(spec, gpSpec.gigantamaxEqual(!negate));
+				break;
 			case tooStrong:
 				spec = appendAndExpression(spec, gpSpec.tooStrongEqual(!negate));
 				break;

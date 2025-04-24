@@ -144,7 +144,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0103A01', '0102N01', 50, null, null, null, null, null, 'ポケモンGOでは、タマタマはアローラナッシーに進化しない。', FALSE), --ナッシー(アローラのすがた)
 	('0104N01', 'root', 0, null, null, null, null, null, null, FALSE), --カラカラ
 	('0105N01', '0104N01', 50, null, null, null, null, null, null, TRUE), --ガラガラ
-	('0105A01', '0104N01', 50, null, null, null, null, null, null, TRUE), --ガラガラ(アローラのすがた)
+	('0105A01', '0104N01', 0, null, null, null, null, null, null, FALSE), --ガラガラ(アローラのすがた)
 	('0106N01', '0236N01', 25, null, null, 'こうげきが高い場合', null, null, '個体値が同じ場合は、ランダムで決まる。', TRUE), --サワムラー
 	('0107N01', '0236N01', 25, null, null, 'ぼうぎょが高い場合', null, null, null, TRUE), --エビワラー
 	('0108N01', 'root', 0, null, null, null, null, null, null, FALSE), --ベロリンガ
