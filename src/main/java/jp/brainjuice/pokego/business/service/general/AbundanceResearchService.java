@@ -27,6 +27,7 @@ import jp.brainjuice.pokego.business.service.utils.dto.cpIv.FrTaskIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.IvRangeCp;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RaidIvRange;
 import jp.brainjuice.pokego.business.service.utils.dto.cpIv.RocketIvRange;
+import jp.brainjuice.pokego.business.service.utils.dto.cpIv.WildIvRange;
 import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.elem.CatchCp;
 import jp.brainjuice.pokego.web.form.res.elem.Color;
@@ -114,6 +115,9 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 					.findFirst().orElseThrow();
 		}
 
+		// CP(野生)
+		IvRangeCp wild = catchCpUtils.getIvRangeCp(cpTargetGp, new WildIvRange());
+		res.setWild(new CatchCp(wild, null));
 		// CP(レイド)
 		IvRangeCp raid = catchCpUtils.getIvRangeCp(cpTargetGp, new RaidIvRange());
 		res.setRaid(new CatchCp(raid, null));

@@ -17,6 +17,7 @@ public enum PageNameEnum {
 	abundance("ポケモン情報"),
 	filterAll("ポケモン検索"),
 	searchAll("全ポケ絞り込み"),
+	wild("野生CP"),
 	raid("レイドボス勝利ボーナスCP"),
 	rocket("ロケット団勝利ボーナスCP"),
 	frTask("フィールドリサーチCP"),

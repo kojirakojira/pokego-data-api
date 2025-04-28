@@ -13,6 +13,7 @@ import jp.brainjuice.pokego.business.service.catchCp.EggsResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.FrTaskResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.catchCp.RocketResearchService;
+import jp.brainjuice.pokego.business.service.catchCp.WildResearchService;
 import jp.brainjuice.pokego.business.service.utils.ValidationService;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.form.req.catchCp.DynamaxRequest;
@@ -20,11 +21,13 @@ import jp.brainjuice.pokego.web.form.req.catchCp.EggsRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.FrTaskRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RaidRequest;
 import jp.brainjuice.pokego.web.form.req.catchCp.RocketRequest;
+import jp.brainjuice.pokego.web.form.req.catchCp.WildRequest;
 import jp.brainjuice.pokego.web.form.res.catchCp.DynamaxResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.EggsResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.FrTaskResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RaidResponse;
 import jp.brainjuice.pokego.web.form.res.catchCp.RocketResponse;
+import jp.brainjuice.pokego.web.form.res.catchCp.WildResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,6 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 @Slf4j
 public class CatchCpResearchController {
+
+	private WildResearchService wildResearchService;
+	private ResearchServiceExecutor<WildResponse> wildResRse;
 
 	private RaidResearchService raidResearchService;
 	private ResearchServiceExecutor<RaidResponse> raidResRse;
@@ -56,6 +62,7 @@ public class CatchCpResearchController {
 	private ValidationService validationService;
 
 	public CatchCpResearchController(
+			WildResearchService wildResearchService, ResearchServiceExecutor<WildResponse> wildResRse,
 			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
 			FrTaskResearchService frTaskResearchService, ResearchServiceExecutor<FrTaskResponse> frTaskResRse,
 			EggsResearchService eggsResearchService, ResearchServiceExecutor<EggsResponse> eggsResRse,
@@ -63,6 +70,9 @@ public class CatchCpResearchController {
 			DynamaxResearchService dynamaxResearchService, ResearchServiceExecutor<DynamaxResponse> dynamaxResRse,
 			ValidationService validationService) {
 
+		// 野生CP算出
+		this.wildResearchService = wildResearchService;
+		this.wildResRse = wildResRse;
 		// レイドボスCP算出
 		this.raidResearchService = raidResearchService;
 		this.raidResRse = raidResRse;
@@ -80,6 +90,23 @@ public class CatchCpResearchController {
 		this.dynamaxResRse = dynamaxResRse;
 		// 入力チェック
 		this.validationService = validationService;
+	}
+
+	/**
+	 * 野生のCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param wildReq
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/wild")
+	public WildResponse wild(WildRequest wildReq) throws Exception {
+
+		validationService.validation(wildReq);
+
+		WildResponse wildRes = new WildResponse();
+		wildResRse.execute(wildReq, wildRes, wildResearchService);
+		return wildRes;
 	}
 
 	/**

@@ -21,6 +21,8 @@ public class AbundanceResponse extends ResearchResponse {
 	private int cp50;
 	// CP(PL51)
 	private int maxCp;
+	// 野生
+	private CatchCp wild;
 	// レイド
 	private CatchCp raid;
 	// ロケット団

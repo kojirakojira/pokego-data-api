@@ -79,19 +79,21 @@ public class CatchCpUtils {
 
 		int maxIv = ir.getMaxIv();
 		int minIv = ir.getMinIv();
-		String pl = ir.getMaxPl();
+		String maxPl = ir.getMaxPl();
+		String minPl = ir.getMinPl();
 
 		// 通常
-		ivRangeCp.setMax(pokemonGoUtils.calcCp(goPokedex, maxIv, maxIv, maxIv, pl));
-		ivRangeCp.setMin(pokemonGoUtils.calcCp(goPokedex, minIv, minIv, minIv, pl));
+		ivRangeCp.setMax(pokemonGoUtils.calcCp(goPokedex, maxIv, maxIv, maxIv, maxPl));
+		ivRangeCp.setMin(pokemonGoUtils.calcCp(goPokedex, minIv, minIv, minIv, minPl));
 
 		Integer maxIvWb = ir.getMaxIvWb();
 		Integer minIvWb = ir.getMinIvWb();
-		String plWb = ir.getMaxPlWb();
+		String maxPlWb = ir.getMaxPlWb();
+		String minPlWb = ir.getMinPlWb();
 		// 天候ブースト
-		if (maxIvWb != null && minIvWb != null && plWb != null) {
-			ivRangeCp.setWbMax(pokemonGoUtils.calcCp(goPokedex, maxIvWb, maxIvWb, maxIvWb, plWb));
-			ivRangeCp.setWbMin(pokemonGoUtils.calcCp(goPokedex, minIvWb, minIvWb, minIvWb, plWb));
+		if (maxIvWb != null && minIvWb != null && maxPlWb != null && minPlWb != null) {
+			ivRangeCp.setWbMax(pokemonGoUtils.calcCp(goPokedex, maxIvWb, maxIvWb, maxIvWb, maxPlWb));
+			ivRangeCp.setWbMin(pokemonGoUtils.calcCp(goPokedex, minIvWb, minIvWb, minIvWb, minPlWb));
 		}
 
 		return ivRangeCp;
