@@ -1019,8 +1019,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0838N01', '0837N01', 0, null, null, null, null, null, null, TRUE), --トロッゴン
 	('0839N01', '0838N01', 0, null, null, null, null, null, null, TRUE), --セキタンザン
 	('0840N01', 'root', 0, null, null, null, null, null, null, FALSE), --カジッチュ
-	('0841N01', '0840N01', 0, null, null, null, null, null, null, TRUE), --アップリュー
-	('0842N01', '0840N01', 0, null, null, null, null, null, null, TRUE), --タルップル
+	('0841N01', '0840N01', 200, 'あまーいりんご20コ', null, null, null, null, null, TRUE), --アップリュー
+	('0842N01', '0840N01', 200, 'すっぱいりんご20コ', null, null, null, null, null, TRUE), --タルップル
 	('0843N01', 'root', 0, null, null, null, null, null, null, FALSE), --スナヘビ
 	('0844N01', '0843N01', 0, null, null, null, null, null, null, TRUE), --サダイジャ
 	('0845N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウッウ
