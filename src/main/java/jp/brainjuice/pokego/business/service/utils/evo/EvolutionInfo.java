@@ -106,6 +106,43 @@ class EvolutionInfo {
 	}
 
 	/**
+	 * 進化後のポケモンをすべて取得する。<br>
+	 * ラルトスの場合、キルリア、サーナイト、エルレイドを取得する。<br>
+	 * <strong>DBアクセスなし</strong>
+	 *
+	 * @param pokedexId
+	 * @param evolTreeList
+	 * @return
+	 */
+	List<String> getAllAfterEvolution(String pokedexId, List<Evolution> evolTreeList) {
+
+		List<String> pidList = List.of(pokedexId);
+		List<String> afEvolList = new ArrayList<>();
+		
+		boolean allReafFlg = true;
+		while (allReafFlg) {
+			
+			List<String> nextList = new ArrayList<>();
+			for (String pid: pidList) {
+				List<String> thisStageList = getAfterEvolution(pid, evolTreeList);
+				afEvolList.addAll(thisStageList);
+				
+				if (!thisStageList.isEmpty()) {
+					nextList.addAll(thisStageList);
+				}
+			}
+			
+			if (nextList.isEmpty()) {
+				allReafFlg = false;
+			}
+			
+			pidList = nextList;
+		}
+		
+		return afEvolList;
+	}
+
+	/**
 	 * 進化後のポケモンを取得する。<br>
 	 * <strong>DBアクセスなし</strong>
 	 *

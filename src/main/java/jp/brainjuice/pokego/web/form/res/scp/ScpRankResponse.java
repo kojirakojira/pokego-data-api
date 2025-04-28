@@ -1,7 +1,9 @@
 package jp.brainjuice.pokego.web.form.res.scp;
 
+import java.util.List;
+
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
-import jp.brainjuice.pokego.web.form.res.elem.ScpRank;
+import jp.brainjuice.pokego.web.form.res.elem.ScpRankAllInOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,10 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ScpRankResponse extends ResearchResponse {
 
-	/** スーパーリーグpvp順位 */
-	private ScpRank scpSlRank;
-	/** ハイパーリーグpvp順位 */
-	private ScpRank scpHlRank;
-	/** マスターリーグpvp順位 */
-	private ScpRank scpMlRank;
+	private ScpRankAllInOne targetScpRank;
+	
+	private List<ScpRankAllInOne> afEvolScpRankList;
+	
+	private List<ScpRankAllInOne> anotherFormScpRankList;
 }

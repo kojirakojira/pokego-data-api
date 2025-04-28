@@ -47,6 +47,16 @@ public class EvolutionProvider {
 	}
 
 	/**
+	 * この{@link EvolutionInfo#getAllAfterEvolution(String, List) メソッド}を参照
+	 * @param pid
+	 * @param evolTreeList
+	 * @return
+	 */
+	public List<String> getAllAfterEvolution(String pid, List<Evolution> evolTreeList) {
+		return evolutionInfo.getAllAfterEvolution(pid, evolTreeList);
+	}
+
+	/**
 	 * この{@link EvolutionInfo#getAnotherFormList(String) メソッド}を参照
 	 * @param pid
 	 * @return

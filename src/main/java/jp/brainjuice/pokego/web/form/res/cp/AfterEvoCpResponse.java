@@ -20,6 +20,6 @@ public class AfterEvoCpResponse extends ResearchResponse {
 	private int ivh;
 	private int cp;
 	private String pl;
-	private List<GoPokedexAndCp> afEvoList;
+	private List<GoPokedexAndCp> afEvolCpList;
 	private List<GoPokedexAndCp> anotherFormList;
 }

@@ -1,19 +1,16 @@
 package jp.brainjuice.pokego.business.service.cp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
-import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.dto.GoPokedexAndCp;
 import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
@@ -74,15 +71,27 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 
 
 		res.setPl(pl);
+		
+		List<Evolution> lineageList = evolutionProvider.getLineageList(sp);
+		List<GoPokedex> gpList = goPokedexRepository.findAllById(
+				lineageList.stream().map(Evolution::getPokedexId).toList()
+				);
+		
+		List<String> afEvolPidList = evolutionProvider.getAllAfterEvolution(sp.getPokedexId(), lineageList);
+		
 
 		// 進化後のポケモン
-		List<String> afEvoPidList = getAllAfterEvoPidList(sp);
-		List<GoPokedex> gpAfEvoList = goPokedexRepository.findAllById(afEvoPidList);
-		res.setAfEvoList(convGpAndCpList(gpAfEvoList, iva, ivd, ivh, pl));
+		List<GoPokedex> afEvolGpList = gpList.stream()
+				.filter(gp -> afEvolPidList.contains(gp.getPokedexId()))
+				.toList();
+		res.setAfEvolCpList(convGpAndCpList(afEvolGpList, iva, ivd, ivh, pl));
 
 		// 進化後のポケモンの別のすがた
-		List<GoPokedex> gpAnotherFormList = goPokedexRepository.findAllById(getAnotherFormPidList(sp, afEvoPidList));
-		res.setAnotherFormList(convGpAndCpList(gpAnotherFormList, iva, ivd, ivh, pl));
+		List<GoPokedex> anotherFormGpList = gpList.stream()
+				.filter(gp -> !afEvolPidList.contains(gp.getPokedexId()))
+				.filter(gp -> !sp.getPokedexId().equals(gp.getPokedexId()))
+				.toList();
+		res.setAnotherFormList(convGpAndCpList(anotherFormGpList, iva, ivd, ivh, pl));
 	}
 
 	/**
@@ -102,51 +111,6 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 					int cp = pokemonGoUtils.calcCp(gp, iva, ivd, ivh, pl);
 					return new GoPokedexAndCp(gp, cp);
 				})
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * 進化後のPokedexIdをすべて取得する。<br>
-	 * （第一形態のポケモンで検索された場合、第三形態のポケモンのPokedexIdも取得する。）
-	 *
-	 * @param searchPokemon
-	 * @return
-	 */
-	private List<String> getAllAfterEvoPidList(GoPokedex searchPokemon) {
-
-		List<String> afEvoList = new ArrayList<>();
-		{
-			List<String> searchPidList = Arrays.asList(searchPokemon.getPokedexId());
-
-			while (true) {
-				List<String> hieList = searchPidList.stream()
-						.flatMap(pid -> evolutionProvider.getAfterEvolution(pid).stream())
-						.collect(Collectors.toList());
-
-				if (hieList.isEmpty()) break;
-
-				afEvoList.addAll(hieList);
-				searchPidList = hieList;
-			}
-		}
-
-		afEvoList.sort(PokemonEditUtils.getPokedexIdComparator());
-
-		return afEvoList;
-	}
-
-	/**
-	 * 別のすがたをすべて取得する。
-	 *
-	 * @param goPokedex
-	 * @param pidList
-	 * @return
-	 */
-	private List<String> getAnotherFormPidList(GoPokedex goPokedex, List<String> pidList) {
-
-		return Stream.concat(Stream.of(goPokedex.getPokedexId()), pidList.stream())
-				.flatMap(pid -> evolutionProvider.getAnotherFormPidList(pid).stream())
-				.sorted(PokemonEditUtils.getPokedexIdComparator())
 				.collect(Collectors.toList());
 	}
 

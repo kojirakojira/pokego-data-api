@@ -1,21 +1,19 @@
 package jp.brainjuice.pokego.business.service.scp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
+import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
-import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
-import jp.brainjuice.pokego.business.service.utils.dto.AfterEvoIv;
+import jp.brainjuice.pokego.business.service.utils.dto.AfterEvolIv;
 import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.form.res.scp.AfterEvoScpRankResponse;
@@ -67,6 +65,7 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 		String pl = null;
 		if (spCp != null) {
 			pl = pokemonGoUtils.calcPl(sp, iva, ivd, ivh, spCp);
+			pl = pl.replaceAll("^0+", "");
 			res.setPl(pl);
 
 			if (PokemonGoUtils.DUPLICATE.equals(pl)) {
@@ -80,59 +79,48 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 			}
 		}
 
-		List<GoPokedex> gpAfEvoList = goPokedexRepository.findAllById(getAllAfterEvoPidList(sp));
-		res.setAfEvoList(convGpAndScpRankList(gpAfEvoList, iva, ivd, ivh, pl));
+		List<Evolution> lineageList = evolutionProvider.getLineageList(sp);
+		
+		List<String> afEvolPidList = evolutionProvider.getAllAfterEvolution(sp.getPokedexId(), lineageList);
+		
+		List<GoPokedex> gpAfEvoList = goPokedexRepository.findAllById(afEvolPidList);
+		res.setAfEvolIvList(convGpAndScpRankList(gpAfEvoList, iva, ivd, ivh, pl));
+		
+		// 検索したポケモンのPvP順位
+		res.setTargetGpIv(convGpAndScpRank(sp, iva, ivd, ivh, pl));
 	}
 
 	/**
-	 * GoPokedexのリストを、GoPokedexAndCpのリストに変換します。
+	 * GoPokedexのリストを、GoPokedexAndCpのリストに変換する。
 	 *
-	 * @param pidList
+	 * @param gpList
 	 * @param iva
 	 * @param ivd
 	 * @param ivh
 	 * @return
 	 */
-	private List<AfterEvoIv> convGpAndScpRankList(List<GoPokedex> pidList, int iva, int ivd, int ivh, String pl) {
-
-		return pidList.stream()
-				.map(gp -> new AfterEvoIv(
-						gp,
-						pl == null ? null : pokemonGoUtils.calcCp(gp, iva, ivd, ivh, pl),
-						scpRankCalculator.getSuperLeagueRank(gp, iva, ivd, ivh).getRank(),
-						scpRankCalculator.getHyperLeagueRank(gp, iva, ivd, ivh).getRank(),
-						scpRankCalculator.getMasterLeagueRank(gp, iva, ivd, ivh).getRank()))
+	private List<AfterEvolIv> convGpAndScpRankList(List<GoPokedex> gpList, int iva, int ivd, int ivh, String pl) {
+		return gpList.stream()
+				.map(gp -> convGpAndScpRank(gp, iva, ivd, ivh, pl))
 				.collect(Collectors.toList());
 	}
-
+	
 	/**
-	 * 進化後のPokedexIdをすべて取得する。<br>
-	 * （第一形態のポケモンで検索された場合、第三形態のポケモンのPokedexIdも取得する。）
-	 *
-	 * @param searchPokemon
+	 * GoPokedexを、GoPokedexAndCpのリストに変換する。
+	 * @param goPokedex
+	 * @param iva
+	 * @param ivd
+	 * @param ivh
+	 * @param pl
 	 * @return
 	 */
-	private List<String> getAllAfterEvoPidList(GoPokedex searchPokemon) {
-
-		List<String> afEvoList = new ArrayList<>();
-		{
-			List<String> searchPidList = Arrays.asList(searchPokemon.getPokedexId());
-
-			while (true) {
-				List<String> hieList = searchPidList.stream()
-						.flatMap(pid -> evolutionProvider.getAfterEvolution(pid).stream())
-						.collect(Collectors.toList());
-
-				if (hieList.isEmpty()) break;
-
-				afEvoList.addAll(hieList);
-				searchPidList = hieList;
-			}
-		}
-
-		afEvoList.sort(PokemonEditUtils.getPokedexIdComparator());
-
-		return afEvoList;
+	private AfterEvolIv convGpAndScpRank(GoPokedex goPokedex, int iva, int ivd, int ivh, String pl) {
+		return new AfterEvolIv(
+				goPokedex,
+				pl == null ? null : pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl),
+				scpRankCalculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh).getRank(),
+				scpRankCalculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh).getRank(),
+				scpRankCalculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh).getRank());
 	}
 
 }

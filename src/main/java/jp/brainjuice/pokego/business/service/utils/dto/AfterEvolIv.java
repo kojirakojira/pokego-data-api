@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AfterEvoIv {
+public class AfterEvolIv {
 
 	private GoPokedex goPokedex;
 	private Integer cp;
