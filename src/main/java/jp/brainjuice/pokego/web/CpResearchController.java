@@ -1,12 +1,17 @@
 package jp.brainjuice.pokego.web;
 
+import java.util.List;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.cp.AfterEvoCpResearchService;
 import jp.brainjuice.pokego.business.service.cp.CpIvResearchService;
@@ -168,7 +173,26 @@ public class CpResearchController {
 	}
 
 	/**
-	 * ガラル三鳥の野生個体値を取得するAPIです。
+	 * ガラル三鳥のGoPokedexのリスト取得するAPI
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/threeGalarBirdList")
+	public ResponseEntity<List<GoPokedex>> threeGalarBirdList() throws Exception {
+		// ResponseEntityを使用してもこの場合は変わらないが、備忘的な意味でこの書き方で実装。
+		// 返却値は以下のような形式になる。
+		// { 0: { GoPokedexの内容 }, 1: { GoPokedexの内容 }, ...}
+		List<GoPokedex> tgbGpList = threeGalarBirdsResearchService.getList();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return new ResponseEntity<>(tgbGpList, headers, HttpStatus.OK);
+	}
+
+	/**
+	 * ガラル三鳥の野生個体値を取得するAPI
 	 *
 	 * @param raidReq
 	 * @param req
@@ -184,7 +208,7 @@ public class CpResearchController {
 	}
 
 	/**
-	 * CPから個体値を算出するAPIです。
+	 * CPから個体値を算出するAPI
 	 *
 	 * @param cpIvReq
 	 * @param req

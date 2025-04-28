@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
@@ -19,8 +20,10 @@ import jp.brainjuice.pokego.web.form.res.elem.VersatilityIv;
 
 @Service
 public class ThreeGalarBirdsResearchService implements ResearchService<ThreeGalarBirdsResponse> {
+	
+	private GoPokedexRepository goPokedexRepository;
 
-	CpIvCalculator cpIvCalculator;
+	private CpIvCalculator cpIvCalculator;
 
 	private static final String NO_HIT_MSG = "該当する個体値が存在しませんでした。";
 
@@ -31,8 +34,18 @@ public class ThreeGalarBirdsResearchService implements ResearchService<ThreeGala
 	private List<String> tgbPidList = Arrays.asList("0144G01", "0145G01", "0146G01");
 
 	public ThreeGalarBirdsResearchService(
+			GoPokedexRepository goPokedexRepository,
 			CpIvCalculator cpIvCalculator) {
 		this.cpIvCalculator = cpIvCalculator;
+		this.goPokedexRepository = goPokedexRepository;
+	}
+	
+	/**
+	 * ガラル三鳥のGoPokedexのリストを取得する。
+	 * @return
+	 */
+	public List<GoPokedex> getList() {
+		return goPokedexRepository.findAllById(tgbPidList);
 	}
 
 	@Override

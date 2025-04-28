@@ -88,7 +88,7 @@ public class IroiroTypeRankService {
 		if (!IroiroTypeRankSearchPattern.isDefined(sp)) {
 			res.setSuccess(false);
 			res.setMsgLevel(MsgLevelEnum.error);
-			res.setMessage("存在しない検索パターンが指定されました。");
+			res.setMessage("存在しないランキングパターンが指定されました。");
 		}
 
 		return res.isSuccess();

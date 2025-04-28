@@ -80,6 +80,7 @@ public class ConstantsController {
 	public List<String> genPl() {
 		return cpMultiplierMap.entrySet().stream()
 				.map(Map.Entry::getKey)
+				.map(pl -> pl.replaceAll("^0+", "")) // ゼロサプレス
 				.collect(Collectors.toList());
 	}
 

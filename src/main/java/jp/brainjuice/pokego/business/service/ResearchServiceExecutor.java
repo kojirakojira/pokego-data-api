@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.business.service;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +55,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 	@Transactional(readOnly = true)
 	public void execute(ResearchRequest req, T res, ResearchService<T> researchService) throws BadRequestException {
 
-		if (req.getPid() != null) {
+		if (!StringUtils.isEmpty(req.getPid())) {
 			Optional<GoPokedex> goPokedexOp = goPokedexRepository.findById(req.getPid());
 
 			if (!goPokedexOp.isPresent()) {
@@ -66,7 +67,7 @@ public class ResearchServiceExecutor<T extends ResearchResponse> {
 
 			research(goPokedexOp.get(), req, res, researchService);
 
-		} else if (req.getName() != null) {
+		} else if (!StringUtils.isEmpty(req.getName())) {
 			PokemonSearchResult psr = pokemonSearchService.search(req.getName());
 			res.setPokemonSearchResult(psr);
 
