@@ -5,6 +5,7 @@ import java.util.List;
 import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.utils.dto.AfterEvolIv;
 import jp.brainjuice.pokego.web.form.res.ResearchResponse;
+import jp.brainjuice.pokego.web.form.res.elem.ScpRankAllInOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,6 @@ public class AfterEvoScpRankResponse extends ResearchResponse {
 	private Integer cp;
 	private String pl;
 	private List<AfterEvolIv> afEvolIvList;
+	private List<ScpRankAllInOne> afEvolScpRankList;
 	private AfterEvolIv targetGpIv;
 }

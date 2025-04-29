@@ -52,11 +52,11 @@ public class ScpRankCalculator {
 	}
 
 	// スーパーリーグ用CP制限判定用Predicate
-	public static final Predicate<Integer> SL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 1500; };
+	public final Predicate<Integer> SL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 1500; };
 	// ハイパーリーグ用CP制限判定用Predicate
-	public static final Predicate<Integer> HL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 2500; };
+	public final Predicate<Integer> HL_CP_LIMIT_PREDICATE = (arg) -> { return arg.intValue() <= 2500; };
 	// マスターリーグ用CP制限判定用Predicate
-	public static final Predicate<Integer> ML_CP_LIMIT_PREDICATE = (arg) -> { return true; };
+	public final Predicate<Integer> ML_CP_LIMIT_PREDICATE = (arg) -> { return true; };
 
 
 	/**

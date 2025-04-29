@@ -157,6 +157,7 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		}
 		
 		setMegaMsg(goPokedex, evolTreeGpList, res);
+		res.setFinEvo(goPokedex.isFinEvo());
 
 		// スーパーリーグ、ハイパーリーグ制限内最大CP
 		setLeagueSafeCp(goPokedex, res, evolTreeList, evolTreeGpList);
@@ -302,7 +303,7 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		List<GoPokedexAndCpPl> slLeagueSafeCp = goPokedexList.stream()
 				.map(gp -> {
 					// 最終進化の最低個体値でスーパーリーグ制限にひっかからないPLを取得し、そのPLから進化前の状態のCPを求める。
-					ScpRank slScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, ScpRankCalculator.SL_CP_LIMIT_PREDICATE);
+					ScpRank slScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, scpRankCalculator.SL_CP_LIMIT_PREDICATE);
 					String pl = slScpRank.getPl();
 					int cp = pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, pl);
 					return new GoPokedexAndCpPl(gp, cp, pl);
@@ -310,7 +311,7 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 				.toList();
 		List<GoPokedexAndCpPl> hlLeagueSafeCp = goPokedexList.stream()
 				.map(gp -> {
-					ScpRank hlScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, ScpRankCalculator.HL_CP_LIMIT_PREDICATE);
+					ScpRank hlScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, scpRankCalculator.HL_CP_LIMIT_PREDICATE);
 					String pl = hlScpRank.getPl();
 					int cp = pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, pl);
 					return new GoPokedexAndCpPl(gp, cp, pl);

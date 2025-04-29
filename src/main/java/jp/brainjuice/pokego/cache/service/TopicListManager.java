@@ -129,7 +129,8 @@ public class TopicListManager {
 					PageNameEnum pageName = PageNameEnum.valueOf(entry.getKey());
 					return new TopicPage(pageName, pageName.getJpn(), entry.getValue());
 				})
-				.filter(tp -> tp.getPage() != PageNameEnum.abundance) // abundanceは検索ページではないため、対象外とする。
+				// abundance、homeは検索ページではないため、対象外とする。
+				.filter(tp -> tp.getPage() != PageNameEnum.abundance && tp.getPage() != PageNameEnum.home)
 				.sorted((o1, o2) -> {
 					return o1.getCount() < o2.getCount() ? 1 : -1;
 				})

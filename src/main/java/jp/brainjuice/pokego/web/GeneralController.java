@@ -56,6 +56,20 @@ public class GeneralController {
 
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/home")
+	public String home() throws BadRequestException {
+
+		// 閲覧数を手動で追加。
+		viewsCacheProvider.addTempList();
+		
+		return "OK";
+	}
 
 	/**
 	 * アバンダンス取得用API

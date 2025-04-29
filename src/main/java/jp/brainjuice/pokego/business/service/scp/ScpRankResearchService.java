@@ -19,17 +19,17 @@ import jp.brainjuice.pokego.web.form.res.scp.ScpRankResponse;
 @Service
 public class ScpRankResearchService implements ResearchService<ScpRankResponse> {
 
-	private ScpRankCalculator scpRankCulculator;
+	private ScpRankCalculator scpRankCalculator;
 
 	private GoPokedexRepository goPokedexRepository;
 
 	private EvolutionProvider evolutionProvider;
 
 	public ScpRankResearchService(
-			ScpRankCalculator scpRankCulculator,
+			ScpRankCalculator scpRankCalculator,
 			GoPokedexRepository goPokedexRepository,
 			EvolutionProvider evolutionProvider) {
-		this.scpRankCulculator = scpRankCulculator;
+		this.scpRankCalculator = scpRankCalculator;
 		this.goPokedexRepository = goPokedexRepository;
 		this.evolutionProvider = evolutionProvider;
 	}
@@ -76,9 +76,9 @@ public class ScpRankResearchService implements ResearchService<ScpRankResponse> 
 	private ScpRankAllInOne createScpRankAllInOne(GoPokedex goPokedex, int iva, int ivd, int ivh) {
 		return new ScpRankAllInOne(
 				goPokedex,
-				scpRankCulculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh),
-				scpRankCulculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh),
-				scpRankCulculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh)
+				scpRankCalculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh),
+				scpRankCalculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh),
+				scpRankCalculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh)
 				);
 	}
 

@@ -42,6 +42,8 @@ public class AbundanceResponse extends ResearchResponse {
 	private Color type1Color;
 	private Color type2Color;
 
+	// 最終進化か否か
+	private boolean finEvo;
 	// メガシンカ（ゲンシカイキ含む）後か否か
 	private boolean mega;
 	// メガシンカ（ゲンシカイキ含む）可能か

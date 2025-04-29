@@ -3,6 +3,7 @@ package jp.brainjuice.pokego.business.service.scp;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
@@ -11,11 +12,13 @@ import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
 import jp.brainjuice.pokego.business.service.ResearchService;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.pokeFilter.dto.SearchValue.ParamsEnum;
+import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.utils.ScpRankCalculator;
 import jp.brainjuice.pokego.business.service.utils.dto.AfterEvolIv;
 import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.web.form.res.MsgLevelEnum;
+import jp.brainjuice.pokego.web.form.res.elem.ScpRankAllInOne;
 import jp.brainjuice.pokego.web.form.res.scp.AfterEvoScpRankResponse;
 
 /**
@@ -86,8 +89,24 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 		List<GoPokedex> gpAfEvoList = goPokedexRepository.findAllById(afEvolPidList);
 		res.setAfEvolIvList(convGpAndScpRankList(gpAfEvoList, iva, ivd, ivh, pl));
 		
+		// 進化後のポケモン
+		List<ScpRankAllInOne> afEvolScpRankList = gpAfEvoList.stream()
+				.sorted(PokemonEditUtils.getPokedexComparator(1))
+				.map(gp -> createScpRankAllInOne(gp, iva, ivd, ivh))
+				.toList();
+		res.setAfEvolScpRankList(afEvolScpRankList);
+		
 		// 検索したポケモンのPvP順位
 		res.setTargetGpIv(convGpAndScpRank(sp, iva, ivd, ivh, pl));
+	}
+	
+	private ScpRankAllInOne createScpRankAllInOne(GoPokedex goPokedex, int iva, int ivd, int ivh) {
+		return new ScpRankAllInOne(
+				goPokedex,
+				scpRankCalculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh),
+				scpRankCalculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh),
+				scpRankCalculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh)
+				);
 	}
 
 	/**
@@ -115,12 +134,30 @@ public class AfterEvoScpRankResearchService implements ResearchService<AfterEvoS
 	 * @return
 	 */
 	private AfterEvolIv convGpAndScpRank(GoPokedex goPokedex, int iva, int ivd, int ivh, String pl) {
-		return new AfterEvolIv(
+		AfterEvolIv afterEvolIv = new AfterEvolIv(
 				goPokedex,
-				pl == null ? null : pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl),
+				StringUtils.isEmpty(pl) ? null : pokemonGoUtils.calcCp(goPokedex, iva, ivd, ivh, pl),
 				scpRankCalculator.getSuperLeagueRank(goPokedex, iva, ivd, ivh).getRank(),
 				scpRankCalculator.getHyperLeagueRank(goPokedex, iva, ivd, ivh).getRank(),
-				scpRankCalculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh).getRank());
+				scpRankCalculator.getMasterLeagueRank(goPokedex, iva, ivd, ivh).getRank(),
+				false,
+				false
+				);
+		
+		if (!StringUtils.isEmpty(pl)) {
+			if (!scpRankCalculator.SL_CP_LIMIT_PREDICATE.test(afterEvolIv.getCp().intValue())) {
+				// スーパーリーグ制限を超えた場合
+				afterEvolIv.setSlRank(0);
+				afterEvolIv.setSlOver(true);
+			}
+			if (!scpRankCalculator.HL_CP_LIMIT_PREDICATE.test(afterEvolIv.getCp().intValue())) {
+				// ハイパーリーグ制限を超えた場合
+				afterEvolIv.setHlRank(0);
+				afterEvolIv.setHlOver(true);
+			}
+		}
+		
+		return afterEvolIv;
 	}
 
 }

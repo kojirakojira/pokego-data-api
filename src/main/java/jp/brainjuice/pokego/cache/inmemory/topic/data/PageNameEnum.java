@@ -14,6 +14,7 @@ public enum PageNameEnum {
 
 	// jpnを空文字にした場合、ページの閲覧数をカウントしない。
 
+	home("ホーム"),
 	abundance("ポケモン情報"),
 	filterAll("ポケモン検索"),
 	searchAll("全ポケ絞り込み"),
@@ -24,7 +25,7 @@ public enum PageNameEnum {
 	eggs("タマゴCP"),
 	dynamax("MAX,G-MAX勝利ボーナスCP"),
 	scpRank("PvP順位"),
-	scpRankList("PvP順位リスト"),
+	scpRankList("PvP順位ランキング"),
 	scpRankMaxMin("PvP最高(最低)順位"),
 	afterEvoScpRank("進化後PvP順位"),
 	afterEvoCp("進化後CP"),

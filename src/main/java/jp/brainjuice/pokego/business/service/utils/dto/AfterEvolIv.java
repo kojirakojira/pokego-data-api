@@ -15,4 +15,6 @@ public class AfterEvolIv {
 	private int slRank;
 	private int hlRank;
 	private int mlRank;
+	private boolean slOver; // スーパーリーグ制限を超えている場合
+	private boolean hlOver; // スーパーリーグ制限を超えている場合
 }
