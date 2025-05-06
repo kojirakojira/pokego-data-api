@@ -2,9 +2,11 @@ package jp.brainjuice.pokego.filter.interceptor;
 
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jp.brainjuice.pokego.utils.BjJwtUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 

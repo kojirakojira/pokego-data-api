@@ -1,0 +1,215 @@
+package jp.brainjuice.pokego.web.search;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.search.catchCp.DynamaxResearchService;
+import jp.brainjuice.pokego.business.service.search.catchCp.EggsResearchService;
+import jp.brainjuice.pokego.business.service.search.catchCp.FrTaskResearchService;
+import jp.brainjuice.pokego.business.service.search.catchCp.RaidResearchService;
+import jp.brainjuice.pokego.business.service.search.catchCp.RocketResearchService;
+import jp.brainjuice.pokego.business.service.search.catchCp.WildResearchService;
+import jp.brainjuice.pokego.business.service.search.utils.ValidationService;
+import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.DynamaxRequest;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.EggsRequest;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.FrTaskRequest;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.RaidRequest;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.RocketRequest;
+import jp.brainjuice.pokego.web.search.form.req.catchCp.WildRequest;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.DynamaxResponse;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.EggsResponse;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.FrTaskResponse;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.RaidResponse;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.RocketResponse;
+import jp.brainjuice.pokego.web.search.form.res.catchCp.WildResponse;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 捕獲時CPを算出するコントローラクラス
+ *
+ * @author saibabanagchampa
+ *
+ */
+@RestController
+@RequestMapping("/api")
+@Slf4j
+public class CatchCpResearchController {
+
+	private WildResearchService wildResearchService;
+	private ResearchServiceExecutor<WildResponse> wildResRse;
+
+	private RaidResearchService raidResearchService;
+	private ResearchServiceExecutor<RaidResponse> raidResRse;
+
+	private FrTaskResearchService frTaskResearchService;
+	private ResearchServiceExecutor<FrTaskResponse> frTaskResRse;
+
+	private EggsResearchService eggsResearchService;
+	private ResearchServiceExecutor<EggsResponse> eggsResRse;
+
+	private RocketResearchService rocketResearchService;
+	private ResearchServiceExecutor<RocketResponse> rocketResRse;
+
+	private DynamaxResearchService dynamaxResearchService;
+	private ResearchServiceExecutor<DynamaxResponse> dynamaxResRse;
+
+	private ValidationService validationService;
+
+	public CatchCpResearchController(
+			WildResearchService wildResearchService, ResearchServiceExecutor<WildResponse> wildResRse,
+			RaidResearchService raidResearchService, ResearchServiceExecutor<RaidResponse> raidResRse,
+			FrTaskResearchService frTaskResearchService, ResearchServiceExecutor<FrTaskResponse> frTaskResRse,
+			EggsResearchService eggsResearchService, ResearchServiceExecutor<EggsResponse> eggsResRse,
+			RocketResearchService rocketResearchService, ResearchServiceExecutor<RocketResponse> rocketResRse,
+			DynamaxResearchService dynamaxResearchService, ResearchServiceExecutor<DynamaxResponse> dynamaxResRse,
+			ValidationService validationService) {
+
+		// 野生CP算出
+		this.wildResearchService = wildResearchService;
+		this.wildResRse = wildResRse;
+		// レイドボスCP算出
+		this.raidResearchService = raidResearchService;
+		this.raidResRse = raidResRse;
+		// フィールドリサーチ算出
+		this.frTaskResearchService = frTaskResearchService;
+		this.frTaskResRse = frTaskResRse;
+		// タマゴCP算出
+		this.eggsResearchService = eggsResearchService;
+		this.eggsResRse = eggsResRse;
+		// シャドウCP算出
+		this.rocketResearchService = rocketResearchService;
+		this.rocketResRse = rocketResRse;
+		// ダイマックス、キョダイマックスCP算出
+		this.dynamaxResearchService = dynamaxResearchService;
+		this.dynamaxResRse = dynamaxResRse;
+		// 入力チェック
+		this.validationService = validationService;
+	}
+
+	/**
+	 * 野生のCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param wildReq
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/wild")
+	public WildResponse wild(WildRequest wildReq) throws Exception {
+
+		validationService.validation(wildReq);
+
+		WildResponse wildRes = new WildResponse();
+		wildResRse.execute(wildReq, wildRes, wildResearchService);
+		return wildRes;
+	}
+
+	/**
+	 * レイドボスのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/raid")
+	public RaidResponse raid(RaidRequest raidReq) throws Exception {
+
+		validationService.validation(raidReq);
+
+		RaidResponse raidRes = new RaidResponse();
+		raidResRse.execute(raidReq, raidRes, raidResearchService);
+		return raidRes;
+	}
+
+	/**
+	 * フィールドリサーチタスクのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/frTask")
+	public FrTaskResponse frTask(FrTaskRequest frTaskReq) throws Exception {
+
+		validationService.validation(frTaskReq);
+
+		FrTaskResponse frTaskRes = new FrTaskResponse();
+		frTaskResRse.execute(frTaskReq, frTaskRes, frTaskResearchService);
+		return frTaskRes;
+	}
+
+	/**
+	 * タマゴCP最高値・最低値を求めるAPIです。<br>
+	 * フィールドリサーチと全く同じなので、処理を使いまわします。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/eggs")
+	public EggsResponse eggs(EggsRequest eggsReq) throws Exception {
+
+		validationService.validation(eggsReq);
+
+		EggsResponse eggsRes = new EggsResponse();
+		eggsResRse.execute(eggsReq, eggsRes, eggsResearchService);
+		return eggsRes;
+	}
+
+	/**
+	 * ロケット団勝利ボーナスで獲得できるポケモンのCP最高値・最低値を求めるAPIです。
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/rocket")
+	public RocketResponse shadow(RocketRequest rocketReq) throws Exception {
+
+		validationService.validation(rocketReq);
+
+		RocketResponse shadowRes = new RocketResponse();
+		rocketResRse.execute(rocketReq, shadowRes, rocketResearchService);
+		return shadowRes;
+	}
+
+	/**
+	 * ダイマックス、キョダイマックスのポケモンのCP最高値・最低値を求めるAPI
+	 *
+	 * @param raidReq
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/dynamax")
+	public DynamaxResponse dynamax(DynamaxRequest dynamaxReq) throws Exception {
+
+		validationService.validation(dynamaxReq);
+
+		DynamaxResponse dynamaxRes = new DynamaxResponse();
+		dynamaxResRse.execute(dynamaxReq, dynamaxRes, dynamaxResearchService);
+		return dynamaxRes;
+	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<String> badRequestException(Exception e) {
+		String errMsg = "不正なリクエストです。";
+		log.error(errMsg, e);
+		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exception(Exception e) {
+		String errMsg = "処理中に想定外の問題が発生しました。";
+		log.error(errMsg, e);
+		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+}

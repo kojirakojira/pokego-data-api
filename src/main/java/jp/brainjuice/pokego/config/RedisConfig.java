@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableCaching
-@EnableRedisRepositories(basePackages = { "jp.brainjuice.pokego.cache.dao.redis" })
+@EnableRedisRepositories(basePackages = { "jp.brainjuice.pokego.dao.redis" })
 @Slf4j
 public class RedisConfig {
 

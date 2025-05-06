@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.dao.RaceExceptionsRepository;
-import jp.brainjuice.pokego.business.dao.entity.RaceExceptions;
 import jp.brainjuice.pokego.cache.inmemory.dto.RaceEx;
+import jp.brainjuice.pokego.dao.jpa.RaceExceptionsRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.RaceExceptions;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 

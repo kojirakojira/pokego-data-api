@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.cache.dao.redis.PageTempViewRedisRepository;
-import jp.brainjuice.pokego.cache.dao.redis.PokemonTempViewRedisRepository;
-import jp.brainjuice.pokego.cache.dao.redis.entity.PageTempView;
-import jp.brainjuice.pokego.cache.dao.redis.entity.PokemonTempView;
-import jp.brainjuice.pokego.cache.dao.redis.entity.TempView;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
 import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPage;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPokemon;
+import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
+import jp.brainjuice.pokego.dao.redis.PageTempViewRedisRepository;
+import jp.brainjuice.pokego.dao.redis.PokemonTempViewRedisRepository;
+import jp.brainjuice.pokego.dao.redis.entity.PageTempView;
+import jp.brainjuice.pokego.dao.redis.entity.PokemonTempView;
+import jp.brainjuice.pokego.dao.redis.entity.TempView;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.dao.CpMultiplierRepository;
-import jp.brainjuice.pokego.business.dao.entity.CpMultiplier;
+import jp.brainjuice.pokego.dao.jpa.CpMultiplierRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.CpMultiplier;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 

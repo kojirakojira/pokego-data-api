@@ -1,0 +1,55 @@
+package jp.brainjuice.pokego.dao.redis.entity;
+
+import java.io.Serializable;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@RedisHash(value = "admins")
+@ToString
+public class Admin implements Serializable, Cloneable {
+
+	@Id
+	private String userId;
+	private String password;
+	private String tempSecretKey; // 一時シークレットキー。MFA登録前に一時的にシークレットキーを登録しておく
+	private String secretKey;
+	private String lastFailed;
+	
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+        return userId.hashCode();
+	}
+
+    /**
+     * (非 Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+	@Override
+	public boolean equals(Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Admin)) {
+			return false;
+		}
+
+		Admin other = (Admin) obj;
+
+		return userId != null && userId.equals(other.getUserId());
+	}
+}

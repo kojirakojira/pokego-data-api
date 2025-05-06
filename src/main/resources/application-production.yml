@@ -17,13 +17,12 @@ spring:
   jpa:
     hibernate.ddl-auto: validate
     properties.hibernate:
-      session_factory.statement_inspector: jp.brainjuice.pokego.business.dao.inspector.SqlInspector
+      session_factory.statement_inspector: jp.brainjuice.pokego.dao.jpa.inspector.SqlInspector
       use_sql_comments: true
     open-in-view: false
   data.redis.url: ${REDIS_URL}
 
-    
-jwt.uuid: ${JWT_UUID:}
+jwt.cryptoKey: ${CRYPTO_KEY:}
 
 # ロギング
 logging:

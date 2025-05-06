@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * Postgres接続の設定
  */
 @Configuration
-@EnableJpaRepositories(basePackages = { "jp.brainjuice.pokego.business.dao", "jp.brainjuice.pokego.cache.dao.jpa" })
+@EnableJpaRepositories(basePackages = { "jp.brainjuice.pokego.dao.jpa" })
 @Slf4j
 public class JpaConfig {
 

@@ -19,7 +19,7 @@ import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
 
-import jp.brainjuice.pokego.business.service.utils.dto.TokenizeResult;
+import jp.brainjuice.pokego.business.service.search.utils.dto.TokenizeResult;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;

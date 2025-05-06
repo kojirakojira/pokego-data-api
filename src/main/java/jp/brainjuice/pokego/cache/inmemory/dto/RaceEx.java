@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.cache.inmemory.dto;
 
-import jp.brainjuice.pokego.business.dao.entity.RaceExceptions;
+import jp.brainjuice.pokego.dao.jpa.entity.RaceExceptions;
 
 /**
  * 種族値例外で使用するキー名

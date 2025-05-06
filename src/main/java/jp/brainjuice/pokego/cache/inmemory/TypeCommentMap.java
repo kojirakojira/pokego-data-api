@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEffectiveEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import jp.brainjuice.pokego.business.dao.EvolutionRepository;
-import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.business.service.utils.TypeUtils;
-import jp.brainjuice.pokego.business.service.utils.dto.type.TwoTypeKey;
-import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
+import jp.brainjuice.pokego.business.service.search.utils.TypeUtils;
+import jp.brainjuice.pokego.business.service.search.utils.dto.type.TwoTypeKey;
+import jp.brainjuice.pokego.business.service.search.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.dao.jpa.EvolutionRepository;
+import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import lombok.extern.slf4j.Slf4j;
 

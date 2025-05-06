@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.dao.EvolutionRepository;
-import jp.brainjuice.pokego.business.dao.entity.Evolution;
 import jp.brainjuice.pokego.cache.inmemory.dto.EvoCostType;
+import jp.brainjuice.pokego.dao.jpa.EvolutionRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
 
 @Component
 public class EvoCostInfo {

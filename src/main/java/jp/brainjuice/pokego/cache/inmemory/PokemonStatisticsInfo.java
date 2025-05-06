@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.PokedexRepository;
-import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.dao.entity.Pokedex;
+import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.PokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
+import jp.brainjuice.pokego.dao.jpa.entity.Pokedex;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

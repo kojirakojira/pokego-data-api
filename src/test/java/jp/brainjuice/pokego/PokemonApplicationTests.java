@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import jp.brainjuice.pokego.business.dao.GoPokedexRepository;
-import jp.brainjuice.pokego.business.dao.entity.GoPokedex;
-import jp.brainjuice.pokego.business.service.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
+import jp.brainjuice.pokego.business.service.search.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
+import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 
 @SpringBootTest
 class PokemonApplicationTests {

@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.ListIterator;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
@@ -24,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Component
-@ThreadSafe
 @Slf4j
 public class ViewTempList extends ArrayList<ViewTempInfo> {
 
