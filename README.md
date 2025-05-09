@@ -91,14 +91,15 @@ docker exec -it {コンテナID} ls
 あとで書く。
 
 ## Redisサーバに管理者権限のユーザを追加する方法
-HSETでuseIdを登録する。_classはちゃんとパッケージを合わせる
-HADD admins #{ユーザID}
-HSET admins:#{ユーザID} _class jp.brainjuice.pokego.dao.redis.entity.Admins userId #{ユーザID}
+1. HSETでuseIdを登録する。_classはちゃんとパッケージを合わせる
+1. SADD admins #{ユーザID}
+1. HSET admins:#{ユーザID} userId #{ユーザID}
 
 ### Tips
 
 @RedisHashで定義したものは、Redis上で、SETとHASHの2つを使用して管理される。
-KEYS admins* // 存在しているキーの確認
-SMEMBERS key // SETのキーを確認
-HADD key // SETが存在しない(adminsが存在しない)場合は、HADDでキーを追加する。
-HSET key field value // HASHが存在しない(ユーザが存在しない)場合は、HSETで追加する。
+
+1. KEYS admins* // 存在しているキーの確認
+1. SMEMBERS key // SETのキーを確認
+1. SADD key // SETが存在しない(adminsが存在しない)場合は、HADDでキーを追加する。
+1. HSET key field value // HASHが存在しない(ユーザが存在しない)場合は、HSETで追加する。

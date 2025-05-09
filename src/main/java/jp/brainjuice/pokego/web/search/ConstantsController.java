@@ -20,9 +20,10 @@ import jp.brainjuice.pokego.business.service.search.pokeFilter.FilterEnum;
 import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.search.form.res.elem.Color;
 import jp.brainjuice.pokego.web.search.form.res.elem.TypeInfo;
+import jp.brainjuice.pokego.web.search.form.res.others.Constants;
 
 /**
- * 定数情報を取得するコントローラクラス
+ * クライアント定数を取得するコントローラクラス
  *
  * @author saibabanagchampa
  *
@@ -35,6 +36,18 @@ public class ConstantsController {
 
 	public ConstantsController(CpMultiplierMap cpMultiplierMap) {
 		this.cpMultiplierMap = cpMultiplierMap;
+	}
+	
+	@GetMapping("/constants")
+	public Constants constants() {
+		Constants constants = new Constants();
+		constants.setTypeList(typeConst());
+		constants.setRegionMap(regionConst());
+		constants.setGenMap(genConst());
+		constants.setFilterItemMap(filterItemsConst());
+		constants.setPlList(plConst());
+		constants.setSituationMap(situationConst());
+		return constants;
 	}
 
 	@GetMapping("/typeConst")
@@ -77,7 +90,7 @@ public class ConstantsController {
 	}
 
 	@GetMapping("/plConst")
-	public List<String> genPl() {
+	public List<String> plConst() {
 		return cpMultiplierMap.entrySet().stream()
 				.map(Map.Entry::getKey)
 				.map(pl -> pl.replaceAll("^0+", "")) // ゼロサプレス
