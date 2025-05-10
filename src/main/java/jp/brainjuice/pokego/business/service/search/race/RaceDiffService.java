@@ -8,9 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.search.general.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonUtils;
 import jp.brainjuice.pokego.business.service.search.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.search.utils.dto.PokemonSearchResult;
+import jp.brainjuice.pokego.business.service.search.utils.dto.RaceDiffElem;
 import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.PokedexRepository;
@@ -39,6 +41,8 @@ public class RaceDiffService {
 
 	private PokemonUtils pokemonUtils;
 
+	private PokemonGoUtils pokemonGoUtils;
+
 	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
 	
 	private static final String MSG_NO_UNIQUE_NAMES = "指定されたポケモンに重複があります。";
@@ -50,12 +54,14 @@ public class RaceDiffService {
 			GoPokedexRepository goPokedexRepository,
 			PokemonStatisticsInfo pokemonStatisticsInfo,
 			PokemonSearchService pokemonSearchService,
-			PokemonUtils pokemonUtils) {
+			PokemonUtils pokemonUtils,
+			PokemonGoUtils pokemonGoUtils) {
 		this.pokedexRepository = pokedexRepository;
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.pokemonSearchService = pokemonSearchService;
 		this.pokemonUtils = pokemonUtils;
+		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	public boolean checkBeforeNameSearch(RaceDiffRequest req, RaceDiffResponse res) throws BadRequestException {
@@ -242,7 +248,7 @@ public class RaceDiffService {
 			return;
 		}
 		
-		List<Race> raceList = idList.stream() // 検索した時のid順で作成
+		List<RaceDiffElem> raceDiffElemList = idList.stream() // 検索した時のid順で作成
 				.map(pid -> {
 					Pokedex p = pokedexList.stream()
 							.filter(pdx -> pdx.getPokedexId().equals(pid))
@@ -255,8 +261,13 @@ public class RaceDiffService {
 							.findFirst().get();
 					return new Race(p, gp, pokemonStatisticsInfo);
 				})
+				.map(race -> {
+					GoPokedex gp = race.getGoPokedex();
+					int cp = pokemonGoUtils.calcBaseCp(gp.getAttack(), gp.getDefense(), gp.getHp());
+					return new RaceDiffElem(race, cp);
+				})
 				.toList();
-		res.setRaceArr(raceList);
+		res.setRaceDiffElemArr(raceDiffElemList);
 
 		res.setGoTotalCount(pokemonStatisticsInfo.getGoPokedexStats().getGoHpStats().getList().size());
 		res.setOriTotalCount(pokemonStatisticsInfo.getPokedexStats().getHpStats().getList().size());;
