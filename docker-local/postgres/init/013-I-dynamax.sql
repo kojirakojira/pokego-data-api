@@ -311,7 +311,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0242N01', TRUE, FALSE), --ハピナス
 	('0243N01', TRUE, FALSE), --ライコウ
 	('0244N01', TRUE, FALSE), --エンテイ
-	('0245N01', FALSE, FALSE), --スイクン
+	('0245N01', TRUE, FALSE), --スイクン
 	('0246N01', FALSE, FALSE), --ヨーギラス
 	('0247N01', FALSE, FALSE), --サナギラス
 	('0248N01', FALSE, FALSE), --バンギラス

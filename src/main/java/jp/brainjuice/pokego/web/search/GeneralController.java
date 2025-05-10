@@ -83,9 +83,6 @@ public class GeneralController {
 
 		AbundanceResponse abundanceRes = new AbundanceResponse();
 		abundanceResRse.execute(abundanceReq, abundanceRes, abundanceResearchService);
-
-		// 閲覧数を手動で追加。
-		viewsCacheProvider.addTempList();
 		
 		return abundanceRes;
 	}

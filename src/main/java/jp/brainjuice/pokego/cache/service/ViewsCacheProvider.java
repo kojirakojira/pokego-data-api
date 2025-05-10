@@ -1,13 +1,13 @@
 package jp.brainjuice.pokego.cache.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
@@ -43,7 +43,7 @@ public class ViewsCacheProvider {
 	 *
 	 * @param jp
 	 */
-	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.ResearchService.exec(..))")
+	@AfterReturning("execution(* jp.brainjuice.pokego.business.service.search.ResearchService.exec(..))")
 	public void addTempList(JoinPoint jp) {
 
 		if (((SearchValue) jp.getArgs()[0]).isEnableCount()) {
