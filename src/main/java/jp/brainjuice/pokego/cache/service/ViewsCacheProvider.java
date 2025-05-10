@@ -112,6 +112,24 @@ public class ViewsCacheProvider {
 	}
 
 	/**
+	 * この{@link ViewsCacheManager#cleanupPageTempView() メソッド}を参照
+	 * @param pid
+	 * @return
+	 */
+	public void cleanupPageTempView() {
+		viewsCacheManager.cleanupPageTempView();
+	}
+	
+	/**
+	 * この{@link ViewsCacheManager#cleanupPokemonTempView() メソッド}を参照
+	 * @param pid
+	 * @return
+	 */
+	public void cleanupPokemonTempView() {
+		viewsCacheManager.cleanupPokemonTempView();
+	}
+
+	/**
 	 * リリース後、古いキャッシュが残り不備が発生する場合、このAPIを使用する。（ページ一時情報用）
 	 */
 	public void clearPageTempView() {

@@ -13,6 +13,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +60,8 @@ public class ViewsCacheManager {
 	private PageTempViewRedisRepository pageTempViewRedisRepository;
 	/** Redis上の一時的なポケモン閲覧情報を管理するためのリポジトリ */
 	private PokemonTempViewRedisRepository pokemonTempViewRedisRepository;
+	
+	private SetOperations<String, String> setOperations;
 
 	private static final String START_MSG_SCHEDULE = "Start ViewInfo(page, pokemon) schedule.";
 	private static final String END_MSG_SCHEDULE = "End ViewInfo(page. pokemon) schedule.";
@@ -70,18 +74,23 @@ public class ViewsCacheManager {
 
 	private static final String DELETE_ALL_TEMP_PAGE_INFO = "Delete All PageTempView.(Redis)";
 	private static final String DELETE_ALL_TEMP_POKEMON_INFO = "Delete All PokemonTempView.(Redis)";
+	
+	private static final String CLEANUP_INFO = "CLEANUP {0}.(count = {1})";
+	private static final String CLEANUP_NOTHING_INFO = "CLEANUP {0}. There is nothing to delete.";
 
 	public ViewsCacheManager(
 			ViewTempList viewTempList,
 			PageViewRepository pageViewRepository,
 			PokemonViewRepository pokemonViewRepository,
 			PageTempViewRedisRepository pageTempViewRedisRepository,
-			PokemonTempViewRedisRepository pokemonTempViewRedisRepository) {
+			PokemonTempViewRedisRepository pokemonTempViewRedisRepository,
+			RedisTemplate<String, String> redisTemplate) {
 		this.viewTempList = viewTempList;
 		this.pokemonViewRepository = pokemonViewRepository;
 		this.pageViewRepository = pageViewRepository;
 		this.pageTempViewRedisRepository = pageTempViewRedisRepository;
 		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
+		this.setOperations = redisTemplate.opsForSet();
 	}
 
 	/**
@@ -280,6 +289,70 @@ public class ViewsCacheManager {
 					return pv;
 				})
 				.toList();
+	}
+
+	/**
+	 * SpringRedisは、なぜかtimeToLiveで削除されたキー名をSet型のオブジェクトから削除してくれない。
+	 * これを呼び出すと、それを削除できる。
+	 * 
+	 * @see PageTempViewRedisRepository
+	 */
+	void cleanupPageTempView() {
+		
+		String key = "pageTempView";
+		
+		List<PageTempView> pageTempViewList = (List<PageTempView>) pageTempViewRedisRepository.findAll();
+		List<String> activeIdList = pageTempViewList.stream()
+				.filter(ptv -> ptv != null)
+				.map(PageTempView::getId)
+				.toList();
+		
+		String[] inactiveIdArr = getInActiveIdArr(key, activeIdList);
+		
+		if (inactiveIdArr.length == 0) {
+			log.info(MessageFormat.format(CLEANUP_NOTHING_INFO, key));
+			return;
+		}
+		
+		Long removeCnt = setOperations.remove(key, (Object[]) inactiveIdArr);
+		
+		log.info(MessageFormat.format(CLEANUP_INFO, key, removeCnt.toString()));
+	}
+
+	/**
+	 * SpringRedisは、なぜかtimeToLiveで削除されたキー名をSet型のオブジェクトから削除してくれない。
+	 * これを呼び出すと、それを削除できる。
+	 * 
+	 * @see PokemonTempViewRedisRepository
+	 */
+	void cleanupPokemonTempView() {
+		
+		String key = "pokemonTempView";
+		
+		List<PokemonTempView> pokemonTempViewList = (List<PokemonTempView>) pokemonTempViewRedisRepository.findAll();
+		List<String> activeIdList = pokemonTempViewList.stream()
+				.filter(ptv -> ptv != null)
+				.map(PokemonTempView::getId)
+				.toList();
+		
+		String[] inactiveIdArr = getInActiveIdArr(key, activeIdList);
+		
+		if (inactiveIdArr.length == 0) {
+			log.info(MessageFormat.format(CLEANUP_NOTHING_INFO, key));
+			return;
+		}
+		
+		Long removeCnt = setOperations.remove(key, (Object[]) inactiveIdArr);
+		
+		log.info(MessageFormat.format(CLEANUP_INFO, key, removeCnt.toString()));
+	}
+	
+	private String[] getInActiveIdArr(String key, List<String> activeIdList) {
+		Set<String> smembers = setOperations.members(key);
+		String[] inactiveIdArr = smembers.stream()
+				.filter(id -> !activeIdList.contains(id))
+				.toArray(String[]::new);
+		return inactiveIdArr;
 	}
 
 	/**

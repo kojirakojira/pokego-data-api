@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.manage.LoginService;
+import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
 import jp.brainjuice.pokego.utils.exception.AuthenticationFailedException;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
@@ -26,8 +27,26 @@ public class ManageController {
 	
 	private LoginService loginService;
 	
-	public ManageController(LoginService loginService) {
+	private ViewsCacheProvider viewsCacheProvider;
+	
+	public ManageController(
+			LoginService loginService,
+			ViewsCacheProvider viewsCacheProvider) {
 		this.loginService = loginService;
+		this.viewsCacheProvider = viewsCacheProvider;
+	}
+
+	@PostMapping("/secure/cleanupRedis")
+	public String cleanUpRedis(String userId,
+			HttpServletRequest req) throws Exception {
+		if (!BjJwtUtils.checkUser(req, userId)) {
+			throw new UserUnmatchException();
+		}
+
+		viewsCacheProvider.cleanupPageTempView();
+		viewsCacheProvider.cleanupPokemonTempView();
+		
+		return "OK";
 	}
 
 	@PostMapping("/secure/manage")
