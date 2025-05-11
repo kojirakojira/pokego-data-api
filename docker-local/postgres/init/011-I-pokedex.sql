@@ -1180,7 +1180,7 @@ INSERT INTO pokedex
     ('0981N01', 'リキキリン', 120, 90, 70, 110, 70, 60, '', 'normal', 'psychic', 'g9', null, null, FALSE, null),
     ('0982N01', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'ふたふしフォルム', 'normal', null, 'g9', null, null, FALSE, null),
     ('0982N02', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'みつふしフォルム', 'normal', null, 'g9', null, null, FALSE, null),
-    ('0983N01', 'ドドゲザン', 100, 135, 120, 60, 85, 50, '', 'dark', 'steel', 'g9', null, null, FALSE, null),
+    ('0983N01', 'ドドゲザン', 100, 135, 120, 60, 85, 50, '', 'dark', 'steel', 'g9', null, null, TRUE, null),
     ('0984N01', 'イダイナキバ', 115, 131, 131, 53, 53, 87, '', 'ground', 'fighting', 'g9', null, null, FALSE, null),
     ('0985N01', 'サケブシッポ', 115, 65, 99, 65, 115, 111, '', 'fairy', 'psychic', 'g9', null, null, FALSE, null),
     ('0986N01', 'アラブルタケ', 111, 127, 99, 79, 99, 55, '', 'grass', 'dark', 'g9', null, null, FALSE, null),
