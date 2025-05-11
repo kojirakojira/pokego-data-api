@@ -1048,7 +1048,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0864N01', 'root', 0, null, null, null, null, null, null, FALSE), --サニゴーン
 	('0865N01', '0083G01', 50, null, 'エクセレントスローを10回投げる', null, null, null, null, TRUE), --ネギガナイト
 	('0866N01', '0122G01', 50, null, null, null, null, null, null, TRUE), --バリコオル
-	('0867N01', '0562G01', 50, null, 'レイドバトルに10回勝利する', null, null, null, null, TRUE), --デスバーン
+	('0867N01', '0562G01', 50, null, 'レイドバトルで10回勝利する', null, null, null, null, TRUE), --デスバーン
 	('0868N01', 'root', 0, null, null, null, null, null, null, FALSE), --マホミル
 	('0869N01', '0868N01', 0, null, null, null, null, null, null, TRUE), --マホイップ
 	('0870N01', 'root', 0, null, null, null, null, null, null, FALSE), --タイレーツ
@@ -1094,7 +1094,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0902N01', '0550N03', 0, null, null, null, null, null, null, TRUE), --イダイトウ(オスのすがた)
 	('0902N02', '0550N03', 0, null, null, null, null, null, null, TRUE), --イダイトウ(メスのすがた)
 	('0903N01', '0215H01', 100, null, '7km歩く', '昼のみ', null, null, null, TRUE), --オオニューラ
-	('0904N01', '0211H01', 50, null, 'レイドバトルに10回勝利する', null, null, null, null, TRUE), --ハリーマン
+	('0904N01', '0211H01', 50, null, 'レイドバトルで10回勝利する', null, null, null, null, TRUE), --ハリーマン
 	('0905N01', 'root', 0, null, null, null, null, null, null, FALSE), --ラブトロス(けしんフォルム)
 	('0905N02', 'root', 0, null, null, null, null, null, null, FALSE), --ラブトロス(れいじゅうフォルム)
 	('0906N01', 'root', 0, null, null, null, null, null, null, FALSE), --ニャオハ
@@ -1114,8 +1114,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0919N01', 'root', 0, null, null, null, null, null, null, FALSE), --マメバッタ
 	('0920N01', '0919N01', 0, null, null, null, null, null, null, TRUE), --エクスレッグ
 	('0921N01', 'root', 0, null, null, null, null, null, null, FALSE), --パモ
-	('0922N01', '0921N01', 0, null, null, null, null, null, null, TRUE), --パモット
-	('0923N01', '0922N01', 0, null, null, null, null, null, null, TRUE), --パーモット
+	('0922N01', '0921N01', 25, null, null, null, null, null, null, TRUE), --パモット
+	('0923N01', '0922N01', 100, null, '25km歩く', null, null, null, null, TRUE), --パーモット
 	('0924N01', 'root', 0, null, null, null, null, null, null, FALSE), --ワッカネズミ
 	('0925N01', '0924N01', 50, null, null, null, null, null,'ランダムでごく稀に3ひきかぞくに進化する。', TRUE), --イッカネズミ(３びきかぞく)
 	('0925N02', '0924N01', 50, null, null, null, null, null, null, TRUE), --イッカネズミ(４ひきかぞく)
@@ -1132,8 +1132,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0933N01', '0932N01', 0, null, null, null, null, null, null, TRUE), --ジオヅム
 	('0934N01', '0933N01', 0, null, null, null, null, null, null, TRUE), --キョジオーン
 	('0935N01', 'root', 0, null, null, null, null, null, null, FALSE), --カルボウ
-	('0936N01', '0935N01', 50, null,'エスパータイプのポケモン30匹に勝利する', null, null, null, null, TRUE), --グレンアルマ
-	('0937N01', '0935N01', 50, null,'ゴーストタイプのポケモン30匹に勝利する', null, null, null, null, TRUE), --ソウブレイズ
+	('0936N01', '0935N01', 50, null,'エスパータイプのポケモンに30回勝利する', null, null, null, null, TRUE), --グレンアルマ
+	('0937N01', '0935N01', 50, null,'ゴーストタイプのポケモンに30回勝利する', null, null, null, null, TRUE), --ソウブレイズ
 	('0938N01', 'root', 0, null, null, null, null, null, null, FALSE), --ズピカ
 	('0939N01', '0938N01', 0, null, null, null, null, null, null, TRUE), --ハラバリー
 	('0940N01', 'root', 0, null, null, null, null, null, null, FALSE), --カイデン
@@ -1169,7 +1169,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0969N01', 'root', 0, null, null, null, null, null, null, FALSE), --キラーメ
 	('0970N01', '0969N01', 0, null, null, null, null, null, null, TRUE), --キラフロル
 	('0971N01', 'root', 0, null, null, null, null, null, null, FALSE), --ボチ
-	('0972N01', '0971N01', 0, null, null, null, null, null, null, TRUE), --ハカドッグ
+	('0972N01', '0971N01', 50, null, null, null, null, null, null, TRUE), --ハカドッグ
 	('0973N01', 'root', 0, null, null, null, null, null, null, FALSE), --カラミンゴ
 	('0974N01', 'root', 0, null, null, null, null, null, null, FALSE), --アルクジラ
 	('0975N01', '0974N01', 0, null, null, null, null, null, null, TRUE), --ハルクジラ
@@ -1178,12 +1178,12 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0978N01', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(そった)
 	('0978N02', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(たれた)
 	('0978N03', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(のびた)
-	('0979N01', '0057N01', 0, null, null, null, null, null, null, TRUE), --コノヨザル
+	('0979N01', '0057N01', 100, null, 'ゴーストか、エスパータイプのポケモンに30勝利する', null, null, null, null, TRUE), --コノヨザル
 	('0980N01', '0194P01', 0, null, null, null, null, null, null, TRUE), --ドオー
 	('0981N01', '0203N01', 0, null, null, null, null, null, null, TRUE), --リキキリン
 	('0982N01', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(ふたふしフォルム)
 	('0982N02', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(みつふしフォルム)
-	('0983N01', '0625N01', 0, null, null, null, null, null, null, TRUE), --ドドゲザン
+	('0983N01', '0625N01', 100, null, 'あくか、はがねタイプのポケモンにレイドバトルで15回勝利する', null, null, null, null, TRUE), --ドドゲザン
 	('0984N01', 'root', 0, null, null, null, null, null, null, FALSE), --イダイナキバ
 	('0985N01', 'root', 0, null, null, null, null, null, null, FALSE), --サケブシッポ
 	('0986N01', 'root', 0, null, null, null, null, null, null, FALSE), --アラブルタケ
