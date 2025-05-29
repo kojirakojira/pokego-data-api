@@ -1078,8 +1078,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0889N02', 'root', 0, null, null, null, null, null, null, FALSE), --ザマゼンタ(たてのおう)
 	('0890N01', 'root', 0, null, null, null, null, null, null, FALSE), --ムゲンダイナ
 	('0891N01', 'root', 0, null, null, null, null, null, null, FALSE), --ダクマ
-	('0892N01', '0891N01', 0, null, null, null, null, null, null, TRUE), --ウーラオス(いちげきのかた)
-	('0892N02', '0891N01', 0, null, null, null, null, null, null, TRUE), --ウーラオス(れんげきのかた)
+	('0892N01', '0891N01', 200, null, 'あくタイプのポケモンのレイドか、マックスバトルで30回勝利する', null, null, null, null, TRUE), --ウーラオス(いちげきのかた)
+	('0892N02', '0891N01', 200, null, 'みずタイプのポケモンのレイドか、マックスバトルで30回勝利する', null, null, null, null, TRUE), --ウーラオス(れんげきのかた)
 	('0893N01', 'root', 0, null, null, null, null, null, null, FALSE), --ザルード
 	('0894N01', 'root', 0, null, null, null, null, null, null, FALSE), --レジエレキ
 	('0895N01', 'root', 0, null, null, null, null, null, null, FALSE), --レジドラゴ
@@ -1183,7 +1183,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0981N01', '0203N01', 0, null, null, null, null, null, null, TRUE), --リキキリン
 	('0982N01', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(ふたふしフォルム)
 	('0982N02', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(みつふしフォルム)
-	('0983N01', '0625N01', 100, null, 'あくか、はがねタイプのポケモンにレイドバトルで15回勝利する', null, null, null, null, TRUE), --ドドゲザン
+	('0983N01', '0625N01', 100, null, 'あくか、はがねタイプのポケモンのレイドバトルで15回勝利する', null, null, null, null, TRUE), --ドドゲザン
 	('0984N01', 'root', 0, null, null, null, null, null, null, FALSE), --イダイナキバ
 	('0985N01', 'root', 0, null, null, null, null, null, null, FALSE), --サケブシッポ
 	('0986N01', 'root', 0, null, null, null, null, null, null, FALSE), --アラブルタケ

@@ -91,7 +91,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0065M01', FALSE, FALSE), --メガフーディン
 	('0066N01', TRUE, FALSE), --ワンリキー
 	('0067N01', TRUE, FALSE), --ゴーリキー
-	('0068N01', TRUE, FALSE), --カイリキー
+	('0068N01', TRUE, TRUE), --カイリキー
 	('0069N01', FALSE, FALSE), --マダツボミ
 	('0070N01', FALSE, FALSE), --ウツドン
 	('0071N01', FALSE, FALSE), --ウツボット
@@ -1075,8 +1075,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0889N02', FALSE, FALSE), --ザマゼンタ(たてのおう)
 	('0890N01', FALSE, FALSE), --ムゲンダイナ
 	('0891N01', TRUE, FALSE), --ダクマ
-	('0892N01', FALSE, FALSE), --ウーラオス(いちげきのかた)
-	('0892N02', FALSE, FALSE), --ウーラオス(れんげきのかた)
+	('0892N01', TRUE, FALSE), --ウーラオス(いちげきのかた)
+	('0892N02', TRUE, FALSE), --ウーラオス(れんげきのかた)
 	('0893N01', FALSE, FALSE), --ザルード
 	('0894N01', FALSE, FALSE), --レジエレキ
 	('0895N01', FALSE, FALSE), --レジドラゴ
