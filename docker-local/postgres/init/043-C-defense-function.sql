@@ -25,6 +25,8 @@ RETURNS double precision AS $$
     
     -- 2 × (0.625 × [高い方] + 0.375 × [低い方])を四捨五入
     SELECT ROUND(2 * (0.625 * tmp_higher + 0.375 * tmp_lower)) INTO tmp_scaled_defense;
+    
+    RAISE DEBUG 'tmp_scaled_defense: %', tmp_scaled_defense;
     -- すばやさ補正値を掛ける
     RETURN tmp_scaled_defense * calc_speed_mod(v_speed);
   END;
@@ -88,6 +90,9 @@ RETURNS INTEGER AS $$
       END IF;
 
     END IF;
+
+    RAISE DEBUG 'tmp_defense: %', tmp_defense;
+    RAISE DEBUG 'rounded tmp_defense: %', round(tmp_defense::NUMERIC);
 
     -- 四捨五入
     RETURN round(tmp_defense);

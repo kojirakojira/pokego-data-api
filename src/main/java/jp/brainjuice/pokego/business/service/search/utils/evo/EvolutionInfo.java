@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -489,6 +490,30 @@ class EvolutionInfo {
 		// HierarchyのX軸、Distを更新
 		treeList.forEach(yList -> setX(yList));
 
+		// x軸に空白が必要な場合、nullを挿入する。
+		// バリコオルの考慮。通常のバリヤードに進化後は存在しないため、バリコオルの左隣りは空白になる。
+		for (List<List<Hierarchy>> yList: treeList) {
+			for (List<Hierarchy> xList: yList) {
+				int maxX = xList.stream()
+						.map(Hierarchy::getX)
+						.max(Comparator.naturalOrder())
+						.orElseThrow();
+				
+				if (maxX <= xList.size()) {
+					continue;
+				}
+				
+				for (int x = 0; x < maxX - 1; x++) {
+					Hierarchy hie = xList.get(x);
+					if (hie == null) {
+						continue;
+					}
+					if (x + 1 < hie.getX()) {
+						xList.add(x, null);
+					}
+				}
+			}
+		}
 
 		return treeList;
 	}
@@ -546,6 +571,61 @@ class EvolutionInfo {
 				.collect(Collectors.toList());
 
 		return treeList;
+	}
+	
+	/**
+	 * 第2引数に指定したリストの中から、第1引数に指定した図鑑IDのツリー上に存在するEvolutionに絞り込む。<br>
+	 * <strong>DBアクセスなし</strong>
+	 * 
+	 * @param pokedexId
+	 * @param evolList
+	 * @return
+	 */
+	List<Evolution> filterEvolTrees(String pokedexId, List<Evolution> evolList) {
+		
+		List<String> rootList = getRoot(pokedexId, evolList);
+
+		List<String> targetPidList =
+				Stream.concat(
+						rootList.stream(), // 第1進化
+						rootList.stream()
+						.flatMap(rootPid -> getAllAfterEvolution(rootPid, evolList).stream()) // 第2進化以降をすべて取得
+						.sorted()
+						.distinct())
+				.toList();
+		
+		return evolList.stream()
+				.filter(evol -> targetPidList.contains(evol.getPokedexId()))
+				.toList();
+	}
+	/**
+	 * 系統全体から、検索対象のpokedexIdが含まれるツリーを抜き出す。<br>
+	 * <strong>DBアクセスなし</strong>
+	 * 
+	 * @param pokedexId
+	 * @param lineageHieList
+	 * @return
+	 */
+	List<List<List<Hierarchy>>> getTargetTree(String pokedexId, List<List<List<Hierarchy>>> lineageHieList) {
+
+		List<List<List<Hierarchy>>> hieList = new ArrayList<>();
+		for (List<List<Hierarchy>> yList: lineageHieList) {
+			boolean skipFlg = false;
+			for (List<Hierarchy> xList: yList) {
+				for (Hierarchy hie: xList) {
+					if (hie.getId().equals(pokedexId)) {
+						hieList.add(yList);
+						skipFlg = true;
+						break;
+					}
+				}
+
+				if (skipFlg) {
+					break;
+				}
+			}
+		}
+		return hieList;
 	}
 
 	/**

@@ -164,7 +164,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0120N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒトデマン
 	('0121N01', '0120N01', 50, null, null, null, null, null, null, TRUE), --スターミー
 	('0122N01', '0439N01', 25, null, '15km歩く', null, null, null, null, TRUE), --バリヤード
-	('0122G01', 'root', 0, null, null, null, null, null, null, FALSE), --バリヤード(ガラルのすがた)
+	('0122G01', '0439N01', 0, null, null, null, null, null, 'ポケモンGOでは、マネネはヒスイバリヤードに進化しない。', FALSE), --バリヤード(ガラルのすがた)
 	('0123N01', 'root', 0, null, null, null, null, null, null, FALSE), --ストライク
 	('0124N01', '0238N01', 25, null, null, null, null, null, null, TRUE), --ルージュラ
 	('0125N01', '0239N01', 25, null, null, null, null, null, null, TRUE), --エレブー
@@ -799,7 +799,11 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0647N02', 'root', 0, null, null, null, null, null, null, FALSE), --ケルディオ(かくごのすがた)
 	('0648N01', 'root', 0, null, null, null, null, null, null, FALSE), --メロエッタ(ボイスフォルム)
 	('0648N02', 'root', 0, null, null, null, null, null, null, FALSE), --メロエッタ(ステップフォルム)
-	('0649N01', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト
+	('0649N01', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト(ノーマル)
+	('0649N02', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト(イナズマ)
+	('0649N03', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト(ブレイズ)
+	('0649N04', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト(フリーズ)
+	('0649N05', 'root', 0, null, null, null, null, null, null, FALSE), --ゲノセクト(アクア)
 	('0650N01', 'root', 0, null, null, null, null, null, null, FALSE), --ハリマロン
 	('0651N01', '0650N01', 25, null, null, null, null, null, null, TRUE), --ハリボーグ
 	('0652N01', '0651N01', 100, null, null, null, null, null, null, TRUE), --ブリガロン
@@ -916,9 +920,10 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0742N01', 'root', 0, null, null, null, null, null, null, FALSE), --アブリー
 	('0743N01', '0742N01', 50, null, null, null, null, null, null, TRUE), --アブリボン
 	('0744N01', 'root', 0, null, null, null, null, null, null, FALSE), --イワンコ
+	('0744N02', 'root', 0, null, null, null, null, null, null, FALSE), --イワンコ(たそがれ)
 	('0745N01', '0744N01', 50, null, null, '昼のみ', null, null, null, TRUE), --ルガルガン(まひるのすがた)
 	('0745N02', '0744N01', 50, null, null, '夜のみ', null, null, null, TRUE), --ルガルガン(まよなかのすがた)
-	('0745N03', '0744N01', 0, null, null, null, null, null, null, TRUE), --ルガルガン(たそがれのすがた)
+	('0745N03', '0744N02', 50, null, null, '夕方のみ', null, null, null, TRUE), --ルガルガン(たそがれのすがた)
 	('0746N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヨワシ(たんどくのすがた)
 	('0746N02', 'root', 0, null, null, null, null, null, null, FALSE), --ヨワシ(むれたすがた)
 	('0747N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒドイデ
@@ -953,7 +958,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0775N01', 'root', 0, null, null, null, null, null, null, FALSE), --ネッコアラ
 	('0776N01', 'root', 0, null, null, null, null, null, null, FALSE), --バクガメス
 	('0777N01', 'root', 0, null, null, null, null, null, null, FALSE), --トゲデマル
-	('0778N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミミッキュ
+	('0778N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミミッキュ(ばけたすがた)
+	('0778N02', 'root', 0, null, null, null, null, null, null, FALSE), --ミミッキュ(ばれたすがた)
 	('0779N01', 'root', 0, null, null, null, null, null, null, FALSE), --ハギギシリ
 	('0780N01', 'root', 0, null, null, null, null, null, null, FALSE), --ジジーロン
 	('0781N01', 'root', 0, null, null, null, null, null, null, FALSE), --ダダリン
@@ -1014,7 +1020,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0833N01', 'root', 0, null, null, null, null, null, null, FALSE), --カムカメ
 	('0834N01', '0833N01', 0, null, null, null, null, null, null, TRUE), --カジリガメ
 	('0835N01', 'root', 0, null, null, null, null, null, null, FALSE), --ワンパチ
-	('0836N01', '0835N01', 0, null, null, null, null, null, null, TRUE), --パルスワン
+	('0836N01', '0835N01', 50, null, null, null, null, null, null, TRUE), --パルスワン
 	('0837N01', 'root', 0, null, null, null, null, null, null, FALSE), --タンドン
 	('0838N01', '0837N01', 0, null, null, null, null, null, null, TRUE), --トロッゴン
 	('0839N01', '0838N01', 0, null, null, null, null, null, null, TRUE), --セキタンザン
@@ -1077,6 +1083,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0889N01', 'root', 0, null, null, null, null, null, null, FALSE), --ザマゼンタ(れきせんのゆうしゃ)
 	('0889N02', 'root', 0, null, null, null, null, null, null, FALSE), --ザマゼンタ(たてのおう)
 	('0890N01', 'root', 0, null, null, null, null, null, null, FALSE), --ムゲンダイナ
+	('0890N02', 'root', 0, null, null, null, null, null, null, FALSE), --ムゲンダイナ(ムゲンダイマックス)
 	('0891N01', 'root', 0, null, null, null, null, null, null, FALSE), --ダクマ
 	('0892N01', '0891N01', 200, null, 'あくタイプのポケモンのレイドか、マックスバトルで30回勝利する', null, null, null, null, TRUE), --ウーラオス(いちげきのかた)
 	('0892N02', '0891N01', 200, null, 'みずタイプのポケモンのレイドか、マックスバトルで30回勝利する', null, null, null, null, TRUE), --ウーラオス(れんげきのかた)

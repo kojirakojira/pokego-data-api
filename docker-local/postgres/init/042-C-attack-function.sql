@@ -26,6 +26,8 @@ RETURNS double precision AS $$
     
     -- 2 × (0.825 × [高い方] + 0.125 × [低い方])を四捨五入
     SELECT ROUND(2 * (0.875 * tmp_higher + 0.125 * tmp_lower)) INTO tmp_scaled_attack;
+
+    RAISE DEBUG 'tmp_scaled_attack: %', tmp_scaled_attack;
     -- すばやさ補正値を掛ける
     RETURN tmp_scaled_attack * calc_speed_mod(v_speed);
   END;
@@ -90,8 +92,10 @@ RETURNS INTEGER AS $$
 
     END IF;
 
+    RAISE DEBUG 'tmp_attack: %', tmp_attack;
+    RAISE DEBUG 'rounded tmp_attack: %', round(tmp_attack::NUMERIC);
     -- 四捨五入
-    RETURN round(tmp_attack);
+    RETURN round(tmp_attack::NUMERIC);
 
   END;
 $$ LANGUAGE plpgsql

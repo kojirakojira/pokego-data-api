@@ -9,19 +9,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonUtils;
 import jp.brainjuice.pokego.business.service.search.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.PokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
+import jp.brainjuice.pokego.dao.jpa.entity.Pokedex;
 
 @SpringBootTest
 class PokemonApplicationTests {
+
+	@Autowired
+	PokedexRepository pokedexRepository;
 
 	@Autowired
 	GoPokedexRepository gpRepository;
 
 	@Autowired
 	PokemonGoUtils pokemonGoUtils;
+
+	@Autowired
+	PokemonUtils pokemonUtils;
 
 	@Autowired
 	CpMultiplierMap cpMultiplierMap;
@@ -78,6 +87,14 @@ class PokemonApplicationTests {
 		int cp = calcCpFunc.apply(cpMultiplierMap.get(pl));
 
 		return cp;
+	}
+	
+	@Test
+	public void pokemonGoUtilsTest() {
+
+		Pokedex p = pokedexRepository.findById("0379N01").get();
+		
+		System.out.println(pokemonUtils.convGoAttack(p, false));
 	}
 
 }

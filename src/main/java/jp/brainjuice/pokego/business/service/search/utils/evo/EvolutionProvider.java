@@ -185,6 +185,15 @@ public class EvolutionProvider {
 	}
 
 	/**
+	 * この{@link EvolutionInfo#filterEvolTrees(String, List) メソッド}を参照
+	 * @param pid
+	 * @return
+	 */
+	public List<Evolution> filterEvoTrees(String pokedexId, List<Evolution> evolList) {
+		return evolutionInfo.filterEvolTrees(pokedexId, evolList);
+	}
+
+	/**
 	 * この{@link EvolutionInfo#convDispHierarchy(List) メソッド}を参照
 	 * @param pid
 	 * @return

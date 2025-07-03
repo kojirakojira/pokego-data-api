@@ -1,6 +1,5 @@
 package jp.brainjuice.pokego.business.service.search.others;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +53,10 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 				.toList()
 				);
 
-		List<List<List<Hierarchy>>> lineageHieList = evolutionProvider.getEvoTrees(lineageList, goPokedexList);
-
 		// 検索対象のポケモンを含む進化ツリーの取得
-		List<List<List<Hierarchy>>> targetTreeHieList = getTargetTree(pokedexId, lineageHieList);
+		List<List<List<Hierarchy>>> targetTreeHieList = evolutionProvider.getEvoTrees(
+				evolutionProvider.filterEvoTrees(pokedexId, lineageList),
+				goPokedexList);
 
 		// 進化ツリー上のポケモンを直列化する。
 		Set<String> targetTreePidSet = serializeHierarchy(targetTreeHieList);
@@ -66,8 +65,8 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		List<String> evolTreeAnnoList = evolutionProvider.getEvolAnnotations(targetTreePidSet);
 
 		// 別のすがたの進化前、進化後
-		// その系統のすべてのポケモン - (検索対象のポケモンを含む進化ツリーのポケモン + 別のすがた)
-		List<String> bfAfAotFormList = serializeHierarchy(lineageHieList).stream()
+		List<String> bfAfAotFormList = lineageList.stream()
+				.map(Evolution::getPokedexId)
 				.filter(lpid -> !targetTreePidSet.contains(lpid))
 				.filter(lpid -> !anotherFormList.contains(lpid))
 				.toList();
@@ -87,37 +86,13 @@ public class EvolutionResearchService implements ResearchService<EvolutionRespon
 		res.setRaceMap(raceMap);
 	}
 
-	/**
-	 * 系統全体から、検索対象のpokedexIdが含まれるツリーを抜き出す。
-	 * @param pokedexId
-	 * @param lineageHieList
-	 * @return
-	 */
-	private List<List<List<Hierarchy>>> getTargetTree(String pokedexId, List<List<List<Hierarchy>>> lineageHieList) {
-
-		List<List<List<Hierarchy>>> hieList = new ArrayList<>();
-		for (List<List<Hierarchy>> yList: lineageHieList) {
-			boolean skipFlg = false;
-			for (List<Hierarchy> xList: yList) {
-				for (Hierarchy hie: xList) {
-					if (hie.getId().equals(pokedexId)) {
-						hieList.add(yList);
-						skipFlg = true;
-						break;
-					}
-				}
-
-				if (skipFlg) {
-					break;
-				}
-			}
-		}
-		return hieList;
-	}
-
 	private Set<String> serializeHierarchy(List<List<List<Hierarchy>>> hieList) {
 		Set<String> pidSet = new HashSet<>();
-		hieList.forEach(tree -> tree.forEach(li -> li.forEach(h -> pidSet.add(h.getId()))));
+		hieList.forEach(tree -> tree.forEach(y -> y.forEach(x -> {
+			if (x != null) {
+				pidSet.add(x.getId());
+			}
+		})));
 		return pidSet;
 	}
 

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -65,4 +66,32 @@ public class Evolution implements Serializable {
 	@Column(name = "can_go_evol", nullable = false)
 	private boolean canGoEvol;
 
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return pokedexId.hashCode();
+	}
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof GoPokedex)) {
+			return false;
+		}
+
+		GoPokedex other = (GoPokedex) obj;
+
+		return pokedexId != null && pokedexId.equals(other.getPokedexId());
+	}
 }
