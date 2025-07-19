@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.manage.LoginService;
+import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.MasterFileAnalyzerService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
 import jp.brainjuice.pokego.utils.exception.AuthenticationFailedException;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.UserUnmatchException;
 import jp.brainjuice.pokego.web.manage.req.LoginRequest;
+import jp.brainjuice.pokego.web.manage.req.MasterFileAnalyzeRequest;
 import jp.brainjuice.pokego.web.manage.res.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,12 +30,16 @@ public class ManageController {
 	
 	private LoginService loginService;
 	
+	private MasterFileAnalyzerService masterFileAnalyzerService;
+	
 	private ViewsCacheProvider viewsCacheProvider;
 	
 	public ManageController(
 			LoginService loginService,
+			MasterFileAnalyzerService masterFileAnalyzerService,
 			ViewsCacheProvider viewsCacheProvider) {
 		this.loginService = loginService;
+		this.masterFileAnalyzerService = masterFileAnalyzerService;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
@@ -55,6 +62,20 @@ public class ManageController {
 		if (!BjJwtUtils.checkUser(req, userId)) {
 			throw new UserUnmatchException();
 		}
+		return true;
+	}
+
+	@PostMapping(value = "/secure/masterFileAnalyze", 
+			consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public boolean masterFileAnalyze(
+			MasterFileAnalyzeRequest masterFileAnalyzeRequest,
+			HttpServletRequest req) throws Exception {
+		
+		if (!BjJwtUtils.checkUser(req, masterFileAnalyzeRequest.getUserId())) {
+			throw new UserUnmatchException();
+		}
+		
+		masterFileAnalyzerService.analyze(masterFileAnalyzeRequest.getMasterFile());
 		return true;
 	}
 

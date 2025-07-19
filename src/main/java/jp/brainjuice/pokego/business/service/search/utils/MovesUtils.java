@@ -22,6 +22,14 @@ import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
 @Component
 public class MovesUtils {
 
+	public enum MoveCategory {
+		normal,
+		elite,
+		purified,
+		shadow,
+		formChange
+	}
+
 	/** ChargedAttackのbuffTargetはハイフン区切りで表す。 */
 	private static String BUFF_TARGET_SEPARATOR = "-";
 

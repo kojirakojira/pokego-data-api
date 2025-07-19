@@ -86,14 +86,11 @@ RETURNS INTEGER AS $$
           -- 普通のポケモン
           SELECT tmp_attack * ts_correct_value INTO tmp_attack;
         END IF;
-		-- 強ポケ補正後は四捨五入
-		SELECT round(tmp_attack) INTO tmp_attack;
       END IF;
 
     END IF;
 
     RAISE DEBUG 'tmp_attack: %', tmp_attack;
-    RAISE DEBUG 'rounded tmp_attack: %', round(tmp_attack::NUMERIC);
     -- 四捨五入
     RETURN round(tmp_attack::NUMERIC);
 

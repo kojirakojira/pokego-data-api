@@ -130,13 +130,14 @@ public class PokemonUtils {
 		}
 
 		double baseAttack = baseAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed());
-
+		System.out.println(baseAttack);
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedex)
 					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
 			baseAttack = tooStrongRepository.existsById(pid) ? baseAttack * correctionValue : baseAttack;
 		}
 
+		System.out.println(Math.round(baseAttack));
 		return (int) Math.round(baseAttack);
 	}
 

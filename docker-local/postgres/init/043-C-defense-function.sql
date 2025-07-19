@@ -85,17 +85,14 @@ RETURNS INTEGER AS $$
           -- 普通のポケモン
           SELECT tmp_defense * ts_correct_value INTO tmp_defense;
         END IF;
-		-- 強ポケ補正後は四捨五入
-		SELECT round(tmp_defense) INTO tmp_defense;
       END IF;
 
     END IF;
 
     RAISE DEBUG 'tmp_defense: %', tmp_defense;
-    RAISE DEBUG 'rounded tmp_defense: %', round(tmp_defense::NUMERIC);
 
     -- 四捨五入
-    RETURN round(tmp_defense);
+    RETURN round(tmp_defense::NUMERIC);
 
   END;
 $$ LANGUAGE plpgsql
