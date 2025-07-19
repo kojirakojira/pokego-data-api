@@ -17,7 +17,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0009M01', FALSE, FALSE), --メガカメックス
 	('0010N01', TRUE, FALSE), --キャタピー
 	('0011N01', TRUE, FALSE), --トランセル
-	('0012N01', TRUE, FALSE), --バタフリー
+	('0012N01', TRUE, TRUE), --バタフリー
 	('0013N01', FALSE, FALSE), --ビードル
 	('0014N01', FALSE, FALSE), --コクーン
 	('0015N01', FALSE, FALSE), --スピアー
@@ -399,8 +399,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0318N01', FALSE, FALSE), --キバニア
 	('0319N01', FALSE, FALSE), --サメハダー
 	('0319M01', FALSE, FALSE), --メガサメハダー
-	('0320N01', FALSE, FALSE), --ホエルコ
-	('0321N01', FALSE, FALSE), --ホエルオー
+	('0320N01', TRUE, FALSE), --ホエルコ
+	('0321N01', TRUE, FALSE), --ホエルオー
 	('0322N01', FALSE, FALSE), --ドンメル
 	('0323N01', FALSE, FALSE), --バクーダ
 	('0323M01', FALSE, FALSE), --メガバクーダ
@@ -469,9 +469,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0377N01', FALSE, FALSE), --レジロック
 	('0378N01', FALSE, FALSE), --レジアイス
 	('0379N01', FALSE, FALSE), --レジスチル
-	('0380N01', FALSE, FALSE), --ラティアス
+	('0380N01', TRUE, FALSE), --ラティアス
 	('0380M01', FALSE, FALSE), --メガラティアス
-	('0381N01', FALSE, FALSE), --ラティオス
+	('0381N01', TRUE, FALSE), --ラティオス
 	('0381M01', FALSE, FALSE), --メガラティオス
 	('0382N01', FALSE, FALSE), --カイオーガ
 	('0382M01', FALSE, FALSE), --ゲンシカイオーガ
