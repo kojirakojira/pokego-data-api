@@ -37,3 +37,4 @@ docker-local/postgres/*
 docker-local/volumes/*
 !docker-local/volumes/.gitkeep
 !docker-local/postgres/init/
+docker-local/postgres/**/.*
