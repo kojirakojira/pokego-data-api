@@ -68,10 +68,10 @@ aws:
     s3BacketName: static.brainjuice.jp
     suffix: -test
 
-# management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "prometheus"
-#  server:
-#    port: 8090
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  server:
+    port: 8090
