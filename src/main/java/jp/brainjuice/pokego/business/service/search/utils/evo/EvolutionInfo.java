@@ -68,12 +68,12 @@ class EvolutionInfo {
 				.filter(evol -> evol.getPokedexId().equals(pokedexId))
 				.map(Evolution::getBeforePokedexId)
 				.toList();
-		
+
 		// 引数のevolTreeListが正しければ、必ず1件以上はヒットする。
 		if (ROOT.equals(pidList.get(0))) {
 			return null;
 		}
-		
+
 		return pidList;
 	}
 
@@ -119,27 +119,27 @@ class EvolutionInfo {
 
 		List<String> pidList = List.of(pokedexId);
 		List<String> afEvolList = new ArrayList<>();
-		
+
 		boolean allReafFlg = true;
 		while (allReafFlg) {
-			
+
 			List<String> nextList = new ArrayList<>();
 			for (String pid: pidList) {
 				List<String> thisStageList = getAfterEvolution(pid, evolTreeList);
 				afEvolList.addAll(thisStageList);
-				
+
 				if (!thisStageList.isEmpty()) {
 					nextList.addAll(thisStageList);
 				}
 			}
-			
+
 			if (nextList.isEmpty()) {
 				allReafFlg = false;
 			}
-			
+
 			pidList = nextList;
 		}
-		
+
 		return afEvolList;
 	}
 
@@ -259,10 +259,10 @@ class EvolutionInfo {
 
 		List<String> pidList = List.of(pokedexId);
 		List<String> rootList = new ArrayList<>();
-		
+
 		boolean allReafFlg = true;
 		while (allReafFlg) {
-			
+
 			List<String> nextList = new ArrayList<>();
 			for (String pid: pidList) {
 				List<String> beforeList = getBeforeEvolution(pid, evolTreeList);
@@ -272,11 +272,11 @@ class EvolutionInfo {
 				}
 				nextList.addAll(beforeList);
 			}
-			
+
 			if (nextList.isEmpty()) {
 				allReafFlg = false;
 			}
-			
+
 			pidList = nextList;
 		}
 
@@ -323,10 +323,10 @@ class EvolutionInfo {
 
 		List<String> pidList = List.of(pokedexId);
 		List<String> leafList = new ArrayList<>();
-		
+
 		boolean allReafFlg = true;
 		while (allReafFlg) {
-			
+
 			List<String> nextList = new ArrayList<>();
 			for (String pid: pidList) {
 				if (isAfterEvolutionCanGoEvol(pid, evolTreeList)) {
@@ -335,11 +335,11 @@ class EvolutionInfo {
 					leafList.add(pid);
 				}
 			}
-			
+
 			if (nextList.isEmpty()) {
 				allReafFlg = false;
 			}
-			
+
 			pidList = nextList;
 		}
 
@@ -394,18 +394,18 @@ class EvolutionInfo {
 		}
 		return lineageList;
 	}
-	
+
 	/**
 	 * そのポケモンの進化ツリー上のポケモンを取得する。<br>
 	 * メガシンカ後のポケモンが存在する場合は、そのポケモンの情報も一緒に取得する。
-	 * 
+	 *
 	 * @param pokedexId
 	 * @return
 	 */
 	List<Evolution> getEvolTreeAndMegaList(String pokedexId) {
-		
+
 		List<Evolution> evolTreeAndMegaList = evolutionRepository.getEvolTreeAndMegaById(pokedexId);
-		
+
 		return evolTreeAndMegaList;
 	}
 
@@ -455,7 +455,7 @@ class EvolutionInfo {
 	List<List<List<Hierarchy>>> getEvoTrees(List<Evolution> evolList, List<GoPokedex> gpList) {
 
 		List<List<List<Hierarchy>>> treeList = null;
-		
+
 		// evolListに完全に対応するgpListを作る
 		List<GoPokedex> trustedGpList = evolList.stream()
 				.map(evol -> {
@@ -498,11 +498,11 @@ class EvolutionInfo {
 						.map(Hierarchy::getX)
 						.max(Comparator.naturalOrder())
 						.orElseThrow();
-				
+
 				if (maxX <= xList.size()) {
 					continue;
 				}
-				
+
 				for (int x = 0; x < maxX - 1; x++) {
 					Hierarchy hie = xList.get(x);
 					if (hie == null) {
@@ -572,17 +572,17 @@ class EvolutionInfo {
 
 		return treeList;
 	}
-	
+
 	/**
 	 * 第2引数に指定したリストの中から、第1引数に指定した図鑑IDのツリー上に存在するEvolutionに絞り込む。<br>
 	 * <strong>DBアクセスなし</strong>
-	 * 
+	 *
 	 * @param pokedexId
 	 * @param evolList
 	 * @return
 	 */
 	List<Evolution> filterEvolTrees(String pokedexId, List<Evolution> evolList) {
-		
+
 		List<String> rootList = getRoot(pokedexId, evolList);
 
 		List<String> targetPidList =
@@ -593,15 +593,17 @@ class EvolutionInfo {
 						.sorted()
 						.distinct())
 				.toList();
-		
+
+		// 進化後、進化前両方が図鑑ID上に存在するEvolutionに絞り込む
 		return evolList.stream()
-				.filter(evol -> targetPidList.contains(evol.getPokedexId()))
+				.filter(evol -> targetPidList.contains(evol.getPokedexId())
+						&& (targetPidList.contains(evol.getBeforePokedexId()) || evol.getBeforePokedexId().equals(ROOT)))
 				.toList();
 	}
 	/**
 	 * 系統全体から、検索対象のpokedexIdが含まれるツリーを抜き出す。<br>
 	 * <strong>DBアクセスなし</strong>
-	 * 
+	 *
 	 * @param pokedexId
 	 * @param lineageHieList
 	 * @return
