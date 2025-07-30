@@ -5,9 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -19,9 +24,11 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.icu.text.MessageFormat;
 
-import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.AdditionalMove;
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.CinematicMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.ParsedMasterData;
+import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.PokemonMove;
+import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.PokemonMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.QuickMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.CinematicCombatMoveData;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.FormChange;
@@ -47,146 +54,89 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MasterFileAnalyzerService {
 
-	private enum MasterLinkDataKey {
-		pokemon,
-		move,
-		limited_time_learned_cinematic_moves,
-		not_defined_cinematic_moves
-	}
-
 	private ObjectMapper objectMapper;
 
 	private GoPokedexRepository goPokedexRepository;
 
+	private MoveCreator moveCreator;
+
+	private PokemonMoveCreator pokemonMoveCreator;
+
 	private static final String MASTER_LINK_DATA_FILE = "pokemon/master_link_data.yml";
 
-	public MasterFileAnalyzerService(ObjectMapper objectMapper, GoPokedexRepository goPokedexRepository) {
+	public MasterFileAnalyzerService(
+			ObjectMapper objectMapper,
+			GoPokedexRepository goPokedexRepository,
+			MoveCreator moveCreator,
+			PokemonMoveCreator pokemonMoveCreator) {
 		this.objectMapper = objectMapper;
 		this.goPokedexRepository = goPokedexRepository;
+		this.moveCreator = moveCreator;
+		this.pokemonMoveCreator = pokemonMoveCreator;
 	}
 
-	public List<String> analyze(MultipartFile masterFile) throws StreamReadException, DatabindException, IOException {
+	public void analyze(
+			MultipartFile masterFile,
+			boolean isPrintQuickMoves,
+			boolean isPrintCinematicMoves,
+			boolean isPrintRequestedMoveEachPokemon,
+			boolean shouldSaveFastAttack,
+			boolean shouldSaveChargedAttack) throws StreamReadException, DatabindException, IOException {
 
+		// マスタデータから必要な情報を抜き出す
 		ParsedMasterData parsedMasterData = loadMasterData(masterFile);
 
+		// master_link_data.ymlを読み込む
 		Map<String, Object> masterLinkMap = loadMasterLinkData();
 
+		// ぺりずかんの情報を取得
 		Map<String, GoPokedex> gpMap = goPokedexRepository.findAll().stream()
 				.collect(Collectors.toMap(
 						gp -> gp.getPokedexId(),
 						gp -> gp));
 
-		// ペリずかん上のポケモンのデータが正しいかチェックする。
+		// ペリずかん上のポケモンのデータが正しいかチェックする。（技は含まない）
 		checkPeriData(parsedMasterData.getPokemonDataList(), gpMap, masterLinkMap);
 
-		log.info("------------技 - 通常技一覧一覧ここから------------");
-		{
-			// ポケモンが覚えてる技
-			List<String> usedQuickMoveList = parsedMasterData.getPokemonDataList().stream()
-					.flatMap(pd -> {
-						List<String> moves = new ArrayList<>();
-						if (pd.getPokemonSettings().getQuickMoves() != null) {
-							moves.addAll(pd.getPokemonSettings().getQuickMoves());
-						}
-						if (pd.getPokemonSettings().getEliteQuickMove() != null) {
-							moves.addAll(pd.getPokemonSettings().getEliteQuickMove());
-						}
-						return moves.stream();
-					})
-					.sorted()
-					.distinct()
-					.toList();
+		// ポケモンが覚える技の整理
+		Map<String, PokemonMoveAll> pokemonMoveAllMap = createPokemonMoveAllMap(
+				parsedMasterData.getPokemonDataList(),
+				parsedMasterData.getAdditionalCinematicMoveMap(),
+				masterLinkMap,
+				gpMap);
 
-			// どのポケモンも覚えていない技
-			List<String> unusedQuickMoveList = parsedMasterData.getQuickMoveList().stream()
-					.filter(qma -> !usedQuickMoveList.contains(qma.getGymRaid().getMovementId()))
-					.map(qma -> qma.getMovementId())
-					.toList();
-
-			if (unusedQuickMoveList.isEmpty()) {
-				log.info("誰も覚えていない技は1件もありませんでした。");
-			} else {
-				unusedQuickMoveList.stream().forEach(mid -> {
-					log.info(MessageFormat.format("誰も覚えていない技：movementId:\t{0}", mid));
-				});
-			}
-
-			parsedMasterData.getQuickMoveList().stream()
-			.filter(qma -> !unusedQuickMoveList.contains(qma.getGymRaid().getMovementId())) // 誰も覚えていない技は省く
-			.map(qma -> List.of(
-					qma.getMovementId(),
-					qma.getGymRaid().getPokemonType(),
-					String.valueOf(qma.getGymRaid().getPower()),
-					String.valueOf(qma.getPvp().getPower())
-					))
-			.map(list -> String.join("\t", list))
-			.forEach(log::info);
+		// 技の一覧を出力する。
+		if (isPrintQuickMoves) {
+			printQuickMoves(
+					parsedMasterData.getQuickMoveList(),
+					pokemonMoveAllMap,
+					masterLinkMap);
 		}
-		log.info("------------技 - 通常技一覧一覧ここまで------------");
 
-		log.info("------------技 - スペシャル技一覧一覧ここから------------");
-		{
-			// ポケモンが覚えてる技
-			List<String> canUseCinematicMoveList = parsedMasterData.getPokemonDataList().stream()
-					.flatMap(pd -> {
-						List<String> moves = new ArrayList<>();
-						if (pd.getPokemonSettings().getCinematicMoves() != null) {
-							moves.addAll(pd.getPokemonSettings().getCinematicMoves());
-						}
-						if (pd.getPokemonSettings().getEliteCinematicMove() != null) {
-							moves.addAll(pd.getPokemonSettings().getEliteCinematicMove());
-						}
-						// ガリョウテンセイ
-						if (pd.getPokemonSettings().getNonTmCinematicMoves() != null) {
-							moves.addAll(pd.getPokemonSettings().getNonTmCinematicMoves());
-						}
-						return moves.stream();
-					})
-					.sorted()
-					.distinct()
-					.toList();
-			// シャドウ、リトレーン、フォルムチェンジで覚える技
-			List<String> additionalMoveList = parsedMasterData.getAdditionalCinematicMoveMap().entrySet().stream()
-					.flatMap(entry -> entry.getValue().stream())
-					.map(AdditionalMove::getMovementId)
-					.distinct()
-					.toList();
-
-			// どのポケモンも覚えていない技
-			List<String> cantCinematicMoveList = parsedMasterData.getCinematicMoveList().stream()
-					.filter(qma -> {
-						String mid = qma.getGymRaid().getMovementId();
-						return !canUseCinematicMoveList.contains(mid) && !additionalMoveList.contains(mid);
-					})
-					.map(qma -> qma.getMovementId())
-					.toList();
-
-			if (cantCinematicMoveList.isEmpty()) {
-				log.info("誰も覚えていない技は1件もありませんでした。");
-			} else {
-				cantCinematicMoveList.stream().forEach(mid -> {
-					log.info(MessageFormat.format("誰も覚えていない技：movementId:\t{0}", mid));
-				});
-			}
-
-
-			parsedMasterData.getCinematicMoveList().stream()
-			.filter(qma -> !cantCinematicMoveList.contains(qma.getGymRaid().getMovementId())) // 誰も覚えていない技は省く
-			.map(cma -> List.of(
-					cma.getMovementId(),
-					cma.getGymRaid().getPokemonType(),
-					String.valueOf(cma.getGymRaid().getPower()),
-					String.valueOf(cma.getPvp().getPower())
-					))
-			.map(list -> String.join("\t", list))
-			.forEach(log::info);
+		if (isPrintCinematicMoves) {
+			printCinematicMoves(
+					parsedMasterData.getCinematicMoveList(),
+					pokemonMoveAllMap,
+					masterLinkMap);
 		}
-		log.info("------------技 - スペシャル技一覧一覧ここまで------------");
 
 		// ポケモンごとの技を出力する。
-		printMovesForEachPokemon(parsedMasterData.getPokemonDataList(), gpMap, masterLinkMap);
+		if (isPrintRequestedMoveEachPokemon) {
+			printMovesForEachPokemon(pokemonMoveAllMap, gpMap);
+		}
 
-		return null;
+		// マスタデータから通常技のリストを生成し、DBに登録
+		moveCreator.createAndSaveFastAttack(parsedMasterData.getQuickMoveList(), masterLinkMap, shouldSaveFastAttack);
+
+		// マスタデータからスペシャル技のリストを生成し、DBに登録
+		moveCreator.createAndSaveChargedAttack(parsedMasterData.getCinematicMoveList(), masterLinkMap, shouldSaveChargedAttack);
+
+		// マスタデータからポケモンが覚える通常技のリストを生成し、DBに登録
+		pokemonMoveCreator.createAndSaveFastAttack(pokemonMoveAllMap.values(), shouldSaveFastAttack);
+
+		// マスタデータからポケモンが覚えるスペシャル技のリストを生成し、DBに登録
+		pokemonMoveCreator.createAndSaveChargedAttack(pokemonMoveAllMap.values(), shouldSaveChargedAttack);
+
 	}
 
 	private ParsedMasterData loadMasterData(MultipartFile masterFile) throws StreamReadException, DatabindException, IOException {
@@ -195,7 +145,7 @@ public class MasterFileAnalyzerService {
 		List<CinematicMoveAll> cinematicMoveList;
 		List<PokemonData> pokemonDataList;
 		// PokemonDataのcinematicMovesに含まれない技。Map<templateId(ポケモン), List<<スペシャル技>>
-		Map<String, List<AdditionalMove>> additionalCinematicMoveMap;
+		Map<String, List<PokemonMove>> additionalCinematicMoveMap;
 		{
 			List<MasterRoot> jsonData = objectMapper.readValue(masterFile.getInputStream(), new TypeReference<List<MasterRoot>>() {});
 
@@ -232,9 +182,12 @@ public class MasterFileAnalyzerService {
 										.findFirst()
 										.map(matchResult -> matchResult.group(1))
 										.orElse("No match found");
+								String strType = qcmd.getCombatMove().getType().replaceFirst("POKEMON_TYPE_", "").toLowerCase();
+								TypeEnum type = TypeEnum.valueOf(strType);
 								return new QuickMoveAll(
 										movementId,
 										movementNo,
+										type,
 										quickPvpMap.get(movementId),
 										qcmd.getCombatMove());
 							})
@@ -264,9 +217,12 @@ public class MasterFileAnalyzerService {
 										.findFirst()
 										.map(matchResult -> matchResult.group(1))
 										.orElse("No match found");
+								String strType = ccmd.getCombatMove().getType().replaceFirst("POKEMON_TYPE_", "").toLowerCase();
+								TypeEnum type = TypeEnum.valueOf(strType);
 								return new CinematicMoveAll(
 										movementId,
 										movementNo,
+										type,
 										cinematicPvpMap.get(movementId),
 										ccmd.getCombatMove());
 							})
@@ -296,13 +252,13 @@ public class MasterFileAnalyzerService {
 					String templateId = pd.getTemplateId();
 					Shadow shadow = pd.getPokemonSettings().getShadow();
 					if (shadow.getShadowChargeMove() != null) {
-						AdditionalMove ad = new AdditionalMove(shadow.getShadowChargeMove(), MoveCategory.shadow);
-						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(ad);
+						PokemonMove pm = new PokemonMove(shadow.getShadowChargeMove(), MoveCategory.shadow, false);
+						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(pm);
 					}
 
 					if (shadow.getPurifiedChargeMove() != null) {
-						AdditionalMove ad = new AdditionalMove(shadow.getPurifiedChargeMove(), MoveCategory.purified);
-						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(ad);
+						PokemonMove pm = new PokemonMove(shadow.getPurifiedChargeMove(), MoveCategory.purified, false);
+						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(pm);
 					}
 				});
 
@@ -324,14 +280,14 @@ public class MasterFileAnalyzerService {
 								.toList();
 
 						// templateIdが重複する可能性があるため、一旦リストで持つ。
-						List<Map.Entry<String, String>> pokemonMoveList = fc.getAvailableForm().stream()
+						List<Map.Entry<String, String>> formChangeList = fc.getAvailableForm().stream()
 								.flatMap(aForm -> {
 									// form -> Map.Entry<form, movementId>に変換
 									return movementIdList.stream()
 											.map(mid -> Map.entry(aForm, mid));
-								})
+								}) // return Map.Entry<form, movementId>
 								.map(entry -> {
-									// Map.Entry<form, movementId> -> Map.Entry<templateId, movementId> の変換
+									// Map.Entry<form, movementId> -> Map.Entry<フォルムチェンジ後のポケモンのtemplateId, movementId> の変換
 									String templateId = pokemonDataList.stream()
 											.filter(pd2 -> entry.getKey().equals(pd2.getPokemonSettings().getForm()))
 											.findFirst()
@@ -341,10 +297,10 @@ public class MasterFileAnalyzerService {
 								})
 								.toList();
 
-						pokemonMoveList.stream()
+						formChangeList.stream()
 						.forEach(entry -> {
-							AdditionalMove ad = new AdditionalMove(entry.getValue(), MoveCategory.formChange);
-							additionalCinematicMoveMap.computeIfAbsent(entry.getValue(), k -> new ArrayList<>()).add(ad);
+							PokemonMove pm = new PokemonMove(entry.getValue(), MoveCategory.formChange, false);
+							additionalCinematicMoveMap.computeIfAbsent(entry.getValue(), k -> new ArrayList<>()).add(pm);
 						});
 					}
 				}
@@ -352,11 +308,11 @@ public class MasterFileAnalyzerService {
 				// 重複を除去する
 				additionalCinematicMoveMap.entrySet().stream()
 				.forEach(entry -> {
-					List<AdditionalMove> ad = entry.getValue()
+					List<PokemonMove> pm = entry.getValue()
 							.stream()
 							.distinct()
 							.toList();
-					entry.setValue(ad);
+					entry.setValue(pm);
 				});
 			}
 		}
@@ -390,11 +346,7 @@ public class MasterFileAnalyzerService {
 	private void checkPeriData(List<PokemonData> pokemonDataList, Map<String, GoPokedex> gpMap, Map<String, Object> masterLinkMap) {
 
 		@SuppressWarnings("unchecked")
-		Map<String, String> masterLinkPokemonMap = ((Map<String, String>) masterLinkMap.get(MasterLinkDataKey.pokemon.name())).entrySet().stream()
-		.filter(entry -> !StringUtils.isEmpty(entry.getValue()))
-		.collect(Collectors.toMap(
-				Map.Entry::getKey,
-				Map.Entry::getValue));
+		final Map<String, String> masterLinkPokemonMap = ((Map<String, String>) masterLinkMap.get(MasterLinkDataKey.pokemon.name()));
 
 		log.info("------------ポケモン - テンプレートID一覧ここから------------");
 		pokemonDataList.forEach(pd -> log.info(pd.getTemplateId()));
@@ -402,17 +354,29 @@ public class MasterFileAnalyzerService {
 
 		log.info("------------ポケモン - ステータスチェックここから------------");
 		log.info("①マスタデータにあって、master_link_data.ymlにないやつ ここから");
-		pokemonDataList.stream()
-		.filter(pd -> !masterLinkPokemonMap.containsKey(pd.getTemplateId()))
-		.map(pd -> pd.getTemplateId())
-		.forEach(log::warn);
+		{
+			List<String> notDefinedPokemonTemplateIdList = pokemonDataList.stream()
+					.filter(pd -> !masterLinkPokemonMap.containsKey(pd.getTemplateId()))
+					.map(pd -> pd.getTemplateId())
+					.toList();
+			if (!notDefinedPokemonTemplateIdList.isEmpty()) {
+				notDefinedPokemonTemplateIdList.forEach(log::warn);
+				throw new PokemonDataException("master_link_data.ymlに存在しないポケモンが存在します。");
+			}
+		}
 		log.info("①マスタデータにあって、master_link_data.ymlにないやつ ここまで");
+
+		Map<String, String> masterLinkPokemonEmptyRemovedMap = masterLinkPokemonMap.entrySet().stream()
+				.filter(entry -> !StringUtils.isEmpty(entry.getValue()))
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue));
 
 		log.info("②ステータス検査対象外 ここから");
 		log.info("(go_pokedexにあって、master_link_data.ymlにないやつ。メガシンカ、ゲンシカイキを除く)");
 		{
 			Set<String> pokedexIdSet = gpMap.keySet();
-			Set<String> masterLinkPidSet = masterLinkPokemonMap.entrySet().stream()
+			Set<String> masterLinkPidSet = masterLinkPokemonEmptyRemovedMap.entrySet().stream()
 					.filter(entry -> !StringUtils.isEmpty(entry.getValue()))
 					.map(Map.Entry::getValue)
 					.collect(Collectors.toSet());
@@ -430,12 +394,12 @@ public class MasterFileAnalyzerService {
 		log.info("②ステータス検査対象外 ここまで");
 		log.info("③ステータス検査 ここから");
 		for (PokemonData pd: pokemonDataList) {
-			if (!masterLinkPokemonMap.containsKey(pd.getTemplateId())) {
+			if (!masterLinkPokemonEmptyRemovedMap.containsKey(pd.getTemplateId())) {
 				continue;
 			}
 
 			PokemonStats ps = pd.getPokemonSettings().getStats();
-			GoPokedex gp = gpMap.get(masterLinkPokemonMap.get(pd.getTemplateId()));
+			GoPokedex gp = gpMap.get(masterLinkPokemonEmptyRemovedMap.get(pd.getTemplateId()));
 
 			if (ps.getBaseStamina() == 0 || ps.getBaseAttack() == 0 || ps.getBaseDefense() == 0) {
 				// statsが存在しない場合
@@ -463,77 +427,302 @@ public class MasterFileAnalyzerService {
 		log.info("------------ポケモン - ステータスチェックここまで------------");
 	}
 
-	private void printMovesForEachPokemon(List<PokemonData> pokemonDataList, Map<String, GoPokedex> gpMap, Map<String, Object> masterLinkMap) {
+	/**
+	 *
+	 * @param pokemonDataList
+	 * @param additionalCinematicMoveMap
+	 * @param masterLinkMap
+	 * @param gpMap Map<pokedexId, PokemonMoveAll>
+	 * @return
+	 */
+	private Map<String, PokemonMoveAll> createPokemonMoveAllMap(
+			List<PokemonData> pokemonDataList,
+			Map<String, List<PokemonMove>> additionalCinematicMoveMap,
+			Map<String, Object> masterLinkMap,
+			Map<String, GoPokedex> gpMap) {
 
-		log.info("------------技 - ポケモンと技 ここから------------");
+		// 返却値の初期化
+		Map<String, PokemonMoveAll> pokemonMoveAllMap = gpMap.entrySet().stream()
+				.filter(entry -> StringUtils.isEmpty(entry.getValue().getPreMegaPokedexId())) // メガシンカを除く
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						entry -> new PokemonMoveAll(entry.getKey(), null))); // ValueのPokemonMoveAllはpokedexIdだけをセットして初期化
+
 		@SuppressWarnings("unchecked")
 		Map<String, String> masterLinkPokemonMap = (Map<String, String>) masterLinkMap.get(MasterLinkDataKey.pokemon.name());
-		List<String> quickMoveStrList = new ArrayList<>();
-		List<String> eliteQuickMoveStrList = new ArrayList<>();
-		List<String> cinematicMoveStrList = new ArrayList<>();
-		List<String> eliteCinematicMoveStrList = new ArrayList<>();
-		for (PokemonData pd: pokemonDataList) {
-			if (masterLinkPokemonMap.get(pd.getTemplateId()) == null) {
-				continue;
-			}
 
-			if (pd.getPokemonSettings() == null) {
-				// pokemonSettingsが存在しない場合スキップ(多分そんなパターンはない)
-				log.warn(pd.getTemplateId() + " pokemonSettings is null");
-				continue;
-			}
+		{
+			// 第1、第2引数の値からPokemMoveのインスタンスを生成し、第3引数のmoveListに追加する関数
+			BiFunction<List<String>, MoveCategory, Consumer<List<PokemonMove>>> pokemonMoveListAddFunc = (movementIdList, moveCategory) -> (moveList) -> {
+				if (movementIdList != null) {
+					List<PokemonMove> pmList = movementIdList.stream()
+							.map(mid -> new PokemonMove(mid, moveCategory, false))
+							.toList();
+					moveList.addAll(pmList);
+				}
+			};
 
-			GoPokedex gp = gpMap.get(masterLinkPokemonMap.get(pd.getTemplateId()));
-			String name = PokemonEditUtils.appendRemarks(gp);
+			for (PokemonData pd: pokemonDataList) {
+				if (masterLinkPokemonMap.get(pd.getTemplateId()) == null) {
+					continue;
+				}
 
-			// 通常技
-			if (pd.getPokemonSettings().getQuickMoves() == null) {
-				log.warn(pd.getTemplateId() + " quickMoves is null");
-			} else {
-				List<String> strList = pd.getPokemonSettings().getQuickMoves().stream()
-						.map(move -> MessageFormat.format("{0}\t{1}\t{2}", gp.getPokedexId(), name, move))
-						.toList();
-				quickMoveStrList.addAll(strList);
-			}
+				if (pd.getPokemonSettings() == null) {
+					// pokemonSettingsが存在しない場合スキップ(多分そんなパターンはない)
+					log.warn(pd.getTemplateId() + " pokemonSettings is null");
+					continue;
+				}
 
-			if (pd.getPokemonSettings().getEliteQuickMove() != null) {
-				List<String> strList = pd.getPokemonSettings().getEliteQuickMove().stream()
-						.map(move -> MessageFormat.format("{0}\t{1}\t{2}", gp.getPokedexId(), name, move))
-						.toList();
-				eliteQuickMoveStrList.addAll(strList);
-			}
+				String pokedexId = gpMap.get(masterLinkPokemonMap.get(pd.getTemplateId())).getPokedexId(); // 念の為GoPokedexからpokedexIdを取得
+				PokemonMoveAll pma = pokemonMoveAllMap.get(pokedexId);
 
-			// スペシャル技
-			if (pd.getPokemonSettings().getCinematicMoves() == null) {
-				log.warn(pd.getTemplateId() + " cinematicMoves is null");
-			} else {
-				List<String> strList = pd.getPokemonSettings().getCinematicMoves().stream()
-						.map(move -> MessageFormat.format("{0}\t{1}\t{2}", gp.getPokedexId(), name, move))
-						.toList();
-				cinematicMoveStrList.addAll(strList);
-			}
 
-			if (pd.getPokemonSettings().getEliteCinematicMove() != null) {
-				List<String> strList = pd.getPokemonSettings().getEliteCinematicMove().stream()
-						.map(move -> MessageFormat.format("{0}\t{1}\t{2}", gp.getPokedexId(), name, move))
-						.toList();
-				eliteCinematicMoveStrList.addAll(strList);
-			}
+				// 通常技
+				if (pd.getPokemonSettings().getQuickMoves() == null) {
+					log.warn(pd.getTemplateId() + " quickMoves is null");
+				}
+				// 通常技
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getQuickMoves(), MoveCategory.normal).accept(pma.getQuickMoveList());
+				// 通常技（レガシー）
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteQuickMove(), MoveCategory.elite).accept(pma.getQuickMoveList());
 
-			if (pd.getPokemonSettings().getNonTmCinematicMoves() != null) {
-				List<String> strList = pd.getPokemonSettings().getNonTmCinematicMoves().stream()
-						.map(move -> MessageFormat.format("{0}\t{1}\t{2}", gp.getPokedexId(), name, move))
-						.toList();
-				eliteCinematicMoveStrList.addAll(strList);
-
+				// スペシャル技
+				if (pd.getPokemonSettings().getCinematicMoves() == null) {
+					log.warn(pd.getTemplateId() + " cinematicMoves is null");
+				}
+				// スペシャル技
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getCinematicMoves(), MoveCategory.normal).accept(pma.getCinematicMoveList());
+				// スペシャル技（レガシー）
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteCinematicMove(), MoveCategory.elite).accept(pma.getCinematicMoveList());
+				// スペシャル技（その他（ガリョウテンセイだけの認識））
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getNonTmCinematicMoves(), MoveCategory.other).accept(pma.getCinematicMoveList());
 			}
 		}
+
+		// シャドウ、リトレーン、フォルムチェンジ等の変則的なスペシャル技の追加
+		for (Map.Entry<String, List<PokemonMove>> entry: additionalCinematicMoveMap.entrySet()) {
+
+			String templateId = entry.getKey();
+
+			if (StringUtils.isEmpty(masterLinkPokemonMap.get(templateId))) {
+				// ぺりずかんとして使用しないtemplateIdの場合はスキップ
+				continue;
+			}
+			// additionalCinematicMoveMapはキーがポケモンのtemplateIdのため、pokedexIdに変換する必要がある。
+			String pokedexId = gpMap.get(masterLinkPokemonMap.get(templateId)).getPokedexId(); // 念の為GoPokedexからpokedexIdを取得
+
+			PokemonMoveAll pma = pokemonMoveAllMap.get(pokedexId);
+			pma.getCinematicMoveList().addAll(entry.getValue());
+		}
+
+		// mster_link_data.ymlから取得し調整用の技の追加
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, Map<String, Map<String, String>>> tuneMoveMap = (Map<String, Map<String, Map<String, String>>>) masterLinkMap.get(MasterLinkDataKey.tune_moves.name());
+
+			// Map<pokedexId, List<PokemonMove>>
+			Map<String, List<PokemonMove>> tuneMap =
+					Stream.concat(
+							Optional.ofNullable(tuneMoveMap.get(MasterLinkDataKey.limited_time_learned_cinematic_moves.name()))
+							.orElse(Map.of()).entrySet().stream(),
+							Optional.ofNullable(tuneMoveMap.get(MasterLinkDataKey.not_defined_cinematic_moves.name()))
+							.orElse(Map.of()).entrySet().stream())
+					.map(entry -> {
+						String pokedexId = entry.getKey();
+						String movementId = entry.getValue().get(MasterLinkDataKey.movement_id.name());
+						String moveCategory = entry.getValue().get(MasterLinkDataKey.move_category.name());
+
+						return Map.entry(pokedexId, new PokemonMove(movementId, MoveCategory.valueOf(moveCategory), true));
+					})
+					.collect(Collectors.groupingBy(
+							entry -> entry.getKey(),
+							Collectors.mapping(
+									entry -> entry.getValue(),
+									Collectors.toList())));
+
+			for (Map.Entry<String, List<PokemonMove>> entry: tuneMap.entrySet()) {
+
+				PokemonMoveAll pma = pokemonMoveAllMap.get(entry.getKey());
+				pma.getCinematicMoveList().addAll(entry.getValue());
+			}
+		}
+
+		return pokemonMoveAllMap;
+	}
+
+	/**
+	 * 技の一覧を出力する
+	 *
+	 * @param parsedMasterData
+	 * @param pokemonMoveAllMap
+	 */
+	private void printQuickMoves(
+			List<QuickMoveAll> quickMoveList,
+			Map<String, PokemonMoveAll> pokemonMoveAllMap,
+			Map<String, Object> masterLinkMap) {
+
+		@SuppressWarnings("unchecked")
+		Map<String, Map<String, String>> masterLinkMoveMap = (Map<String, Map<String, String>>) masterLinkMap.get(MasterLinkDataKey.moves.name());
+
+		log.info("------------技 - 通常技一覧一覧ここから------------");
+		{
+			// ポケモンが覚えてる技
+			List<String> canUsedQuickMoveList = pokemonMoveAllMap.entrySet().stream()
+					.map(entry -> entry.getValue().getQuickMoveList())
+					.flatMap(pmList -> pmList.stream()
+							.map(pm -> pm.getMovementId()))
+					.sorted()
+					.distinct()
+					.toList();
+
+			// どのポケモンも覚えていない技
+			List<String> cantUsedQuickMoveList = quickMoveList.stream()
+					.filter(qma -> !canUsedQuickMoveList.contains(qma.getGymRaid().getMovementId()))
+					.map(qma -> qma.getMovementId())
+					.toList();
+
+			if (cantUsedQuickMoveList.isEmpty()) {
+				log.info("誰も覚えていない技は1件もありませんでした。");
+			} else {
+				cantUsedQuickMoveList.stream().forEach(mid -> {
+					log.info(MessageFormat.format("誰も覚えていない技：movementId:\t{0}", mid));
+				});
+			}
+
+			Map<String, String> masterLinkQuickMoveMap = masterLinkMoveMap.get(MasterLinkDataKey.quick_moves.name());
+
+			// master_link_data.ymlに定義していない技
+			List<String> notDefinedQuickMoveList = quickMoveList.stream()
+					.map(qma -> qma.getMovementId())
+					.filter(mid -> !masterLinkQuickMoveMap.containsKey(mid))
+					.toList();
+
+			if (notDefinedQuickMoveList.isEmpty()) {
+				log.info("master_link_data.ymlに定義していない技はありませんでした。");
+			} else {
+				notDefinedQuickMoveList.stream().forEach(mid -> {
+					log.warn(MessageFormat.format("master_link_data.ymlに定義していない技：movementId:\t{0}", mid));
+				});
+				throw new PokemonDataException("master_link_data.ymlに存在しないスペシャル技が存在します。");
+			}
+
+			quickMoveList.stream()
+			.filter(qma -> !cantUsedQuickMoveList.contains(qma.getGymRaid().getMovementId())) // 誰も覚えていない技は省く
+			.map(qma -> List.of(
+					qma.getMovementId(),
+					masterLinkQuickMoveMap.get(qma.getMovementId()),
+					qma.getType().name(),
+					String.valueOf(qma.getGymRaid().getPower()),
+					String.valueOf(qma.getPvp().getPower())
+					))
+			.map(list -> String.join("\t", list))
+			.forEach(log::info);
+		}
+		log.info("------------技 - 通常技一覧一覧ここまで------------");
+
+	}
+
+
+	/**
+	 * 技の一覧を出力する
+	 *
+	 * @param parsedMasterData
+	 * @param pokemonMoveAllMap
+	 */
+	private void printCinematicMoves(
+			List<CinematicMoveAll> cinematicMoveList,
+			Map<String, PokemonMoveAll> pokemonMoveAllMap,
+			Map<String, Object> masterLinkMap) {
+
+		@SuppressWarnings("unchecked")
+		Map<String, Map<String, String>> masterLinkMoveMap = (Map<String, Map<String, String>>) masterLinkMap.get(MasterLinkDataKey.moves.name());
+
+		log.info("------------技 - スペシャル技一覧一覧ここから------------");
+		{
+			// ポケモンが覚えてる技
+			List<String> canUseCinematicMoveList = pokemonMoveAllMap.entrySet().stream()
+					.map(entry -> entry.getValue().getCinematicMoveList())
+					.flatMap(pmList -> pmList.stream()
+							.map(pm -> pm.getMovementId()))
+					.sorted()
+					.distinct()
+					.toList();
+
+			// どのポケモンも覚えていない技
+			List<String> cantCinematicMoveList = cinematicMoveList.stream()
+					.filter(qma -> {
+						String mid = qma.getGymRaid().getMovementId();
+						return !canUseCinematicMoveList.contains(mid);
+					})
+					.map(qma -> qma.getMovementId())
+					.toList();
+
+			if (cantCinematicMoveList.isEmpty()) {
+				log.info("誰も覚えていない技は1件もありませんでした。");
+			} else {
+				cantCinematicMoveList.stream().forEach(mid -> {
+					log.info(MessageFormat.format("誰も覚えていない技：movementId:\t{0}", mid));
+				});
+			}
+
+			Map<String, String> masterLinkCinematicMoveMap = masterLinkMoveMap.get(MasterLinkDataKey.cinematic_moves.name());
+
+			// master_link_data.ymlに定義していない技
+			List<String> notDefinedCinematicMoveList = cinematicMoveList.stream()
+					.map(cma -> cma.getMovementId())
+					.filter(mid -> !masterLinkCinematicMoveMap.containsKey(mid))
+					.toList();
+
+			if (notDefinedCinematicMoveList.isEmpty()) {
+				log.info("master_link_data.ymlに定義していない技はありませんでした。");
+			} else {
+				notDefinedCinematicMoveList.stream().forEach(mid -> {
+					log.warn(MessageFormat.format("master_link_data.ymlに定義していない技：movementId:\t{0}", mid));
+				});
+				throw new PokemonDataException("master_link_data.ymlに存在しないスペシャル技が存在します。");
+			}
+
+			cinematicMoveList.stream()
+			.filter(qma -> !cantCinematicMoveList.contains(qma.getGymRaid().getMovementId())) // 誰も覚えていない技は省く
+			.map(cma -> List.of(
+					cma.getMovementId(),
+					masterLinkCinematicMoveMap.get(cma.getMovementId()),
+					cma.getType().name(),
+					String.valueOf(cma.getGymRaid().getPower()),
+					String.valueOf(cma.getPvp().getPower())
+					))
+			.map(list -> String.join("\t", list))
+			.forEach(log::info);
+		}
+		log.info("------------技 - スペシャル技一覧一覧ここまで------------");
+	}
+
+	/**
+	 * ポケモンが覚えることができる技の一覧を出力する
+	 *
+	 * @param pokemonMoveAllMap
+	 * @param gpMap
+	 */
+	private void printMovesForEachPokemon(Map<String, PokemonMoveAll> pokemonMoveAllMap, Map<String, GoPokedex> gpMap) {
+
+		Function<Function<PokemonMoveAll, List<PokemonMove>>, List<String>> createStrMoveListFunc = (moveListGetFunc) -> {
+			return pokemonMoveAllMap.entrySet().stream()
+					.map(Map.Entry::getValue)
+					.sorted((o1, o2) -> PokemonEditUtils.getPokedexIdComparator().compare(o1.getPokedexId(), o2.getPokedexId()))
+					.flatMap(pma -> {
+						GoPokedex gp = gpMap.get(pma.getPokedexId());
+						String name = PokemonEditUtils.appendRemarks(gp);
+
+						return moveListGetFunc.apply(pma).stream()
+								.map(pm -> MessageFormat.format("{0}\t{1}\t{2}\t{3}", gp.getPokedexId(), name, pm.getMovementId(), pm.getCategory().name()));
+					})
+					.toList();
+		};
+		log.info("------------技 - ポケモンと技 ここから------------");
 		log.info("-----①通常技の紐付け--------");
-		quickMoveStrList.stream().forEach(log::info);
-		eliteQuickMoveStrList.stream().forEach(log::info);
+		createStrMoveListFunc.apply((pma) -> pma.getQuickMoveList()).stream().forEach(log::info);
 		log.info("-----②スペシャル技の紐付け------");
-		cinematicMoveStrList.stream().forEach(log::info);
-		eliteCinematicMoveStrList.stream().forEach(log::info);
+		createStrMoveListFunc.apply((pma) -> pma.getCinematicMoveList()).stream().forEach(log::info);
 		log.info("------------技 - ポケモンと技 ここまで------------");
 	}
 }

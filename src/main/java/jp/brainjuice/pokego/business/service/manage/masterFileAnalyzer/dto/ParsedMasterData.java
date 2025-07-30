@@ -12,5 +12,5 @@ public class ParsedMasterData {
 	private List<QuickMoveAll> quickMoveList;
 	private List<CinematicMoveAll> cinematicMoveList;
 	private List<PokemonData> pokemonDataList;
-	private Map<String, List<AdditionalMove>> additionalCinematicMoveMap;
+	private Map<String, List<PokemonMove>> additionalCinematicMoveMap;
 }

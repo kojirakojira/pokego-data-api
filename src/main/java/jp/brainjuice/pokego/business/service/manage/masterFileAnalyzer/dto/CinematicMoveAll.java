@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.CinematicCombatMove;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.Move;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ public class CinematicMoveAll {
 
 	private String movementId;
 	private String movementNo;
+	private TypeEnum type;
 	private Move gymRaid;
 	private CinematicCombatMove pvp;
 }

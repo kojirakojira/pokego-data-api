@@ -12,7 +12,7 @@ public class Move {
 
 	private String movementId;
 	private String pokemonType;
-	private float power;
+	private double power;
 	private int durationMs;
 	private int damageWindowStartMs;
 	private int damageWindowEndMs;

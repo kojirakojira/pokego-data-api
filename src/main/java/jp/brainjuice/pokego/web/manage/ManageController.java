@@ -27,13 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 @Slf4j
 public class ManageController {
-	
+
 	private LoginService loginService;
-	
+
 	private MasterFileAnalyzerService masterFileAnalyzerService;
-	
+
 	private ViewsCacheProvider viewsCacheProvider;
-	
+
 	public ManageController(
 			LoginService loginService,
 			MasterFileAnalyzerService masterFileAnalyzerService,
@@ -52,7 +52,7 @@ public class ManageController {
 
 		viewsCacheProvider.cleanupPageTempView();
 		viewsCacheProvider.cleanupPokemonTempView();
-		
+
 		return "OK";
 	}
 
@@ -65,30 +65,37 @@ public class ManageController {
 		return true;
 	}
 
-	@PostMapping(value = "/secure/masterFileAnalyze", 
+	@PostMapping(value = "/secure/masterFileAnalyze",
 			consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public boolean masterFileAnalyze(
 			MasterFileAnalyzeRequest masterFileAnalyzeRequest,
 			HttpServletRequest req) throws Exception {
-		
+
 		if (!BjJwtUtils.checkUser(req, masterFileAnalyzeRequest.getUserId())) {
 			throw new UserUnmatchException();
 		}
-		
-		masterFileAnalyzerService.analyze(masterFileAnalyzeRequest.getMasterFile());
+
+		masterFileAnalyzerService.analyze(
+				masterFileAnalyzeRequest.getMasterFile(),
+				masterFileAnalyzeRequest.isPrintRequestedQuickMoves(),
+				masterFileAnalyzeRequest.isPrintRequestedCinematicMoves(),
+				masterFileAnalyzeRequest.isPrintRequestedMoveEachPokemon(),
+				masterFileAnalyzeRequest.isShouldSaveFastAttack(),
+				masterFileAnalyzeRequest.isShouldSaveChargedAttack());
+
 		return true;
 	}
 
 	@PostMapping("/manage/login")
 	public LoginResponse login(@Valid LoginRequest loginReq,
 			HttpServletRequest req) throws Exception {
-		
+
 		LoginResponse res = loginService.login(
-				loginReq.getUserId(), 
+				loginReq.getUserId(),
 				loginReq.getPassword(),
 				loginReq.getMfaCode(),
 				req);
-		
+
 		return res;
 	}
 

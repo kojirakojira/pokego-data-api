@@ -31,6 +31,7 @@ public enum PageNameEnum {
 	afterEvoCp("進化後CP"),
 	race("種族値検索"),
 	raceDiff("種族値比較"),
+	moveList("ポケモン技一覧"),
 	typeScore("タイプ評価"),
 	xType("Xタイプ検索"),
 	iroiroTypeRank("色々タイプランキング"),

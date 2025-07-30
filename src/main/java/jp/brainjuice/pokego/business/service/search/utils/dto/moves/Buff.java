@@ -15,6 +15,9 @@ public class Buff {
 
 	private List<BuffContent> buffList;
 
+	private String buffMsg;
+
 	/** バフ・デバフの発動確率 */
-	private float activationChance;
+	private double activationChance;
+	private String activationChanceStr;
 }

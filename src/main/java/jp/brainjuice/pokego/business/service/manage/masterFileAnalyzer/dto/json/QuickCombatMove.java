@@ -11,7 +11,7 @@ public class QuickCombatMove implements Serializable, Cloneable {
 
 	private String uniqueId;
 	private String type;
-	private float power;
+	private double power;
 	private String vfxName;
 	private int durationTurns;
 	private int energyDelta;

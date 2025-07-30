@@ -275,10 +275,10 @@ public final class BjUtils {
 			list.add(editFunc.apply(str));
 		}
 	}
-	
+
 	/**
 	 * 部分一致検索用の文字列(%str%)を生成する。
-	 * 
+	 *
 	 * @param str
 	 * @return
 	 */
@@ -329,58 +329,73 @@ public final class BjUtils {
 		return resourceLoader.getResource("classpath:" + fileName);
 	}
 
-    /**
-     * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
-     * @param <T>
-     *
-     * @param original
-     * @return
-     */
-    @SuppressWarnings("unchecked")
+	/**
+	 * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
+	 * @param <T>
+	 *
+	 * @param original
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> T deepCopy(T original) {
-        try {
-            // 1. オブジェクトをシリアライズしてバイトストリームに変換する
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(original);
+		try {
+			// 1. オブジェクトをシリアライズしてバイトストリームに変換する
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(original);
 
-            // 2. バイトストリームからオブジェクトをデシリアライズする
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object copy = ois.readObject();
+			// 2. バイトストリームからオブジェクトをデシリアライズする
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			Object copy = ois.readObject();
 
-            // 3. 新しいオブジェクトを返す
-            return (T) copy;
-        } catch (IOException | ClassNotFoundException e) {
-            // 例外が発生した場合はnullを返す
-            return null;
-        }
-    }
+			// 3. 新しいオブジェクトを返す
+			return (T) copy;
+		} catch (IOException | ClassNotFoundException e) {
+			// 例外が発生した場合はnullを返す
+			return null;
+		}
+	}
 
-    /**
-     * 四捨五入用メソッド</br>
-     * 例：round(1, 4, 2) -> 0.3
-     *
-     * @param divisor 割られる数
-     * @param divident 割る数
-     * @param roundDigit 四捨五入する小数点以下桁
-     * @return
-     */
-    public static float round(float divisor, float divident, int roundDigit) {
+	/**
+	 * 四捨五入用メソッド</br>
+	 * 例：round(1, 4, 2) -> 0.3
+	 *
+	 * @param divisor 割られる数
+	 * @param divident 割る数
+	 * @param roundDigit 四捨五入する小数点以下桁
+	 * @return
+	 */
+	public static double round(double divisor, double divident, int roundDigit) {
 
-    	float num = (float) Math.pow(10.0, roundDigit - 1);
-    	return Math.round((divisor / divident) * num) / num;
-    }
-    
-    /**
-     * double型を比較する用のメソッド
-     * 
-     * @param a
-     * @param b
-     * @param epsilon 許容する精度。double型の有効桁数は約15桁。つまり、一応1e-15まで指定できる。
-     * @return
-     */
-    public static boolean doubleEquals(double a, double b, double epsilon) {
-    	return Math.abs(a - b) < epsilon;
-    }
+		double num = Math.pow(10.0, roundDigit - 1);
+		return Math.round((divisor / divident) * num) / num;
+	}
+
+	/**
+	 * 四捨五入用メソッド</br>
+	 * 例：round(1, 4, 2) -> 0.3
+	 *
+	 * @param divisor 割られる数
+	 * @param divident 割る数
+	 * @param roundDigit 四捨五入する小数点以下桁
+	 * @return
+	 */
+	public static float round(float divisor, float divident, int roundDigit) {
+
+		float num = (float) Math.pow(10.0, roundDigit - 1);
+		return Math.round((divisor / divident) * num) / num;
+	}
+
+	/**
+	 * double型を比較する用のメソッド
+	 *
+	 * @param a
+	 * @param b
+	 * @param epsilon 許容する精度。double型の有効桁数は約15桁。つまり、一応1e-15まで指定できる。
+	 * @return
+	 */
+	public static boolean doubleEquals(double a, double b, double epsilon) {
+		return Math.abs(a - b) < epsilon;
+	}
 }

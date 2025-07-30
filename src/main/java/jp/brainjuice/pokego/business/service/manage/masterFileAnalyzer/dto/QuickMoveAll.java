@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.Move;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.QuickCombatMove;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ public class QuickMoveAll {
 
 	private String movementId;
 	private String movementNo; // V9999のやつ
+	private TypeEnum type;
 	private Move gymRaid;
 	private QuickCombatMove pvp;
 }

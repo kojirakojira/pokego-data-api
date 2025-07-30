@@ -65,7 +65,7 @@ public class ViewsCacheProvider {
 
 	/**
 	 * 閲覧情報をメモリ上のリストに追加する。<br>
-	 * 単体のポケモンに対する閲覧じゃない場合の呼び出し口。
+	 * 単一のポケモンに限定できないパターンの場合の呼び出し口
 	 *
 	 */
 	public void addTempList() {
@@ -119,7 +119,7 @@ public class ViewsCacheProvider {
 	public void cleanupPageTempView() {
 		viewsCacheManager.cleanupPageTempView();
 	}
-	
+
 	/**
 	 * この{@link ViewsCacheManager#cleanupPokemonTempView() メソッド}を参照
 	 * @param pid

@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import lombok.Data;
 import lombok.ToString;
@@ -12,8 +11,8 @@ public class CinematicCombatMove implements Serializable, Cloneable {
 
 	private String uniqueId;
 	private String type;
-	private float power;
+	private double power;
 	private String vfxName;
-	private float energyDelta;
-	private Map<String, Float> buffs;
+	private int energyDelta;
+	private Buffs buffs;
 }

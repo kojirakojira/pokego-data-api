@@ -16,10 +16,11 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdditionalMove {
+public class PokemonMove {
 
 	private String movementId;
 	private MoveCategory category;
+	private boolean fromMasterLinkData; // master_link_data.ymlから追加されたかどうか（独自に追加したかどうか）
 
 	/**
 	 * (非 Javadoc)
@@ -27,8 +28,10 @@ public class AdditionalMove {
 	 */
 	@Override
 	public int hashCode() {
-		// 衝突を防ぐため素数31を掛ける
-		return movementId.hashCode() * 31 + category.name().hashCode();
+		int result = 17;
+		result = result * 31 + movementId.hashCode();
+		result = result * 31 + category.name().hashCode();
+		return result;
 	}
 
 	/**
@@ -39,7 +42,7 @@ public class AdditionalMove {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null || getClass() != obj.getClass()) return false;
-		AdditionalMove am = (AdditionalMove) obj;
+		PokemonMove am = (PokemonMove) obj;
 		return Objects.equals(movementId, am.getMovementId()) && category == am.getCategory();
 	}
 }
