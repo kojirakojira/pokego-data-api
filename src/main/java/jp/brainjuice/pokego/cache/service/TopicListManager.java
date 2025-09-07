@@ -168,8 +168,8 @@ public class TopicListManager {
 							entry.getValue()); // TopicPokemonに変換。
 				})
 				.sorted((o1, o2) -> {
-					return o1.getCount() < o2.getCount() ? 1 : -1;
-				}) // 並び替え
+					return Integer.compare(o2.getCount(), o1.getCount());
+				}) // 降順に並び替え
 				.collect(Collectors.toList());
 	}
 
