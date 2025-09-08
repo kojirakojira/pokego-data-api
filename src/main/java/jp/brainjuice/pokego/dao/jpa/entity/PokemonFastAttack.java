@@ -53,13 +53,13 @@ public class PokemonFastAttack implements Serializable, Cloneable {
 	private LearningPatternEnum learningPattern;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "move_id")
+	@JoinColumn(name = "move_id", insertable = false, updatable = false)
 	private FastAttack fastAttack;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumns({
-		@JoinColumn(name = "move_id"),
-		@JoinColumn(name = "pokedex_id")
+		@JoinColumn(name = "move_id", referencedColumnName = "move_id"),
+		@JoinColumn(name = "pokedex_id", referencedColumnName = "pokedex_id")
 	})
 	private List<AttackAdditionalInfo> attackAdditionalInfo;
 

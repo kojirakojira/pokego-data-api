@@ -53,7 +53,7 @@ public class PokemonChargedAttack implements Serializable, Cloneable {
 	private LearningPatternEnum learningPattern;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "move_id")
+	@JoinColumn(name = "move_id", insertable = false, updatable = false)
 	private ChargedAttack chargedAttack;
 
 	@OneToMany(fetch = FetchType.LAZY)
