@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto;
 
 import java.util.Objects;
 
-import jp.brainjuice.pokego.business.service.search.utils.MovesUtils.MoveCategory;
+import jp.brainjuice.pokego.business.constant.LearningPatternEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import lombok.ToString;
 public class PokemonMove {
 
 	private String movementId;
-	private MoveCategory category;
+	private LearningPatternEnum category;
 	private boolean fromMasterLinkData; // master_link_data.ymlから追加されたかどうか（独自に追加したかどうか）
 
 	/**

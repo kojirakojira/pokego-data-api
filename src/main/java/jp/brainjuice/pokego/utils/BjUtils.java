@@ -23,6 +23,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
+import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.Transliterator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,9 @@ public final class BjUtils {
 
 	/** カタカナ→ひらがな */
 	private static Transliterator transKanaToHira = Transliterator.getInstance("Katakana-Hiragana");
+
+	/** 日本語のソート */
+	private static Collator collator = Collator.getInstance(Locale.JAPAN);
 
 	/**
 	 * 引数に指定された文字が、空文字またはnullでない場合は数値に変換し返却する。
@@ -355,6 +359,14 @@ public final class BjUtils {
 			// 例外が発生した場合はnullを返す
 			return null;
 		}
+	}
+
+	/**
+	 * 日本語のソートオブジェクト取得する
+	 * @return
+	 */
+	public static Collator getCollator() {
+		return collator;
 	}
 
 	/**

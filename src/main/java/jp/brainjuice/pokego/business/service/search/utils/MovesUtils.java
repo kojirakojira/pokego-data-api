@@ -2,14 +2,11 @@ package jp.brainjuice.pokego.business.service.search.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import com.ibm.icu.text.Collator;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.Buff;
@@ -24,27 +21,16 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastGymParam
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastPvpParam;
 import jp.brainjuice.pokego.dao.jpa.entity.ChargedAttack;
 import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
+import jp.brainjuice.pokego.utils.BjUtils;
 
 @Component
 public class MovesUtils {
-
-	public enum MoveCategory {
-		normal,
-		elite,
-		purified,
-		shadow,
-		formChange,
-		other //今のところガリョウテンセイのみのはず
-	}
-
-	// 日本語のソート
-	private Collator collator = Collator.getInstance(Locale.JAPAN);
 
 	public List<DispFastAttack> convDispFastAttackList(List<FastAttack> faList) {
 
 		List<DispFastAttack> fastAttackList = faList.stream()
 				.map(this::convDispFastAttack)
-				.sorted((o1, o2) -> collator.compare(o1.getName(), o2.getName()))
+				.sorted((o1, o2) -> BjUtils.getCollator().compare(o1.getName(), o2.getName()))
 				.collect(Collectors.toList());
 
 		return IntStream.range(0, fastAttackList.size())
@@ -60,7 +46,7 @@ public class MovesUtils {
 
 		List<DispChargedAttack> chargedAttackList = faList.stream()
 				.map(this::convDispChargedAttack)
-				.sorted((o1, o2) -> collator.compare(o1.getName(), o2.getName()))
+				.sorted((o1, o2) -> BjUtils.getCollator().compare(o1.getName(), o2.getName()))
 				.collect(Collectors.toList());
 
 		return IntStream.range(0, chargedAttackList.size())
@@ -147,12 +133,15 @@ public class MovesUtils {
 
 		String buffMsg = sb.toString();
 		if (!StringUtils.isEmpty(buffMsg)) {
+			// 一番後ろの改行コードを除去する
 			buffMsg = buffMsg.substring(0, buffMsg.length() - 1);
+		} else {
+			buffMsg = "-";
 		}
 
 		String activationChanceStr = ca.getActivationChance() > 0.0
 				? String.valueOf(ca.getActivationChance() * 100.0) + "%"
-				: "";
+				: "-";
 
 		return new Buff(buffContentList, buffMsg, ca.getActivationChance(), activationChanceStr);
 	}

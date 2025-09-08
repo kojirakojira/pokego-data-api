@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.search.moves.MoveListService;
+import jp.brainjuice.pokego.business.service.search.moves.PokemonAttackResearchService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.search.form.req.moves.PokemonAttackRequest;
 import jp.brainjuice.pokego.web.search.form.res.moves.MoveListResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.PokemonAttackResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,28 +30,20 @@ public class MovesController {
 
 	private MoveListService moveListService;
 
+	private PokemonAttackResearchService pokemonAttackResearchService;
+	private ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse;
+
 	private ViewsCacheProvider viewsCacheProvider;
 
 	public MovesController(
 			MoveListService moveListService,
+			PokemonAttackResearchService pokemonAttackResearchService, ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse,
 			ViewsCacheProvider viewsCacheProvider) {
 		this.moveListService = moveListService;
+		this.pokemonAttackResearchService = pokemonAttackResearchService;
+		this.pokemonAttackResRse = pokemonAttackResRse;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
-
-	/**
-	 * @return
-	 */
-//	@GetMapping("/moveListPattern")
-//	public LinkedHashMap<String, String> moveListPattern() {
-//
-//		return Stream.of(MoveListPatternEnum.values())
-//				.collect(Collectors.toMap(
-//						itrs -> itrs.name(),
-//						itrs -> itrs.getJpn(),
-//						(a, b) -> a,
-//						LinkedHashMap::new));
-//	}
 
 	@GetMapping("/moveList")
 	public MoveListResponse moveList() {
@@ -58,6 +54,21 @@ public class MovesController {
 
 		viewsCacheProvider.addTempList();
 
+		return res;
+	}
+
+	/**
+	 * そのポケモンが覚える通常技を取得する
+	 *
+	 * @param req
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/pokemonAttack")
+	public PokemonAttackResponse pokemonFastAttack(PokemonAttackRequest req) throws BadRequestException {
+
+		PokemonAttackResponse res = new PokemonAttackResponse();
+		pokemonAttackResRse.execute(req, res, pokemonAttackResearchService);
 		return res;
 	}
 

@@ -1,16 +1,22 @@
 package jp.brainjuice.pokego.dao.jpa.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-import jp.brainjuice.pokego.business.service.search.utils.MovesUtils.MoveCategory;
+import jp.brainjuice.pokego.business.constant.LearningPatternEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,7 +49,18 @@ public class PokemonFastAttack implements Serializable, Cloneable {
 
 	/** 技のカテゴリ */
 	@Enumerated(EnumType.STRING)
-	@Column(name = "category", nullable = false, columnDefinition = "bpchar")
-	private MoveCategory category;
+	@Column(name = "learning_pattern", nullable = false, columnDefinition = "bpchar")
+	private LearningPatternEnum learningPattern;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "move_id")
+	private FastAttack fastAttack;
+
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumns({
+		@JoinColumn(name = "move_id"),
+		@JoinColumn(name = "pokedex_id")
+	})
+	private List<AttackAdditionalInfo> attackAdditionalInfo;
 
 }

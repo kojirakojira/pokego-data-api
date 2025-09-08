@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.icu.text.MessageFormat;
 
+import jp.brainjuice.pokego.business.constant.LearningPatternEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.CinematicMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.ParsedMasterData;
@@ -39,7 +40,6 @@ import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.PokemonStats;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.QuickCombatMoveData;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.Shadow;
-import jp.brainjuice.pokego.business.service.search.utils.MovesUtils.MoveCategory;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
@@ -252,12 +252,12 @@ public class MasterFileAnalyzerService {
 					String templateId = pd.getTemplateId();
 					Shadow shadow = pd.getPokemonSettings().getShadow();
 					if (shadow.getShadowChargeMove() != null) {
-						PokemonMove pm = new PokemonMove(shadow.getShadowChargeMove(), MoveCategory.shadow, false);
+						PokemonMove pm = new PokemonMove(shadow.getShadowChargeMove(), LearningPatternEnum.shadow, false);
 						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(pm);
 					}
 
 					if (shadow.getPurifiedChargeMove() != null) {
-						PokemonMove pm = new PokemonMove(shadow.getPurifiedChargeMove(), MoveCategory.purified, false);
+						PokemonMove pm = new PokemonMove(shadow.getPurifiedChargeMove(), LearningPatternEnum.purified, false);
 						additionalCinematicMoveMap.computeIfAbsent(templateId, k -> new ArrayList<>()).add(pm);
 					}
 				});
@@ -299,7 +299,7 @@ public class MasterFileAnalyzerService {
 
 						formChangeList.stream()
 						.forEach(entry -> {
-							PokemonMove pm = new PokemonMove(entry.getValue(), MoveCategory.formChange, false);
+							PokemonMove pm = new PokemonMove(entry.getValue(), LearningPatternEnum.formChange, false);
 							additionalCinematicMoveMap.computeIfAbsent(entry.getValue(), k -> new ArrayList<>()).add(pm);
 						});
 					}
@@ -453,7 +453,7 @@ public class MasterFileAnalyzerService {
 
 		{
 			// 第1、第2引数の値からPokemMoveのインスタンスを生成し、第3引数のmoveListに追加する関数
-			BiFunction<List<String>, MoveCategory, Consumer<List<PokemonMove>>> pokemonMoveListAddFunc = (movementIdList, moveCategory) -> (moveList) -> {
+			BiFunction<List<String>, LearningPatternEnum, Consumer<List<PokemonMove>>> pokemonMoveListAddFunc = (movementIdList, moveCategory) -> (moveList) -> {
 				if (movementIdList != null) {
 					List<PokemonMove> pmList = movementIdList.stream()
 							.map(mid -> new PokemonMove(mid, moveCategory, false))
@@ -482,20 +482,20 @@ public class MasterFileAnalyzerService {
 					log.warn(pd.getTemplateId() + " quickMoves is null");
 				}
 				// 通常技
-				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getQuickMoves(), MoveCategory.normal).accept(pma.getQuickMoveList());
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getQuickMoves(), LearningPatternEnum.normal).accept(pma.getQuickMoveList());
 				// 通常技（レガシー）
-				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteQuickMove(), MoveCategory.elite).accept(pma.getQuickMoveList());
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteQuickMove(), LearningPatternEnum.elite).accept(pma.getQuickMoveList());
 
 				// スペシャル技
 				if (pd.getPokemonSettings().getCinematicMoves() == null) {
 					log.warn(pd.getTemplateId() + " cinematicMoves is null");
 				}
 				// スペシャル技
-				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getCinematicMoves(), MoveCategory.normal).accept(pma.getCinematicMoveList());
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getCinematicMoves(), LearningPatternEnum.normal).accept(pma.getCinematicMoveList());
 				// スペシャル技（レガシー）
-				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteCinematicMove(), MoveCategory.elite).accept(pma.getCinematicMoveList());
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getEliteCinematicMove(), LearningPatternEnum.elite).accept(pma.getCinematicMoveList());
 				// スペシャル技（その他（ガリョウテンセイだけの認識））
-				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getNonTmCinematicMoves(), MoveCategory.other).accept(pma.getCinematicMoveList());
+				pokemonMoveListAddFunc.apply(pd.getPokemonSettings().getNonTmCinematicMoves(), LearningPatternEnum.other).accept(pma.getCinematicMoveList());
 			}
 		}
 
@@ -532,7 +532,7 @@ public class MasterFileAnalyzerService {
 						String movementId = entry.getValue().get(MasterLinkDataKey.movement_id.name());
 						String moveCategory = entry.getValue().get(MasterLinkDataKey.move_category.name());
 
-						return Map.entry(pokedexId, new PokemonMove(movementId, MoveCategory.valueOf(moveCategory), true));
+						return Map.entry(pokedexId, new PokemonMove(movementId, LearningPatternEnum.valueOf(moveCategory), true));
 					})
 					.collect(Collectors.groupingBy(
 							entry -> entry.getKey(),

@@ -81,7 +81,9 @@ public class PokemonMoveCreator {
 							.map(pm -> new PokemonFastAttack(
 									uniqueIdMoveIdMap.get(pm.getMovementId()),
 									pma.getPokedexId(),
-									pm.getCategory()));
+									pm.getCategory(),
+									null,
+									null));
 				})
 				.toList();
 
@@ -116,8 +118,8 @@ public class PokemonMoveCreator {
 							break;
 						}
 					}
-					// カテゴリが一致するやつを排除
-					return pfa.getCategory() != pfaFromDb.getCategory();
+					// 覚え方も一致するやつを排除
+					return pfa.getLearningPattern() != pfaFromDb.getLearningPattern();
 				})
 				.toList();
 		differentList.stream().forEach(pfa -> log.info(pfa.toString()));
@@ -176,7 +178,9 @@ public class PokemonMoveCreator {
 							.map(pm -> new PokemonChargedAttack(
 									uniqueIdMoveIdMap.get(pm.getMovementId()),
 									pma.getPokedexId(),
-									pm.getCategory()));
+									pm.getCategory(),
+									null,
+									null));
 				})
 				.toList();
 
@@ -213,8 +217,8 @@ public class PokemonMoveCreator {
 							break;
 						}
 					}
-					// カテゴリが一致するやつを排除
-					return pca.getCategory() != pcaFromDb.getCategory();
+					// 覚え方も一致するやつを排除
+					return pca.getLearningPattern() != pcaFromDb.getLearningPattern();
 				})
 				.toList();
 		differentList.stream().forEach(pca -> log.info(pca.toString()));
