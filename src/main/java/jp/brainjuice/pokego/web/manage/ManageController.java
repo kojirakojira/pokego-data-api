@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.web.manage;
 
+import java.util.Map;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -15,9 +17,11 @@ import jp.brainjuice.pokego.business.service.manage.LoginService;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.MasterFileAnalyzerService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
+import jp.brainjuice.pokego.utils.LastUpdateService;
 import jp.brainjuice.pokego.utils.exception.AuthenticationFailedException;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.UserUnmatchException;
+import jp.brainjuice.pokego.web.manage.req.LastUpdateSaveRequest;
 import jp.brainjuice.pokego.web.manage.req.LoginRequest;
 import jp.brainjuice.pokego.web.manage.req.MasterFileAnalyzeRequest;
 import jp.brainjuice.pokego.web.manage.res.LoginResponse;
@@ -34,12 +38,16 @@ public class ManageController {
 
 	private ViewsCacheProvider viewsCacheProvider;
 
+	private LastUpdateService lastUpdateService;
+
 	public ManageController(
 			LoginService loginService,
 			MasterFileAnalyzerService masterFileAnalyzerService,
+			LastUpdateService lastUpdateService,
 			ViewsCacheProvider viewsCacheProvider) {
 		this.loginService = loginService;
 		this.masterFileAnalyzerService = masterFileAnalyzerService;
+		this.lastUpdateService = lastUpdateService;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
@@ -84,6 +92,31 @@ public class ManageController {
 				masterFileAnalyzeRequest.isShouldSaveChargedAttack());
 
 		return true;
+	}
+	@PostMapping("/secure/manage/lastUpdateGetFormat")
+	public Map<String, String> lastUpdateGetFormat(String userId,
+			HttpServletRequest req) throws Exception {
+
+		if (!BjJwtUtils.checkUser(req, userId)) {
+			throw new UserUnmatchException();
+		}
+
+		String format = lastUpdateService.getFormat();
+
+		return Map.of("format", format);
+	}
+
+	@PostMapping("/secure/manage/lastUpdateSave")
+	public Map<String, String> lastUpdateSave(@Valid LastUpdateSaveRequest lastUpdReq,
+			HttpServletRequest req) throws Exception {
+
+		if (!BjJwtUtils.checkUser(req, lastUpdReq.getUserId())) {
+			throw new UserUnmatchException();
+		}
+
+		String format = lastUpdateService.saveYmd(lastUpdReq.getYmdStr());
+
+		return Map.of("format", format, "result", "OK");
 	}
 
 	@PostMapping("/manage/login")

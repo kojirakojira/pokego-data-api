@@ -186,10 +186,10 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0135N01', FALSE, FALSE), --サンダース
 	('0136N01', FALSE, FALSE), --ブースター
 	('0137N01', FALSE, FALSE), --ポリゴン
-	('0138N01', FALSE, FALSE), --オムナイト
-	('0139N01', FALSE, FALSE), --オムスター
-	('0140N01', FALSE, FALSE), --カブト
-	('0141N01', FALSE, FALSE), --カブトプス
+	('0138N01', TRUE, FALSE), --オムナイト
+	('0139N01', TRUE, FALSE), --オムスター
+	('0140N01', TRUE, FALSE), --カブト
+	('0141N01', TRUE, FALSE), --カブトプス
 	('0142N01', FALSE, FALSE), --プテラ
 	('0142M01', FALSE, FALSE), --メガプテラ
 	('0143N01', FALSE, TRUE), --カビゴン
@@ -696,8 +696,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0565N01', FALSE, FALSE), --アバゴーラ
 	('0566N01', FALSE, FALSE), --アーケン
 	('0567N01', FALSE, FALSE), --アーケオス
-	('0568N01', FALSE, FALSE), --ヤブクロン
-	('0569N01', FALSE, FALSE), --ダストダス
+	('0568N01', TRUE, FALSE), --ヤブクロン
+	('0569N01', TRUE, FALSE), --ダストダス
 	('0570N01', FALSE, FALSE), --ゾロア
 	('0570H01', FALSE, FALSE), --ゾロア(ヒスイのすがた)
 	('0571N01', FALSE, FALSE), --ゾロアーク
@@ -1071,7 +1071,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0881N01', FALSE, FALSE), --パッチルドン
 	('0882N01', FALSE, FALSE), --ウオノラゴン
 	('0883N01', FALSE, FALSE), --ウオチルドン
-	('0884N01', FALSE, FALSE), --ジュラルドン
+	('0884N01', FALSE, TRUE), --ジュラルドン
 	('0885N01', FALSE, FALSE), --ドラメシヤ
 	('0886N01', FALSE, FALSE), --ドロンチ
 	('0887N01', FALSE, FALSE), --ドラパルト

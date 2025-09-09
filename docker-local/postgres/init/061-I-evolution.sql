@@ -929,7 +929,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0747N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒドイデ
 	('0748N01', '0747N01', 50, null, null, null, null, null, null, TRUE), --ドヒドイデ
 	('0749N01', 'root', 0, null, null, null, null, null, null, FALSE), --ドロバンコ
-	('0750N01', '0749N01', 0, null, null, null, null, null, null, TRUE), --バンバドロ
+	('0750N01', '0749N01', 50, null, null, null, null, null, null, TRUE), --バンバドロ
 	('0751N01', 'root', 0, null, null, null, null, null, null, FALSE), --シズクモ
 	('0752N01', '0751N01', 50, null, null, null, null, null, null, TRUE), --オニシズクモ
 	('0753N01', 'root', 0, null, null, null, null, null, null, FALSE), --カリキリ
@@ -1047,8 +1047,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0857N01', '0856N01', 25, null, null, null, null, null, null, TRUE), --テブリム
 	('0858N01', '0857N01', 100, null, null, null, null, null, null, TRUE), --ブリムオン
 	('0859N01', 'root', 0, null, null, null, null, null, null, FALSE), --ベロバー
-	('0860N01', '0859N01', 0, null, null, null, null, null, null, TRUE), --ギモー
-	('0861N01', '0860N01', 0, null, null, null, null, null, null, TRUE), --オーロンゲ
+	('0860N01', '0859N01', 25, null, null, null, null, null, null, TRUE), --ギモー
+	('0861N01', '0860N01', 100, null, null, null, null, null, null, TRUE), --オーロンゲ
 	('0862N01', '0264G01', 100, null, null, null, null, null, null, TRUE), --タチフサグマ
 	('0863N01', '0052G01', 50, null, null, null, null, null, null, TRUE), --ニャイキング
 	('0864N01', 'root', 0, null, null, null, null, null, null, FALSE), --サニゴーン
@@ -1060,7 +1060,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0870N01', 'root', 0, null, null, null, null, null, null, FALSE), --タイレーツ
 	('0871N01', 'root', 0, null, null, null, null, null, null, FALSE), --バチンウニ
 	('0872N01', 'root', 0, null, null, null, null, null, null, FALSE), --ユキハミ
-	('0873N01', '0872N01', 0, null, null, null, null, null, null, TRUE), --モスノウ
+	('0873N01', '0872N01', 400, null, null, 'ハートポイントを10個獲得後、夜に進化', null, null, null, TRUE), --モスノウ
 	('0874N01', 'root', 0, null, null, null, null, null, null, FALSE), --イシヘンジン
 	('0875N01', 'root', 0, null, null, null, null, null, null, FALSE), --コオリッポ(アイスフェイス)
 	('0875N02', 'root', 0, null, null, null, null, null, null, FALSE), --コオリッポ(ナイスフェイス)
@@ -1148,11 +1148,11 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0942N01', 'root', 0, null, null, null, null, null, null, FALSE), --オラチフ
 	('0943N01', '0942N01', 0, null, null, null, null, null, null, TRUE), --マフィティフ
 	('0944N01', 'root', 0, null, null, null, null, null, null, FALSE), --シルシュルー
-	('0945N01', '0944N01', 0, null, null, null, null, null, null, TRUE), --タギングル
+	('0945N01', '0944N01', 50, null, null, null, null, null, null, TRUE), --タギングル
 	('0946N01', 'root', 0, null, null, null, null, null, null, FALSE), --アノクサ
 	('0947N01', '0946N01', 0, null, null, null, null, null, null, TRUE), --アノホラグサ
 	('0948N01', 'root', 0, null, null, null, null, null, null, FALSE), --ノノクラゲ
-	('0949N01', '0948N01', 0, null, null, null, null, null, null, TRUE), --リククラゲ
+	('0949N01', '0948N01', 50, null, null, null, null, null, null, TRUE), --リククラゲ
 	('0950N01', 'root', 0, null, null, null, null, null, null, FALSE), --ガケガニ
 	('0951N01', 'root', 0, null, null, null, null, null, null, FALSE), --カプサイジ
 	('0952N01', '0951N01', 0, null, null, null, null, null, null, TRUE), --スコヴィラン

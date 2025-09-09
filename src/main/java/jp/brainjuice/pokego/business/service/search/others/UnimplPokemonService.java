@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.utils.BjUtils;
-import jp.brainjuice.pokego.utils.LastUpdatedMap;
+import jp.brainjuice.pokego.utils.LastUpdateService;
+import jp.brainjuice.pokego.utils.LastUpdateService.Keys;
 import jp.brainjuice.pokego.web.search.form.res.elem.SimpPokemon;
 import jp.brainjuice.pokego.web.search.form.res.others.UnimplPokemonResponse;
 
@@ -17,13 +17,13 @@ public class UnimplPokemonService {
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private LastUpdatedMap lastUpdatedMap;
+	private LastUpdateService lastUpdateService;
 
 	public UnimplPokemonService(
 			GoPokedexRepository goPokedexRepository,
-			LastUpdatedMap lastUpdatedMap) {
+			LastUpdateService lastUpdateService) {
 		this.goPokedexRepository = goPokedexRepository;
-		this.lastUpdatedMap = lastUpdatedMap;
+		this.lastUpdateService = lastUpdateService;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class UnimplPokemonService {
 		res.setUnimplList(simpPokemonList);
 
 		// 最終更新日
-		String lastUpdated = lastUpdatedMap.get(LastUpdatedMap.Keys.unimplPokemon, BjUtils.sdfYmd);
+		String lastUpdated = lastUpdateService.getYmd(Keys.unimplPokemon);
 		res.setLastUpdated(lastUpdated);
 
 	}
