@@ -131,9 +131,7 @@ public class TopicListManager {
 				})
 				// abundance、homeは検索ページではないため、対象外とする。
 				.filter(tp -> tp.getPage() != PageNameEnum.abundance && tp.getPage() != PageNameEnum.home)
-				.sorted((o1, o2) -> {
-					return o1.getCount() < o2.getCount() ? 1 : -1;
-				})
+				.sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount())) // 降順に並び替え
 				.collect(Collectors.toList());
 	}
 
@@ -167,9 +165,7 @@ public class TopicListManager {
 							PokemonEditUtils.appendRemarks(gp),
 							entry.getValue()); // TopicPokemonに変換。
 				})
-				.sorted((o1, o2) -> {
-					return Integer.compare(o2.getCount(), o1.getCount());
-				}) // 降順に並び替え
+				.sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount())) // 降順に並び替え
 				.collect(Collectors.toList());
 	}
 
