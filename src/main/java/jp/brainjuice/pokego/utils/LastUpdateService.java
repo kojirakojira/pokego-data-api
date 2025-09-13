@@ -32,7 +32,7 @@ public class LastUpdateService {
 	}
 
 	public String getYmd(Keys key) {
-		return lastUpdateRepository.findById(key.name()).orElseThrow().getYmd();
+		return lastUpdateRepository.findById(key.name()).orElse(new LastUpdate(key.name(), "-")).getYmd();
 	}
 
 	/**
