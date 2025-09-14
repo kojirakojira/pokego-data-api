@@ -12,5 +12,7 @@ public enum MasterLinkDataKey {
 	limited_time_learned_cinematic_moves,
 	not_defined_cinematic_moves,
 	movement_id,
-	move_category
+	move_category,
+	/** AからBにフォルムチェンジするときは、フォルムチェンジ扱いにはしない */
+	a_to_b_form_change_not_treated
 }

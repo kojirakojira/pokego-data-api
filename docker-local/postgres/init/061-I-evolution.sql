@@ -317,7 +317,9 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0248N01', '0247N01', 100, null, null, null, null, null, null, TRUE), --バンギラス
 	('0248M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガバンギラス
 	('0249N01', 'root', 0, null, null, null, null, null, null, FALSE), --ルギア
+	('0249N02', 'root', 0, null, null, null, null, null, null, FALSE), --ルギア(シャドウAPEX)
 	('0250N01', 'root', 0, null, null, null, null, null, null, FALSE), --ホウオウ
+	('0250N02', 'root', 0, null, null, null, null, null, null, FALSE), --ホウオウ(シャドウAPEX)
 	('0251N01', 'root', 0, null, null, null, null, null, null, FALSE), --セレビィ
 	('0252N01', 'root', 0, null, null, null, null, null, null, FALSE), --キモリ
 	('0253N01', '0252N01', 25, null, null, null, null, null, null, TRUE), --ジュプトル

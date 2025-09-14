@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.dao.jpa.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,7 +34,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "pokemon_fast_attack")
-@ToString
+@ToString(exclude = {"fastAttack", "attackAdditionalInfo"})
 @IdClass(PokemonAttackPk.class)
 public class PokemonFastAttack implements Serializable, Cloneable {
 
@@ -63,4 +64,27 @@ public class PokemonFastAttack implements Serializable, Cloneable {
 	})
 	private List<AttackAdditionalInfo> attackAdditionalInfo;
 
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = result * 31 + pokedexId.hashCode();
+		result = result * 31 + moveId.hashCode();
+		return result;
+	}
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		PokemonFastAttack pfa = (PokemonFastAttack) obj;
+		return Objects.equals(pokedexId, pfa.getPokedexId()) && Objects.equals(moveId, pfa.getMoveId());
+	}
 }

@@ -83,11 +83,11 @@ public class MasterFileAnalyzerService {
 			boolean shouldSaveFastAttack,
 			boolean shouldSaveChargedAttack) throws StreamReadException, DatabindException, IOException {
 
-		// マスタデータから必要な情報を抜き出す
-		ParsedMasterData parsedMasterData = loadMasterData(masterFile);
-
 		// master_link_data.ymlを読み込む
 		Map<String, Object> masterLinkMap = loadMasterLinkData();
+
+		// マスタデータから必要な情報を抜き出す
+		ParsedMasterData parsedMasterData = loadMasterData(masterFile, masterLinkMap);
 
 		// ぺりずかんの情報を取得
 		Map<String, GoPokedex> gpMap = goPokedexRepository.findAll().stream()
@@ -139,7 +139,7 @@ public class MasterFileAnalyzerService {
 
 	}
 
-	private ParsedMasterData loadMasterData(MultipartFile masterFile) throws StreamReadException, DatabindException, IOException {
+	private ParsedMasterData loadMasterData(MultipartFile masterFile, Map<String, Object> masterLinkMap) throws StreamReadException, DatabindException, IOException {
 
 		List<QuickMoveAll> quickMoveList;
 		List<CinematicMoveAll> cinematicMoveList;
@@ -262,15 +262,42 @@ public class MasterFileAnalyzerService {
 					}
 				});
 
+				// Map<ポケモンのtemplateId, pokedexId>
+				@SuppressWarnings("unchecked")
+				final Map<String, String> masterLinkPokemonMap = ((Map<String, String>) masterLinkMap.get(MasterLinkDataKey.pokemon.name()));
+
+				// フォルムチェンジ扱いとしないパターンの定義
+				@SuppressWarnings("unchecked")
+				final Map<String, List<String>> formChangeNotTreatedMap =
+				((Map<String, Map<String, List<String>>>) masterLinkMap.get(MasterLinkDataKey.tune_moves.name()))
+				.get(MasterLinkDataKey.a_to_b_form_change_not_treated.name());
+
 				// フォルムチェンジで覚える技を追加
 				for (PokemonData pd: pokemonDataList) {
 					if (pd.getPokemonSettings().getFormChange() == null) {
 						continue;
 					}
 
+					if (!masterLinkPokemonMap.containsKey(pd.getTemplateId()) || StringUtils.isEmpty(masterLinkPokemonMap.get(pd.getTemplateId()))) {
+						// master_link_data.yml上で定義していないtemplateIdは対象外
+						continue;
+					}
+
 					for (FormChange fc: pd.getPokemonSettings().getFormChange()) {
 						if (fc.getMoveReassignment() == null || fc.getMoveReassignment().getCinematicMoves() == null) {
 							continue;
+						}
+
+						if (formChangeNotTreatedMap.containsKey(pd.getPokemonSettings().getForm())) {
+							// master_link_data.ymlのa_to_b_form_change_not_treatedに定義されてる場合(一旦ポケモンAのチェック）
+
+							List<String> notTreatedList = formChangeNotTreatedMap.get(pd.getPokemonSettings().getForm());
+							if (notTreatedList.stream()
+									.filter(form -> fc.getAvailableForm().contains(form))
+									.anyMatch(e -> true)) {
+								// ポケモンA->ポケモンBの両方が定義と一致している場合
+								continue;
+							}
 						}
 
 						// フォルムチェンジ後に覚える技のリスト
@@ -300,7 +327,7 @@ public class MasterFileAnalyzerService {
 						formChangeList.stream()
 						.forEach(entry -> {
 							PokemonMove pm = new PokemonMove(entry.getValue(), LearningPatternEnum.formChange, false);
-							additionalCinematicMoveMap.computeIfAbsent(entry.getValue(), k -> new ArrayList<>()).add(pm);
+							additionalCinematicMoveMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(pm);
 						});
 					}
 				}

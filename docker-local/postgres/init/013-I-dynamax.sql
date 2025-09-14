@@ -317,7 +317,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0248N01', FALSE, FALSE), --バンギラス
 	('0248M01', FALSE, FALSE), --メガバンギラス
 	('0249N01', FALSE, FALSE), --ルギア
+	('0249N02', FALSE, FALSE), --ルギア(シャドウAPEX)
 	('0250N01', FALSE, FALSE), --ホウオウ
+	('0250N02', FALSE, FALSE), --ホウオウ(シャドウAPEX)
 	('0251N01', FALSE, FALSE), --セレビィ
 	('0252N01', FALSE, FALSE), --キモリ
 	('0253N01', FALSE, FALSE), --ジュプトル

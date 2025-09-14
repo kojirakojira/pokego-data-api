@@ -206,22 +206,34 @@ public class PokemonMoveCreator {
 		mdNoDbYesList.stream().forEach(pca -> log.warn(pca.toString()));
 		log.info("------------【ポケモンスペシャル技】DBにあるが、マスタデータにないやつ ここまで------------");
 		log.info("------------【ポケモンスペシャル技】DBとマスタデータで値が異なる ここから------------");
-		List<PokemonChargedAttack> differentList = pcaFromMdList.stream()
-				.filter(pca -> !mdYesDbNoList.contains(pca))
-				.filter(pca -> {
-					PokemonChargedAttack pcaFromDb = null;
-					// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
-					for (PokemonChargedAttack tmpPfaFromDb: pcaFromDbList) {
-						if (pca.equals(tmpPfaFromDb)) {
-							pcaFromDb = tmpPfaFromDb;
-							break;
-						}
+		List<PokemonChargedAttack> differentList;
+		{
+			differentList = pcaFromMdList.stream()
+			.filter(pca -> !mdYesDbNoList.contains(pca))
+			.filter(pca -> {
+				PokemonChargedAttack pcaFromDb = null;
+				// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
+				for (PokemonChargedAttack tmpPfaFromDb: pcaFromDbList) {
+					if (pca.equals(tmpPfaFromDb)) {
+						pcaFromDb = tmpPfaFromDb;
+						break;
 					}
-					// 覚え方も一致するやつを排除
-					return pca.getLearningPattern() != pcaFromDb.getLearningPattern();
-				})
-				.toList();
-		differentList.stream().forEach(pca -> log.info(pca.toString()));
+				}
+				// 覚え方も一致するやつを排除
+				return pca.getLearningPattern() != pcaFromDb.getLearningPattern();
+			})
+			.toList();
+			// ログ出力
+			differentList.stream().forEach(pca -> {
+				// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
+				for (PokemonChargedAttack tmpPfaFromDb: pcaFromDbList) {
+					if (pca.equals(tmpPfaFromDb)) {
+						log.info(MessageFormat.format("マスタデータ:{0}, DB:{1}", pca.toString(), tmpPfaFromDb.toString()));
+						break;
+					}
+				}
+			});
+		}
 		log.info("------------【ポケモンスペシャル技】DBとマスタデータで値が異なる ここまで------------");
 		log.info("------------【ポケモンスペシャル技】マスタデータ重複チェック ここから------------");
 		{

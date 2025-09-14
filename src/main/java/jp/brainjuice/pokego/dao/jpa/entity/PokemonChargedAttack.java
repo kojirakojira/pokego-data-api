@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.dao.jpa.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,7 +34,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "pokemon_charged_attack")
-@ToString
+@ToString(exclude = {"chargedAttack", "attackAdditionalInfo"})
 @IdClass(PokemonAttackPk.class)
 public class PokemonChargedAttack implements Serializable, Cloneable {
 
@@ -62,5 +63,29 @@ public class PokemonChargedAttack implements Serializable, Cloneable {
 		@JoinColumn(name = "pokedex_id", referencedColumnName = "pokedex_id")
 	})
 	private List<AttackAdditionalInfo> attackAdditionalInfo;
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = result * 31 + pokedexId.hashCode();
+		result = result * 31 + moveId.hashCode();
+		return result;
+	}
+
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		PokemonChargedAttack pca = (PokemonChargedAttack) obj;
+		return Objects.equals(pokedexId, pca.getPokedexId()) && Objects.equals(moveId, pca.getMoveId());
+	}
 
 }

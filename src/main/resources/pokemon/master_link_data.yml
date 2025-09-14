@@ -559,10 +559,10 @@ pokemon:
   "V0248_POKEMON_TYRANITAR_NORMAL": "0248N01" # バンギラス
   "V0249_POKEMON_LUGIA": 
   "V0249_POKEMON_LUGIA_NORMAL": "0249N01" # ルギア
-  "V0249_POKEMON_LUGIA_S": 
+  "V0249_POKEMON_LUGIA_S": "0249N02" # ルギア(シャドウAPEX)
   "V0250_POKEMON_HO_OH": 
   "V0250_POKEMON_HO_OH_NORMAL": "0250N01" # ホウオウ
-  "V0250_POKEMON_HO_OH_S": 
+  "V0250_POKEMON_HO_OH_S": "0250N02" # ホウオウ(シャドウAPEX)
   "V0251_POKEMON_CELEBI": "0251N01" # セレビィ
   "V0252_POKEMON_TREECKO": "0252N01" # キモリ
   "V0253_POKEMON_GROVYLE": "0253N01" # ジュプトル
@@ -2084,3 +2084,9 @@ tune_moves:
 #    "0486N01": # レジギガス にぎりつぶす
 #      movement_id: "CRUSH_GRIP"
 #      move_category: "elite"
+  a_to_b_form_change_not_treated: # AからBにフォルムチェンジするときは、フォルムチェンジ扱いにはしない
+  # ※現状、ポケモンA->ポケモンBのうち、この技はフォルムチェンジ扱い、この技はフォルムチェンジ扱いとしない、といった細かい設定が必要なケースは想定していない。
+    "ZACIAN_CROWNED_SWORD": # ザシアン（けんのおう）-> ザシアン（れきせんのゆうしゃ）実際の技はアイアンヘッド
+      - "ZACIAN_HERO"
+    "ZAMAZENTA_CROWNED_SHIELD": # # ザシアン（けんのおう）-> ザシアン（れきせんのゆうしゃ）実際の技はアイアンヘッド
+      - "ZAMAZENTA_HERO"
