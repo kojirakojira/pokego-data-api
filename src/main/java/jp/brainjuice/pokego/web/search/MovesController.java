@@ -65,7 +65,7 @@ public class MovesController {
 	 * @throws BadRequestException
 	 */
 	@GetMapping("/pokemonAttack")
-	public PokemonAttackResponse pokemonFastAttack(PokemonAttackRequest req) throws BadRequestException {
+	public PokemonAttackResponse pokemonAttack(PokemonAttackRequest req) throws BadRequestException {
 
 		PokemonAttackResponse res = new PokemonAttackResponse();
 		pokemonAttackResRse.execute(req, res, pokemonAttackResearchService);

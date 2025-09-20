@@ -51,16 +51,18 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 		GoPokedex gp = sv.getGoPokedex();
 		res.setGoPokedex(gp);
 
+		GoPokedex targetGp = gp;
 		if (!StringUtils.isEmpty(gp.getPreMegaPokedexId())) {
 			// メガシンカの場合
 			GoPokedex preMegaGp = goPokedexRepository.findById(gp.getPreMegaPokedexId()).orElseThrow();
 			res.setPreMegaGp(preMegaGp);
-			return;
+
+			targetGp = preMegaGp;
 		}
 
 		{
 			// 通常技
-			List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository.findByPokedexIdJoinFastAttack(gp.getPokedexId());
+			List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository.findByPokedexIdJoinFastAttack(targetGp.getPokedexId());
 
 			List<DispPokemonFastAttack> dispPokemonFastAttackList = pokemonFastAttackList.stream()
 					.map(pfa -> {
@@ -81,7 +83,7 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 
 		{
 			// スペシャル技
-			List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository.findByPokedexIdJoinChargedAttack(gp.getPokedexId());
+			List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository.findByPokedexIdJoinChargedAttack(targetGp.getPokedexId());
 
 			List<DispPokemonChargedAttack> dispPokemonFastAttackList = pokemonChargedAttackList.stream()
 					.map(pca -> {
