@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GoPokedexAndCp {
 
+	private int no;
 	private GoPokedex goPokedex;
 	private int cp;
 }

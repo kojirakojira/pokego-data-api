@@ -34,7 +34,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "pokemon_fast_attack")
-@ToString(exclude = {"fastAttack", "attackAdditionalInfo"})
+@ToString(exclude = {"fastAttack", "attackAdditionalInfo", "goPokedex"})
 @IdClass(PokemonAttackPk.class)
 public class PokemonFastAttack implements Serializable, Cloneable {
 
@@ -63,6 +63,10 @@ public class PokemonFastAttack implements Serializable, Cloneable {
 		@JoinColumn(name = "pokedex_id", referencedColumnName = "pokedex_id")
 	})
 	private List<AttackAdditionalInfo> attackAdditionalInfo;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "pokedex_id", insertable = false, updatable = false)
+	private GoPokedex goPokedex;
 
 	/**
 	 * (非 Javadoc)

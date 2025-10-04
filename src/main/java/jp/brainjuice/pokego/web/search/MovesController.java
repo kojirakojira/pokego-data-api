@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.search.moves.MoveListService;
+import jp.brainjuice.pokego.business.service.search.moves.MoveLookupService;
 import jp.brainjuice.pokego.business.service.search.moves.PokemonAttackResearchService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
+import jp.brainjuice.pokego.web.search.form.req.moves.MoveLookupRequest;
 import jp.brainjuice.pokego.web.search.form.req.moves.PokemonAttackRequest;
 import jp.brainjuice.pokego.web.search.form.res.moves.MoveListResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.MoveLookupResponse;
 import jp.brainjuice.pokego.web.search.form.res.moves.PokemonAttackResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,15 +36,19 @@ public class MovesController {
 	private PokemonAttackResearchService pokemonAttackResearchService;
 	private ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse;
 
+	private MoveLookupService moveLookupService;
+
 	private ViewsCacheProvider viewsCacheProvider;
 
 	public MovesController(
 			MoveListService moveListService,
 			PokemonAttackResearchService pokemonAttackResearchService, ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse,
+			MoveLookupService moveLookupService,
 			ViewsCacheProvider viewsCacheProvider) {
 		this.moveListService = moveListService;
 		this.pokemonAttackResearchService = pokemonAttackResearchService;
 		this.pokemonAttackResRse = pokemonAttackResRse;
+		this.moveLookupService = moveLookupService;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
@@ -72,6 +79,16 @@ public class MovesController {
 		return res;
 	}
 
+	@GetMapping("/moveLookup")
+	public MoveLookupResponse moveLookup(MoveLookupRequest req) throws BadRequestException {
+
+		MoveLookupResponse res = new MoveLookupResponse();
+		moveLookupService.check(req, res);
+
+		moveLookupService.execute(req, res);
+
+		return res;
+	}
 
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<String> badRequestException(Exception e) {

@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.business.service.search.cp;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -71,14 +72,14 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 
 
 		res.setPl(pl);
-		
+
 		List<Evolution> lineageList = evolutionProvider.getLineageList(sp);
 		List<GoPokedex> gpList = goPokedexRepository.findAllById(
 				lineageList.stream().map(Evolution::getPokedexId).toList()
 				);
-		
+
 		List<String> afEvolPidList = evolutionProvider.getAllAfterEvolution(sp.getPokedexId(), lineageList);
-		
+
 
 		// 進化後のポケモン
 		List<GoPokedex> afEvolGpList = gpList.stream()
@@ -106,10 +107,11 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	 */
 	private List<GoPokedexAndCp> convGpAndCpList(List<GoPokedex> pidList, int iva, int ivd, int ivh, String pl) {
 
+		AtomicInteger counter = new AtomicInteger();
 		return pidList.stream()
 				.map(gp -> {
 					int cp = pokemonGoUtils.calcCp(gp, iva, ivd, ivh, pl);
-					return new GoPokedexAndCp(gp, cp);
+					return new GoPokedexAndCp(counter.incrementAndGet(), gp, cp);
 				})
 				.collect(Collectors.toList());
 	}

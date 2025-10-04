@@ -31,6 +31,7 @@ public enum PageNameEnum {
 	afterEvoCp("進化後CP"),
 	race("種族値検索"),
 	raceDiff("種族値比較"),
+	moveLookup("技検索"),
 	moveList("技一覧"),
 	pokemonAttack("ポケモンが覚える技"),
 	typeScore("タイプ評価"),

@@ -83,6 +83,7 @@ public class PokemonMoveCreator {
 									pma.getPokedexId(),
 									pm.getCategory(),
 									null,
+									null,
 									null));
 				})
 				.toList();
@@ -179,6 +180,7 @@ public class PokemonMoveCreator {
 									uniqueIdMoveIdMap.get(pm.getMovementId()),
 									pma.getPokedexId(),
 									pm.getCategory(),
+									null,
 									null,
 									null));
 				})

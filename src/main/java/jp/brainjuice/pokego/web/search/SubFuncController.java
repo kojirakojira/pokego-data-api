@@ -42,7 +42,7 @@ public class SubFuncController {
 	private OgpInfoService ogpInfoService;
 
 	private TopicListProvider topicListProvider;
-	
+
 	private AdminCommentService adminCommentService;
 
 	private ViewsCacheProvider viewsCacheProvider;
@@ -59,7 +59,7 @@ public class SubFuncController {
 		this.ogpInfoService = ogpInfoService;
 
 		this.topicListProvider = topicListProvider;
-		
+
 		this.adminCommentService = adminCommentService;
 
 		this.viewsCacheProvider = viewsCacheProvider;

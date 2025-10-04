@@ -27,9 +27,9 @@ import lombok.ToString;
 @Entity
 @Table(name = "charged_attack")
 @ToString
-public class ChargedAttack implements Serializable, Cloneable {
+public class ChargedAttack implements Attack, Serializable, Cloneable {
 
-	/** 技ID(タイプコード2桁 + (ノーマル技(1) or スペシャル技(2))1桁 + 連番3桁) */
+	/** 技ID(タイプコード3桁 + (ノーマル技(1) or スペシャル技(2))1桁 + 連番3桁) */
 	@Id
 	@Column(name = "move_id", nullable = false, columnDefinition = "bpchar")
 	private String moveId;

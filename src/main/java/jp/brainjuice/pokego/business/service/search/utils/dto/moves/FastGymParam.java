@@ -29,10 +29,10 @@ public class FastGymParam {
 	/**
 	 * 技の発生時間。画面をタップしてからダメージが発生するまでの時間。
 	 */
-	private double damageSecond;
+	private double damageSeconds;
 
 	/**
 	 * 全体時間。durationともいう。画面をタップしてから硬直が終了するまで（≒次の行動ができるようになるまで）の時間
 	 */
-	private double totalSecond;
+	private double totalSeconds;
 }

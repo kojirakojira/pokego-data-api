@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,24 +98,25 @@ public class PokemonSearchService {
 
 			if (goPokedexList.size() == 1) {
 				// 1件のみヒットした場合
-				result.setGoPokedex(getGoPokedexAndCp(goPokedexList.get(0)));
+				result.setGoPokedex(getGoPokedexAndCp(goPokedexList.get(0), 0));
 				result.setUnique(true);
 			}
 		}
 
+		AtomicInteger counter = new AtomicInteger();
 		List<GoPokedexAndCp> gpAndCpList = goPokedexList.stream()
-				.map(this::getGoPokedexAndCp)
+				.map(gp -> getGoPokedexAndCp(gp, counter.incrementAndGet()))
 				.collect(Collectors.toList());
 		result.setGpAndCpList(gpAndCpList);
 		return result;
 	}
 
-	private GoPokedexAndCp getGoPokedexAndCp(GoPokedex goPokedex) {
+	private GoPokedexAndCp getGoPokedexAndCp(GoPokedex goPokedex, int no) {
 		int cp = pokemonGoUtils.calcBaseCp(goPokedex.getAttack(), goPokedex.getDefense(), goPokedex.getHp());
-		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(goPokedex, cp);
+		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(no, goPokedex, cp);
 		return gpAndCp;
 	}
-	
+
 	@Data
 	@AllArgsConstructor
 	private class MultiSearchDto {
@@ -143,7 +145,7 @@ public class PokemonSearchService {
 					return new MultiSearchDto(pan.getPid(), psr);
 				})
 				.toList();
-		
+
 		// 既にpidが確定しているもの
 		List<String> pidList = msDtoList.stream()
 				.map(MultiSearchDto::getPid)
@@ -194,10 +196,10 @@ public class PokemonSearchService {
 
 		return res;
 	}
-	
+
 	/**
 	 * ユニークなpsrを生成する
-	 * 
+	 *
 	 * @param goPokedex
 	 * @return
 	 */
@@ -209,7 +211,7 @@ public class PokemonSearchService {
 		psr.setMaybe(false);
 		psr.setHit(true); // ヒットしたものとする
 		psr.setSearched(true); // 検索したものとする
-		
+
 		return psr;
 	}
 
@@ -229,11 +231,6 @@ public class PokemonSearchService {
 			return result;
 		}
 
-		// ひらがなをカタカナに置き換える。
-		// 例「あア亜１ｱ1」→「アア亜1ア1」
-		String transWords = BjUtils.transAnyNFKC(words);
-		transWords = BjUtils.transHiraToKana(transWords);
-
 		// 形態素解析をして検索
 		List<GoPokedex> goPokedexList = searchGeneral(words);
 		result.setSearched(true);
@@ -242,6 +239,10 @@ public class PokemonSearchService {
 		if (goPokedexList.isEmpty()) {
 
 			if (words.length() <= 20) {
+				// ひらがなをカタカナに置き換える。
+				// 例「あア亜１ｱ1」→「アア亜1ア1」
+				String transWords = BjUtils.transAnyNFKC(words);
+				transWords = BjUtils.transHiraToKana(transWords);
 				// すごく曖昧に検索する。
 				goPokedexList = searchFuzzy(transWords);
 				result.setMaybe(true);
@@ -310,10 +311,10 @@ public class PokemonSearchService {
 
 		if (goPokedexList.isEmpty()) {
 			// ポケモン名がヒットしなかった場合
-			
+
 			// まず、入力された文字列から、そのまま備考を検索する。
 			goPokedexList = searchRemarks(List.of(words));
-			
+
 			if (goPokedexList.isEmpty()) {
 				// ない場合は、形態素解析して、名詞判定された値から備考を検索する。
 				goPokedexList = searchRemarks(otherList);
@@ -365,6 +366,10 @@ public class PokemonSearchService {
 	 */
 	private List<String> toFuzzyNameList(String name) {
 
+		if (name.length() < 2) {
+			return List.of(name);
+		}
+
 		char[] nameChars = name.toCharArray();
 
 		List<String> list = new ArrayList<String>();
@@ -378,10 +383,10 @@ public class PokemonSearchService {
 
 		return list;
 	}
-	
+
 	/**
 	 * 備考から部分一致検索します。
-	 * 
+	 *
 	 * @param wordList
 	 * @return
 	 */

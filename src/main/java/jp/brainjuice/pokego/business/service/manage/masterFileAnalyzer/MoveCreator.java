@@ -17,6 +17,7 @@ import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.CinematicMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.QuickMoveAll;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.json.Buffs;
+import jp.brainjuice.pokego.business.service.search.utils.MovesUtils.MoveCode;
 import jp.brainjuice.pokego.dao.jpa.ChargedAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.FastAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.ChargedAttack;
@@ -120,8 +121,8 @@ public class MoveCreator {
 						StringBuilder sb = new StringBuilder();
 						// タイプの先頭三文字を大文字にした文字列をIDの頭につける
 						sb.append(entry.getKey().name().substring(0, 3).toUpperCase());
-						// 通常技は1とする
-						sb.append("1");
+						// 通常技は1
+						sb.append(MoveCode.fast_attack.getCode());
 						// タイプごとに3桁の連番
 						sb.append(String.format("%03d", i + 1));
 						Map.Entry<String, QuickMoveAll> moveIdEntry = Map.entry(sb.toString(), sortedQmaList.get(i));
@@ -141,7 +142,7 @@ public class MoveCreator {
 					QuickMoveAll qma = entry.getValue();
 					double dps = BjUtils.round(qma.getGymRaid().getPower(), ((double) qma.getGymRaid().getDurationMs()) / 1000.0, 3);
 					double eps = BjUtils.round(qma.getGymRaid().getEnergyDelta(), ((double) qma.getGymRaid().getDurationMs() / 1000.0), 3);
-					int turns = qma.getPvp().getDurationTurns() + 1; // durationTurnsの項目が存在しない場合は、int型のため0が入る。
+					int turns = qma.getPvp().getDurationTurns() + 1; // durationTurnsの項目が存在しない場合は、マスタデータ上は0が入る。（int型だから？）
 					double dpt = BjUtils.round(qma.getPvp().getPower(), (double) turns, 3);
 					double ept = BjUtils.round(qma.getPvp().getEnergyDelta(), (double) turns, 3);
 					return new FastAttack(
@@ -271,8 +272,8 @@ public class MoveCreator {
 						StringBuilder sb = new StringBuilder();
 						// タイプの先頭三文字を大文字にした文字列をIDの頭につける
 						sb.append(entry.getKey().name().substring(0, 3).toUpperCase());
-						// スペシャル技は2とする
-						sb.append("2");
+						// スペシャル技は2
+						sb.append(MoveCode.charged_attack.getCode());
 						// タイプごとに3桁の連番
 						sb.append(String.format("%03d", i + 1));
 						Map.Entry<String, CinematicMoveAll> moveIdEntry = Map.entry(sb.toString(), sortedQmaList.get(i));

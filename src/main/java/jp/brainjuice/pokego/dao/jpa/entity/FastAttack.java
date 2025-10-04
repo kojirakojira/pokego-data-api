@@ -27,7 +27,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "fast_attack")
 @ToString
-public class FastAttack implements Serializable, Cloneable {
+public class FastAttack implements Attack, Serializable, Cloneable {
 
 	/** 技ID(タイプコード3桁 + (通常技(1) or スペシャル技(2))1桁 + 連番3桁) */
 	@Id
@@ -58,17 +58,17 @@ public class FastAttack implements Serializable, Cloneable {
 	@Column(name = "gym_power", nullable = false)
 	private double gymPower;
 
-	/** ゲージ増加量（ジム・レイド時） */
+	/** ゲージ増加量（ジム・レイド時）(=energyDelta) */
 	@Column(name = "gym_energy_incr_amount", nullable = false)
 	private int gymEnergyIncrAmount;
 
-	/** Power Per Seconds. round(gymPower / totalTime, 2) */
+	/** Damage Per Seconds. round(gymPower / totalMs, 2) */
 	@Column(nullable = false)
 	private double dps;
 
 	/**
-	 * Energy Per Second. 1秒あたりのゲージ回復量を指す。
-	 * ただ、ゲージ回復量の情報は一般的に出回っておらず、EPSという数値が独り歩きしている模様。
+	 * Energy Per Second. 1秒あたりのゲージ回復量を指す
+	 * round(gymEnergyIncrAmount / totalMs, 2)
 	 */
 	@Column(nullable = false)
 	private double eps;

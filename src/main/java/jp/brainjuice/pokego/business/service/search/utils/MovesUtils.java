@@ -2,8 +2,10 @@ package jp.brainjuice.pokego.business.service.search.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -22,9 +24,60 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastPvpParam
 import jp.brainjuice.pokego.dao.jpa.entity.ChargedAttack;
 import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
 import jp.brainjuice.pokego.utils.BjUtils;
+import lombok.Getter;
 
 @Component
 public class MovesUtils {
+
+	private static final int MOVE_ID_LENGTH = 7;
+
+	@Getter
+	public enum MoveCode {
+		fast_attack("1"), // 通常技のコード
+		charged_attack("2"); // スペシャル技のコード
+
+		private String code;
+
+		MoveCode(String code) {
+			this.code = code;
+		}
+
+		public static MoveCode lookup(String code) {
+			return switch(code) {
+			case "1" -> MoveCode.fast_attack;
+			case "2" -> MoveCode.charged_attack;
+			default -> throw new IllegalArgumentException("Unexpected value: " + code);
+			};
+		}
+	}
+
+	/**
+	 * moveIdから通常技orスペシャル技を表すMoveCodeを取得する
+	 *
+	 * @param moveId
+	 * @return
+	 */
+	public Optional<MoveCode> getMoveCode(String moveId) {
+
+		if (StringUtils.isEmpty(moveId)) {
+			return Optional.empty();
+		}
+
+		if (moveId.length() != MOVE_ID_LENGTH) {
+			return Optional.empty();
+		}
+
+		String moveCodeStr = moveId.substring(3, 4);
+
+		if (!Stream.of(MoveCode.values())
+				.filter(mc -> moveCodeStr.equals(mc.getCode()))
+				.anyMatch(e -> true)) {
+			// moveIdの4桁目がMoveCodeに該当しなかった場合
+			return Optional.empty();
+		}
+
+		return Optional.of(MoveCode.lookup(moveCodeStr));
+	}
 
 	public List<DispFastAttack> convDispFastAttackList(List<FastAttack> faList) {
 
@@ -42,9 +95,9 @@ public class MovesUtils {
 				.toList();
 	}
 
-	public List<DispChargedAttack> convDispChargedAttackList(List<ChargedAttack> faList) {
+	public List<DispChargedAttack> convDispChargedAttackList(List<ChargedAttack> caList) {
 
-		List<DispChargedAttack> chargedAttackList = faList.stream()
+		List<DispChargedAttack> chargedAttackList = caList.stream()
 				.map(this::convDispChargedAttack)
 				.sorted((o1, o2) -> BjUtils.getCollator().compare(o1.getName(), o2.getName()))
 				.collect(Collectors.toList());
@@ -59,7 +112,9 @@ public class MovesUtils {
 	}
 
 	/**
-	 * Entityの直列的な形式から、画面上で扱いやすい構造体の形に変換する。
+	 * Entityの直列的な形式から、画面上で扱いやすい構造体の形に変換する。<br>
+	 * Noは設定されない。
+	 *
 	 * @param {@link FastAttack} fa
 	 * @return
 	 */
@@ -85,7 +140,8 @@ public class MovesUtils {
 	}
 
 	/**
-	 * Entityの直列的な形式から、画面上で扱いやすい構造体の形に変換する。
+	 * Entityの直列的な形式から、画面上で扱いやすい構造体の形に変換する。<br>
+	 * Noは設定されない。
 	 * @param {@link ChargedAttack} ca
 	 * @return
 	 */
