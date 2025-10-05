@@ -833,7 +833,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0672N01', 'root', 0, null, null, null, null, null, null, FALSE), --メェークル
 	('0673N01', '0672N01', 50, null, null, null, null, null, null, TRUE), --ゴーゴート
 	('0674N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤンチャム
-	('0675N01', '0674N01', 50, null, 'あくタイプを32匹捕まえる', null, null, null, null, TRUE), --ゴロンダ
+	('0675N01', '0674N01', 50, null, 'あくタイプのポケモンを32匹捕まえる', null, null, null, null, TRUE), --ゴロンダ
 	('0676N01', 'root', 0, null, null, null, null, null, null, FALSE), --トリミアン
 	('0677N01', 'root', 0, null, null, null, null, null, null, FALSE), --ニャスパー
 	('0678N01', '0677N01', 50, null, null, 'オスのみ', null, null, null, TRUE), --ニャオニクス(オスのすがた)
@@ -1190,8 +1190,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0979N01', '0057N01', 100, null, 'ゴーストか、エスパータイプのポケモンに30勝利する', null, null, null, null, TRUE), --コノヨザル
 	('0980N01', '0194P01', 0, null, null, null, null, null, null, TRUE), --ドオー
 	('0981N01', '0203N01', 0, null, null, null, null, null, null, TRUE), --リキキリン
-	('0982N01', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(ふたふしフォルム)
-	('0982N02', '0206N01', 0, null, null, null, null, null, null, TRUE), --ノココッチ(みつふしフォルム)
+	('0982N01', '0206N01', 50, null, null, null, null, null, null, TRUE), --ノココッチ(ふたふしフォルム)
+	('0982N02', '0206N01', 50, null, null, null, null, null, null, TRUE), --ノココッチ(みつふしフォルム)
 	('0983N01', '0625N01', 100, null, 'あくか、はがねタイプのポケモンのレイドバトルで15回勝利する', null, null, null, null, TRUE), --ドドゲザン
 	('0984N01', 'root', 0, null, null, null, null, null, null, FALSE), --イダイナキバ
 	('0985N01', 'root', 0, null, null, null, null, null, null, FALSE), --サケブシッポ
@@ -1222,7 +1222,9 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('1007N01', 'root', 0, null, null, null, null, null, null, FALSE), --コライドン
 	('1008N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミライドン
 	('1009N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウネルミナモ
-	('1010N01', 'root', 0, null, null, null, null, null, null, FALSE) --テツノイサハ
+	('1010N01', 'root', 0, null, null, null, null, null, null, FALSE), --テツノイサハ
+	('1011N01', '0840N01', 200, 'みついりりんご20コ', null, null, null, null, null, TRUE), --カミッチュ
+	('1012N01', '1011N01', 400, null, null, 'ドラゴンタイプのポケモンを7匹捕まえる', null, null, null, TRUE) --カミツオロチ
 ;
 
 COMMIT;

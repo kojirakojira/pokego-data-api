@@ -85,9 +85,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0060N01', FALSE, FALSE), --ニョロモ
 	('0061N01', FALSE, FALSE), --ニョロゾ
 	('0062N01', FALSE, FALSE), --ニョロボン
-	('0063N01', FALSE, FALSE), --ケーシィ
-	('0064N01', FALSE, FALSE), --ユンゲラー
-	('0065N01', FALSE, FALSE), --フーディン
+	('0063N01', TRUE, FALSE), --ケーシィ
+	('0064N01', TRUE, FALSE), --ユンゲラー
+	('0065N01', TRUE, FALSE), --フーディン
 	('0065M01', FALSE, FALSE), --メガフーディン
 	('0066N01', TRUE, FALSE), --ワンリキー
 	('0067N01', TRUE, FALSE), --ゴーリキー
@@ -1073,7 +1073,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0881N01', FALSE, FALSE), --パッチルドン
 	('0882N01', FALSE, FALSE), --ウオノラゴン
 	('0883N01', FALSE, FALSE), --ウオチルドン
-	('0884N01', FALSE, TRUE), --ジュラルドン
+	('0884N01', TRUE, FALSE), --ジュラルドン
 	('0885N01', FALSE, FALSE), --ドラメシヤ
 	('0886N01', FALSE, FALSE), --ドロンチ
 	('0887N01', FALSE, FALSE), --ドラパルト
@@ -1217,7 +1217,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('1007N01', FALSE, FALSE), --コライドン
 	('1008N01', FALSE, FALSE), --ミライドン
 	('1009N01', FALSE, FALSE), --ウネルミナモ
-	('1010N01', FALSE, FALSE) --テツノイサハ
+	('1010N01', FALSE, FALSE), --テツノイサハ
+	('1011N01', FALSE, FALSE), --カミッチュ
+	('1012N01', FALSE, FALSE) --カミツオロチ
 ;
 
 COMMIT;

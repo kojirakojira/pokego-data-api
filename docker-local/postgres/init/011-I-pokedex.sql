@@ -405,7 +405,7 @@ INSERT INTO pokedex
     ('0321N01', 'ホエルオー', 170, 90, 45, 90, 45, 60, '', 'water', null, 'g3', null, null, TRUE, null),
     ('0322N01', 'ドンメル', 60, 60, 40, 65, 45, 35, '', 'fire', 'ground', 'g3', null, null, TRUE, null),
     ('0323N01', 'バクーダ', 70, 100, 70, 105, 75, 40, '', 'fire', 'ground', 'g3', null, null, TRUE, null),
-    ('0323M01', 'メガバクーダ', 70, 120, 100, 145, 105, 20, '', 'fire', 'ground', 'g6oras', null, null, FALSE, '0323N01'),
+    ('0323M01', 'メガバクーダ', 70, 120, 100, 145, 105, 20, '', 'fire', 'ground', 'g6oras', null, null, TRUE, '0323N01'),
     ('0324N01', 'コータス', 70, 85, 140, 85, 70, 20, '', 'fire', null, 'g3', null, null, TRUE, null),
     ('0325N01', 'バネブー', 60, 25, 35, 70, 80, 60, '', 'psychic', null, 'g3', null, null, TRUE, null),
     ('0326N01', 'ブーピッグ', 80, 45, 65, 90, 110, 80, '', 'psychic', null, 'g3', null, null, TRUE, null),
@@ -467,7 +467,7 @@ INSERT INTO pokedex
     ('0374N01', 'ダンバル', 40, 55, 80, 35, 60, 30, '', 'steel', 'psychic', 'g3', null, null, TRUE, null),
     ('0375N01', 'メタング', 60, 75, 100, 55, 80, 50, '', 'steel', 'psychic', 'g3', null, null, TRUE, null),
     ('0376N01', 'メタグロス', 80, 135, 130, 95, 90, 70, '', 'steel', 'psychic', 'g3', 'pokego/pokemon/0376_metagross/metagross_300.jpg', 'pokego/pokemon/0376_metagross/metagross_motion.gif', TRUE, null),
-    ('0376M01', 'メガメタグロス', 80, 145, 150, 105, 110, 110, '', 'steel', 'psychic', 'g6oras', null, null, FALSE, '0376N01'),
+    ('0376M01', 'メガメタグロス', 80, 145, 150, 105, 110, 110, '', 'steel', 'psychic', 'g6oras', null, null, TRUE, '0376N01'),
     ('0377N01', 'レジロック', 80, 100, 200, 50, 100, 50, '', 'rock', null, 'g3', null, null, TRUE, null),
     ('0378N01', 'レジアイス', 80, 50, 100, 100, 200, 50, '', 'ice', null, 'g3', null, null, TRUE, null),
     ('0379N01', 'レジスチル', 80, 75, 150, 75, 150, 50, '', 'steel', null, 'g3', null, null, TRUE, null),
@@ -1187,8 +1187,8 @@ INSERT INTO pokedex
     ('0979N01', 'コノヨザル', 110, 115, 80, 50, 90, 90, '', 'fighting', 'ghost', 'g9', null, null, TRUE, null),
     ('0980N01', 'ドオー', 130, 75, 60, 45, 100, 20, '', 'poison', 'ground', 'g9', null, null, TRUE, null),
     ('0981N01', 'リキキリン', 120, 90, 70, 110, 70, 60, '', 'normal', 'psychic', 'g9', null, null, FALSE, null),
-    ('0982N01', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'ふたふしフォルム', 'normal', null, 'g9', null, null, FALSE, null),
-    ('0982N02', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'みつふしフォルム', 'normal', null, 'g9', null, null, FALSE, null),
+    ('0982N01', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'ふたふしフォルム', 'normal', null, 'g9', null, null, TRUE, null),
+    ('0982N02', 'ノココッチ', 125, 100, 80, 85, 75, 55, 'みつふしフォルム', 'normal', null, 'g9', null, null, TRUE, null),
     ('0983N01', 'ドドゲザン', 100, 135, 120, 60, 85, 50, '', 'dark', 'steel', 'g9', null, null, TRUE, null),
     ('0984N01', 'イダイナキバ', 115, 131, 131, 53, 53, 87, '', 'ground', 'fighting', 'g9', null, null, FALSE, null),
     ('0985N01', 'サケブシッポ', 115, 65, 99, 65, 115, 111, '', 'fairy', 'psychic', 'g9', null, null, FALSE, null),
@@ -1217,7 +1217,9 @@ INSERT INTO pokedex
     ('1007N01', 'コライドン', 100, 135, 115, 85, 100, 135, '', 'fighting', 'dragon', 'g9', null, null, FALSE, null),
     ('1008N01', 'ミライドン', 100, 85, 100, 135, 115, 135, '', 'electric', 'dragon', 'g9', null, null, FALSE, null),
     ('1009N01', 'ウネルミナモ', 99, 83, 91, 125, 83, 109, '', 'water', 'dragon', 'g9', null, null, FALSE, null),
-    ('1010N01', 'テツノイサハ', 90, 130, 88, 70, 108, 104, '', 'grass', 'psychic', 'g9', null, null, FALSE, null)
+    ('1010N01', 'テツノイサハ', 90, 130, 88, 70, 108, 104, '', 'grass', 'psychic', 'g9', null, null, FALSE, null),
+    ('1011N01', 'カミッチュ', 80, 80, 110, 95, 80, 40, '', 'grass', 'dragon', 'g9', null, null, TRUE, null),
+    ('1012N01', 'カミツオロチ', 106, 80, 110, 120, 80, 44, '', 'grass', 'dragon', 'g9', null, null, TRUE, null)
 ;
 
 COMMIT;

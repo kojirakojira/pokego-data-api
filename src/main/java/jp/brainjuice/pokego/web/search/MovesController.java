@@ -76,6 +76,8 @@ public class MovesController {
 
 		PokemonAttackResponse res = new PokemonAttackResponse();
 		pokemonAttackResRse.execute(req, res, pokemonAttackResearchService);
+
+		viewsCacheProvider.addTempList();
 		return res;
 	}
 
@@ -86,6 +88,8 @@ public class MovesController {
 		moveLookupService.check(req, res);
 
 		moveLookupService.execute(req, res);
+
+		viewsCacheProvider.addTempList();
 
 		return res;
 	}
