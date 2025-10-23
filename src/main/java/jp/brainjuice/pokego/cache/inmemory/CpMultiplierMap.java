@@ -66,6 +66,15 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	}
 
 	/**
+	 * 小数点以下を省略して呼び出された場合の考慮
+	 */
+	@Override
+	public boolean containsKey(Object pl) {
+		DecimalFormat df = new DecimalFormat("00.0");
+		return super.containsKey(df.format(Double.valueOf((String) pl)));
+	}
+
+	/**
 	 * リストで取得する。
 	 *
 	 * @return

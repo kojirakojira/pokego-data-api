@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Meta;
 import org.springframework.data.jpa.repository.Query;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.dao.jpa.entity.ChargedAttack;
 
 public interface ChargedAttackRepository extends JpaRepository<ChargedAttack, String> {
+
+	@Meta(comment = "find by type in(charged attack)")
+	List<ChargedAttack> findByTypeIn(List<TypeEnum> typeList);
 
 	/**
 	 * ポケモンが覚えるすべての技を取得する。<br>

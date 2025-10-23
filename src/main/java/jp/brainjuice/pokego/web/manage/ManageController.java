@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.web.manage;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -8,10 +9,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ibm.icu.text.MessageFormat;
 
 import jp.brainjuice.pokego.business.service.manage.LoginService;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.MasterFileAnalyzerService;
@@ -151,5 +155,20 @@ public class ManageController {
 		String errMsg = "処理中に想定外の問題が発生しました。";
 		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<String> notValidException(MethodArgumentNotValidException e) {
+		// 発生したフィールドごとのエラー情報を取得
+		String errsStr = e.getBindingResult().getFieldErrors().stream().map((error) -> {
+			String fieldName = error.getField();
+			String errorMessage = error.getDefaultMessage();
+			return MessageFormat.format("'{' \"{0}\": \"{1}\" '}'", fieldName, errorMessage);
+		})
+		.collect(Collectors.joining(", "));
+		String errMsg = "パラメータに不備があります。";
+		log.error(errMsg + "(" + errsStr + ")", e);
+		// 400 Bad Request ステータスとともにエラー詳細を返す
+		return new ResponseEntity<>(errMsg, HttpStatus.BAD_REQUEST);
 	}
 }

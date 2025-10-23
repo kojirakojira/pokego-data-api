@@ -6,10 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Meta;
 import org.springframework.data.jpa.repository.Query;
 
+import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
 import jp.brainjuice.pokego.dao.jpa.dto.SimpMove;
 import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
 
 public interface FastAttackRepository extends JpaRepository<FastAttack, String> {
+
+	@Meta(comment = "find by type in(fast attack)")
+	List<FastAttack> findByTypeIn(List<TypeEnum> typeList);
 
 	/**
 	 * ポケモンが覚えるすべての技を取得する。<br>

@@ -32,6 +32,7 @@ public enum PageNameEnum {
 	race("種族値検索"),
 	raceDiff("種族値比較"),
 	moveLookup("技検索"),
+	filterAllMove("全技絞り込み"),
 	moveList("技一覧"),
 	pokemonAttack("ポケモンが覚える技"),
 	typeScore("タイプ評価"),
