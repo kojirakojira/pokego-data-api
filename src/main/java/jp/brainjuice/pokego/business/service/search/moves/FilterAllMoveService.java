@@ -56,9 +56,10 @@ public class FilterAllMoveService {
 
 		List<TypeEnum> typeList = req.getTypes();
 		int typeLength = TypeEnum.values().length;
+		MoveDispTypeEnum moveDispType = req.getMoveDispType();
 
 		// typesの指定がない場合、または全てor通常技を選択したときのみ、通常技のリストを返却する。
-		boolean shouldDispFaList = typeList == null || List.of(MoveDispTypeEnum.all, MoveDispTypeEnum.fa).contains(req.getMoveDispType());
+		boolean shouldDispFaList = typeList == null || moveDispType == null || List.of(MoveDispTypeEnum.all, MoveDispTypeEnum.fa).contains(moveDispType);
 		res.setShouldDispFaList(shouldDispFaList);
 		if (shouldDispFaList) {
 			res.setFaList(getFaList(typeList, typeLength));
@@ -66,7 +67,7 @@ public class FilterAllMoveService {
 
 
 		// typesの指定がない場合、全てorスペシャル技を選択したときのみ、スペシャル技のリストを返却する。
-		boolean shouldDispCaList = typeList == null || List.of(MoveDispTypeEnum.all, MoveDispTypeEnum.ca).contains(req.getMoveDispType());
+		boolean shouldDispCaList = typeList == null || moveDispType == null ||List.of(MoveDispTypeEnum.all, MoveDispTypeEnum.ca).contains(moveDispType);
 		res.setShouldDispCaList(shouldDispCaList);
 		if (shouldDispCaList) {
 			res.setCaList(getCaList(typeList, typeLength));
