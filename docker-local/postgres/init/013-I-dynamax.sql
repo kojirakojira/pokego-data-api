@@ -699,7 +699,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0566N01', FALSE, FALSE), --アーケン
 	('0567N01', FALSE, FALSE), --アーケオス
 	('0568N01', TRUE, FALSE), --ヤブクロン
-	('0569N01', TRUE, FALSE), --ダストダス
+	('0569N01', TRUE, TRUE), --ダストダス
 	('0570N01', FALSE, FALSE), --ゾロア
 	('0570H01', FALSE, FALSE), --ゾロア(ヒスイのすがた)
 	('0571N01', FALSE, FALSE), --ゾロアーク
@@ -1219,7 +1219,27 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('1009N01', FALSE, FALSE), --ウネルミナモ
 	('1010N01', FALSE, FALSE), --テツノイサハ
 	('1011N01', FALSE, FALSE), --カミッチュ
-	('1012N01', FALSE, FALSE) --カミツオロチ
+	('1012N01', FALSE, FALSE), --チャデス(タカイモノのすがた)
+	('1012N02', FALSE, FALSE), --チャデス(マガイモノのすがた)
+	('1013N01', FALSE, FALSE), --ヤバソチャ(ケッサクのすがた)
+	('1013N02', FALSE, FALSE), --ヤバソチャ(ボンサクのすがた)
+	('1014N01', FALSE, FALSE), --イイネイヌ
+	('1015N01', FALSE, FALSE), --マシマシラ
+	('1016N01', FALSE, FALSE), --キチキギス
+	('1017N01', FALSE, FALSE), --オーガポン(みどりのめん)
+	('1017N02', FALSE, FALSE), --オーガポン(いどのめん)
+	('1017N03', FALSE, FALSE), --オーガポン(かまどのめん)
+	('1017N04', FALSE, FALSE), --オーガポン(いしずえのめん)
+	('1018N01', FALSE, FALSE), --ブリジュラス
+	('1019N01', FALSE, FALSE), --カミツオロチ
+	('1020N01', FALSE, FALSE), --ウガツホムラ
+	('1021N01', FALSE, FALSE), --タケルライコ
+	('1022N01', FALSE, FALSE), --テツノイワオ
+	('1023N01', FALSE, FALSE), --テツノカシラ
+	('1024N01', FALSE, FALSE), --テラパゴス(ノーマルフォルム)
+	('1024N02', FALSE, FALSE), --テラパゴス(テラスタルフォルム)
+	('1024N03', FALSE, FALSE), --テラパゴス(ステラフォルム)
+	('1025N01', FALSE, FALSE) --モモワロウ
 ;
 
 COMMIT;

@@ -1044,7 +1044,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0854N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤバチャ(がんさくフォルム)
 	('0854N02', 'root', 0, null, null, null, null, null, null, FALSE), --ヤバチャ(しんさくフォルム)
 	('0855N01', '0854N01', 50, null, null, null, null, null, null, TRUE), --ポットデス(がんさくフォルム)
-	('0855N02', '0854N02', 50, null, null, null, null, null, null, TRUE), --ポットデス(しんさくフォルム)
+	('0855N02', '0854N02', 400, null, null, null, null, null, null, TRUE), --ポットデス(しんさくフォルム)
 	('0856N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミブリム
 	('0857N01', '0856N01', 25, null, null, null, null, null, null, TRUE), --テブリム
 	('0858N01', '0857N01', 100, null, null, null, null, null, null, TRUE), --ブリムオン
@@ -1224,7 +1224,27 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('1009N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウネルミナモ
 	('1010N01', 'root', 0, null, null, null, null, null, null, FALSE), --テツノイサハ
 	('1011N01', '0840N01', 200, 'みついりりんご20コ', null, null, null, null, null, TRUE), --カミッチュ
-	('1012N01', '1011N01', 400, null, null, 'ドラゴンタイプのポケモンを7匹捕まえる', null, null, null, TRUE) --カミツオロチ
+	('1012N01', 'root', 0, null, null, null, null, null, null, FALSE), --チャデス(タカイモノのすがた)
+	('1012N02', 'root', 0, null, null, null, null, null, null, FALSE), --チャデス(マガイモノのすがた)
+	('1013N01', '1012N01', 400, null, null, null, null, null, null, TRUE), --ヤバソチャ(ケッサクのすがた)
+	('1013N02', '1012N02', 50, null, null, null, null, null, null, TRUE), --ヤバソチャ(ボンサクのすがた)
+	('1014N01', 'root', 0, null, null, null, null, null, null, FALSE), --イイネイヌ
+	('1015N01', 'root', 0, null, null, null, null, null, null, FALSE), --マシマシラ
+	('1016N01', 'root', 0, null, null, null, null, null, null, FALSE), --キチキギス
+	('1017N01', 'root', 0, null, null, null, null, null, null, FALSE), --オーガポン(みどりのめん)
+	('1017N02', 'root', 0, null, null, null, null, null, null, FALSE), --オーガポン(いどのめん)
+	('1017N03', 'root', 0, null, null, null, null, null, null, FALSE), --オーガポン(かまどのめん)
+	('1017N04', 'root', 0, null, null, null, null, null, null, FALSE), --オーガポン(いしずえのめん)
+	('1018N01', '0884N01', 0, null, null, null, null, null, null, TRUE), --ブリジュラス
+	('1019N01', '1011N01', 400, null, null, 'ドラゴンタイプのポケモンを7匹捕まえる', null, null, null, TRUE), --カミツオロチ
+	('1020N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウガツホムラ
+	('1021N01', 'root', 0, null, null, null, null, null, null, FALSE), --タケルライコ
+	('1022N01', 'root', 0, null, null, null, null, null, null, FALSE), --テツノイワオ
+	('1023N01', 'root', 0, null, null, null, null, null, null, FALSE), --テツノカシラ
+	('1024N01', 'root', 0, null, null, null, null, null, null, FALSE), --テラパゴス(ノーマルフォルム)
+	('1024N02', 'root', 0, null, null, null, null, null, null, FALSE), --テラパゴス(テラスタルフォルム)
+	('1024N03', 'root', 0, null, null, null, null, null, null, FALSE), --テラパゴス(ステラフォルム)
+	('1025N01', 'root', 0, null, null, null, null, null, null, FALSE) --モモワロウ
 ;
 
 COMMIT;
