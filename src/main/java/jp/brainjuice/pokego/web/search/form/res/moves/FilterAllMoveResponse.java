@@ -4,7 +4,7 @@ import java.util.List;
 
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.DispChargedAttack;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.DispFastAttack;
-import jp.brainjuice.pokego.web.search.form.res.Response;
+import jp.brainjuice.pokego.web.Response;
 import jp.brainjuice.pokego.web.search.form.res.elem.DispFilterParam;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

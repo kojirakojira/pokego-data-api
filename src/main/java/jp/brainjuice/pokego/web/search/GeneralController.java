@@ -1,8 +1,5 @@
 package jp.brainjuice.pokego.web.search;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,9 +53,9 @@ public class GeneralController {
 
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 * @throws BadRequestException
 	 */
@@ -67,7 +64,7 @@ public class GeneralController {
 
 		// 閲覧数を手動で追加。
 		viewsCacheProvider.addTempList();
-		
+
 		return "OK";
 	}
 
@@ -83,7 +80,7 @@ public class GeneralController {
 
 		AbundanceResponse abundanceRes = new AbundanceResponse();
 		abundanceResRse.execute(abundanceReq, abundanceRes, abundanceResearchService);
-		
+
 		return abundanceRes;
 	}
 
@@ -128,20 +125,4 @@ public class GeneralController {
 
 		return res;
 	}
-
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 }

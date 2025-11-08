@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import jp.brainjuice.pokego.business.service.search.others.EvoCostResearchService.Costs;
-import jp.brainjuice.pokego.web.search.form.res.Response;
+import jp.brainjuice.pokego.web.Response;
 import jp.brainjuice.pokego.web.search.form.res.elem.EvolutionEdge;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,6 +1,6 @@
 package jp.brainjuice.pokego.web.manage.res;
 
-import jp.brainjuice.pokego.web.search.form.res.Response;
+import jp.brainjuice.pokego.web.Response;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

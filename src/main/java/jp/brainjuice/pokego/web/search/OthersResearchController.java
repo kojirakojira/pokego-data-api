@@ -1,9 +1,8 @@
 package jp.brainjuice.pokego.web.search;
 
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.search.others.DynamaxImplPokemonService;
 import jp.brainjuice.pokego.business.service.search.others.EvoCostResearchService;
+import jp.brainjuice.pokego.business.service.search.others.EvoCostResearchService.Costs;
 import jp.brainjuice.pokego.business.service.search.others.EvolutionResearchService;
 import jp.brainjuice.pokego.business.service.search.others.UnimplPokemonService;
-import jp.brainjuice.pokego.business.service.search.others.EvoCostResearchService.Costs;
-import jp.brainjuice.pokego.business.service.search.utils.ValidationService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.others.EvoCostRequest;
@@ -42,10 +40,8 @@ public class OthersResearchController {
 	private EvoCostResearchService evoCostResearchService;
 
 	private UnimplPokemonService unimplPokemonService;
-	
-	private DynamaxImplPokemonService dynamaxImplPokemonService;
 
-	private ValidationService validationService;
+	private DynamaxImplPokemonService dynamaxImplPokemonService;
 
 	private ViewsCacheProvider viewsCacheProvider;
 
@@ -54,7 +50,6 @@ public class OthersResearchController {
 			EvoCostResearchService evoCostResearchService,
 			UnimplPokemonService unimplPokemonService,
 			DynamaxImplPokemonService dynamaxImplPokemonService,
-			ValidationService validationService,
 			ViewsCacheProvider viewsCacheProvider) {
 
 		// 進化ツリー
@@ -70,7 +65,6 @@ public class OthersResearchController {
 		// ダイマックス、キョダイマックス実装済みポケモン一覧
 		this.dynamaxImplPokemonService = dynamaxImplPokemonService;
 
-		this.validationService = validationService;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
@@ -97,9 +91,9 @@ public class OthersResearchController {
 	 * @throws BadRequestException
 	 */
 	@GetMapping("/evoCost")
-	public EvoCostResponse evoCost(EvoCostRequest evoCostReq) throws BadRequestException {
+	public EvoCostResponse evoCost(@Valid EvoCostRequest evoCostReq) throws BadRequestException {
 
-		validationService.validation(evoCostReq);
+//		validationService.validation(evoCostReq);
 
 		EvoCostResponse evoCostRes = new EvoCostResponse();
 		Costs costs = Costs.valueOf(evoCostReq.getCosts());
@@ -140,20 +134,5 @@ public class OthersResearchController {
 		viewsCacheProvider.addTempList();
 
 		return res;
-	}
-
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

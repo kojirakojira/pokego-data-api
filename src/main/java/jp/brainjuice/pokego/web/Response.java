@@ -1,5 +1,6 @@
-package jp.brainjuice.pokego.web.search.form.res;
+package jp.brainjuice.pokego.web;
 
+import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
 import lombok.Data;
 
 /**
