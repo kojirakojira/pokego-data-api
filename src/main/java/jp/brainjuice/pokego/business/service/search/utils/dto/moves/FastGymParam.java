@@ -17,6 +17,9 @@ public class FastGymParam {
 	 */
 	private double gymPower;
 
+	/** ゲージ増加量 */
+	private double energy;
+
 	/** Power Per Seconds. round(gymPower / totalTime, 2) */
 	private double dps;
 

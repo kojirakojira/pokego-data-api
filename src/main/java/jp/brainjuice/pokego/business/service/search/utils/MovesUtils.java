@@ -31,6 +31,9 @@ public class MovesUtils {
 
 	private static final int MOVE_ID_LENGTH = 7;
 
+	/** へんしんのmoveId */
+	public static final String TRANSFORM_MOVE_ID = "NOR1006";
+
 	@Getter
 	public enum MoveCode {
 		fast_attack("1"), // 通常技のコード
@@ -125,6 +128,7 @@ public class MovesUtils {
 		TypeEnum type = fa.getType();
 		FastGymParam gym = new FastGymParam(
 				fa.getGymPower(),
+				fa.getGymEnergyIncrAmount(),
 				fa.getDps(),
 				fa.getEps(),
 				fa.getDamageMs() / 1000.0,
