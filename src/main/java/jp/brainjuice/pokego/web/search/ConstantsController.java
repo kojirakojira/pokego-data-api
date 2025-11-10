@@ -16,6 +16,7 @@ import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.SituationEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.constant.WeatherBoosts.WeatherEnum;
 import jp.brainjuice.pokego.business.service.search.pokeFilter.FilterEnum;
 import jp.brainjuice.pokego.cache.inmemory.CpMultiplierMap;
 import jp.brainjuice.pokego.web.search.form.res.elem.Color;
@@ -37,7 +38,7 @@ public class ConstantsController {
 	public ConstantsController(CpMultiplierMap cpMultiplierMap) {
 		this.cpMultiplierMap = cpMultiplierMap;
 	}
-	
+
 	@GetMapping("/constants")
 	public Constants constants() {
 		Constants constants = new Constants();
@@ -47,6 +48,7 @@ public class ConstantsController {
 		constants.setFilterItemMap(filterItemsConst());
 		constants.setPlList(plConst());
 		constants.setSituationMap(situationConst());
+		constants.setWeatherMap(weatherConst());
 		return constants;
 	}
 
@@ -104,5 +106,14 @@ public class ConstantsController {
 			situationMap.put(item.name(), item.getJpn());
 		}
 		return situationMap;
+	}
+
+	@GetMapping("/weatherConst")
+	public Map<String, String> weatherConst() {
+		Map<String, String> weatherMap = new LinkedHashMap<>();
+		for (WeatherEnum item: WeatherEnum.values()) {
+			weatherMap.put(item.name(), item.getJpn());
+		}
+		return weatherMap;
 	}
 }

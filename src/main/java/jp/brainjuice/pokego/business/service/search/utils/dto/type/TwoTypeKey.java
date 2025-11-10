@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.business.service.search.utils.dto.type;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -14,16 +13,24 @@ import lombok.Data;
  * @author saibabanagchampa
  *
  */
-@AllArgsConstructor
 @Data
 public class TwoTypeKey {
 
 	private TypeEnum type1;
 	private TypeEnum type2;
 
+	public TwoTypeKey(TypeEnum type1, TypeEnum type2) {
+		TypeEnum t1 = type1;
+		TypeEnum t2 = type2 == null ? null : type2;
+		setType1(t1);
+		setType2(t2 != t1 ? t2 : null);
+	}
+
 	public TwoTypeKey(String type1, String type2) {
-		setType1(TypeEnum.valueOf(type1));
-		setType2(type2 == null ? null : TypeEnum.valueOf(type2));
+		TypeEnum t1 = TypeEnum.valueOf(type1);
+		TypeEnum t2 = type2 == null ? null : TypeEnum.valueOf(type2);
+		setType1(t1);
+		setType2(t2 != t1 ? t2 : null);
 	}
 
 	public String toJpnString() {

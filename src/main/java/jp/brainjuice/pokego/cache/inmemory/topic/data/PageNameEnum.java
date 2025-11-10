@@ -18,6 +18,7 @@ public enum PageNameEnum {
 	abundance("ポケモン情報"),
 	searchAll("ポケモン検索"),
 	filterAll("全ポケ絞り込み"),
+	gymRaidPinnacleRank("ジム・レイド対策ポケモンランキング"),
 	wild("野生CP"),
 	raid("レイドボス勝利ボーナスCP"),
 	rocket("ロケット団勝利ボーナスCP"),
