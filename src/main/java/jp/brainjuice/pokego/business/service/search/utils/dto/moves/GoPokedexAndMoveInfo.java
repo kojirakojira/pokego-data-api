@@ -13,6 +13,7 @@ public class GoPokedexAndMoveInfo {
 
 	private int no;
 	private GoPokedex goPokedex;
+	private int cp;
 	private LearningPatternEnum learningPattern;
 	private String learningPatternName;
 	private String learningPatternAnnos;

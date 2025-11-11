@@ -164,6 +164,22 @@ public class PokemonGoUtils {
 	 * ※引数にはGOのステータスを指定してください。
 	 *
 	 * @param goPokedex
+	 * @return
+	 */
+	public int calcBaseCp(GoPokedex goPokedex) {
+
+		return calcBaseCp(
+				goPokedex.getAttack(),
+				goPokedex.getDefense(),
+				goPokedex.getHp());
+	}
+
+	/**
+	 * GoPokedex、個体値からcpを求めます。<br>
+	 * PL40の場合のCPを求めます。<br>
+	 * ※引数にはGOのステータスを指定してください。
+	 *
+	 * @param goPokedex
 	 * @param ivAttack
 	 * @param ivDefense
 	 * @param ivHp

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.constant.LearningPatternEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.constant.WeatherBoosts;
 import jp.brainjuice.pokego.business.constant.WeatherBoosts.WeatherEnum;
 import jp.brainjuice.pokego.business.service.search.utils.GymRaidDamageCalculator;
 import jp.brainjuice.pokego.business.service.search.utils.MovesUtils;
@@ -55,6 +56,8 @@ public class GymRaidPinnacleRankService {
 
 	private TypeCommentMap typeCommentMap;
 
+	private WeatherBoosts weatherBoosts;
+
 	public enum SelectPattern {
 		/** 含める */
 		include,
@@ -78,7 +81,8 @@ public class GymRaidPinnacleRankService {
 			FastAttackRepository fastAttackRepository,
 			ChargedAttackRepository chargedAttackRepository,
 			GymRaidDamageCalculator gymRaidDamageCalculator,
-			TypeCommentMap typeCommentMap) {
+			TypeCommentMap typeCommentMap,
+			WeatherBoosts weatherBoosts) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonFastAttackRepository = pokemonFastAttackRepository;
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
@@ -86,6 +90,7 @@ public class GymRaidPinnacleRankService {
 		this.chargedAttackRepository = chargedAttackRepository;
 		this.gymRaidDamageCalculator = gymRaidDamageCalculator;
 		this.typeCommentMap = typeCommentMap;
+		this.weatherBoosts = weatherBoosts;
 	}
 
 	public void exec(GymRaidPinnacleRankRequest req, GymRaidPinnacleRankResponse res) {
@@ -164,6 +169,10 @@ public class GymRaidPinnacleRankService {
 		res.setCombiList(combiList);
 
 		res.setTypeComments(typeCommentMap.get(type1, type2));
+		if (weather != null) {
+			List<TypeEnum> wbTypeList = weatherBoosts.getTypeWbLookupMap().get(weather);
+			res.setWbTypeList(wbTypeList);
+		}
 	}
 
 	/**

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import jp.brainjuice.pokego.business.constant.AttackAnnotationTypeEnum;
 import jp.brainjuice.pokego.business.service.search.utils.MovesUtils;
 import jp.brainjuice.pokego.business.service.search.utils.MovesUtils.MoveCode;
+import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.ChargedAttackDetails;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.ChargedAttackRank;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.DispChargedAttack;
@@ -51,18 +52,22 @@ public class MoveLookupService {
 
 	private PokemonChargedAttackRepository pokemonChargedAttackRepository;
 
+	private PokemonGoUtils pokemonGoUtils;
+
 	public MoveLookupService(MoveSearchService moveSearchService,
 			MovesUtils movesUtils,
 			FastAttackRepository fastAttackRepository,
 			ChargedAttackRepository chargedAttackRepository,
 			PokemonFastAttackRepository pokemonFastAttackRepository,
-			PokemonChargedAttackRepository pokemonChargedAttackRepository) {
+			PokemonChargedAttackRepository pokemonChargedAttackRepository,
+			PokemonGoUtils pokemonGoUtils) {
 		this.moveSearchService = moveSearchService;
 		this.movesUtils = movesUtils;
 		this.fastAttackRepository = fastAttackRepository;
 		this.chargedAttackRepository = chargedAttackRepository;
 		this.pokemonFastAttackRepository = pokemonFastAttackRepository;
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
+		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
 	public boolean check(MoveLookupRequest req, MoveLookupResponse res) {
@@ -86,6 +91,7 @@ public class MoveLookupService {
 	public void execute(MoveLookupRequest req, MoveLookupResponse res) throws BadRequestException {
 
 		if (!StringUtils.isEmpty(req.getMid())) {
+			// moveIdから取得
 			String moveId = req.getMid();
 			MoveCode moveCode = movesUtils.getMoveCode(moveId).orElseThrow();
 			switch (moveCode) {
@@ -100,6 +106,7 @@ public class MoveLookupService {
 			}
 
 		} else if (!StringUtils.isEmpty(req.getName())) {
+			// nameから取得
 			MoveSearchResult moveSearchResult = moveSearchService.search(req.getName());
 			res.setMoveSearchResult(moveSearchResult);
 
@@ -149,10 +156,14 @@ public class MoveLookupService {
 		details.setFastAttackRank(createFastAttackRank(moveId, fastAttackList));
 
 		List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository.findByMoveIdJoinGoPokedex(moveId);
+
+		AtomicInteger counter = new AtomicInteger();
 		List<GoPokedexAndMoveInfo> learnPokemonList = pokemonFastAttackList.stream()
 				.map(pfa -> {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
+					gpami.setNo(counter.incrementAndGet());
 					gpami.setGoPokedex(pfa.getGoPokedex());
+					gpami.setCp(pokemonGoUtils.calcBaseCp(pfa.getGoPokedex()));
 					gpami.setLearningPattern(pfa.getLearningPattern());
 					gpami.setLearningPatternName(pfa.getLearningPattern().getJpn());
 					Optional<String> annosOp = pfa.getAttackAdditionalInfo().stream()
@@ -238,6 +249,7 @@ public class MoveLookupService {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
 					gpami.setNo(counter.incrementAndGet());
 					gpami.setGoPokedex(pca.getGoPokedex());
+					gpami.setCp(pokemonGoUtils.calcBaseCp(pca.getGoPokedex()));
 					gpami.setLearningPattern(pca.getLearningPattern());
 					gpami.setLearningPatternName(pca.getLearningPattern().getJpn());
 					Optional<String> annosOp = pca.getAttackAdditionalInfo().stream()
