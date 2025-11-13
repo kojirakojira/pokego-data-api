@@ -138,11 +138,15 @@ public class PokemonSearchService {
 
 		List<MultiSearchDto> msDtoList = pidAndNameList.stream()
 				.map(pan -> {
+					String pid = pan.getPid();
 					PokemonSearchResult psr = null;
 					if (StringUtils.isEmpty(pan.getPid())) {
 						psr = search(pan.getName());
+						if (psr.isUnique()) {
+							pid = psr.getGoPokedex().getPokedexId();
+						}
 					}
-					return new MultiSearchDto(pan.getPid(), psr);
+					return new MultiSearchDto(pid, psr);
 				})
 				.toList();
 
@@ -231,9 +235,21 @@ public class PokemonSearchService {
 			return result;
 		}
 
-		// 形態素解析をして検索
+		// そのままnameカラムで検索する。
 		List<GoPokedex> goPokedexList = searchGeneral(words);
 		result.setSearched(true);
+
+		if (goPokedexList.size() == 1) {
+			// uniqueだったらそのまま返却する。
+			result.setGoPokedexList(goPokedexList);
+			result.setGoPokedex(goPokedexList.get(0));
+			result.setUnique(true);
+			result.setHit(true);
+			return result;
+		}
+
+		// 形態素解析をして検索
+		goPokedexList = searchMorphologicalAnalysis(words);
 
 		// 1件もヒットしなかった場合
 		if (goPokedexList.isEmpty()) {
@@ -280,18 +296,51 @@ public class PokemonSearchService {
 	}
 
 	/**
+	 * カタカナに変換してnameカラムでそのまま検索する。
+	 * @param words
+	 * @return
+	 */
+	private List<GoPokedex> searchGeneral(String words) {
+		String transWords = BjUtils.transAnyNFKC(words);
+		transWords = BjUtils.transHiraToKana(transWords);
+
+		return goPokedexRepository.findByName(transWords);
+	}
+
+	/**
 	 * 入力された文字列を形態素解析で分解し、名詞（ポケモン名、それ以外）から検索をおこなう。
 	 *
 	 * @param transWords
 	 * @return
 	 */
-	private List<GoPokedex> searchGeneral(String words) {
+	private List<GoPokedex> searchMorphologicalAnalysis(String words) {
 
-		TokenizeResult tokenizeResult = pokemonDictionaryInfo.search(words);
-		// 形態素解析で分解
-		final List<String> pokemonList = tokenizeResult.getPokemonList();
-		final List<String> otherList = tokenizeResult.getOtherList();
-		final List<String> groupList = tokenizeResult.getGroupList();
+		List<String> pokemonList;
+		List<String> otherList;
+		List<String> groupList;
+		{
+			// 加工せず形態素解析
+			TokenizeResult tokenizeResult = pokemonDictionaryInfo.search(words);
+			pokemonList = tokenizeResult.getPokemonList();
+			otherList = tokenizeResult.getOtherList();
+			groupList = tokenizeResult.getGroupList();
+		}
+
+		if (pokemonList.size() + otherList.size() + groupList.size() == 0) {
+			// 何もヒットしなかった場合、カタカナに変換して形態素解析
+			String transWords = BjUtils.transAnyNFKC(words);
+			transWords = BjUtils.transHiraToKana(transWords);
+
+			TokenizeResult tokenizeResult = pokemonDictionaryInfo.search(transWords);
+			pokemonList = tokenizeResult.getPokemonList();
+			otherList = tokenizeResult.getOtherList();
+			groupList = tokenizeResult.getGroupList();
+		}
+
+		if (pokemonList.size() + otherList.size() + groupList.size() == 0) {
+			// ヒットしなかった場合
+			return List.of();
+		}
 
 		/* 以下、GoPokedexの検索アルゴリズム */
 		// ポケモン名からGoPokedexリストを取得
@@ -324,10 +373,14 @@ public class PokemonSearchService {
 			// ポケモン名以外の名詞が存在する場合
 
 			// 備考で絞り込む
+			final List<String> otherTmpList = otherList;
 			List<GoPokedex> remarksResultList = goPokedexList.stream()
-					.filter(gp -> otherList.stream()
-							.filter(other ->  gp.getRemarks().contains(other))
-							.anyMatch(e -> true))
+					.filter(gp -> {
+						String remarks = gp.getRemarks();
+						return otherTmpList.stream()
+								.filter(other -> remarks.contains(other))
+								.anyMatch(e -> true);
+					})
 					.collect(Collectors.toList());
 
 			if (!remarksResultList.isEmpty()) {

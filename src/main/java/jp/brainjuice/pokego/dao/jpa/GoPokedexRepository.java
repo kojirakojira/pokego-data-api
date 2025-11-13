@@ -25,9 +25,18 @@ import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, JpaSpecificationExecutor<GoPokedex> {
 
 	/**
-	 * リストのポケモン名から検索
+	 * ポケモン名から検索
 	 *
 	 * @param name
+	 * @return
+	 */
+	@Meta(comment = "find goPokedex by name")
+	List<GoPokedex> findByName(String name);
+
+	/**
+	 * リストのポケモン名から検索
+	 *
+	 * @param names
 	 * @return
 	 */
 	@Meta(comment = "find goPokedex by name like in")
@@ -88,7 +97,7 @@ public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, J
 	 */
 	@Meta(comment = "find by implFlg")
 	List<GoPokedex> findByDynamaxImplFlgTrueOrGigantamaxImplFlgTrue();
-	
+
 
 	@Query(value = "WITH RECURSIVE root AS ("
 			+ "  SELECT pokedex_id, before_pokedex_id FROM evolution WHERE pokedex_id = :pid"
@@ -104,9 +113,9 @@ public interface GoPokedexRepository extends JpaRepository<GoPokedex, String>, J
 			+ "  WHERE r.before_pokedex_id = 'root'", nativeQuery = true)
 	@Meta(comment = "find go_pokedex root by id")
 	List<GoPokedex> findRootById(@Param("pid") String pid);
-	
+
 	/**
-	 * 
+	 *
 	 * @param pid
 	 * @return
 	 */

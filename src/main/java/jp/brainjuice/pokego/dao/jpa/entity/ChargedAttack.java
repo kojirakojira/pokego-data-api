@@ -92,7 +92,7 @@ public class ChargedAttack implements Attack, Serializable, Cloneable {
 	@Column(name = "pvp_energy_incr_amount", nullable = false)
 	private int pvpEnergyIncrAmount;
 
-	/** Power Per Energy. round(pvpPower / abs(energyIncrAmount), 2) */
+	/** Damage Per Energy. round(pvpPower / abs(energyIncrAmount), 2) */
 	@Column(nullable = false)
 	private double dpe;
 
