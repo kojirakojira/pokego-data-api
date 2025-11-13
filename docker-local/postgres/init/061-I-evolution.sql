@@ -1119,7 +1119,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0916N01', '0915N01', 0, null, null, null, null, null, null, TRUE), --パフュートン(オスのすがた)
 	('0916N02', '0915N01', 0, null, null, null, null, null, null, TRUE), --パフュートン(メスのすがた)
 	('0917N01', 'root', 0, null, null, null, null, null, null, FALSE), --タマンチュラ
-	('0918N01', '0917N01', 0, null, null, null, null, null, null, TRUE), --ワナイダー
+	('0918N01', '0917N01', 50, null, null, null, null, null, null, TRUE), --ワナイダー
 	('0919N01', 'root', 0, null, null, null, null, null, null, FALSE), --マメバッタ
 	('0920N01', '0919N01', 0, null, null, null, null, null, null, TRUE), --エクスレッグ
 	('0921N01', 'root', 0, null, null, null, null, null, null, FALSE), --パモ

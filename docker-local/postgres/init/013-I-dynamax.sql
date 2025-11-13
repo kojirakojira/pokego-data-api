@@ -843,8 +843,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0683N01', FALSE, FALSE), --フレフワン
 	('0684N01', FALSE, FALSE), --ペロッパフ
 	('0685N01', FALSE, FALSE), --ペロリーム
-	('0686N01', FALSE, FALSE), --マーイーカ
-	('0687N01', FALSE, FALSE), --カラマネロ
+	('0686N01', TRUE, FALSE), --マーイーカ
+	('0687N01', TRUE, FALSE), --カラマネロ
 	('0688N01', FALSE, FALSE), --カメテテ
 	('0689N01', FALSE, FALSE), --ガメノデス
 	('0690N01', FALSE, FALSE), --クズモー
@@ -1047,7 +1047,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0858N01', TRUE, FALSE), --ブリムオン
 	('0859N01', FALSE, FALSE), --ベロバー
 	('0860N01', FALSE, FALSE), --ギモー
-	('0861N01', FALSE, FALSE), --オーロンゲ
+	('0861N01', FALSE, TRUE), --オーロンゲ
 	('0862N01', FALSE, FALSE), --タチフサグマ
 	('0863N01', FALSE, FALSE), --ニャイキング
 	('0864N01', FALSE, FALSE), --サニゴーン
