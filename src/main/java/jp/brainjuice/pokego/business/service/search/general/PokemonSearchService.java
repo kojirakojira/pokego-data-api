@@ -112,7 +112,7 @@ public class PokemonSearchService {
 	}
 
 	private GoPokedexAndCp getGoPokedexAndCp(GoPokedex goPokedex, int no) {
-		int cp = pokemonGoUtils.calcBaseCp(goPokedex.getAttack(), goPokedex.getDefense(), goPokedex.getHp());
+		int cp = pokemonGoUtils.calcMaxBaseCp(goPokedex);
 		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(no, goPokedex, cp);
 		return gpAndCp;
 	}

@@ -17,10 +17,13 @@ public class AbundanceResponse extends ResearchResponse {
 	private GoPokedex goPokedex;
 	// CP(PL40)
 	private int cp40;
+	private int cp40Max;
 	// CP(PL50)
 	private int cp50;
+	private int cp50Max;
 	// CP(PL51)
-	private int maxCp;
+	private int cp51;
+	private int cp51Max;
 	// 野生
 	private CatchCp wild;
 	// レイド
@@ -54,7 +57,7 @@ public class AbundanceResponse extends ResearchResponse {
 	private String dynamaxMsg;
 	// キョダイマックス可能かを示すメッセージ
 	private String gigantamaxMsg;
-	
+
 	// そのポケモンを進化させた場合、最終進化後のポケモンのCPがリーグ制限に引っかからないギリギリのCP
 	// ホゲータの場合、ラウドボーンがCP1500,2500にならないギリギリのCP
 	private List<GoPokedexAndCpPl> superLeagueSafeCpList;

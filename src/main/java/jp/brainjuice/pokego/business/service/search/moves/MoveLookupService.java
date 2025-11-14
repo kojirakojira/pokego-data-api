@@ -163,7 +163,7 @@ public class MoveLookupService {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
 					gpami.setNo(counter.incrementAndGet());
 					gpami.setGoPokedex(pfa.getGoPokedex());
-					gpami.setCp(pokemonGoUtils.calcBaseCp(pfa.getGoPokedex()));
+					gpami.setCp(pokemonGoUtils.calcMaxBaseCp(pfa.getGoPokedex()));
 					gpami.setLearningPattern(pfa.getLearningPattern());
 					gpami.setLearningPatternName(pfa.getLearningPattern().getJpn());
 					Optional<String> annosOp = pfa.getAttackAdditionalInfo().stream()
@@ -249,7 +249,7 @@ public class MoveLookupService {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
 					gpami.setNo(counter.incrementAndGet());
 					gpami.setGoPokedex(pca.getGoPokedex());
-					gpami.setCp(pokemonGoUtils.calcBaseCp(pca.getGoPokedex()));
+					gpami.setCp(pokemonGoUtils.calcMaxBaseCp(pca.getGoPokedex()));
 					gpami.setLearningPattern(pca.getLearningPattern());
 					gpami.setLearningPatternName(pca.getLearningPattern().getJpn());
 					Optional<String> annosOp = pca.getAttackAdditionalInfo().stream()

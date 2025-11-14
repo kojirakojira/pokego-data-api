@@ -159,6 +159,23 @@ public class PokemonGoUtils {
 	}
 
 	/**
+	 * GoPokedexから最大個体値のcpを求めます。<br>
+	 * PL40の場合のCPを求めます。<br>
+	 * ※引数にはGOのステータスを指定してください。
+	 *
+	 * @param goPokedex
+	 * @return
+	 */
+	public int calcMaxBaseCp(GoPokedex goPokedex) {
+
+		// 個体値
+		return calcBaseCp(
+				goPokedex.getAttack() + 15,
+				goPokedex.getDefense() + 15,
+				goPokedex.getHp() + 15);
+	}
+
+	/**
 	 * GoPokedex、個体値からcpを求めます。<br>
 	 * PL40の場合のCPを求めます。<br>
 	 * ※引数にはGOのステータスを指定してください。
