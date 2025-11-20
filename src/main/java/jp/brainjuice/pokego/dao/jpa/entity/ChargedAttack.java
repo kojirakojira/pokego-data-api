@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * スペシャル技（Charged Attacks, 技2）
@@ -27,6 +28,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "charged_attack")
 @ToString
+@Slf4j
 public class ChargedAttack implements Attack, Serializable, Cloneable {
 
 	/** 技ID(タイプコード3桁 + (ノーマル技(1) or スペシャル技(2))1桁 + 連番3桁) */
@@ -115,4 +117,15 @@ public class ChargedAttack implements Attack, Serializable, Cloneable {
 	/** バフ・デバフの発動確率 */
 	@Column(name = "activation_chance", nullable = false)
 	private double activationChance;
+
+	@Override
+	public ChargedAttack clone() {
+		ChargedAttack ca = null;
+		try {
+			ca = (ChargedAttack) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.", e);
+		}
+		return ca;
+	}
 }

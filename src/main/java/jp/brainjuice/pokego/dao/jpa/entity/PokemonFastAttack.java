@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ポケモンごとの通常技
@@ -36,6 +37,7 @@ import lombok.ToString;
 @Table(name = "pokemon_fast_attack")
 @ToString(exclude = {"fastAttack", "attackAdditionalInfo", "goPokedex"})
 @IdClass(PokemonAttackPk.class)
+@Slf4j
 public class PokemonFastAttack implements Serializable, Cloneable {
 
 	/** 図鑑ID */
@@ -90,5 +92,16 @@ public class PokemonFastAttack implements Serializable, Cloneable {
 		if (obj == null || getClass() != obj.getClass()) return false;
 		PokemonFastAttack pfa = (PokemonFastAttack) obj;
 		return Objects.equals(pokedexId, pfa.getPokedexId()) && Objects.equals(moveId, pfa.getMoveId());
+	}
+
+	@Override
+	public PokemonFastAttack clone() {
+		PokemonFastAttack pfa = null;
+		try {
+			pfa = (PokemonFastAttack) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.", e);
+		}
+		return pfa;
 	}
 }

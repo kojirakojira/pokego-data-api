@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ポケモンごとのスペシャル技
@@ -36,6 +37,7 @@ import lombok.ToString;
 @Table(name = "pokemon_charged_attack")
 @ToString(exclude = {"chargedAttack", "attackAdditionalInfo", "goPokedex"})
 @IdClass(PokemonAttackPk.class)
+@Slf4j
 public class PokemonChargedAttack implements Serializable, Cloneable {
 
 	/** 図鑑ID */
@@ -90,6 +92,17 @@ public class PokemonChargedAttack implements Serializable, Cloneable {
 		if (obj == null || getClass() != obj.getClass()) return false;
 		PokemonChargedAttack pca = (PokemonChargedAttack) obj;
 		return Objects.equals(pokedexId, pca.getPokedexId()) && Objects.equals(moveId, pca.getMoveId());
+	}
+
+	@Override
+	public PokemonChargedAttack clone() {
+		PokemonChargedAttack pca = null;
+		try {
+			pca = (PokemonChargedAttack) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.", e);
+		}
+		return pca;
 	}
 
 }

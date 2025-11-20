@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ノーマル技（Fast Attacks、技1）
@@ -27,6 +28,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "fast_attack")
 @ToString
+@Slf4j
 public class FastAttack implements Attack, Serializable, Cloneable {
 
 	/** 技ID(タイプコード3桁 + (通常技(1) or スペシャル技(2))1桁 + 連番3桁) */
@@ -104,4 +106,15 @@ public class FastAttack implements Attack, Serializable, Cloneable {
 	/** Energy Per Turns. round(energy / turns, 2) */
 	@Column(nullable = false)
 	private double ept;
+
+	@Override
+	public FastAttack clone() {
+		FastAttack fa = null;
+		try {
+			fa = (FastAttack) super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone failed.", e);
+		}
+		return fa;
+	}
 }

@@ -58,6 +58,8 @@ public class GymRaidPinnacleRankService {
 
 	private WeatherBoosts weatherBoosts;
 
+	private MovesUtils movesUtils;
+
 	public enum SelectPattern {
 		/** 含める */
 		include,
@@ -82,7 +84,8 @@ public class GymRaidPinnacleRankService {
 			ChargedAttackRepository chargedAttackRepository,
 			GymRaidDamageCalculator gymRaidDamageCalculator,
 			TypeCommentMap typeCommentMap,
-			WeatherBoosts weatherBoosts) {
+			WeatherBoosts weatherBoosts,
+			MovesUtils movesUtils) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonFastAttackRepository = pokemonFastAttackRepository;
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
@@ -91,6 +94,7 @@ public class GymRaidPinnacleRankService {
 		this.gymRaidDamageCalculator = gymRaidDamageCalculator;
 		this.typeCommentMap = typeCommentMap;
 		this.weatherBoosts = weatherBoosts;
+		this.movesUtils = movesUtils;
 	}
 
 	public void exec(GymRaidPinnacleRankRequest req, GymRaidPinnacleRankResponse res) {
@@ -106,7 +110,9 @@ public class GymRaidPinnacleRankService {
 
 		List<PokemonAttackCombination> combiList = createTmpCombiList(megaSelected, shadowSelected);
 
-		Map<String, FastAttack> fastAttackMap = fastAttackRepository.findAllCanLearn().stream()
+		Map<String, FastAttack> fastAttackMap = movesUtils.convHiddenPowerForFastAttackList( // めざめるパワーを変換
+				fastAttackRepository.findAllCanLearn()
+				).stream()
 				.collect(Collectors.toMap(FastAttack::getMoveId, Function.identity()));
 		Map<String, ChargedAttack> chargedAttackMap = chargedAttackRepository.findAllCanLearn().stream()
 				.collect(Collectors.toMap(ChargedAttack::getMoveId, Function.identity()));
@@ -188,7 +194,9 @@ public class GymRaidPinnacleRankService {
 
 		// ポケモンが覚える技をすべて取得する
 		// 通常技
-		Map<String, List<PokemonFastAttack>> pfaMap = pokemonFastAttackRepository.findAll().stream()
+		Map<String, List<PokemonFastAttack>> pfaMap = movesUtils.convHiddenPowerForPokemonFastAttackList( // めざめるパワーを変換
+				pokemonFastAttackRepository.findAll()
+				).stream()
 				.filter(pfa -> !MovesUtils.TRANSFORM_MOVE_ID.equals(pfa.getMoveId())) // へんしんを排除する。
 				.collect(Collectors.groupingBy(PokemonFastAttack::getPokedexId));
 		List<PokemonChargedAttack> pcaList = pokemonChargedAttackRepository.findAll();

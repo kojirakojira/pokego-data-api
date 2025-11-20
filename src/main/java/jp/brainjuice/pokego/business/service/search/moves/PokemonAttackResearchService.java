@@ -51,6 +51,13 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 		GoPokedex gp = sv.getGoPokedex();
 		res.setGoPokedex(gp);
 
+		if (!gp.isImplFlg()) {
+			// 未実装のポケモンの場合、技は表示しない
+			res.setFastAttackList(List.of());
+			res.setChargedAttackList(List.of());
+			return;
+		}
+
 		GoPokedex targetGp = gp;
 		if (!StringUtils.isEmpty(gp.getPreMegaPokedexId())) {
 			// メガシンカの場合

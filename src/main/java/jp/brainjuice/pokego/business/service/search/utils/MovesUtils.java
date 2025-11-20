@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.business.service.search.moves.HiddenPowerConverter;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.Buff;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.BuffContent;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.BuffContent.BuffTarget1Enum;
@@ -23,6 +24,7 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastGymParam
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastPvpParam;
 import jp.brainjuice.pokego.dao.jpa.entity.ChargedAttack;
 import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
+import jp.brainjuice.pokego.dao.jpa.entity.PokemonFastAttack;
 import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.Getter;
 
@@ -33,6 +35,22 @@ public class MovesUtils {
 
 	/** へんしんのmoveId */
 	public static final String TRANSFORM_MOVE_ID = "NOR1006";
+
+	/** めざめるパワーのmoveId */
+	public static final String HIDDEN_POWER_MOVE_ID = "NOR1007";
+
+	/**
+	 * めざめるパワー変換後のmoveIdの5桁目の数字。
+	 * (めざめるパワー以外にも変換が必要な技が出てきたらこの数値の扱いはまた考える。)
+	 * moveId: NOR19XX
+	 */
+	public static final String HIDDEN_POWER_RESERVED_WORD_9 = "9";
+
+	private HiddenPowerConverter hiddenPowerConverter;
+
+	public MovesUtils(HiddenPowerConverter hiddenPowerConverter) {
+		this.hiddenPowerConverter = hiddenPowerConverter;
+	}
 
 	@Getter
 	public enum MoveCode {
@@ -228,4 +246,27 @@ public class MovesUtils {
 		}
 	}
 
+	/**
+	 * めざめるパワー変換の転送メソッド<br>
+	 * {@linkplain HiddenPowerConverter#convertFastAttackList}
+	 */
+	public List<FastAttack> convHiddenPowerForFastAttackList(List<FastAttack> fastAttackList) {
+		return hiddenPowerConverter.convertFastAttackList(fastAttackList);
+	}
+
+	/**
+	 * めざめるパワー変換の転送メソッド<br>
+	 * {@linkplain HiddenPowerConverter#convertPokemonFastAttackList}
+	 */
+	public List<PokemonFastAttack> convHiddenPowerForPokemonFastAttackList(List<PokemonFastAttack> pfaList) {
+		return hiddenPowerConverter.convertPokemonFastAttackList(pfaList);
+	}
+
+	/**
+	 * めざめるパワーの技IDを元に戻す転送メソッド<br>
+	 * {@linkplain HiddenPowerConverter#resetMoveId}
+	 */
+	public String resetHiddenPowerMoveId(String moveId) {
+		return hiddenPowerConverter.resetMoveId(moveId);
+	}
 }

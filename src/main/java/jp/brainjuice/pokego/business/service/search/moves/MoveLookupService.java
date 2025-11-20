@@ -138,14 +138,26 @@ public class MoveLookupService {
 	 */
 	private void executeFastAttack(String moveId, MoveLookupResponse res) {
 
+		// 変換後のめざめるパワーの場合は、元に戻す
+		String mid = movesUtils.resetHiddenPowerMoveId(moveId);
+
 		List<FastAttack> fastAttackList = fastAttackRepository.findAll();
-		FastAttack fastAttack = fastAttackList.stream()
-				.filter(fa -> moveId.equals(fa.getMoveId()))
-				.findFirst().orElseThrow();
+		Optional<FastAttack> fastAttackOp = fastAttackList.stream()
+				.filter(fa -> mid.equals(fa.getMoveId()))
+				.findFirst();
+
+		if (!fastAttackOp.isPresent()) {
+			res.setSuccess(false);
+			res.setMsgLevel(MsgLevelEnum.error);
+			res.setMessage("存在しない技IDが指定されました。");
+			return;
+		}
+
+		FastAttack fastAttack = fastAttackOp.get();
 
 		res.setMoveId(fastAttack.getMoveId());
 		res.setName(fastAttack.getName());
-		res.setFastAttackDetails(createFastAttackDetails(moveId, fastAttack, fastAttackList));
+		res.setFastAttackDetails(createFastAttackDetails(fastAttack.getMoveId(), fastAttack, fastAttackList));
 	}
 
 	private FastAttackDetails createFastAttackDetails(String moveId, FastAttack fastAttack, List<FastAttack> fastAttackList) {
@@ -157,8 +169,10 @@ public class MoveLookupService {
 
 		List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository.findByMoveIdJoinGoPokedex(moveId);
 
+		// 覚えるポケモン
 		AtomicInteger counter = new AtomicInteger();
 		List<GoPokedexAndMoveInfo> learnPokemonList = pokemonFastAttackList.stream()
+				.filter(pfa -> pfa.getGoPokedex().isImplFlg()) // 実装済みのポケモンに絞り込む
 				.map(pfa -> {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
 					gpami.setNo(counter.incrementAndGet());
@@ -223,9 +237,18 @@ public class MoveLookupService {
 	private void executeChargedAttack(String moveId, MoveLookupResponse res) {
 
 		List<ChargedAttack> chargedAttackList = chargedAttackRepository.findAll();
-		ChargedAttack chargedAttack = chargedAttackList.stream()
+		Optional<ChargedAttack> chargedAttackOp = chargedAttackList.stream()
 				.filter(fa -> moveId.equals(fa.getMoveId()))
-				.findFirst().orElseThrow();
+				.findFirst();
+
+		if (!chargedAttackOp.isPresent()) {
+			res.setSuccess(false);
+			res.setMsgLevel(MsgLevelEnum.error);
+			res.setMessage("存在しない技IDが指定されました。");
+			return;
+		}
+
+		ChargedAttack chargedAttack = chargedAttackOp.get();
 
 		res.setMoveId(chargedAttack.getMoveId());
 		res.setName(chargedAttack.getName());
@@ -234,7 +257,6 @@ public class MoveLookupService {
 
 	private ChargedAttackDetails createChargedAttackDetails(String moveId, ChargedAttack chargedAttack, List<ChargedAttack> chargedAttackList) {
 		ChargedAttackDetails details = new ChargedAttackDetails();
-
 
 		details.setChargedAttack(movesUtils.convDispChargedAttack(chargedAttack));
 
@@ -245,6 +267,7 @@ public class MoveLookupService {
 		// 覚えるポケモン
 		AtomicInteger counter = new AtomicInteger();
 		List<GoPokedexAndMoveInfo> learnPokemonList = pokemonChargedAttackList.stream()
+				.filter(pfa -> pfa.getGoPokedex().isImplFlg()) // 実装済みのポケモンに絞り込む
 				.map(pca -> {
 					GoPokedexAndMoveInfo gpami = new GoPokedexAndMoveInfo();
 					gpami.setNo(counter.incrementAndGet());
