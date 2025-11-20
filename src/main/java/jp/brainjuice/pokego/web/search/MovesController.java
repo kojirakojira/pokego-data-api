@@ -6,14 +6,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.search.moves.FilterAllMoveService;
+import jp.brainjuice.pokego.business.service.search.moves.GymRaidPokeMoveCombiResearchService;
 import jp.brainjuice.pokego.business.service.search.moves.MoveLookupService;
 import jp.brainjuice.pokego.business.service.search.moves.PokemonAttackResearchService;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.moves.FilterAllMoveRequest;
+import jp.brainjuice.pokego.web.search.form.req.moves.GymRaidPokeMoveCombiRequest;
 import jp.brainjuice.pokego.web.search.form.req.moves.MoveLookupRequest;
 import jp.brainjuice.pokego.web.search.form.req.moves.PokemonAttackRequest;
 import jp.brainjuice.pokego.web.search.form.res.moves.FilterAllMoveResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.GymRaidPokeMoveCombiResponse;
 import jp.brainjuice.pokego.web.search.form.res.moves.MoveLookupResponse;
 import jp.brainjuice.pokego.web.search.form.res.moves.PokemonAttackResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,9 @@ public class MovesController {
 	private PokemonAttackResearchService pokemonAttackResearchService;
 	private ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse;
 
+	private GymRaidPokeMoveCombiResearchService gymRaidPokeMoveCombiResearchService;
+	private ResearchServiceExecutor<GymRaidPokeMoveCombiResponse> gymRaidPokeMoveCombiResRse;
+
 	private MoveLookupService moveLookupService;
 
 	private ViewsCacheProvider viewsCacheProvider;
@@ -41,11 +47,14 @@ public class MovesController {
 	public MovesController(
 			FilterAllMoveService filterAllMoveService,
 			PokemonAttackResearchService pokemonAttackResearchService, ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse,
+			GymRaidPokeMoveCombiResearchService gymRaidPokeMoveCombiResearchService, ResearchServiceExecutor<GymRaidPokeMoveCombiResponse> gymRaidPokeMoveCombiResRse,
 			MoveLookupService moveLookupService,
 			ViewsCacheProvider viewsCacheProvider) {
 		this.filterAllMoveService = filterAllMoveService;
 		this.pokemonAttackResearchService = pokemonAttackResearchService;
 		this.pokemonAttackResRse = pokemonAttackResRse;
+		this.gymRaidPokeMoveCombiResearchService = gymRaidPokeMoveCombiResearchService;
+		this.gymRaidPokeMoveCombiResRse = gymRaidPokeMoveCombiResRse;
 		this.moveLookupService = moveLookupService;
 		this.viewsCacheProvider = viewsCacheProvider;
 	}
@@ -82,10 +91,25 @@ public class MovesController {
 		PokemonAttackResponse res = new PokemonAttackResponse();
 		pokemonAttackResRse.execute(req, res, pokemonAttackResearchService);
 
-		viewsCacheProvider.addTempList();
 		return res;
 	}
 
+	@GetMapping("gymRaidPokeMoveCombi")
+	public GymRaidPokeMoveCombiResponse pokemonMoveCombi(GymRaidPokeMoveCombiRequest req) throws BadRequestException {
+
+		GymRaidPokeMoveCombiResponse res = new GymRaidPokeMoveCombiResponse();
+		gymRaidPokeMoveCombiResRse.execute(req, res, gymRaidPokeMoveCombiResearchService);
+
+		return res;
+	}
+
+	/**
+	 * 技の情報を取得する。
+	 *
+	 * @param req
+	 * @return
+	 * @throws BadRequestException
+	 */
 	@GetMapping("/moveLookup")
 	public MoveLookupResponse moveLookup(MoveLookupRequest req) throws BadRequestException {
 

@@ -35,6 +35,7 @@ public enum PageNameEnum {
 	moveLookup("技検索"),
 	filterAllMove("技一覧"),
 	pokemonAttack("ポケモンが覚える技"),
+	gymRaidPokeMoveCombi("技の組み合わせランキング(ジム・レイド)"),
 	typeScore("タイプ評価"),
 	xType("Xタイプ検索"),
 	iroiroTypeRank("色々タイプランキング"),
