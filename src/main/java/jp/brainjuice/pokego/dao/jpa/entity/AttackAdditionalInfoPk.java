@@ -1,14 +1,13 @@
 package jp.brainjuice.pokego.dao.jpa.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
 
 import jp.brainjuice.pokego.business.constant.AttackAnnotationTypeEnum;
 import lombok.AllArgsConstructor;
@@ -17,17 +16,15 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 技の追加情報。注釈。<br>
- * 技の情報はマスタデータから取得するようにしている都合上、別テーブルとして定義する必要がある。
+ * ポケモンごとの技の主キー
+ * 通常技、スペシャル技で併用している。
  */
+@Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "attack_additional_info")
 @ToString
-@IdClass(AttackAdditionalInfoPk.class)
-public class AttackAdditionalInfo implements Serializable, Cloneable {
+public class AttackAdditionalInfoPk implements Serializable {
 
 	/** 図鑑ID */
 	@Id
@@ -44,7 +41,26 @@ public class AttackAdditionalInfo implements Serializable, Cloneable {
 	@Column(name = "annotation_type", nullable = false, columnDefinition = "bpchar")
 	private AttackAnnotationTypeEnum annotationType;
 
-	/** 追加の説明文 */
-	private String text;
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(pokedexId, moveId, annotationType);
+	}
 
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		AttackAdditionalInfoPk aaiPk = (AttackAdditionalInfoPk) obj;
+		return Objects.equals(pokedexId, aaiPk.getPokedexId())
+				&& Objects.equals(moveId, aaiPk.getMoveId())
+				&& annotationType == aaiPk.getAnnotationType();
+	}
 }

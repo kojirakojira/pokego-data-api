@@ -13,6 +13,7 @@ import lombok.ToString;
 @ToString
 public class ChargedAttackDetails {
 
+	private String generalDescription;
 	private DispChargedAttack chargedAttack;
 	private ChargedAttackRank chargedAttackRank;
 	private List<GoPokedexAndMoveInfo> learnPokemonList;

@@ -22,6 +22,7 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastAttackDe
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.FastAttackRank;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.GoPokedexAndMoveInfo;
 import jp.brainjuice.pokego.business.service.search.utils.dto.moves.MoveSearchResult;
+import jp.brainjuice.pokego.dao.jpa.AttackAdditionalInfoRepository;
 import jp.brainjuice.pokego.dao.jpa.ChargedAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.FastAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.PokemonChargedAttackRepository;
@@ -52,6 +53,8 @@ public class MoveLookupService {
 
 	private PokemonChargedAttackRepository pokemonChargedAttackRepository;
 
+	private AttackAdditionalInfoRepository attackAdditionalInfoRepository;
+
 	private PokemonGoUtils pokemonGoUtils;
 
 	public MoveLookupService(MoveSearchService moveSearchService,
@@ -60,6 +63,7 @@ public class MoveLookupService {
 			ChargedAttackRepository chargedAttackRepository,
 			PokemonFastAttackRepository pokemonFastAttackRepository,
 			PokemonChargedAttackRepository pokemonChargedAttackRepository,
+			AttackAdditionalInfoRepository attackAdditionalInfoRepository,
 			PokemonGoUtils pokemonGoUtils) {
 		this.moveSearchService = moveSearchService;
 		this.movesUtils = movesUtils;
@@ -67,6 +71,7 @@ public class MoveLookupService {
 		this.chargedAttackRepository = chargedAttackRepository;
 		this.pokemonFastAttackRepository = pokemonFastAttackRepository;
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
+		this.attackAdditionalInfoRepository = attackAdditionalInfoRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 	}
 
@@ -196,6 +201,8 @@ public class MoveLookupService {
 				.toList());
 		details.setSameTypeMoveList(sameTypeMoveList);
 
+		details.setGeneralDescription(getGeneralDescription(moveId));
+
 		return details;
 	}
 
@@ -291,6 +298,8 @@ public class MoveLookupService {
 				.toList());
 		details.setSameTypeMoveList(sameTypeMoveList);
 
+		details.setGeneralDescription(getGeneralDescription(moveId));
+
 		return details;
 	}
 
@@ -317,6 +326,15 @@ public class MoveLookupService {
 		chargedAttackRank.setTotalCount(chargedAttackList.size());
 
 		return chargedAttackRank;
+	}
+
+	private String getGeneralDescription(String moveId) {
+
+		List<AttackAdditionalInfo> attackAdditionalInfoList = attackAdditionalInfoRepository.findByMoveIdAndAnnotationType(moveId, AttackAnnotationTypeEnum.general);
+		return attackAdditionalInfoList.stream()
+				.findAny()
+				.map(aai -> aai.getText())
+				.orElse("");
 	}
 
 	/**

@@ -5,6 +5,6 @@ CREATE TABLE ATTACK_ADDITIONAL_INFO (
   move_id bpchar,
   annotation_type bpchar,
   text varchar NOT NULL,
-  create_date timestamp NOT NULL,
+  create_date timestamp DEFAULT NOW(),
   CONSTRAINT attack_additional_info_pk PRIMARY KEY(pokedex_id, move_id, annotation_type)
 );

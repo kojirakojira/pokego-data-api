@@ -13,6 +13,7 @@ import lombok.ToString;
 @ToString
 public class FastAttackDetails {
 
+	private String generalDescription;
 	private DispFastAttack fastAttack;
 	private FastAttackRank fastAttackRank;
 	private List<GoPokedexAndMoveInfo> learnPokemonList;

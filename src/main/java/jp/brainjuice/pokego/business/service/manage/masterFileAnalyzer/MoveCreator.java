@@ -294,7 +294,7 @@ public class MoveCreator {
 					double dps = BjUtils.round(cma.getGymRaid().getPower(), ((double) cma.getGymRaid().getDurationMs() / 1000.0), 3);
 					int grEenergyDelta = cma.getGymRaid().getEnergyDelta();
 					// なぜかわるあがき(STRUGGLE)は、マスタデータ上にジム・レイドのenergyDeltaが存在しない。
-					int energyBar = grEenergyDelta == 0 ? 3 : (int) (100 / grEenergyDelta) * -1;
+					int energyBar = grEenergyDelta == 0 ? 0 : (int) (100 / grEenergyDelta) * -1;
 					double dpe = BjUtils.round(cma.getPvp().getPower(), ((double) cma.getPvp().getEnergyDelta() * -1), 3);
 					Optional<Buffs> buffsOp = Optional.ofNullable(cma.getPvp().getBuffs());
 					return new ChargedAttack(
