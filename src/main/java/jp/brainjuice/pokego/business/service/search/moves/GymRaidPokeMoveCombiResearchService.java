@@ -2,12 +2,14 @@ package jp.brainjuice.pokego.business.service.search.moves;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.search.ResearchService;
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.search.utils.GymRaidDamageCalculator;
 import jp.brainjuice.pokego.business.service.search.utils.MovesUtils;
 import jp.brainjuice.pokego.business.service.search.utils.dto.damage.GymRaidAttackScoreInDto;
@@ -54,6 +56,7 @@ public class GymRaidPokeMoveCombiResearchService implements ResearchService<GymR
 
 		GoPokedex gp = sv.getGoPokedex();
 		res.setGoPokedex(gp);
+		long limit = sv.get(ParamsEnum.limit, long.class);
 
 		if (!gp.isImplFlg()) {
 			// 未実装のポケモンの場合、技は表示しない
@@ -106,10 +109,12 @@ public class GymRaidPokeMoveCombiResearchService implements ResearchService<GymR
 			}
 		}
 
-		combiList = combiList.stream()
-				.sorted((o1, o2) -> Double.compare(o2.getAttackScore(), o1.getAttackScore()))
-				.limit(20L)
-				.toList();
+		Stream<MoveCombination> combiStream = combiList.stream()
+				.sorted((o1, o2) -> Double.compare(o2.getAttackScore(), o1.getAttackScore()));
+		if (limit != -1L) {
+			combiStream = combiStream.limit(limit);
+		}
+		combiList = combiStream.toList();
 
 		res.setMoveCombiList(combiList);
 	}

@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class GymRaidPokeMoveCombiRequest extends ResearchRequestImpl {
 
-	/** シャドウか否か */
-	private boolean shadow;
+	/** 返却値のmoveCombiListの件数の上限 */
+	private long limit = -1L;
 }
