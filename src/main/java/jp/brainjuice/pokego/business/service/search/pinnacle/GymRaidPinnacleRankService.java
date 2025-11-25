@@ -21,6 +21,7 @@ import jp.brainjuice.pokego.business.service.search.utils.GymRaidDamageCalculato
 import jp.brainjuice.pokego.business.service.search.utils.MovesUtils;
 import jp.brainjuice.pokego.business.service.search.utils.dto.damage.GymRaidAttackScoreInDto;
 import jp.brainjuice.pokego.business.service.search.utils.dto.damage.GymRaidAttackScoreOutDto;
+import jp.brainjuice.pokego.business.service.search.utils.dto.pinnacle.GymRaidPinnacleRankTempDto;
 import jp.brainjuice.pokego.business.service.search.utils.dto.pinnacle.PokemonAttackCombination;
 import jp.brainjuice.pokego.business.service.search.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
@@ -108,38 +109,30 @@ public class GymRaidPinnacleRankService {
 		Order order = req.getOrder();
 		boolean isUnique = req.isUnique();
 
-		List<PokemonAttackCombination> combiList = createTmpCombiList(megaSelected, shadowSelected);
-
-		Map<String, FastAttack> fastAttackMap = movesUtils.convHiddenPowerForFastAttackList( // めざめるパワーを変換
-				fastAttackRepository.findAllCanLearn()
-				).stream()
-				.collect(Collectors.toMap(FastAttack::getMoveId, Function.identity()));
-		Map<String, ChargedAttack> chargedAttackMap = chargedAttackRepository.findAllCanLearn().stream()
-				.collect(Collectors.toMap(ChargedAttack::getMoveId, Function.identity()));
-
-		for (PokemonAttackCombination pac : combiList) {
-			GoPokedex gp = pac.getGoPokedex();
-			GymRaidAttackScoreInDto inDto = new GymRaidAttackScoreInDto(
-					gp,
-					fastAttackMap.get(pac.getFaMoveId()),
-					chargedAttackMap.get(pac.getCaMoveId()),
-					defenderType,
-					weather,
-					pac.isShadow());
-			GymRaidAttackScoreOutDto outDto = gymRaidDamageCalculator.attackScore(inDto);
-			pac.setFaAttackScore(outDto.getFastAttackScore());
-			pac.setCaAttackScore(outDto.getChargedAttackScore());
-			pac.setAttackScore(outDto.getAttackScore());
-		}
-
 		// 並び順を指定する。
-		Comparator<PokemonAttackCombination> comparator = switch (order) {
+		Comparator<GymRaidPinnacleRankTempDto> comparator = switch (order) {
 		case desc -> (o1, o2) -> Double.compare(o2.getAttackScore(), o1.getAttackScore());
 		case asc -> (o1, o2) -> Double.compare(o1.getAttackScore(), o2.getAttackScore());
 		};
 
-		// 並び替える
-		Stream<PokemonAttackCombination> combiStream = combiList.stream()
+		List<GymRaidPinnacleRankTempDto> tempDtoList = createTmpDtoList(megaSelected, shadowSelected);
+
+		GymRaidAttackScoreInDto inDto = new GymRaidAttackScoreInDto(); // オブジェクトを使い回す
+		Stream<GymRaidPinnacleRankTempDto> combiStream = tempDtoList.stream()
+				.map(tempDto -> {
+					GoPokedex gp = tempDto.getGoPokedex();
+					inDto.setGoPokedex(gp);
+					inDto.setFastAttack(tempDto.getPfa().getFastAttack());
+					inDto.setChargedAttack(tempDto.getPca().getChargedAttack());
+					inDto.setDefenderType(defenderType);
+					inDto.setWeather(weather);
+					inDto.setShadow(tempDto.isShadow());
+					GymRaidAttackScoreOutDto outDto = gymRaidDamageCalculator.attackScore(inDto);
+					tempDto.setFastAttackScore(outDto.getFastAttackScore());
+					tempDto.setChargedAttackScore(outDto.getChargedAttackScore());
+					tempDto.setAttackScore(outDto.getAttackScore());
+					return tempDto;
+				})
 				.sorted(comparator);
 
 		if (isUnique) {
@@ -154,22 +147,10 @@ public class GymRaidPinnacleRankService {
 					.entrySet().stream()
 					.map(Map.Entry::getValue);
 		}
-		// 上限1000で切り出し、表示用の最終調整をする。
-		combiList = combiStream
+		// 上限1000で切り出し、表示用の型に変換する。
+		List<PokemonAttackCombination> combiList = combiStream
 				.limit(1000L)
-				.map(pac -> {
-					FastAttack fa = fastAttackMap.get(pac.getFaMoveId());
-					pac.setFaName(fa.getName());
-					pac.setFaType(fa.getType());
-					ChargedAttack ca = chargedAttackMap.get(pac.getCaMoveId());
-					pac.setCaName(ca.getName());
-					pac.setCaType(ca.getType());
-
-					String attribute = pac.isShadow() ? "シャドウ" : "";
-					attribute = pac.isMega() ? "メガ" : attribute;
-					pac.setAttribute(attribute);
-					return pac;
-				})
+				.map(this::convPokemonAttackCombination)
 				.toList();
 
 		res.setCombiList(combiList);
@@ -186,7 +167,8 @@ public class GymRaidPinnacleRankService {
 	 * FastAttackとChargedAttackは設定しないため、作成途中のリストを返却する。
 	 * @return
 	 */
-	private List<PokemonAttackCombination> createTmpCombiList(SelectPattern megaSelected,
+	private List<GymRaidPinnacleRankTempDto> createTmpDtoList(
+			SelectPattern megaSelected,
 			SelectPattern shadowSelected) {
 
 		// 攻撃する側のポケモンの一覧（実装済みの全ポケモン）を取得する
@@ -195,11 +177,11 @@ public class GymRaidPinnacleRankService {
 		// ポケモンが覚える技をすべて取得する
 		// 通常技
 		Map<String, List<PokemonFastAttack>> pfaMap = movesUtils.convHiddenPowerForPokemonFastAttackList( // めざめるパワーを変換
-				pokemonFastAttackRepository.findAll()
+				pokemonFastAttackRepository.findAllJoinFastAttack()
 				).stream()
 				.filter(pfa -> !MovesUtils.TRANSFORM_MOVE_ID.equals(pfa.getMoveId())) // へんしんを排除する。
 				.collect(Collectors.groupingBy(PokemonFastAttack::getPokedexId));
-		List<PokemonChargedAttack> pcaList = pokemonChargedAttackRepository.findAll();
+		List<PokemonChargedAttack> pcaList = pokemonChargedAttackRepository.findAllJoinChargedAttack();
 		// スペシャル技
 		Map<String, List<PokemonChargedAttack>> pcaMap = pcaList.stream()
 				.collect(Collectors.groupingBy(PokemonChargedAttack::getPokedexId));
@@ -217,7 +199,7 @@ public class GymRaidPinnacleRankService {
 		 * 通常状態におけるポケモン×通常技×スペシャル技の全パターン
 		 */
 		// 通常技のCombinationのStreamを作成
-		Stream<PokemonAttackCombination> combiList = goPokedexList.stream()
+		Stream<GymRaidPinnacleRankTempDto> combiList = goPokedexList.stream()
 				.filter(gpPredicate)
 				.flatMap(gp -> {
 					String pokedexId = gp.getPokedexId();
@@ -232,7 +214,7 @@ public class GymRaidPinnacleRankService {
 						log.debug("通常技、スペシャル技のどちらかが存在しませんでした。（pokedexId: {}）", pokedexId);
 						return Stream.empty();
 					}
-					List<PokemonAttackCombination> pacList = createOneGpCombiList(gp, targetGpPfaList, targetGpPcaList,
+					List<GymRaidPinnacleRankTempDto> pacList = createOneTempDtoList(gp, targetGpPfaList, targetGpPcaList,
 							false);
 					return pacList.stream();
 				});
@@ -259,7 +241,7 @@ public class GymRaidPinnacleRankService {
 				.filter(gp -> gp != null) // nullになった要素を除去する。
 				.toList();
 		// シャドウポケモンのCombinationのリストを作成
-		Stream<PokemonAttackCombination> shadowCombiList = goPokedexShadowList.stream()
+		Stream<GymRaidPinnacleRankTempDto> shadowCombiList = goPokedexShadowList.stream()
 				.flatMap(gp -> {
 					String pokedexId = gp.getPokedexId();
 					List<PokemonFastAttack> targetGpPfaList = pfaMap.get(pokedexId);
@@ -268,7 +250,7 @@ public class GymRaidPinnacleRankService {
 						log.warn("{}でエラー", pokedexId);
 						return Stream.empty();
 					}
-					List<PokemonAttackCombination> pacList = createOneGpCombiList(gp, targetGpPfaList, targetGpPcaList,
+					List<GymRaidPinnacleRankTempDto> pacList = createOneTempDtoList(gp, targetGpPfaList, targetGpPcaList,
 							true);
 					return pacList.stream();
 				});
@@ -276,14 +258,14 @@ public class GymRaidPinnacleRankService {
 		return Stream.concat(combiList, shadowCombiList).toList();
 	}
 
-	private List<PokemonAttackCombination> createOneGpCombiList(
+	private List<GymRaidPinnacleRankTempDto> createOneTempDtoList(
 			GoPokedex goPokedex,
 			List<PokemonFastAttack> targetGpPfaList,
 			List<PokemonChargedAttack> targetGpPcaList,
 			boolean shadowFlg) {
 
 		// そのポケモンの通常技 * スペシャル技の数を初期容量としてリストを生成する。
-		List<PokemonAttackCombination> combiList = new ArrayList<>(targetGpPfaList.size() * targetGpPcaList.size());
+		List<GymRaidPinnacleRankTempDto> combiList = new ArrayList<>(targetGpPfaList.size() * targetGpPcaList.size());
 		for (PokemonFastAttack pfa : targetGpPfaList) {
 			for (PokemonChargedAttack pca : targetGpPcaList) {
 				if ((shadowFlg && pca.getLearningPattern() == LearningPatternEnum.purified)
@@ -291,17 +273,44 @@ public class GymRaidPinnacleRankService {
 					// シャドウでリトレーン後の技、またはリトレーン後でシャドウの技の場合はスキップ
 					continue;
 				}
-				PokemonAttackCombination combi = new PokemonAttackCombination();
+				GymRaidPinnacleRankTempDto combi = new GymRaidPinnacleRankTempDto();
 				combi.setGoPokedex(goPokedex);
-				combi.setFaMoveId(pfa.getMoveId());
-				combi.setCaMoveId(pca.getMoveId());
-				combi.setFastAttackLearningPattern(pfa.getLearningPattern());
-				combi.setChargedAttackLearningPattern(pca.getLearningPattern());
-				combi.setMega(goPokedex.getPreMegaPokedexId() != null);
+				combi.setPfa(pfa);
+				combi.setPca(pca);
 				combi.setShadow(shadowFlg);
 				combiList.add(combi);
 			}
 		}
 		return combiList;
+	}
+
+	private PokemonAttackCombination convPokemonAttackCombination(GymRaidPinnacleRankTempDto tempDto) {
+
+		PokemonAttackCombination combi = new PokemonAttackCombination();
+		GoPokedex gp = tempDto.getGoPokedex();
+		PokemonFastAttack pfa = tempDto.getPfa();
+		PokemonChargedAttack pca = tempDto.getPca();
+		combi.setGoPokedex(gp);
+		combi.setFaMoveId(pfa.getMoveId());
+		combi.setCaMoveId(pca.getMoveId());
+		combi.setFastAttackLearningPattern(pfa.getLearningPattern());
+		combi.setChargedAttackLearningPattern(pca.getLearningPattern());
+		combi.setMega(gp.getPreMegaPokedexId() != null);
+		combi.setShadow(tempDto.isShadow());
+
+		combi.setFaAttackScore(tempDto.getFastAttackScore());
+		combi.setCaAttackScore(tempDto.getChargedAttackScore());
+		combi.setAttackScore(tempDto.getAttackScore());
+		FastAttack fa = pfa.getFastAttack();
+		combi.setFaName(fa.getName());
+		combi.setFaType(fa.getType());
+		ChargedAttack ca = pca.getChargedAttack();
+		combi.setCaName(ca.getName());
+		combi.setCaType(ca.getType());
+
+		String attribute = tempDto.isShadow() ? "シャドウ" : "";
+		attribute = gp.getPreMegaPokedexId() != null ? "メガ" : attribute;
+		combi.setAttribute(attribute);
+		return combi;
 	}
 }

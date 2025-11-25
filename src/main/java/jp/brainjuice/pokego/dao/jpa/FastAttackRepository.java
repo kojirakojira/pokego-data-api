@@ -25,7 +25,7 @@ public interface FastAttackRepository extends JpaRepository<FastAttack, String> 
 			+ "FROM fast_attack fa "
 			+ "INNER JOIN pokemon_fast_attack pfa "
 			+ "ON fa.move_id = pfa.move_id", nativeQuery = true)
-	@Meta(comment = "find chargedAttack all can learn")
+	@Meta(comment = "find fastAttack all can learn")
 	List<FastAttack> findAllCanLearn();
 
 	/**

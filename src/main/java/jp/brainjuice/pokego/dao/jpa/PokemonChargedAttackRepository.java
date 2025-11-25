@@ -11,6 +11,13 @@ import jp.brainjuice.pokego.dao.jpa.entity.PokemonChargedAttack;
 
 public interface PokemonChargedAttackRepository extends JpaRepository<PokemonChargedAttack, PokemonAttackPk> {
 
+	@Meta(comment = "find all join fetch charged_attack")
+	@Query(value = "SELECT pca "
+			+ "FROM PokemonChargedAttack pca "
+			+ "JOIN FETCH pca.chargedAttack "
+			+ "LEFT JOIN FETCH pca.attackAdditionalInfo")
+	List<PokemonChargedAttack> findAllJoinChargedAttack();
+
 	@Meta(comment = "find by move_id join fetch charged_attack")
 	@Query(value = "SELECT pca "
 			+ "FROM PokemonChargedAttack pca "

@@ -11,6 +11,13 @@ import jp.brainjuice.pokego.dao.jpa.entity.PokemonFastAttack;
 
 public interface PokemonFastAttackRepository extends JpaRepository<PokemonFastAttack, PokemonAttackPk> {
 
+	@Meta(comment = "find all join fetch fast_attack")
+	@Query(value = "SELECT pfa "
+			+ "FROM PokemonFastAttack pfa "
+			+ "JOIN FETCH pfa.fastAttack "
+			+ "LEFT JOIN FETCH pfa.attackAdditionalInfo ")
+	List<PokemonFastAttack> findAllJoinFastAttack();
+
 	@Meta(comment = "find by pokedex_id join fetch fast_attack")
 	@Query(value = "SELECT pfa "
 			+ "FROM PokemonFastAttack pfa "
