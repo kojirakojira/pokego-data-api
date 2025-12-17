@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import jp.brainjuice.pokego.business.constant.LearningPatternEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -25,8 +26,6 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.pinnacle.GymRaidPi
 import jp.brainjuice.pokego.business.service.search.utils.dto.pinnacle.PokemonAttackCombination;
 import jp.brainjuice.pokego.business.service.search.utils.dto.type.TwoTypeKey;
 import jp.brainjuice.pokego.cache.inmemory.TypeCommentMap;
-import jp.brainjuice.pokego.dao.jpa.ChargedAttackRepository;
-import jp.brainjuice.pokego.dao.jpa.FastAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.PokemonChargedAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.PokemonFastAttackRepository;
@@ -48,10 +47,6 @@ public class GymRaidPinnacleRankService {
 	private PokemonFastAttackRepository pokemonFastAttackRepository;
 
 	private PokemonChargedAttackRepository pokemonChargedAttackRepository;
-
-	private FastAttackRepository fastAttackRepository;
-
-	private ChargedAttackRepository chargedAttackRepository;
 
 	private GymRaidDamageCalculator gymRaidDamageCalculator;
 
@@ -81,8 +76,6 @@ public class GymRaidPinnacleRankService {
 			GoPokedexRepository goPokedexRepository,
 			PokemonFastAttackRepository pokemonFastAttackRepository,
 			PokemonChargedAttackRepository pokemonChargedAttackRepository,
-			FastAttackRepository fastAttackRepository,
-			ChargedAttackRepository chargedAttackRepository,
 			GymRaidDamageCalculator gymRaidDamageCalculator,
 			TypeCommentMap typeCommentMap,
 			WeatherBoosts weatherBoosts,
@@ -90,8 +83,6 @@ public class GymRaidPinnacleRankService {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonFastAttackRepository = pokemonFastAttackRepository;
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
-		this.fastAttackRepository = fastAttackRepository;
-		this.chargedAttackRepository = chargedAttackRepository;
 		this.gymRaidDamageCalculator = gymRaidDamageCalculator;
 		this.typeCommentMap = typeCommentMap;
 		this.weatherBoosts = weatherBoosts;
@@ -100,9 +91,10 @@ public class GymRaidPinnacleRankService {
 
 	public void exec(GymRaidPinnacleRankRequest req, GymRaidPinnacleRankResponse res) {
 
-		TypeEnum type1 = req.getDefenderType1();
-		TypeEnum type2 = req.getDefenderType2();
-		TwoTypeKey defenderType = new TwoTypeKey(type1, type2);
+		TypeEnum oppType1 = req.getOppType1();
+		TypeEnum oppType2 = req.getOppType2();
+		List<TypeEnum> ownTypeList = req.getOwnTypes();
+		TwoTypeKey defenderType = new TwoTypeKey(oppType1, oppType2);
 		WeatherEnum weather = StringUtils.isEmpty(req.getWeather()) ? null : WeatherEnum.valueOf(req.getWeather());
 		SelectPattern megaSelected = req.getMegaSelected();
 		SelectPattern shadowSelected = req.getShadowSelected();
@@ -115,7 +107,7 @@ public class GymRaidPinnacleRankService {
 		case asc -> (o1, o2) -> Double.compare(o1.getAttackScore(), o2.getAttackScore());
 		};
 
-		List<GymRaidPinnacleRankTempDto> tempDtoList = createTmpDtoList(megaSelected, shadowSelected);
+		List<GymRaidPinnacleRankTempDto> tempDtoList = createTmpDtoList(megaSelected, shadowSelected, ownTypeList);
 
 		GymRaidAttackScoreInDto inDto = new GymRaidAttackScoreInDto(); // オブジェクトを使い回す
 		Stream<GymRaidPinnacleRankTempDto> combiStream = tempDtoList.stream()
@@ -155,7 +147,7 @@ public class GymRaidPinnacleRankService {
 
 		res.setCombiList(combiList);
 
-		res.setTypeComments(typeCommentMap.get(type1, type2));
+		res.setTypeComments(typeCommentMap.get(oppType1, oppType2));
 		if (weather != null) {
 			List<TypeEnum> wbTypeList = weatherBoosts.getTypeWbLookupMap().get(weather);
 			res.setWbTypeList(wbTypeList);
@@ -165,14 +157,22 @@ public class GymRaidPinnacleRankService {
 	/**
 	 * 通常ポケモン、リトレーン後のポケモンのPokemonAttackCombinationのリストを作成する。<br>
 	 * FastAttackとChargedAttackは設定しないため、作成途中のリストを返却する。
+	 *
+	 * @param megaSelected
+	 * @param shadowSelected
+	 * @param ownTypeList
 	 * @return
 	 */
 	private List<GymRaidPinnacleRankTempDto> createTmpDtoList(
 			SelectPattern megaSelected,
-			SelectPattern shadowSelected) {
+			SelectPattern shadowSelected,
+			List<TypeEnum> ownTypeList) {
 
+		boolean ownFilterFlg = !CollectionUtils.isEmpty(ownTypeList);
 		// 攻撃する側のポケモンの一覧（実装済みの全ポケモン）を取得する
-		List<GoPokedex> goPokedexList = goPokedexRepository.findByImplFlg(true);
+		List<GoPokedex> goPokedexList = goPokedexRepository.findByImplFlg(true).stream()
+				.filter(gp -> !ownFilterFlg || ownTypeList.contains(gp.getType1()) || ownTypeList.contains(gp.getType2())) // 自分のポケモンをタイプで絞り込む
+				.toList();
 
 		// ポケモンが覚える技をすべて取得する
 		// 通常技

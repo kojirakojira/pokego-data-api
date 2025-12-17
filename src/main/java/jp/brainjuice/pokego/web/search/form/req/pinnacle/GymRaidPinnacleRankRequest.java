@@ -1,5 +1,7 @@
 package jp.brainjuice.pokego.web.search.form.req.pinnacle;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
@@ -14,9 +16,11 @@ import lombok.EqualsAndHashCode;
 public class GymRaidPinnacleRankRequest extends ResearchRequestImpl {
 
 	@NotNull
-	private TypeEnum defenderType1;
+	private TypeEnum oppType1;
 
-	private TypeEnum defenderType2;
+	private TypeEnum oppType2;
+
+	private List<TypeEnum> ownTypes;
 
 	private String weather;
 
