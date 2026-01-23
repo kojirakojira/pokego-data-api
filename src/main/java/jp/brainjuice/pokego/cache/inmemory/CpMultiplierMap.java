@@ -26,14 +26,17 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	/** indexで扱いたい場合に使用するリスト(ArrayList) */
 	private static List<Map.Entry<String, Double>> cpMultiplierList;
 
-	public CpMultiplierMap(CpMultiplierRepository cpMultiplierRepository) throws PokemonDataInitException {
+	/**
+	 * @throws PokemonDataInitException
+	 */
+	public CpMultiplierMap(CpMultiplierRepository cpMultiplierRepository) {
 		init(cpMultiplierRepository);
 	}
 
 	/**
 	 * @throws PokemonDataInitException
 	 */
-	public void init(CpMultiplierRepository cpMultiplierRepository) throws PokemonDataInitException {
+	public void init(CpMultiplierRepository cpMultiplierRepository) {
 
 		try {
 			List<CpMultiplier> cpMultList = cpMultiplierRepository.findAll();

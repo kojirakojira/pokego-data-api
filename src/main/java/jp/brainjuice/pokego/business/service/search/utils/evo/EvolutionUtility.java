@@ -16,7 +16,6 @@ import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
 import jp.brainjuice.pokego.dao.jpa.entity.EvolutionPk;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.utils.exception.PokemonDataException;
-import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 
 @Component
 class EvolutionUtility {
@@ -33,9 +32,12 @@ class EvolutionUtility {
 
 	private static final String UNIMPL_UNKNOWN_MSG = "未実装のため不明";
 
+	/**
+	 * @throws PokemonDataException
+	 */
 	EvolutionUtility(
 			GoPokedexRepository goPokedexRepository,
-			EvolutionRepository evolutionRepository) throws PokemonDataInitException {
+			EvolutionRepository evolutionRepository) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.evolutionRepository = evolutionRepository;
 	}
@@ -46,8 +48,9 @@ class EvolutionUtility {
 	 * @param id 図鑑ID
 	 * @param bid 進化前ポケモンの図鑑ID
 	 * @return
+	 * @throws PokemonDataException
 	 */
-	List<String> getCosts(String id, String bid) throws PokemonDataException {
+	List<String> getCosts(String id, String bid) {
 
 		if (ROOT.equals(bid)) {
 			// rootの場合は進化前は存在しない。
@@ -69,7 +72,7 @@ class EvolutionUtility {
 	 * @return
 	 * @throws PokemonDataException
 	 */
-	List<String> getCosts(Evolution evo, boolean implFlg) throws PokemonDataException {
+	List<String> getCosts(Evolution evo, boolean implFlg) {
 
 		if (ROOT.equals(evo.getBeforePokedexId())) {
 			// rootの場合は進化前は存在しない。
@@ -81,7 +84,7 @@ class EvolutionUtility {
 
 	/**
 	 * 進化条件をリスト形式で取得する。
-	 * 
+	 *
 	 * @param evo
 	 * @param exclusionTypeSet
 	 * @param implFlg
@@ -155,8 +158,9 @@ class EvolutionUtility {
 	 * @param id
 	 * @param bid
 	 * @return
+	 * @throws PokemonDataException
 	 */
-	boolean canGoEvo(Evolution evol) throws PokemonDataException {
+	boolean canGoEvo(Evolution evol) {
 
 		if (ROOT.equals(evol.getBeforePokedexId())) {
 			// rootの場合は進化前は存在しない。
@@ -172,8 +176,9 @@ class EvolutionUtility {
 	 * @param id
 	 * @param bid
 	 * @return
+	 * @throws PokemonDataException
 	 */
-	boolean canGoEvo(String id, String bid) throws PokemonDataException {
+	boolean canGoEvo(String id, String bid) {
 
 		if (ROOT.equals(bid)) {
 			// rootの場合は進化前は存在しない。

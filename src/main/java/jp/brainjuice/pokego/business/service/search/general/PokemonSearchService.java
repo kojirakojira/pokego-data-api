@@ -28,7 +28,6 @@ import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.dto.FilterParam;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 import jp.brainjuice.pokego.utils.BjUtils;
-import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 import jp.brainjuice.pokego.web.search.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.search.form.res.elem.PidAndName;
@@ -58,7 +57,7 @@ public class PokemonSearchService {
 			GoPokedexRepository goPokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
 			PokemonDictionaryInfo pokemonDictionaryInfo,
-			GoPokedexFilterService goPokedexFilterService) throws PokemonDataInitException {
+			GoPokedexFilterService goPokedexFilterService) {
 		this.goPokedexRepository = goPokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.pokemonDictionaryInfo = pokemonDictionaryInfo;

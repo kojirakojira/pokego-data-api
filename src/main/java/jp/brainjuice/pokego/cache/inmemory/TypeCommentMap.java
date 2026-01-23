@@ -36,11 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
+	/**
+	 * @throws PokemonDataInitException
+	 */
 	public TypeCommentMap(
 			TypeChartInfo typeChartInfo,
 			GoPokedexRepository goPokedexRepository,
 			EvolutionRepository evolutionRepository,
-			EvolutionProvider evolutionProvider) throws PokemonDataInitException {
+			EvolutionProvider evolutionProvider) {
 
 		// 全ポケモンのGoPokedexを取得する。
 		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();

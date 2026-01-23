@@ -11,7 +11,7 @@ import jp.brainjuice.pokego.dao.jpa.EvolutionRepository;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
+import jp.brainjuice.pokego.utils.exception.PokemonDataException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,15 +23,21 @@ public class EvolutionConsistencyCheck {
 
 	private static final String NOT_EXISTS_MSG = "pokemon.csvに定義したポケモンがpokemon-evolution.csvに定義されていません。{0}";
 
+	/**
+	 * @throws PokemonDataException
+	 */
 	public EvolutionConsistencyCheck(
 			GoPokedexRepository goPokedexRepository,
-			EvolutionRepository evolutionRepository) throws PokemonDataInitException {
+			EvolutionRepository evolutionRepository) {
 		check(goPokedexRepository, evolutionRepository);
 	}
 
+	/**
+	 * @throws PokemonDataException
+	 */
 	private void check(
 			GoPokedexRepository goPokedexRepository,
-			EvolutionRepository evolutionRepository) throws PokemonDataInitException {
+			EvolutionRepository evolutionRepository) {
 
 		try {
 
@@ -42,7 +48,7 @@ public class EvolutionConsistencyCheck {
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new PokemonDataInitException(e);
+			throw new PokemonDataException(e);
 		}
 	}
 
@@ -51,9 +57,9 @@ public class EvolutionConsistencyCheck {
 	 *
 	 * @param evoList
 	 * @param goPokedexList
-	 * @throws PokemonDataInitException
+	 * @throws PokemonDataException
 	 */
-	private void checkAllExists(List<Evolution> evoList, List<GoPokedex> goPokedexList) throws PokemonDataInitException {
+	private void checkAllExists(List<Evolution> evoList, List<GoPokedex> goPokedexList) {
 
 		List<String> evoPidList = evoList.stream()
 				.map(Evolution::getPokedexId)
@@ -65,7 +71,7 @@ public class EvolutionConsistencyCheck {
 
 		// GoPokedexリストに存在していて、Evolutionリストに存在していないポケモンがいるかどうか。
 		if (!notExistsGpList.isEmpty()) {
-			throw new PokemonDataInitException(
+			throw new PokemonDataException(
 					MessageFormat.format(
 							NOT_EXISTS_MSG,
 							notExistsGpList.stream().map(PokemonEditUtils::appendRemarks).collect(Collectors.toList())));

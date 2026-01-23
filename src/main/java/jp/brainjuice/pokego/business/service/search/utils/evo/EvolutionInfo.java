@@ -17,7 +17,6 @@ import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
 import jp.brainjuice.pokego.dao.jpa.entity.EvolutionPk;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
 
 @Component
 class EvolutionInfo {
@@ -33,7 +32,7 @@ class EvolutionInfo {
 	EvolutionInfo(
 			EvolutionUtility evolutionUtility,
 			EvolutionRepository evolutionRepository,
-			GoPokedexRepository goPokedexRepository) throws PokemonDataInitException {
+			GoPokedexRepository goPokedexRepository) {
 		this.evolutionUtility = evolutionUtility;
 		this.evolutionRepository = evolutionRepository;
 		this.goPokedexRepository = goPokedexRepository;
