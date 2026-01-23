@@ -69,7 +69,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0050A01', FALSE, FALSE), --ディグダ(アローラのすがた)
 	('0051N01', FALSE, FALSE), --ダグトリオ
 	('0051A01', FALSE, FALSE), --ダグトリオ(アローラのすがた)
-	('0052N01', FALSE, FALSE), --ニャース
+	('0052N01', FALSE, TRUE), --ニャース
 	('0052A01', FALSE, FALSE), --ニャース(アローラのすがた)
 	('0052G01', FALSE, FALSE), --ニャース(ガラルのすがた)
 	('0053N01', FALSE, FALSE), --ペルシアン
@@ -145,8 +145,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0104N01', FALSE, FALSE), --カラカラ
 	('0105N01', FALSE, FALSE), --ガラガラ
 	('0105A01', FALSE, FALSE), --ガラガラ(アローラのすがた)
-	('0106N01', FALSE, FALSE), --サワムラー
-	('0107N01', FALSE, FALSE), --エビワラー
+	('0106N01', TRUE, FALSE), --サワムラー
+	('0107N01', TRUE, FALSE), --エビワラー
 	('0108N01', FALSE, FALSE), --ベロリンガ
 	('0109N01', FALSE, FALSE), --ドガース
 	('0110N01', FALSE, FALSE), --マタドガス
@@ -180,11 +180,11 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0130M01', FALSE, FALSE), --メガギャラドス
 	('0131N01', FALSE, TRUE), --ラプラス
 	('0132N01', FALSE, FALSE), --メタモン
-	('0133N01', FALSE, FALSE), --イーブイ
+	('0133N01', TRUE, FALSE), --イーブイ
 	('0133N02', FALSE, FALSE), --イーブイ(相棒)
-	('0134N01', FALSE, FALSE), --シャワーズ
-	('0135N01', FALSE, FALSE), --サンダース
-	('0136N01', FALSE, FALSE), --ブースター
+	('0134N01', TRUE, FALSE), --シャワーズ
+	('0135N01', TRUE, FALSE), --サンダース
+	('0136N01', TRUE, FALSE), --ブースター
 	('0137N01', FALSE, FALSE), --ポリゴン
 	('0138N01', TRUE, FALSE), --オムナイト
 	('0139N01', TRUE, FALSE), --オムスター
@@ -254,8 +254,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0194N01', FALSE, FALSE), --ウパー
 	('0194P01', FALSE, FALSE), --ウパー(パルデアのすがた)
 	('0195N01', FALSE, FALSE), --ヌオー
-	('0196N01', FALSE, FALSE), --エーフィ
-	('0197N01', FALSE, FALSE), --ブラッキー
+	('0196N01', TRUE, FALSE), --エーフィ
+	('0197N01', TRUE, FALSE), --ブラッキー
 	('0198N01', FALSE, FALSE), --ヤミカラス
 	('0199N01', FALSE, FALSE), --ヤドキング
 	('0199G01', FALSE, FALSE), --ヤドキング(ガラルのすがた)
@@ -316,7 +316,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0247N01', FALSE, FALSE), --サナギラス
 	('0248N01', FALSE, FALSE), --バンギラス
 	('0248M01', FALSE, FALSE), --メガバンギラス
-	('0249N01', FALSE, FALSE), --ルギア
+	('0249N01', TRUE, FALSE), --ルギア
 	('0249N02', FALSE, FALSE), --ルギア(シャドウAPEX)
 	('0250N01', FALSE, FALSE), --ホウオウ
 	('0250N02', FALSE, FALSE), --ホウオウ(シャドウAPEX)
@@ -354,9 +354,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0277N01', FALSE, FALSE), --オオスバメ
 	('0278N01', FALSE, FALSE), --キャモメ
 	('0279N01', FALSE, FALSE), --ペリッパー
-	('0280N01', FALSE, FALSE), --ラルトス
-	('0281N01', FALSE, FALSE), --キルリア
-	('0282N01', FALSE, FALSE), --サーナイト
+	('0280N01', TRUE, FALSE), --ラルトス
+	('0281N01', TRUE, FALSE), --キルリア
+	('0282N01', TRUE, FALSE), --サーナイト
 	('0282M01', FALSE, FALSE), --メガサーナイト
 	('0283N01', FALSE, FALSE), --アメタマ
 	('0284N01', FALSE, FALSE), --アメモース
@@ -377,7 +377,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0299N01', FALSE, FALSE), --ノズパス
 	('0300N01', FALSE, FALSE), --エネコ
 	('0301N01', FALSE, FALSE), --エネコロロ
-	('0302N01', FALSE, FALSE), --ヤミラミ
+	('0302N01', TRUE, FALSE), --ヤミラミ
 	('0302M01', FALSE, FALSE), --メガヤミラミ
 	('0303N01', FALSE, FALSE), --クチート
 	('0303M01', FALSE, FALSE), --メガクチート
@@ -452,9 +452,9 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0361N01', FALSE, FALSE), --ユキワラシ
 	('0362N01', FALSE, FALSE), --オニゴーリ
 	('0362M01', FALSE, FALSE), --メガオニゴーリ
-	('0363N01', FALSE, FALSE), --タマザラシ
-	('0364N01', FALSE, FALSE), --トドグラー
-	('0365N01', FALSE, FALSE), --トドゼルガ
+	('0363N01', TRUE, FALSE), --タマザラシ
+	('0364N01', TRUE, FALSE), --トドグラー
+	('0365N01', TRUE, FALSE), --トドゼルガ
 	('0366N01', FALSE, FALSE), --パールル
 	('0367N01', FALSE, FALSE), --ハンテール
 	('0368N01', FALSE, FALSE), --サクラビス
@@ -580,8 +580,8 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0467N01', FALSE, FALSE), --ブーバーン
 	('0468N01', FALSE, FALSE), --トゲキッス
 	('0469N01', FALSE, FALSE), --メガヤンマ
-	('0470N01', FALSE, FALSE), --リーフィア
-	('0471N01', FALSE, FALSE), --グレイシア
+	('0470N01', TRUE, FALSE), --リーフィア
+	('0471N01', TRUE, FALSE), --グレイシア
 	('0472N01', FALSE, FALSE), --グライオン
 	('0473N01', FALSE, FALSE), --マンムー
 	('0474N01', FALSE, FALSE), --ポリゴンZ
@@ -857,7 +857,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0697N01', FALSE, FALSE), --ガチゴラス
 	('0698N01', FALSE, FALSE), --アマルス
 	('0699N01', FALSE, FALSE), --アマルルガ
-	('0700N01', FALSE, FALSE), --ニンフィア
+	('0700N01', TRUE, FALSE), --ニンフィア
 	('0701N01', FALSE, FALSE), --ルチャブル
 	('0702N01', FALSE, FALSE), --デデンネ
 	('0703N01', FALSE, FALSE), --メレシー
@@ -960,7 +960,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0778N01', FALSE, FALSE), --ミミッキュ(ばけたすがた)
 	('0778N02', FALSE, FALSE), --ミミッキュ(ばれたすがた)
 	('0779N01', FALSE, FALSE), --ハギギシリ
-	('0780N01', FALSE, FALSE), --ジジーロン
+	('0780N01', TRUE, FALSE), --ジジーロン
 	('0781N01', FALSE, FALSE), --ダダリン
 	('0782N01', FALSE, FALSE), --ジャラコ
 	('0783N01', FALSE, FALSE), --ジャランゴ

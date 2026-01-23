@@ -1024,8 +1024,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0835N01', 'root', 0, null, null, null, null, null, null, FALSE), --ワンパチ
 	('0836N01', '0835N01', 50, null, null, null, null, null, null, TRUE), --パルスワン
 	('0837N01', 'root', 0, null, null, null, null, null, null, FALSE), --タンドン
-	('0838N01', '0837N01', 0, null, null, null, null, null, null, TRUE), --トロッゴン
-	('0839N01', '0838N01', 0, null, null, null, null, null, null, TRUE), --セキタンザン
+	('0838N01', '0837N01', 25, null, null, null, null, null, null, TRUE), --トロッゴン
+	('0839N01', '0838N01', 100, null, null, null, null, null, null, TRUE), --セキタンザン
 	('0840N01', 'root', 0, null, null, null, null, null, null, FALSE), --カジッチュ
 	('0841N01', '0840N01', 200, 'あまーいりんご20コ', null, null, null, null, null, TRUE), --アップリュー
 	('0842N01', '0840N01', 200, 'すっぱいりんご20コ', null, null, null, null, null, TRUE), --タルップル
@@ -1040,7 +1040,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0850N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤクデ
 	('0851N01', '0850N01', 50, null, null, null, null, null, null, TRUE), --マルヤクデ
 	('0852N01', 'root', 0, null, null, null, null, null, null, FALSE), --タタッコ
-	('0853N01', '0852N01', 0, null, null, null, null, null, null, TRUE), --オトスパス
+	('0853N01', '0852N01', 50, null, null, null, null, null, null, TRUE), --オトスパス
 	('0854N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤバチャ(がんさくフォルム)
 	('0854N02', 'root', 0, null, null, null, null, null, null, FALSE), --ヤバチャ(しんさくフォルム)
 	('0855N01', '0854N01', 50, null, null, null, null, null, null, TRUE), --ポットデス(がんさくフォルム)
@@ -1138,15 +1138,15 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0931N03', 'root', 0, null, null, null, null, null, null, FALSE), --イキリンコ(イエローフェザー)
 	('0931N04', 'root', 0, null, null, null, null, null, null, FALSE), --イキリンコ(ホワイトフェザー)
 	('0932N01', 'root', 0, null, null, null, null, null, null, FALSE), --コジオ
-	('0933N01', '0932N01', 0, null, null, null, null, null, null, TRUE), --ジオヅム
-	('0934N01', '0933N01', 0, null, null, null, null, null, null, TRUE), --キョジオーン
+	('0933N01', '0932N01', 25, null, null, null, null, null, null, TRUE), --ジオヅム
+	('0934N01', '0933N01', 100, null, null, null, null, null, null, TRUE), --キョジオーン
 	('0935N01', 'root', 0, null, null, null, null, null, null, FALSE), --カルボウ
 	('0936N01', '0935N01', 50, null,'エスパータイプのポケモンに30回勝利する', null, null, null, null, TRUE), --グレンアルマ
 	('0937N01', '0935N01', 50, null,'ゴーストタイプのポケモンに30回勝利する', null, null, null, null, TRUE), --ソウブレイズ
 	('0938N01', 'root', 0, null, null, null, null, null, null, FALSE), --ズピカ
 	('0939N01', '0938N01', 0, null, null, null, null, null, null, TRUE), --ハラバリー
 	('0940N01', 'root', 0, null, null, null, null, null, null, FALSE), --カイデン
-	('0941N01', '0940N01', 0, null, null, null, null, null, null, TRUE), --タイカイデン
+	('0941N01', '0940N01', 50, null, null, null, null, null, null, TRUE), --タイカイデン
 	('0942N01', 'root', 0, null, null, null, null, null, null, FALSE), --オラチフ
 	('0943N01', '0942N01', 0, null, null, null, null, null, null, TRUE), --マフィティフ
 	('0944N01', 'root', 0, null, null, null, null, null, null, FALSE), --シルシュルー
