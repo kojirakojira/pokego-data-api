@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ibm.icu.text.MessageFormat;
 
+import io.micrometer.common.util.StringUtils;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.dto.PokemonMoveAll;
 import jp.brainjuice.pokego.dao.jpa.ChargedAttackRepository;
 import jp.brainjuice.pokego.dao.jpa.FastAttackRepository;
@@ -45,6 +46,7 @@ public class PokemonMoveCreator {
 		this.pokemonChargedAttackRepository = pokemonChargedAttackRepository;
 	}
 
+	@SuppressWarnings("null")
 	void createAndSaveFastAttack(Collection<PokemonMoveAll> pokemonMoveList, boolean shouldSaveFastAttack) {
 
 		log.info("------------ポケモンが覚える通常技の登録 ここから------------");
@@ -70,7 +72,8 @@ public class PokemonMoveCreator {
 		log.info("------------ポケモンが覚える通常技の登録 ここまで------------");
 	}
 
-	private List<PokemonFastAttack> createPokemonFastAttackList(List<FastAttack> fastAttackList, Collection<PokemonMoveAll> pokemonMoveList) {
+	private List<PokemonFastAttack> createPokemonFastAttackList(List<FastAttack> fastAttackList,
+			Collection<PokemonMoveAll> pokemonMoveList) {
 
 		Map<String, String> uniqueIdMoveIdMap = fastAttackList.stream()
 				.collect(Collectors.toMap(fa -> fa.getUniqueId(), fa -> fa.getMoveId()));
@@ -91,7 +94,8 @@ public class PokemonMoveCreator {
 		return pokemonFastAttackList;
 	}
 
-	private List<PokemonFastAttack> filterSaveTargetPokemonFastAttack(List<PokemonFastAttack> pfaFromMdList, List<PokemonFastAttack> pfaFromDbList) {
+	private List<PokemonFastAttack> filterSaveTargetPokemonFastAttack(List<PokemonFastAttack> pfaFromMdList,
+			List<PokemonFastAttack> pfaFromDbList) {
 
 		log.info(MessageFormat.format("ポケモン通常技マスタデータ件数: {0}件, DB件数: {1}件", pfaFromMdList.size(), pfaFromDbList.size()));
 		log.info("------------【ポケモン通常技】マスタデータにあるが、DBにないやつ ここから------------");
@@ -113,7 +117,7 @@ public class PokemonMoveCreator {
 				.filter(pfa -> {
 					PokemonFastAttack pfaFromDb = null;
 					// マスタデータとpokedexId,moveIdが一致するPokemonFastAttackを抜き出す。（hashCode,equals実装済み）
-					for (PokemonFastAttack tmpPfaFromDb: pfaFromDbList) {
+					for (PokemonFastAttack tmpPfaFromDb : pfaFromDbList) {
 						if (pfa.equals(tmpPfaFromDb)) {
 							pfaFromDb = tmpPfaFromDb;
 							break;
@@ -127,6 +131,12 @@ public class PokemonMoveCreator {
 		log.info("------------【ポケモン通常技】DBとマスタデータで値が異なる ここまで------------");
 		log.info("------------【ポケモン通常技】マスタデータ重複チェック ここから------------");
 		{
+			List<PokemonFastAttack> unregisteredList = pfaFromMdList.stream()
+					.filter(pfa -> StringUtils.isEmpty(pfa.getMoveId()))
+					.toList();
+			if (!unregisteredList.isEmpty()) {
+				log.warn("DB未登録の通常技が存在します。{}", unregisteredList);
+			}
 			Map<PokemonFastAttack, Long> distinctCountMap = pfaFromMdList.stream()
 					.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 			List<PokemonFastAttack> distinctList = distinctCountMap.entrySet().stream()
@@ -143,6 +153,7 @@ public class PokemonMoveCreator {
 				.toList();
 	}
 
+	@SuppressWarnings("null")
 	void createAndSaveChargedAttack(Collection<PokemonMoveAll> pokemonMoveList, boolean shouldSaveChargedAttack) {
 
 		log.info("------------ポケモンが覚えるスペシャル技の登録 ここから------------");
@@ -156,7 +167,8 @@ public class PokemonMoveCreator {
 		{
 			// DBから取得
 			List<PokemonChargedAttack> pokemonChargedAttackFromDbList = pokemonChargedAttackRepository.findAll();
-			pokemonChargedAttack = filterSaveTargetPokemonChargedAttack(pokemonChargedAttack, pokemonChargedAttackFromDbList);
+			pokemonChargedAttack = filterSaveTargetPokemonChargedAttack(pokemonChargedAttack,
+					pokemonChargedAttackFromDbList);
 
 		}
 		if (shouldSaveChargedAttack) {
@@ -168,7 +180,8 @@ public class PokemonMoveCreator {
 		log.info("------------ポケモンが覚えるスペシャル技の登録 ここまで------------");
 	}
 
-	private List<PokemonChargedAttack> createPokemonChargedAttackList(List<ChargedAttack> chargedAttackList, Collection<PokemonMoveAll> pokemonMoveList) {
+	private List<PokemonChargedAttack> createPokemonChargedAttackList(List<ChargedAttack> chargedAttackList,
+			Collection<PokemonMoveAll> pokemonMoveList) {
 
 		Map<String, String> uniqueIdMoveIdMap = chargedAttackList.stream()
 				.collect(Collectors.toMap(ca -> ca.getUniqueId(), ca -> ca.getMoveId()));
@@ -193,7 +206,8 @@ public class PokemonMoveCreator {
 			List<PokemonChargedAttack> pcaFromMdList,
 			List<PokemonChargedAttack> pcaFromDbList) {
 
-		log.info(MessageFormat.format("ポケモンスペシャル技マスタデータ件数: {0}件, DB件数: {1}件", pcaFromMdList.size(), pcaFromDbList.size()));
+		log.info(MessageFormat.format("ポケモンスペシャル技マスタデータ件数: {0}件, DB件数: {1}件", pcaFromMdList.size(),
+				pcaFromDbList.size()));
 		log.info("------------【ポケモンスペシャル技】マスタデータにあるが、DBにないやつ ここから------------");
 		List<PokemonChargedAttack> mdYesDbNoList = pcaFromMdList.stream()
 				.filter(pca -> !pcaFromDbList.contains(pca))
@@ -211,24 +225,24 @@ public class PokemonMoveCreator {
 		List<PokemonChargedAttack> differentList;
 		{
 			differentList = pcaFromMdList.stream()
-			.filter(pca -> !mdYesDbNoList.contains(pca))
-			.filter(pca -> {
-				PokemonChargedAttack pcaFromDb = null;
-				// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
-				for (PokemonChargedAttack tmpPfaFromDb: pcaFromDbList) {
-					if (pca.equals(tmpPfaFromDb)) {
-						pcaFromDb = tmpPfaFromDb;
-						break;
-					}
-				}
-				// 覚え方も一致するやつを排除
-				return pca.getLearningPattern() != pcaFromDb.getLearningPattern();
-			})
-			.toList();
+					.filter(pca -> !mdYesDbNoList.contains(pca))
+					.filter(pca -> {
+						PokemonChargedAttack pcaFromDb = null;
+						// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
+						for (PokemonChargedAttack tmpPfaFromDb : pcaFromDbList) {
+							if (pca.equals(tmpPfaFromDb)) {
+								pcaFromDb = tmpPfaFromDb;
+								break;
+							}
+						}
+						// 覚え方も一致するやつを排除
+						return pca.getLearningPattern() != pcaFromDb.getLearningPattern();
+					})
+					.toList();
 			// ログ出力
 			differentList.stream().forEach(pca -> {
 				// マスタデータとpokedexId,moveIdが一致するPokemonChargedAttackを抜き出す。（hashCode,equals実装済み）
-				for (PokemonChargedAttack tmpPfaFromDb: pcaFromDbList) {
+				for (PokemonChargedAttack tmpPfaFromDb : pcaFromDbList) {
 					if (pca.equals(tmpPfaFromDb)) {
 						log.info(MessageFormat.format("マスタデータ:{0}, DB:{1}", pca.toString(), tmpPfaFromDb.toString()));
 						break;
@@ -239,6 +253,13 @@ public class PokemonMoveCreator {
 		log.info("------------【ポケモンスペシャル技】DBとマスタデータで値が異なる ここまで------------");
 		log.info("------------【ポケモンスペシャル技】マスタデータ重複チェック ここから------------");
 		{
+			List<PokemonChargedAttack> unregisteredList = pcaFromMdList.stream()
+					.filter(pca -> StringUtils.isEmpty(pca.getMoveId()))
+					.toList();
+			if (!unregisteredList.isEmpty()) {
+				log.warn("DB未登録のスペシャル技が存在します。{}", unregisteredList);
+			}
+			// 重複をログ出力
 			Map<PokemonChargedAttack, Long> distinctCountMap = pcaFromMdList.stream()
 					.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 			List<PokemonChargedAttack> distinctList = distinctCountMap.entrySet().stream()
