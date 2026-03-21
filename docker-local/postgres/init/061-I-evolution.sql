@@ -38,6 +38,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0025N02', 'root', 0, null, null, null, null, null, null, FALSE), --ピカチュウ(相棒)
 	('0026N01', '0025N01', 50, null, null, null, null, null, null, TRUE), --ライチュウ
 	('0026A01', '0025N01', 0, null, null, null, null, null, 'ポケモンGOでは、ピカチュウはアローラライチュウに進化しない。', FALSE), --ライチュウ(アローラのすがた)
+	('0026M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガライチュウX
+	('0026M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガライチュウY
 	('0027N01', 'root', 0, null, null, null, null, null, null, FALSE), --サンド
 	('0027A01', 'root', 0, null, null, null, null, null, null, FALSE), --サンド(アローラのすがた)
 	('0028N01', '0027N01', 50, null, null, null, null, null, null, TRUE), --サンドパン
@@ -50,6 +52,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0034N01', '0033N01', 100, null, null, null, null, null, null, TRUE), --ニドキング
 	('0035N01', '0173N01', 25, null, null, null, null, null, null, TRUE), --ピッピ
 	('0036N01', '0035N01', 50, null, null, null, null, null, null, TRUE), --ピクシー
+	('0036M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガピクシー
 	('0037N01', 'root', 0, null, null, null, null, null, null, FALSE), --ロコン
 	('0037A01', 'root', 0, null, null, null, null, null, null, FALSE), --ロコン(アローラのすがた)
 	('0038N01', '0037N01', 50, null, null, null, null, null, null, TRUE), --キュウコン
@@ -95,6 +98,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0069N01', 'root', 0, null, null, null, null, null, null, FALSE), --マダツボミ
 	('0070N01', '0069N01', 25, null, null, null, null, null, null, TRUE), --ウツドン
 	('0071N01', '0070N01', 100, null, null, null, null, null, null, TRUE), --ウツボット
+	('0071M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガウツボット
 	('0072N01', 'root', 0, null, null, null, null, null, null, FALSE), --メノクラゲ
 	('0073N01', '0072N01', 50, null, null, null, null, null, null, TRUE), --ドククラゲ
 	('0074N01', 'root', 0, null, null, null, null, null, null, FALSE), --イシツブテ
@@ -163,6 +167,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0119N01', '0118N01', 50, null, null, null, null, null, null, TRUE), --アズマオウ
 	('0120N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒトデマン
 	('0121N01', '0120N01', 50, null, null, null, null, null, null, TRUE), --スターミー
+	('0121M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガスターミー
 	('0122N01', '0439N01', 25, null, '15km歩く', null, null, null, null, TRUE), --バリヤード
 	('0122G01', '0439N01', 0, null, null, null, null, null, 'ポケモンGOでは、マネネはヒスイバリヤードに進化しない。', FALSE), --バリヤード(ガラルのすがた)
 	('0123N01', 'root', 0, null, null, null, null, null, null, FALSE), --ストライク
@@ -202,6 +207,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0147N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミニリュウ
 	('0148N01', '0147N01', 25, null, null, null, null, null, null, TRUE), --ハクリュー
 	('0149N01', '0148N01', 100, null, null, null, null, null, null, TRUE), --カイリュー
+	('0149M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガカイリュー
 	('0150N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミュウツー
 	('0150N02', 'root', 0, null, null, null, null, null, null, FALSE), --ミュウツー(アーマード)
 	('0150M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガミュウツーX
@@ -210,6 +216,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0152N01', 'root', 0, null, null, null, null, null, null, FALSE), --チコリータ
 	('0153N01', '0152N01', 25, null, null, null, null, null, null, TRUE), --ベイリーフ
 	('0154N01', '0153N01', 100, null, null, null, null, null, null, TRUE), --メガニウム
+	('0154M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガメガニウム
 	('0155N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒノアラシ
 	('0156N01', '0155N01', 25, null, null, null, null, null, null, TRUE), --マグマラシ
 	('0157N01', '0156N01', 100, null, null, null, null, null, null, TRUE), --バクフーン
@@ -217,6 +224,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0158N01', 'root', 0, null, null, null, null, null, null, FALSE), --ワニノコ
 	('0159N01', '0158N01', 25, null, null, null, null, null, null, TRUE), --アリゲイツ
 	('0160N01', '0159N01', 100, null, null, null, null, null, null, TRUE), --オーダイル
+	('0160M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガオーダイル
 	('0161N01', 'root', 0, null, null, null, null, null, null, FALSE), --オタチ
 	('0162N01', '0161N01', 25, null, null, null, null, null, null, TRUE), --オオタチ
 	('0163N01', 'root', 0, null, null, null, null, null, null, FALSE), --ホーホー
@@ -293,6 +301,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0225N01', 'root', 0, null, null, null, null, null, null, FALSE), --デリバード
 	('0226N01', '0458N01', 50, null, null, null, null, null, null, TRUE), --マンタイン
 	('0227N01', 'root', 0, null, null, null, null, null, null, FALSE), --エアームド
+	('0227M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガエアームド
 	('0228N01', 'root', 0, null, null, null, null, null, null, FALSE), --デルビル
 	('0229N01', '0228N01', 50, null, null, null, null, null, null, TRUE), --ヘルガー
 	('0229M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガヘルガー
@@ -446,8 +455,10 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0356N01', '0355N01', 0, null, null, null, null, null, null, FALSE), --サマヨール
 	('0357N01', 'root', 0, null, null, null, null, null, null, FALSE), --トロピウス
 	('0358N01', '0433N01', 50, null, null, null, null, null, null, TRUE), --チリーン
+	('0358M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガチリーン
 	('0359N01', 'root', 0, null, null, null, null, null, null, FALSE), --アブソル
 	('0359M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガアブソル
+	('0359M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガアブソルZ
 	('0360N01', 'root', 0, null, null, null, null, null, null, FALSE), --ソーナノ
 	('0361N01', 'root', 0, null, null, null, null, null, null, FALSE), --ユキワラシ
 	('0362N01', '0361N01', 100, null, null, null, null, null, null, TRUE), --オニゴーリ
@@ -498,6 +509,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0396N01', 'root', 0, null, null, null, null, null, null, FALSE), --ムックル
 	('0397N01', '0396N01', 25, null, null, null, null, null, null, TRUE), --ムクバード
 	('0398N01', '0397N01', 100, null, null, null, null, null, null, TRUE), --ムクホーク
+	('0398M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガムクホーク
 	('0399N01', 'root', 0, null, null, null, null, null, null, FALSE), --ビッパ
 	('0400N01', '0399N01', 50, null, null, null, null, null, null, TRUE), --ビーダル
 	('0401N01', 'root', 0, null, null, null, null, null, null, FALSE), --コロボーシ
@@ -517,7 +529,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0413N01', '0412N01', 50, null, null, 'メスのみ', null, null, null, TRUE), --ミノマダム(くさきのミノ)
 	('0413N02', '0412N02', 50, null, null, 'メスのみ', null, null, null, TRUE), --ミノマダム(すなちのミノ)
 	('0413N03', '0412N03', 50, null, null, 'メスのみ', null, null, null, TRUE), --ミノマダム(ゴミのミノ)
--- 0414N01はガーメイル。進化前が複数存在するため、注意が必要。  
+-- 0414N01はガーメイル。進化前が複数存在するため、注意が必要。
 	('0414N01', '0412N01', 50, null, null, 'オスのみ', null, null, null, TRUE), --ガーメイル1
 	('0414N01', '0412N02', 50, null, null, 'オスのみ', null, null, null, TRUE), --ガーメイル2
 	('0414N01', '0412N03', 50, null, null, 'オスのみ', null, null, null, TRUE), --ガーメイル3
@@ -557,10 +569,12 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0444N01', '0443N01', 25, null, null, null, null, null, null, TRUE), --ガバイト
 	('0445N01', '0444N01', 100, null, null, null, null, null, null, TRUE), --ガブリアス
 	('0445M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガガブリアス
+	('0445M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガガブリアスZ
 	('0446N01', 'root', 0, null, null, null, null, null, null, FALSE), --ゴンベ
 	('0447N01', 'root', 0, null, null, null, null, null, null, FALSE), --リオル
 	('0448N01', '0447N01', 50, null, null, null, null, null, null, TRUE), --ルカリオ
 	('0448M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガルカリオ
+	('0448M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガルカリオZ
 	('0449N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒポポタス
 	('0450N01', '0449N01', 50, null, null, null, null, null, null, TRUE), --カバルドン
 	('0451N01', 'root', 0, null, null, null, null, null, null, FALSE), --スコルピ
@@ -593,6 +607,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0476N01', '0299N01', 50, null, null, null, 'マグネットルアーを使用したポケストの近く', null, null, TRUE), --ダイノーズ
 	('0477N01', '0356N01', 100, 'シンオウのいし1コ', null, null, null, null, null, TRUE), --ヨノワール
 	('0478N01', '0361N01', 100, 'シンオウのいし1コ', null, null, null, null, null, TRUE), --ユキメノコ
+	('0478M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガユキメノコ
 	('0479N01', 'root', 0, null, null, null, null, null, null, FALSE), --ロトム
 	('0479N02', 'root', 0, null, null, null, null, null, null, FALSE), --ロトム(ヒートロトム)
 	('0479N03', 'root', 0, null, null, null, null, null, null, FALSE), --ロトム(ウォッシュロトム)
@@ -607,6 +622,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0484N01', 'root', 0, null, null, null, null, null, null, FALSE), --パルキア
 	('0484N02', 'root', 0, null, null, null, null, null, null, FALSE), --パルキア(オリジンフォルム)
 	('0485N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒードラン
+	('0485M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガヒードラン
 	('0486N01', 'root', 0, null, null, null, null, null, null, FALSE), --レジギガス
 	('0487N01', 'root', 0, null, null, null, null, null, null, FALSE), --ギラティナ(アナザーフォルム)
 	('0487N02', 'root', 0, null, null, null, null, null, null, FALSE), --ギラティナ(オリジンフォルム)
@@ -614,6 +630,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0489N01', 'root', 0, null, null, null, null, null, null, FALSE), --フィオネ
 	('0490N01', 'root', 0, null, null, null, null, null, null, FALSE), --マナフィ
 	('0491N01', 'root', 0, null, null, null, null, null, null, FALSE), --ダークライ
+	('0491M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガダークライ
 	('0492N01', 'root', 0, null, null, null, null, null, null, FALSE), --シェイミ(ランドフォルム)
 	('0492N02', 'root', 0, null, null, null, null, null, null, FALSE), --シェイミ(スカイフォルム)
 	('0493N01', 'root', 0, null, null, null, null, null, null, FALSE), --アルセウス
@@ -624,6 +641,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0498N01', 'root', 0, null, null, null, null, null, null, FALSE), --ポカブ
 	('0499N01', '0498N01', 25, null, null, null, null, null, null, TRUE), --チャオブー
 	('0500N01', '0499N01', 100, null, null, null, null, null, null, TRUE), --エンブオー
+	('0500M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガエンブオー
 	('0501N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミジュマル
 	('0502N01', '0501N01', 25, null, null, null, null, null, null, TRUE), --フタチマル
 	('0503N01', '0502N01', 100, null, null, null, null, null, null, TRUE), --ダイケンキ
@@ -655,6 +673,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0528N01', '0527N01', 50, null, '1km歩く', null, null, null, null, TRUE), --ココロモリ
 	('0529N01', 'root', 0, null, null, null, null, null, null, FALSE), --モグリュー
 	('0530N01', '0529N01', 50, null, null, null, null, null, null, TRUE), --ドリュウズ
+	('0530M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガドリュウズ
 	('0531N01', 'root', 0, null, null, null, null, null, null, FALSE), --タブンネ
 	('0531M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガタブンネ
 	('0532N01', 'root', 0, null, null, null, null, null, null, FALSE), --ドッコラー
@@ -671,6 +690,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0543N01', 'root', 0, null, null, null, null, null, null, FALSE), --フシデ
 	('0544N01', '0543N01', 25, null, null, null, null, null, null, TRUE), --ホイーガ
 	('0545N01', '0544N01', 100, null, null, null, null, null, null, TRUE), --ペンドラー
+	('0545M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガペンドラー
 	('0546N01', 'root', 0, null, null, null, null, null, null, FALSE), --モンメン
 	('0547N01', '0546N01', 50, 'たいようのいし1コ', null, null, null, null, null, TRUE), --エルフーン
 	('0548N01', 'root', 0, null, null, null, null, null, null, FALSE), --チュリネ
@@ -693,6 +713,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0558N01', '0557N01', 50, null, null, null, null, null, null, TRUE), --イワパレス
 	('0559N01', 'root', 0, null, null, null, null, null, null, FALSE), --ズルッグ
 	('0560N01', '0559N01', 50, null, null, null, null, null, null, TRUE), --ズルズキン
+	('0560M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガズルズキン
 	('0561N01', 'root', 0, null, null, null, null, null, null, FALSE), --シンボラー
 	('0562N01', 'root', 0, null, null, null, null, null, null, FALSE), --デスマス
 	('0562G01', 'root', 0, null, null, null, null, null, null, FALSE), --デスマス(ガラルのすがた)
@@ -748,11 +769,13 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0602N01', 'root', 0, null, null, null, null, null, null, FALSE), --シビシラス
 	('0603N01', '0602N01', 25, null, null, null, null, null, null, TRUE), --シビビール
 	('0604N01', '0603N01', 100, 'イッシュのいし1コ', null, null, null, null, null, TRUE), --シビルドン
+	('0604M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガシビルドン
 	('0605N01', 'root', 0, null, null, null, null, null, null, FALSE), --リグレー
 	('0606N01', '0605N01', 50, null, null, null, null, null, null, TRUE), --オーベム
 	('0607N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒトモシ
 	('0608N01', '0607N01', 25, null, null, null, null, null, null, TRUE), --ランプラー
 	('0609N01', '0608N01', 100, 'イッシュのいし1コ', null, null, null, null, null, TRUE), --シャンデラ
+	('0609M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャンデラ
 	('0610N01', 'root', 0, null, null, null, null, null, null, FALSE), --キバゴ
 	('0611N01', '0610N01', 25, null, null, null, null, null, null, TRUE), --オノンド
 	('0612N01', '0611N01', 100, null, null, null, null, null, null, TRUE), --オノノクス
@@ -768,6 +791,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0621N01', 'root', 0, null, null, null, null, null, null, FALSE), --クリムガン
 	('0622N01', 'root', 0, null, null, null, null, null, null, FALSE), --ゴビット
 	('0623N01', '0622N01', 50, null, null, null, null, null, null, TRUE), --ゴルーグ
+	('0623M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガゴルーグ
 	('0624N01', 'root', 0, null, null, null, null, null, null, FALSE), --コマタナ
 	('0625N01', '0624N01', 50, null, null, null, null, null, null, TRUE), --キリキザン
 	('0626N01', 'root', 0, null, null, null, null, null, null, FALSE), --バッフロン
@@ -809,13 +833,16 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0650N01', 'root', 0, null, null, null, null, null, null, FALSE), --ハリマロン
 	('0651N01', '0650N01', 25, null, null, null, null, null, null, TRUE), --ハリボーグ
 	('0652N01', '0651N01', 100, null, null, null, null, null, null, TRUE), --ブリガロン
+	('0652M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガブリガロン
 	('0653N01', 'root', 0, null, null, null, null, null, null, FALSE), --フォッコ
 	('0654N01', '0653N01', 25, null, null, null, null, null, null, TRUE), --テールナー
 	('0655N01', '0654N01', 100, null, null, null, null, null, null, TRUE), --マフォクシー
+	('0655M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガマフォクシー
 	('0656N01', 'root', 0, null, null, null, null, null, null, FALSE), --ケロマツ
 	('0657N01', '0656N01', 25, null, null, null, null, null, null, TRUE), --ゲコガシラ
 	('0658N01', '0657N01', 100, null, null, null, null, null, null, TRUE), --ゲッコウガ
 	('0658N02', '0657N01', 100, null, null, null, null, null, null, TRUE), --ゲッコウガ(サトシゲッコウガ)
+	('0658M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガゲッコウガ
 	('0659N01', 'root', 0, null, null, null, null, null, null, FALSE), --ホルビー
 	('0660N01', '0659N01', 50, null, null, null, null, null, null, TRUE), --ホルード
 	('0661N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヤヤコマ
@@ -827,8 +854,10 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0667N01', 'root', 0, null, null, null, null, null, null, FALSE), --シシコ
 	('0668N01', '0667N01', 50, null, null, 'オスのみ', null, null, null, TRUE), --カエンジシ(オスのすがた)
 	('0668N02', '0667N01', 50, null, null, 'メスのみ', null, null, null, TRUE), --カエンジシ(メスのすがた)
+	('0668M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガカエンジシ
 	('0669N01', 'root', 0, null, null, null, null, null, null, FALSE), --フラベベ
 	('0670N01', '0669N01', 25, null, null, null, null, null, null, TRUE), --フラエッテ
+	('0670M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガフラエッテ
 	('0671N01', '0670N01', 100, null, 'ハートを20個を獲得する', null, null, null, null, TRUE), --フラージェス
 	('0672N01', 'root', 0, null, null, null, null, null, null, FALSE), --メェークル
 	('0673N01', '0672N01', 50, null, null, null, null, null, null, TRUE), --ゴーゴート
@@ -838,6 +867,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0677N01', 'root', 0, null, null, null, null, null, null, FALSE), --ニャスパー
 	('0678N01', '0677N01', 50, null, null, 'オスのみ', null, null, null, TRUE), --ニャオニクス(オスのすがた)
 	('0678N02', '0677N01', 50, null, null, 'メスのみ', null, null, null, TRUE), --ニャオニクス(メスのすがた)
+	('0678M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガニャオニクス
+	('0678M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガニャオニクス
 	('0679N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒトツキ
 	('0680N01', '0679N01', 0, null, null, null, null, null, null, TRUE), --ニダンギル
 	('0681N01', '0680N01', 0, null, null, null, null, null, null, TRUE), --ギルガルド(シールドフォルム)
@@ -848,10 +879,13 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0685N01', '0684N01', 50, null, 'おやつを25個あげる', null, null, null, null, TRUE), --ペロリーム
 	('0686N01', 'root', 0, null, null, null, null, null, null, FALSE), --マーイーカ
 	('0687N01', '0686N01', 50, null, null, '端末を上下逆さまにする', null, null, null, TRUE), --カラマネロ
+	('0687M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガカラマネロ
 	('0688N01', 'root', 0, null, null, null, null, null, null, FALSE), --カメテテ
 	('0689N01', '0688N01', 50, null, null, null, null, null, null, TRUE), --ガメノデス
+	('0689M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガガメノデス
 	('0690N01', 'root', 0, null, null, null, null, null, null, FALSE), --クズモー
 	('0691N01', '0690N01', 50, null, null, null, null, null, null, TRUE), --ドラミドロ
+	('0691M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガドラミドロ
 	('0692N01', 'root', 0, null, null, null, null, null, null, FALSE), --ウデッポウ
 	('0693N01', '0692N01', 50, null, null, null, null, null, null, TRUE), --ブロスター
 	('0694N01', 'root', 0, null, null, null, null, null, null, FALSE), --エリキテル
@@ -862,6 +896,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0699N01', '0698N01', 50, null, null, '夜のみ', null, null, null, TRUE), --アマルルガ
 	('0700N01', '0133N01', 25, null, 'ハートを70個獲得する', null, null, null, null, TRUE), --ニンフィア
 	('0701N01', 'root', 0, null, null, null, null, null, null, FALSE), --ルチャブル
+	('0701M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガルチャブル
 	('0702N01', 'root', 0, null, null, null, null, null, null, FALSE), --デデンネ
 	('0703N01', 'root', 0, null, null, null, null, null, null, FALSE), --メレシー
 	('0704N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヌメラ
@@ -890,6 +925,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0718N01', 'root', 0, null, null, null, null, null, null, FALSE), --ジガルデ(50%フォルム)
 	('0718N02', 'root', 0, null, null, null, null, null, null, FALSE), --ジガルデ(10%フォルム)
 	('0718N03', 'root', 0, null, null, null, null, null, null, FALSE), --ジガルデ(パーフェクトフォルム)
+	('0718M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガジガルデ
 	('0719N01', 'root', 0, null, null, null, null, null, null, FALSE), --ディアンシー
 	('0719M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガディアンシー
 	('0720N01', 'root', 0, null, null, null, null, null, null, FALSE), --フーパ(いましめられしフーパ)
@@ -915,6 +951,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0738N01', '0737N01', 100, null, null, null, 'マグネットルアーを使用したポケストの近く', null, null, TRUE), --クワガノン
 	('0739N01', 'root', 0, null, null, null, null, null, null, FALSE), --マケンカニ
 	('0740N01', '0739N01', 50, null, null, null, 'アイスルアーを使用したポケストの近く', null, null, TRUE), --ケケンカニ
+	('0740M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガケケンカニ
 	('0741N01', 'root', 0, null, null, null, null, null, null, FALSE), --オドリドリ(めらめらスタイル)
 	('0741N02', 'root', 0, null, null, null, null, null, null, FALSE), --オドリドリ(ぱちぱちスタイル)
 	('0741N03', 'root', 0, null, null, null, null, null, null, FALSE), --オドリドリ(ふらふらスタイル)
@@ -950,6 +987,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0766N01', 'root', 0, null, null, null, null, null, null, FALSE), --ナゲツケサル
 	('0767N01', 'root', 0, null, null, null, null, null, null, FALSE), --コソクムシ
 	('0768N01', '0767N01', 400, null, null, null, null, null, null, TRUE), --グソクムシャ
+	('0768M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガグソクムシャ
 	('0769N01', 'root', 0, null, null, null, null, null, null, FALSE), --スナバァ
 	('0770N01', '0769N01', 50, null, null, null, null, null, null, TRUE), --シロデスナ
 	('0771N01', 'root', 0, null, null, null, null, null, null, FALSE), --ナマコブシ
@@ -964,6 +1002,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0778N02', 'root', 0, null, null, null, null, null, null, FALSE), --ミミッキュ(ばれたすがた)
 	('0779N01', 'root', 0, null, null, null, null, null, null, FALSE), --ハギギシリ
 	('0780N01', 'root', 0, null, null, null, null, null, null, FALSE), --ジジーロン
+	('0780M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガジジーロン
 	('0781N01', 'root', 0, null, null, null, null, null, null, FALSE), --ダダリン
 	('0782N01', 'root', 0, null, null, null, null, null, null, FALSE), --ジャラコ
 	('0783N01', '0782N01', 25, null, null, null, null, null, null, TRUE), --ジャランゴ
@@ -988,12 +1027,14 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0800N03', 'root', 0, null, null, null, null, null, null, FALSE), --ネクロズマ(あかつきのつばさ月食)
 	('0800N04', 'root', 0, null, null, null, null, null, null, FALSE), --ネクロズマ(ウルトラネクロズマ)
 	('0801N01', 'root', 0, null, null, null, null, null, null, FALSE), --マギアナ
+	('0801M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガマギアナ
 	('0802N01', 'root', 0, null, null, null, null, null, null, FALSE), --マーシャドー
 	('0803N01', 'root', 0, null, null, null, null, null, null, FALSE), --ベベノム
 	('0804N01', '0803N01', 200, null, 'ドラゴンタイプのポケモンを20匹捕獲', null, null, null, null, TRUE), --アーゴヨン
 	('0805N01', 'root', 0, null, null, null, null, null, null, FALSE), --ツンデツンデ
 	('0806N01', 'root', 0, null, null, null, null, null, null, FALSE), --ズガドーン
 	('0807N01', 'root', 0, null, null, null, null, null, null, FALSE), --ゼラオラ
+	('0807M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガゼラオラ
 	('0808N01', 'root', 0, null, null, null, null, null, null, FALSE), --メルタン
 	('0809N01', '0808N01', 400, null, null, null, null, null, null, TRUE), --メルメタル
 	('0810N01', 'root', 0, null, null, null, null, null, null, FALSE), --サルノリ
@@ -1011,8 +1052,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0822N01', '0821N01', 25, null, null, null, null, null, null, TRUE), --アオガラス
 	('0823N01', '0822N01', 100, null, null, null, null, null, null, TRUE), --アーマーガア
 	('0824N01', 'root', 0, null, null, null, null, null, null, FALSE), --サッチムシ
-	('0825N01', '0824N01', 0, null, null, null, null, null, null, TRUE), --レドームシ
-	('0826N01', '0825N01', 0, null, null, null, null, null, null, TRUE), --イオルブ
+	('0825N01', '0824N01', 25, null, null, null, null, null, null, TRUE), --レドームシ
+	('0826N01', '0825N01', 100, null, null, null, null, null, null, TRUE), --イオルブ
 	('0827N01', 'root', 0, null, null, null, null, null, null, FALSE), --クスネ
 	('0828N01', '0827N01', 50, null, null, null, null, null, null, TRUE), --フォクスライ
 	('0829N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒメンカ
@@ -1060,6 +1101,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0868N01', 'root', 0, null, null, null, null, null, null, FALSE), --マホミル
 	('0869N01', '0868N01', 0, null, null, null, null, null, null, TRUE), --マホイップ
 	('0870N01', 'root', 0, null, null, null, null, null, null, FALSE), --タイレーツ
+	('0870M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガタイレーツ
 	('0871N01', 'root', 0, null, null, null, null, null, null, FALSE), --バチンウニ
 	('0872N01', 'root', 0, null, null, null, null, null, null, FALSE), --ユキハミ
 	('0873N01', '0872N01', 400, null, null, 'ハートポイントを10個獲得後、夜に進化', null, null, null, TRUE), --モスノウ
@@ -1158,6 +1200,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0950N01', 'root', 0, null, null, null, null, null, null, FALSE), --ガケガニ
 	('0951N01', 'root', 0, null, null, null, null, null, null, FALSE), --カプサイジ
 	('0952N01', '0951N01', 0, null, null, null, null, null, null, TRUE), --スコヴィラン
+	('0952M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガスコヴィラン
 	('0953N01', 'root', 0, null, null, null, null, null, null, FALSE), --シガロコ
 	('0954N01', '0953N01', 0, null, null, null, null, null, null, TRUE), --ベラカス
 	('0955N01', 'root', 0, null, null, null, null, null, null, FALSE), --ヒラヒナ
@@ -1176,7 +1219,8 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0967N01', 'root', 0, null, null, null, null, null, null, FALSE), --モトトカゲ
 	('0968N01', 'root', 0, null, null, null, null, null, null, FALSE), --ミミズズ
 	('0969N01', 'root', 0, null, null, null, null, null, null, FALSE), --キラーメ
-	('0970N01', '0969N01', 0, null, null, null, null, null, null, TRUE), --キラフロル
+	('0970N01', '0969N01', 50, null, null, null, null, null, null, TRUE), --キラフロル
+	('0970M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガキラフロル
 	('0971N01', 'root', 0, null, null, null, null, null, null, FALSE), --ボチ
 	('0972N01', '0971N01', 50, null, null, null, null, null, null, TRUE), --ハカドッグ
 	('0973N01', 'root', 0, null, null, null, null, null, null, FALSE), --カラミンゴ
@@ -1187,6 +1231,7 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0978N01', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(そった)
 	('0978N02', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(たれた)
 	('0978N03', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(のびた)
+	('0978M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャリタツ
 	('0979N01', '0057N01', 100, null, 'ゴーストか、エスパータイプのポケモンに30勝利する', null, null, null, null, TRUE), --コノヨザル
 	('0980N01', '0194P01', 0, null, null, null, null, null, null, TRUE), --ドオー
 	('0981N01', '0203N01', 0, null, null, null, null, null, null, TRUE), --リキキリン
@@ -1208,10 +1253,11 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0996N01', 'root', 0, null, null, null, null, null, null, FALSE), --セビエ
 	('0997N01', '0996N01', 25, null, null, null, null, null, null, TRUE), --セゴール
 	('0998N01', '0997N01', 100, null, null, null, null, null, null, TRUE), --セグレイブ
+	('0998M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガセグレイブ
 	('0999N01', 'root', 0, null, null, null, null, null, null, FALSE), --コレクレー(はこ)
 	('0999N02', 'root', 0, null, null, null, null, null, null, FALSE), --コレクレー(とほ)
--- 1000N01はサーフゴー。進化前が複数存在するため注意が必要。  
-	('1000N01', '0999N01', 0, null, null, 'コレクレーのコイン999枚', null, null, 'コレクレーは、"はこフォルム"と"とほフォルム"両方サーフゴーに進化する。', TRUE), --サーフゴー1
+-- 1000N01はサーフゴー。進化前が複数存在するため注意が必要。
+  	('1000N01', '0999N01', 0, null, null, 'コレクレーのコイン999枚', null, null, 'コレクレーは、"はこフォルム"と"とほフォルム"両方サーフゴーに進化する。', TRUE), --サーフゴー1
 	('1000N01', '0999N02', 0, null, null, 'コレクレーのコイン999枚', null, null, null, TRUE), --サーフゴー2
 	('1001N01', 'root', 0, null, null, null, null, null, null, FALSE), --チオンジェン
 	('1002N01', 'root', 0, null, null, null, null, null, null, FALSE), --パオジアン

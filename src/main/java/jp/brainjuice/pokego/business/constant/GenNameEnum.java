@@ -16,16 +16,17 @@ public enum GenNameEnum implements ConstantEnumInterface {
 	g7pv("第七世代(Let's GO! ピカチュウ&イーブイ)"),
 	g7mov("第七世代(映画オリジナル)"),
 	g8("第八世代(剣盾)"),
-	g8arceus("LEGENDS アルセウス"),
+	g8arceus("第八世代(LEGENDS アルセウス)"),
 	g9("第九世代(スカーレットヴァイオレット)"),
+	g9za("第九世代(Legends Z-A)"),
 	;
 
 	@Getter
 	private final String jpn;
 
 	public static GenNameEnum getEnumName(String str) {
-		for(GenNameEnum v : values()) {
-			if(v.getJpn().equals(str)) {
+		for (GenNameEnum v : values()) {
+			if (v.getJpn().equals(str)) {
 				return v;
 			}
 		}
