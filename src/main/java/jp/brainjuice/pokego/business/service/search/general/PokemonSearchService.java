@@ -4,7 +4,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,14 +21,16 @@ import jp.brainjuice.pokego.business.service.search.pokeFilter.PokemonFilterValu
 import jp.brainjuice.pokego.business.service.search.pokeFilter.PokemonFilterValueUtils;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.search.utils.dto.GoPokedexAndCp;
+import jp.brainjuice.pokego.business.service.search.utils.dto.GppAndCp;
 import jp.brainjuice.pokego.business.service.search.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.search.utils.dto.PokemonSearchResult;
 import jp.brainjuice.pokego.business.service.search.utils.dto.TokenizeResult;
 import jp.brainjuice.pokego.cache.inmemory.PokemonDictionaryInfo;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
+import jp.brainjuice.pokego.dao.jpa.PokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.dto.FilterParam;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
+import jp.brainjuice.pokego.dao.jpa.entity.Pokedex;
 import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.web.search.form.req.ResearchRequest;
 import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
@@ -38,6 +42,8 @@ import lombok.Data;
 public class PokemonSearchService {
 
 	private GoPokedexRepository goPokedexRepository;
+
+	private PokedexRepository pokedexRepository;
 
 	private PokemonGoUtils pokemonGoUtils;
 
@@ -55,10 +61,12 @@ public class PokemonSearchService {
 
 	public PokemonSearchService(
 			GoPokedexRepository goPokedexRepository,
+			PokedexRepository pokedexRepository,
 			PokemonGoUtils pokemonGoUtils,
 			PokemonDictionaryInfo pokemonDictionaryInfo,
 			GoPokedexFilterService goPokedexFilterService) {
 		this.goPokedexRepository = goPokedexRepository;
+		this.pokedexRepository = pokedexRepository;
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.pokemonDictionaryInfo = pokemonDictionaryInfo;
 		this.goPokedexFilterService = goPokedexFilterService;
@@ -83,36 +91,44 @@ public class PokemonSearchService {
 
 		// GoPokedexの取得
 		List<GoPokedex> goPokedexList = goPokedexFilterService.findByAny(filterMap);
-
+		// Pokedexの初期化
+		final Map<String, Pokedex> pidToPokedexMap;
 
 		if (goPokedexList.isEmpty()) {
 			// 検索結果なしだった場合
 			result.setMsgLevel(MsgLevelEnum.error);
 			result.setMessage(MSG_NO_RESULTS);
+			pidToPokedexMap = Map.of();
 
 		} else {
 			// 空でない場合
 			result.setHit(true);
 			result.setMessage(MessageFormat.format(MSG_RESULTS, goPokedexList.size()));
 
+			pidToPokedexMap = pokedexRepository
+					.findAllById(Objects.requireNonNull(
+							goPokedexList.stream().map(GoPokedex::getPokedexId).toList()))
+					.stream().collect(Collectors.toMap(Pokedex::getPokedexId, Function.identity()));
+
 			if (goPokedexList.size() == 1) {
 				// 1件のみヒットした場合
-				result.setGoPokedex(getGoPokedexAndCp(goPokedexList.get(0), 0));
+				result.setGoPokedex(
+						getGppAndCp(goPokedexList.get(0), pidToPokedexMap.get(goPokedexList.get(0).getPokedexId()), 0));
 				result.setUnique(true);
 			}
 		}
 
 		AtomicInteger counter = new AtomicInteger();
-		List<GoPokedexAndCp> gpAndCpList = goPokedexList.stream()
-				.map(gp -> getGoPokedexAndCp(gp, counter.incrementAndGet()))
+		List<GppAndCp> gpAndCpList = goPokedexList.stream()
+				.map(gp -> getGppAndCp(gp, pidToPokedexMap.get(gp.getPokedexId()), counter.incrementAndGet()))
 				.collect(Collectors.toList());
 		result.setGpAndCpList(gpAndCpList);
 		return result;
 	}
 
-	private GoPokedexAndCp getGoPokedexAndCp(GoPokedex goPokedex, int no) {
+	private GppAndCp getGppAndCp(GoPokedex goPokedex, Pokedex pokedex, int no) {
 		int cp = pokemonGoUtils.calcMaxBaseCp(goPokedex);
-		GoPokedexAndCp gpAndCp = new GoPokedexAndCp(no, goPokedex, cp);
+		GppAndCp gpAndCp = new GppAndCp(no, goPokedex, pokedex, cp);
 		return gpAndCp;
 	}
 
@@ -154,7 +170,7 @@ public class PokemonSearchService {
 				.map(MultiSearchDto::getPid)
 				.filter(StringUtils::isNotEmpty)
 				.toList();
-		final List<GoPokedex> gpList = goPokedexRepository.findAllById(pidList);
+		final List<GoPokedex> gpList = goPokedexRepository.findAllById(java.util.Objects.requireNonNull(pidList));
 
 		List<PokemonSearchResult> psrList = msDtoList.stream()
 				.map(msDto -> {
@@ -296,6 +312,7 @@ public class PokemonSearchService {
 
 	/**
 	 * カタカナに変換してnameカラムでそのまま検索する。
+	 * 
 	 * @param words
 	 * @return
 	 */
@@ -348,7 +365,7 @@ public class PokemonSearchService {
 
 		// groupListが空でない場合、goPokedexListにがっちゃんこする。
 		if (!groupList.isEmpty()) {
-			List<GoPokedex> groupGoPdList = goPokedexRepository.findAllById(groupList);
+			List<GoPokedex> groupGoPdList = goPokedexRepository.findAllById(Objects.requireNonNull(groupList));
 
 			goPokedexList = Stream.concat(
 					goPokedexList.stream(),
@@ -427,7 +444,8 @@ public class PokemonSearchService {
 		List<String> list = new ArrayList<String>();
 		for (int i = 0; i < nameChars.length; i++) {
 
-			if (nameChars.length - i < 2) break;
+			if (nameChars.length - i < 2)
+				break;
 
 			list.add(String.valueOf(nameChars[i]) + String.valueOf(nameChars[i + 1]));
 

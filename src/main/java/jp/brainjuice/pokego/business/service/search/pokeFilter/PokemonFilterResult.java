@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.business.service.search.pokeFilter;
 
 import java.util.List;
 
-import jp.brainjuice.pokego.business.service.search.utils.dto.GoPokedexAndCp;
+import jp.brainjuice.pokego.business.service.search.utils.dto.GppAndCp;
 import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.search.form.res.elem.DispFilterParam;
 import lombok.AllArgsConstructor;
@@ -22,10 +22,10 @@ public class PokemonFilterResult {
 	private boolean unique;
 
 	/** 検索結果が複数件の場合 */
-	private List<GoPokedexAndCp> gpAndCpList;
+	private List<GppAndCp> gpAndCpList;
 
 	/** 検索結果が1件の場合 */
-	private GoPokedexAndCp goPokedex;
+	private GppAndCp goPokedex;
 
 	/** ヒットしたかどうか */
 	private boolean hit;
