@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.business.service.search.moves;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -58,8 +59,8 @@ public class GymRaidPokeMoveCombiResearchService implements ResearchService<GymR
 		res.setGoPokedex(gp);
 		long limit = sv.get(ParamsEnum.limit, long.class);
 
-		if (!gp.isImplFlg()) {
-			// 未実装のポケモンの場合、技は表示しない
+		if (StringUtils.isEmpty(gp.getPreMegaPokedexId()) && !gp.isImplFlg()) {
+			// 未実装のポケモン（メガシンカポケモンを除く）の場合、技は表示しない
 			res.setMoveCombiList(List.of());
 			return;
 		}
@@ -67,7 +68,14 @@ public class GymRaidPokeMoveCombiResearchService implements ResearchService<GymR
 		GoPokedex targetGp = gp;
 		if (!StringUtils.isEmpty(gp.getPreMegaPokedexId())) {
 			// メガシンカの場合
-			GoPokedex preMegaGp = goPokedexRepository.findById(gp.getPreMegaPokedexId()).orElseThrow();
+			GoPokedex preMegaGp = goPokedexRepository
+					.findById(Objects.requireNonNull(gp.getPreMegaPokedexId(), "上でチェックしてるから絶対あり得ない…。"))
+					.orElseThrow();
+			if (!preMegaGp.isImplFlg()) {
+				// 進化前も未実装の場合
+				res.setMoveCombiList(List.of());
+				return;
+			}
 			res.setPreMegaGp(preMegaGp);
 
 			targetGp = preMegaGp;
@@ -75,14 +83,14 @@ public class GymRaidPokeMoveCombiResearchService implements ResearchService<GymR
 
 		String pokedexId = targetGp.getPokedexId();
 		List<PokemonFastAttack> pokemonFastAttackList = movesUtils.convHiddenPowerForPokemonFastAttackList( // めざめるパワーを変換
-				pokemonFastAttackRepository.findByPokedexIdJoinFastAttack(pokedexId)
-				).stream()
+				pokemonFastAttackRepository.findByPokedexIdJoinFastAttack(pokedexId)).stream()
 				.filter(pfa -> !MovesUtils.TRANSFORM_MOVE_ID.equals(pfa.getMoveId())) // へんしんを排除する。
 				.toList();
-		List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository.findByPokedexIdJoinChargedAttack(pokedexId);
+		List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository
+				.findByPokedexIdJoinChargedAttack(pokedexId);
 
-
-		List<MoveCombination> combiList = new ArrayList<>(pokemonFastAttackList.size() * pokemonChargedAttackList.size());
+		List<MoveCombination> combiList = new ArrayList<>(
+				pokemonFastAttackList.size() * pokemonChargedAttackList.size());
 		GymRaidAttackScoreInDto inDto = new GymRaidAttackScoreInDto(); // 処理効率化のためインスタンスを使い回す
 		inDto.setGoPokedex(gp); // メガシンカ後の場合、技の検索は進化前で行うが、攻撃スコアの算出はメガシンカ後で行う
 		for (PokemonFastAttack pfa : pokemonFastAttackList) {

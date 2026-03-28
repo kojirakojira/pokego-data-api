@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.business.service.search.moves;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,8 +52,8 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 		GoPokedex gp = sv.getGoPokedex();
 		res.setGoPokedex(gp);
 
-		if (!gp.isImplFlg()) {
-			// 未実装のポケモンの場合、技は表示しない
+		if (StringUtils.isEmpty(gp.getPreMegaPokedexId()) && !gp.isImplFlg()) {
+			// 未実装のポケモン（メガシンカポケモンを除く）の場合、技は表示しない
 			res.setFastAttackList(List.of());
 			res.setChargedAttackList(List.of());
 			return;
@@ -61,19 +62,28 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 		GoPokedex targetGp = gp;
 		if (!StringUtils.isEmpty(gp.getPreMegaPokedexId())) {
 			// メガシンカの場合
-			GoPokedex preMegaGp = goPokedexRepository.findById(gp.getPreMegaPokedexId()).orElseThrow();
+			GoPokedex preMegaGp = goPokedexRepository
+					.findById(Objects.requireNonNull(gp.getPreMegaPokedexId(), "上でチェックしてるから絶対あり得ない…。"))
+					.orElseThrow();
+			if (!preMegaGp.isImplFlg()) {
+				// 進化前も未実装の場合
+				res.setFastAttackList(List.of());
+				res.setChargedAttackList(List.of());
+				return;
+			}
 			res.setPreMegaGp(preMegaGp);
-
 			targetGp = preMegaGp;
 		}
 
 		{
 			// 通常技
-			List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository.findByPokedexIdJoinFastAttack(targetGp.getPokedexId());
+			List<PokemonFastAttack> pokemonFastAttackList = pokemonFastAttackRepository
+					.findByPokedexIdJoinFastAttack(targetGp.getPokedexId());
 
 			List<DispPokemonFastAttack> dispPokemonFastAttackList = pokemonFastAttackList.stream()
 					.map(pfa -> {
-						DispPokemonFastAttack dpfa = new DispPokemonFastAttack(movesUtils.convDispFastAttack(pfa.getFastAttack()));
+						DispPokemonFastAttack dpfa = new DispPokemonFastAttack(
+								movesUtils.convDispFastAttack(pfa.getFastAttack()));
 						dpfa.setLearningPattern(pfa.getLearningPattern());
 						dpfa.setLearningPatternName(pfa.getLearningPattern().getJpn());
 						return dpfa;
@@ -82,7 +92,7 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 					.toList();
 
 			int i = 1;
-			for (DispPokemonFastAttack dpfa: dispPokemonFastAttackList) {
+			for (DispPokemonFastAttack dpfa : dispPokemonFastAttackList) {
 				dpfa.setNo(i++);
 			}
 			res.setFastAttackList(dispPokemonFastAttackList);
@@ -90,11 +100,13 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 
 		{
 			// スペシャル技
-			List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository.findByPokedexIdJoinChargedAttack(targetGp.getPokedexId());
+			List<PokemonChargedAttack> pokemonChargedAttackList = pokemonChargedAttackRepository
+					.findByPokedexIdJoinChargedAttack(targetGp.getPokedexId());
 
 			List<DispPokemonChargedAttack> dispPokemonFastAttackList = pokemonChargedAttackList.stream()
 					.map(pca -> {
-						DispPokemonChargedAttack dpca = new DispPokemonChargedAttack(movesUtils.convDispChargedAttack(pca.getChargedAttack()));
+						DispPokemonChargedAttack dpca = new DispPokemonChargedAttack(
+								movesUtils.convDispChargedAttack(pca.getChargedAttack()));
 						dpca.setLearningPattern(pca.getLearningPattern());
 						dpca.setLearningPatternName(pca.getLearningPattern().getJpn());
 						// 覚え方の注釈
@@ -108,7 +120,7 @@ public class PokemonAttackResearchService implements ResearchService<PokemonAtta
 					.sorted((o1, o2) -> BjUtils.getCollator().compare(o1.getName(), o2.getName()))
 					.toList();
 			int i = 1;
-			for (DispPokemonChargedAttack dpca: dispPokemonFastAttackList) {
+			for (DispPokemonChargedAttack dpca : dispPokemonFastAttackList) {
 				dpca.setNo(i++);
 			}
 			res.setChargedAttackList(dispPokemonFastAttackList);
