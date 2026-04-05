@@ -34,7 +34,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0022N01', FALSE, FALSE), --オニドリル
 	('0023N01', FALSE, FALSE), --アーボ
 	('0024N01', FALSE, FALSE), --アーボック
-	('0025N01', TRUE, FALSE), --ピカチュウ
+	('0025N01', TRUE, TRUE), --ピカチュウ
 	('0025N02', FALSE, FALSE), --ピカチュウ(相棒)
 	('0026N01', TRUE, FALSE), --ライチュウ
 	('0026A01', FALSE, FALSE), --ライチュウ(アローラのすがた)
@@ -480,7 +480,7 @@ INSERT INTO dynamax (pokedex_id, dynamax_impl_flg, gigantamax_impl_flg)
 	('0376N01', TRUE, FALSE), --メタグロス
 	('0376M01', FALSE, FALSE), --メガメタグロス
 	('0377N01', FALSE, FALSE), --レジロック
-	('0378N01', FALSE, FALSE), --レジアイス
+	('0378N01', TRUE, FALSE), --レジアイス
 	('0379N01', FALSE, FALSE), --レジスチル
 	('0380N01', TRUE, FALSE), --ラティアス
 	('0380M01', FALSE, FALSE), --メガラティアス
