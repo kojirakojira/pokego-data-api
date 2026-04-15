@@ -36,10 +36,14 @@ public final class BjUtils {
 	public static final String sdfYmdhme = "yyyy/MM/dd(E) HH:mm";
 	public static final String sdfYmdhms = "yyyy-MM-dd HH:mm:ss";
 	public static final String sdfYmdhm = "yyyy/MM/dd HH:mm";
-	public static final String sdfYmd = "yyyy/MM/dd";
+	public static final String sdfYmdSlash = "yyyy/MM/dd";
+	public static final String sdfYmSlash = "yyyy/MM";
+	public static final String sdfYm = "yyyyMM";
 	public static final String sdfMde = "MM/dd(E)";
 	public static final String sdfHm = "HH:mm";
 	public static final String dirFormat = "yyyyMMddHHmmss";
+	/** yyyyMM形式の正規表現 */
+	public static final String ymRegex = "^\\d{4}(0[1-9]|1[0-2])$";
 
 	private static final String BRAINJUICE_NOW_DATE = "BRAINJUICE_NOW_DATE";
 
@@ -292,6 +296,7 @@ public final class BjUtils {
 
 	/**
 	 * resources配下に配置したYamlファイルを読み込み、ファイル内容を返却する。
+	 *
 	 * @param <T>
 	 *
 	 * @param fileName
@@ -335,6 +340,7 @@ public final class BjUtils {
 
 	/**
 	 * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
+	 *
 	 * @param <T>
 	 *
 	 * @param original
@@ -363,6 +369,7 @@ public final class BjUtils {
 
 	/**
 	 * 日本語のソートオブジェクト取得する
+	 *
 	 * @return
 	 */
 	public static Collator getCollator() {
@@ -373,8 +380,8 @@ public final class BjUtils {
 	 * 四捨五入用メソッド</br>
 	 * 例：round(1, 4, 2) -> 0.3
 	 *
-	 * @param divisor 割られる数
-	 * @param divident 割る数
+	 * @param divisor    割られる数
+	 * @param divident   割る数
 	 * @param roundDigit 四捨五入する小数点以下桁
 	 * @return
 	 */
@@ -388,8 +395,8 @@ public final class BjUtils {
 	 * 四捨五入用メソッド</br>
 	 * 例：round(1, 4, 2) -> 0.3
 	 *
-	 * @param divisor 割られる数
-	 * @param divident 割る数
+	 * @param divisor    割られる数
+	 * @param divident   割る数
 	 * @param roundDigit 四捨五入する小数点以下桁
 	 * @return
 	 */

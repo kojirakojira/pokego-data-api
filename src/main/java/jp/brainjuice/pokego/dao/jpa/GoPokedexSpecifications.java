@@ -1,6 +1,7 @@
 
 package jp.brainjuice.pokego.dao.jpa;
 
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -41,6 +42,8 @@ public class GoPokedexSpecifications {
 	private static final String GIGANTAMX = "gigantamaxImplFlg";
 
 	private static final String IMPL_FLG = "implFlg";
+
+	private static final String RELEASE_DATE = "releaseDate";
 
 	private static final String TOO_STRONG = "tooStrong";
 
@@ -94,6 +97,26 @@ public class GoPokedexSpecifications {
 	}
 
 	/**
+	 * リリース年月（開始）
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public Specification<GoPokedex> greaterThanEqual(Date date) {
+		return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(RELEASE_DATE), date);
+	}
+
+	/**
+	 * リリース年月（終了）
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public Specification<GoPokedex> lessThanEqual(Date date) {
+		return (root, query, builder) -> builder.lessThanOrEqualTo(root.get(RELEASE_DATE), date);
+	}
+
+	/**
 	 * キョダイマックス
 	 * (イメージ：WHERE gigantamax_impl_flg = true）
 	 *
@@ -103,7 +126,6 @@ public class GoPokedexSpecifications {
 	public Specification<GoPokedex> gigantamaxEqual(boolean bool) {
 		return (root, query, builder) -> builder.equal(root.get(GIGANTAMX), bool);
 	}
-
 
 	/**
 	 * 実装済みか否か
@@ -195,7 +217,6 @@ public class GoPokedexSpecifications {
 		};
 	}
 
-
 	/**
 	 * 文字列のカラムへのIN句を生成する。
 	 *
@@ -204,10 +225,11 @@ public class GoPokedexSpecifications {
 	 * @param regionList
 	 * @return
 	 */
-	private CriteriaBuilder.In<String> stringInPredicate(Root<GoPokedex> root, CriteriaBuilder builder, List<String> list, String column) {
+	private CriteriaBuilder.In<String> stringInPredicate(Root<GoPokedex> root, CriteriaBuilder builder,
+			List<String> list, String column) {
 
 		CriteriaBuilder.In<String> inClause = builder.in(root.get(column));
-		for (String str: list) {
+		for (String str : list) {
 			inClause.value(str);
 		}
 		return inClause;
@@ -228,7 +250,8 @@ public class GoPokedexSpecifications {
 
 	/**
 	 * 2タイプ
-	 * (イメージ：WHERE (type1 = :type1 AND type2 = :type2) OR (type1 = :type2 AND type2 = :type1))
+	 * (イメージ：WHERE (type1 = :type1 AND type2 = :type2) OR (type1 = :type2 AND type2
+	 * = :type1))
 	 *
 	 * @param bool
 	 * @return

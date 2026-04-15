@@ -105,10 +105,19 @@ public class PokemonSearchService {
 			result.setHit(true);
 			result.setMessage(MessageFormat.format(MSG_RESULTS, goPokedexList.size()));
 
-			pidToPokedexMap = pokedexRepository
-					.findAllById(Objects.requireNonNull(
-							goPokedexList.stream().map(GoPokedex::getPokedexId).toList()))
-					.stream().collect(Collectors.toMap(Pokedex::getPokedexId, Function.identity()));
+			if (goPokedexList.size() > 100) {
+				// 100件を超える場合は全件取得
+				pidToPokedexMap = pokedexRepository.findAll().stream()
+						.collect(Collectors.toMap(Pokedex::getPokedexId, Function.identity()));
+			} else {
+				// 100件に満たない場合はIN句で取得
+				List<String> pokedexIdList = goPokedexList.stream()
+						.map(GoPokedex::getPokedexId)
+						.distinct()
+						.toList();
+				pidToPokedexMap = pokedexRepository.findAllById(Objects.requireNonNull(pokedexIdList)).stream()
+						.collect(Collectors.toMap(Pokedex::getPokedexId, Function.identity()));
+			}
 
 			if (goPokedexList.size() == 1) {
 				// 1件のみヒットした場合
@@ -170,7 +179,7 @@ public class PokemonSearchService {
 				.map(MultiSearchDto::getPid)
 				.filter(StringUtils::isNotEmpty)
 				.toList();
-		final List<GoPokedex> gpList = goPokedexRepository.findAllById(java.util.Objects.requireNonNull(pidList));
+		final List<GoPokedex> gpList = goPokedexRepository.findAllById(Objects.requireNonNull(pidList));
 
 		List<PokemonSearchResult> psrList = msDtoList.stream()
 				.map(msDto -> {
