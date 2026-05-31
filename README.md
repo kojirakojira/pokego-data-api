@@ -94,7 +94,7 @@ docker exec -it {コンテナID} ls
 1. HSETでuseIdを登録する。_classはちゃんとパッケージを合わせる
 1. SADD admins #{ユーザID}
 1. HSET admins:#{ユーザID} userId #{ユーザID}
-1. ログイン画面でユーザIDとパスワードを入力してログインする。
+1. ログイン画面でユーザIDとパスワードを入力してログインする。(ここで入力したパスワードがパスワードになる。)
 
 ```
 sadd admins "newuser"
