@@ -1231,7 +1231,9 @@ INSERT INTO evolution (pokedex_id, before_pokedex_id, candy, evolution_items, bu
 	('0978N01', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(そった)
 	('0978N02', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(たれた)
 	('0978N03', 'root', 0, null, null, null, null, null, null, FALSE), --シャリタツ(のびた)
-	('0978M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャリタツ
+	('0978M01', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャリタツ(そった)
+	('0978M02', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャリタツ(たれた)
+	('0978M03', 'root', 0, null, null, null, null, null, null, FALSE), --メガシャリタツ(のびた)
 	('0979N01', '0057N01', 100, null, 'ゴーストか、エスパータイプのポケモンに30勝利する', null, null, null, null, TRUE), --コノヨザル
 	('0980N01', '0194P01', 0, null, null, null, null, null, null, TRUE), --ドオー
 	('0981N01', '0203N01', 0, null, null, null, null, null, null, TRUE), --リキキリン

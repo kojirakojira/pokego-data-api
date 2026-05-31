@@ -88,6 +88,10 @@ public class Pokedex implements Serializable {
 	@Column(length = 256)
 	private String image2;
 
+	/** 公式図鑑ID */
+	@Column(name = "official_zukan_id", columnDefinition = "bpchar")
+	private String officialZukanId;
+
 	/** メガシンカ前の図鑑ID */
 	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
 	private String preMegaPokedexId;

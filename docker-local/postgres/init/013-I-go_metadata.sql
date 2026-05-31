@@ -1228,7 +1228,9 @@ INSERT INTO go_metadata (pokedex_id, release_date, dynamax_impl_flg, gigantamax_
 	('0978N01', '2025-07-01', FALSE, FALSE), --シャリタツ(そった)
 	('0978N02', '2025-07-01', FALSE, FALSE), --シャリタツ(たれた)
 	('0978N03', '2025-07-01', FALSE, FALSE), --シャリタツ(のびた)
-	('0978M01', null, FALSE, FALSE), --メガシャリタツ
+	('0978M01', null, FALSE, FALSE), --メガシャリタツ(そった)
+	('0978M02', null, FALSE, FALSE), --メガシャリタツ(たれた)
+	('0978M03', null, FALSE, FALSE), --メガシャリタツ(のびた)
 	('0979N01', '2024-01-01', FALSE, FALSE), --コノヨザル
 	('0980N01', '2023-11-01', FALSE, FALSE), --ドオー
 	('0981N01', null, FALSE, FALSE), --リキキリン

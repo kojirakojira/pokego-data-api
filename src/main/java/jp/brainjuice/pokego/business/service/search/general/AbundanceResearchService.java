@@ -14,6 +14,7 @@ import jp.brainjuice.pokego.business.constant.Type.TypeColorEnum;
 import jp.brainjuice.pokego.business.service.search.ResearchService;
 import jp.brainjuice.pokego.business.service.search.catchCp.utils.CatchCpUtils;
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
+import jp.brainjuice.pokego.business.service.search.sub.CitationsService;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
 import jp.brainjuice.pokego.business.service.search.utils.ScpRankCalculator;
@@ -26,6 +27,7 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.cpIv.RaidIvRange;
 import jp.brainjuice.pokego.business.service.search.utils.dto.cpIv.RocketIvRange;
 import jp.brainjuice.pokego.business.service.search.utils.dto.cpIv.WildIvRange;
 import jp.brainjuice.pokego.business.service.search.utils.evo.EvolutionProvider;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
@@ -53,6 +55,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 
 	private ScpRankCalculator scpRankCalculator;
 
+	private CitationsService referencesService;
+
 	/** {0}からメガシンカ */
 	private final String PRE_MEGA_MSG = "{0}からメガシンカ";
 	/** {0}に進化させればメガシンカ可能 */
@@ -77,13 +81,15 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 			CatchCpUtils catchCpUtils,
 			GoPokedexRepository goPokedexRepository,
 			EvolutionProvider evolutionProvider,
-			ScpRankCalculator scpRankCalculator) {
+			ScpRankCalculator scpRankCalculator,
+			CitationsService referencesService) {
 		this.pokemonGoUtils = pokemonGoUtils;
 		this.catchCpUtils = catchCpUtils;
 
 		this.goPokedexRepository = goPokedexRepository;
 		this.evolutionProvider = evolutionProvider;
 		this.scpRankCalculator = scpRankCalculator;
+		this.referencesService = referencesService;
 	}
 
 	@Override
@@ -95,9 +101,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		List<Evolution> evolTreeList = evolutionProvider.getEvolTreeAndMegaList(pokedexId);
 		List<GoPokedex> evolTreeGpList = goPokedexRepository.findAllById(
 				evolTreeList.stream()
-				.map(Evolution::getPokedexId)
-				.toList()
-				);
+						.map(Evolution::getPokedexId)
+						.toList());
 
 		// こうげき、ぼうぎょ、HP、タイプ
 		res.setGoPokedex(goPokedex);
@@ -164,6 +169,11 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 
 		// スーパーリーグ、ハイパーリーグ制限内最大CP
 		setLeagueSafeCp(goPokedex, res, evolTreeList, evolTreeGpList);
+
+		// 参考文献
+		res.setCitationList(referencesService.exec(
+				PageNameEnum.abundance,
+				List.of(List.of(PokemonEditUtils.appendRemarks(goPokedex), goPokedex.getOfficialZukanId()))));
 	}
 
 	/**
@@ -270,6 +280,7 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 
 	/**
 	 * 制限内最大CP
+	 * 
 	 * @param goPokedex
 	 * @param res
 	 * @param lineageList
@@ -306,7 +317,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 		List<GoPokedexAndCpPl> slLeagueSafeCp = goPokedexList.stream()
 				.map(gp -> {
 					// 最終進化の最低個体値でスーパーリーグ制限にひっかからないPLを取得し、そのPLから進化前の状態のCPを求める。
-					ScpRank slScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, scpRankCalculator.SL_CP_LIMIT_PREDICATE);
+					ScpRank slScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0,
+							scpRankCalculator.SL_CP_LIMIT_PREDICATE);
 					String pl = slScpRank.getPl();
 					int cp = pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, pl);
 					return new GoPokedexAndCpPl(gp, cp, pl);
@@ -314,7 +326,8 @@ public class AbundanceResearchService implements ResearchService<AbundanceRespon
 				.toList();
 		List<GoPokedexAndCpPl> hlLeagueSafeCp = goPokedexList.stream()
 				.map(gp -> {
-					ScpRank hlScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0, scpRankCalculator.HL_CP_LIMIT_PREDICATE);
+					ScpRank hlScpRank = scpRankCalculator.createScpRank(gp, 0, 0, 0,
+							scpRankCalculator.HL_CP_LIMIT_PREDICATE);
 					String pl = hlScpRank.getPl();
 					int cp = pokemonGoUtils.calcCp(goPokedex, 0, 0, 0, pl);
 					return new GoPokedexAndCpPl(gp, cp, pl);

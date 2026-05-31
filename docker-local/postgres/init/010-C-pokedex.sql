@@ -16,6 +16,7 @@ CREATE TABLE pokedex (
   gen varchar(16) not null,
   image1 varchar(256),
   image2 varchar(256),
+  official_zukan_id varchar(10),
   pre_mega_pokedex_id bpchar,
   CONSTRAINT pokedex_pk PRIMARY KEY(pokedex_id)
 );

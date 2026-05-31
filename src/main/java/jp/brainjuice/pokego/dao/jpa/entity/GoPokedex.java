@@ -113,6 +113,10 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Column(name = "gigantamax_impl_flg", nullable = false)
 	private boolean gigantamaxImplFlg;
 
+	/** 公式図鑑ID */
+	@Column(name = "official_zukan_id", columnDefinition = "bpchar")
+	private String officialZukanId;
+
 	/** メガシンカする場合の、メガシンカ前の図鑑ID */
 	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
 	private String preMegaPokedexId;

@@ -22,6 +22,7 @@ CREATE MATERIALIZED VIEW go_pokedex AS
       gm.release_date IS NOT NULL AS impl_flg,
       gm.dynamax_impl_flg,
       gm.gigantamax_impl_flg,
+      p.official_zukan_id,
       p.pre_mega_pokedex_id
     FROM pokedex p
     LEFT JOIN too_strong ts

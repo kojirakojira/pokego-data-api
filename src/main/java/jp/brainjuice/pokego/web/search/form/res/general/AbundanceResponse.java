@@ -7,11 +7,12 @@ import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 import jp.brainjuice.pokego.web.search.form.res.ResearchResponse;
 import jp.brainjuice.pokego.web.search.form.res.elem.CatchCp;
 import jp.brainjuice.pokego.web.search.form.res.elem.Color;
+import jp.brainjuice.pokego.web.search.form.res.elem.Citation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class AbundanceResponse extends ResearchResponse {
 
 	private GoPokedex goPokedex;
@@ -62,4 +63,7 @@ public class AbundanceResponse extends ResearchResponse {
 	// ホゲータの場合、ラウドボーンがCP1500,2500にならないギリギリのCP
 	private List<GoPokedexAndCpPl> superLeagueSafeCpList;
 	private List<GoPokedexAndCpPl> hyperLeagueSafeCpList;
+
+	// 参考文献一覧
+	private List<Citation> citationList;
 }
