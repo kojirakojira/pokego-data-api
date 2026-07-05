@@ -112,6 +112,7 @@ pokemon:
   "V0025_POKEMON_PIKACHU_WCS_2024": 
   "V0025_POKEMON_PIKACHU_WCS_2025": 
   "V0025_POKEMON_PIKACHU_WINTER_2020": 
+  "V0025_POKEMON_PIKACHU_BB_2026": 
   "V0026_POKEMON_RAICHU": 
   "V0026_POKEMON_RAICHU_ALOLA": "0026A01" # ライチュウ(アローラのすがた)
   "V0026_POKEMON_RAICHU_NORMAL": "0026N01" # ライチュウ
@@ -362,6 +363,8 @@ pokemon:
   "V0131_POKEMON_LAPRAS_NORMAL": "0131N01" # ラプラス
   "V0132_POKEMON_DITTO": 
   "V0132_POKEMON_DITTO_NORMAL": "0132N01" # メタモン
+  "V0132_POKEMON_DITTO_SPRING_2026_A":
+  "V0132_POKEMON_DITTO_SPRING_2026_B":
   "V0133_POKEMON_EEVEE": 
   "V0133_POKEMON_EEVEE_GOFEST_2024_MTIARA": 
   "V0133_POKEMON_EEVEE_GOFEST_2024_STIARA": 
@@ -587,6 +590,7 @@ pokemon:
   "V0222_POKEMON_CORSOLA": 
   "V0222_POKEMON_CORSOLA_GALARIAN": "0222G01" # サニーゴ(ガラルのすがた)
   "V0222_POKEMON_CORSOLA_NORMAL": "0222N01" # サニーゴ
+  "V0222_POKEMON_CORSOLA_SPRING_2026":
   "V0223_POKEMON_REMORAID": 
   "V0223_POKEMON_REMORAID_NORMAL": "0223N01" # テッポウオ
   "V0224_POKEMON_OCTILLERY": 
@@ -2768,12 +2772,14 @@ moves:
     "DRAGON_ENERGY": "ドラゴンエナジー"
     "482": "ダイマックスほう"
     "CLANGING_SCALES": "スケイルノイズ"
-    "487": "アクアステップ"
-    "488": "ひやみず"
-    "489": "しんぴのつるぎ"
-    "490": "くちばしキャノン"
-    "491": "ビックリヘッド"
-    "492": "ドラムアタック"
+    "AQUA_STEP": "アクアステップ"
+    "CHILLING_WATER": "ひやみず"
+    "SECRET_SWORD": "しんぴのつるぎ"
+    "BEAK_BLAST": "くちばしキャノン"
+    "MIND_BLOWN": "ビックリヘッド"
+    "DRUM_BEATING": "ドラムアタック"
+    "GIGATON_HAMMER": "デカハンマー"
+    "PYROBALL": "かえんボール"
 
 tune_moves:
   limited_time_learned_cinematic_moves:
