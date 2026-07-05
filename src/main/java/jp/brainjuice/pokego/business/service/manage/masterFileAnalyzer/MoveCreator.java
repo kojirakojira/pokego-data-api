@@ -67,6 +67,7 @@ public class MoveCreator {
 		}
 		log.info("------------通常技の登録 ここまで------------");
 	}
+
 	/**
 	 * マスタデータから取得したスペシャル技の情報をDBに登録する。
 	 *
@@ -85,7 +86,8 @@ public class MoveCreator {
 		// DBから取得
 		List<ChargedAttack> chargedAttackFromDbList = chargedAttackRepository.findAll();
 
-		List<ChargedAttack> saveTargetList = filterSaveTargetChargedAttack(chargedAttackFromMdList, chargedAttackFromDbList);
+		List<ChargedAttack> saveTargetList = filterSaveTargetChargedAttack(chargedAttackFromMdList,
+				chargedAttackFromDbList);
 		if (shouldSaveChargedAttack) {
 			chargedAttackRepository.saveAll(saveTargetList);
 			log.info("ChargedAttackをDBに登録しました。");
@@ -102,7 +104,8 @@ public class MoveCreator {
 	 * @param masterLinkMap
 	 * @return
 	 */
-	private List<FastAttack> createFastAttackList(List<QuickMoveAll> quickMoveAllList, Map<String, Object> masterLinkMap) {
+	private List<FastAttack> createFastAttackList(List<QuickMoveAll> quickMoveAllList,
+			Map<String, Object> masterLinkMap) {
 
 		Map<TypeEnum, List<QuickMoveAll>> typeQuickMoveAllMap = quickMoveAllList.stream()
 				.collect(Collectors.groupingBy(qma -> qma.getType()));
@@ -113,7 +116,8 @@ public class MoveCreator {
 					List<QuickMoveAll> sortedQmaList = entry.getValue().stream()
 							.sorted((o1, o2) -> {
 								// movementNoの先頭のVを抜いて並び替える（念のため）
-								return Integer.valueOf(o1.getMovementNo().substring(1)).intValue() - Integer.valueOf(o2.getMovementNo().substring(1)).intValue();
+								return Integer.valueOf(o1.getMovementNo().substring(1)).intValue()
+										- Integer.valueOf(o2.getMovementNo().substring(1)).intValue();
 							})
 							.toList();
 					List<Map.Entry<String, QuickMoveAll>> moveIdEntryList = new ArrayList<>();
@@ -133,15 +137,18 @@ public class MoveCreator {
 				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
 		@SuppressWarnings("unchecked")
-		Map<String, String> masterLinkQuickMoveMap = ((Map<String, Map<String, String>>) masterLinkMap.get(MasterLinkDataKey.moves.name()))
+		Map<String, String> masterLinkQuickMoveMap = ((Map<String, Map<String, String>>) masterLinkMap
+				.get(MasterLinkDataKey.moves.name()))
 				.get(MasterLinkDataKey.quick_moves.name());
 
 		// FastAttackに変換して返却
 		return moveIdMap.entrySet().stream()
 				.map(entry -> {
 					QuickMoveAll qma = entry.getValue();
-					double dps = BjUtils.round(qma.getGymRaid().getPower(), ((double) qma.getGymRaid().getDurationMs()) / 1000.0, 3);
-					double eps = BjUtils.round(qma.getGymRaid().getEnergyDelta(), ((double) qma.getGymRaid().getDurationMs() / 1000.0), 3);
+					double dps = BjUtils.round(qma.getGymRaid().getPower(),
+							((double) qma.getGymRaid().getDurationMs()) / 1000.0, 3);
+					double eps = BjUtils.round(qma.getGymRaid().getEnergyDelta(),
+							((double) qma.getGymRaid().getDurationMs() / 1000.0), 3);
 					int turns = qma.getPvp().getDurationTurns() + 1; // durationTurnsの項目が存在しない場合は、マスタデータ上は0が入る。（int型だから？）
 					double dpt = BjUtils.round(qma.getPvp().getPower(), (double) turns, 3);
 					double ept = BjUtils.round(qma.getPvp().getEnergyDelta(), (double) turns, 3);
@@ -168,11 +175,13 @@ public class MoveCreator {
 
 	/**
 	 * 通常技のうち、DBの更新が必要な技に絞り込む
+	 * 
 	 * @param fastAttackFromMdList
 	 * @param fastAttackFromDbList
 	 * @return
 	 */
-	private List<FastAttack> filterSaveTargetFastAttack(List<FastAttack> fastAttackFromMdList, List<FastAttack> fastAttackFromDbList) {
+	private List<FastAttack> filterSaveTargetFastAttack(List<FastAttack> fastAttackFromMdList,
+			List<FastAttack> fastAttackFromDbList) {
 
 		Function<FastAttack, String> createIdFunc = (fa) -> {
 			StringBuilder sb = new StringBuilder();
@@ -189,7 +198,8 @@ public class MoveCreator {
 				.map(fadb -> Map.entry(createIdFunc.apply(fadb), fadb))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-		log.info(MessageFormat.format("通常技マスタデータ件数: {0}件, DB件数: {1}件", fastAttackFromMdList.size(), fastAttackFromDbList.size()));
+		log.info(MessageFormat.format("通常技マスタデータ件数: {0}件, DB件数: {1}件", fastAttackFromMdList.size(),
+				fastAttackFromDbList.size()));
 		log.info("------------【通常技】マスタデータにあるが、DBにないやつ ここから------------");
 		// マスタデータ -> DBの比較
 		List<FastAttack> mdYesDbNoList = fromMdMap.entrySet().stream()
@@ -231,13 +241,13 @@ public class MoveCreator {
 				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
 		differentMap.entrySet().stream()
-		.sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
-		.forEach(entry -> {
-			FastAttack mdfa = entry.getValue();
-			FastAttack dbfa = fromDbMap.get(entry.getKey());
-			log.info(entry.getKey() + "\t[after]\t" + mdfa.toString());
-			log.info(entry.getKey() + "\t[before]\t" + dbfa.toString());
-		});
+				.sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+				.forEach(entry -> {
+					FastAttack mdfa = entry.getValue();
+					FastAttack dbfa = fromDbMap.get(entry.getKey());
+					log.info(entry.getKey() + "\t[after]\t" + mdfa.toString());
+					log.info(entry.getKey() + "\t[before]\t" + dbfa.toString());
+				});
 		log.info("------------【通常技】DBとマスタデータで値が異なる ここまで------------");
 
 		return Stream.concat(
@@ -253,7 +263,8 @@ public class MoveCreator {
 	 * @param masterLinkMap
 	 * @return
 	 */
-	private List<ChargedAttack> createChargedAttackList(List<CinematicMoveAll> cinematicMoveAllList, Map<String, Object> masterLinkMap) {
+	private List<ChargedAttack> createChargedAttackList(List<CinematicMoveAll> cinematicMoveAllList,
+			Map<String, Object> masterLinkMap) {
 
 		Map<TypeEnum, List<CinematicMoveAll>> typeCinematicMoveAllMap = cinematicMoveAllList.stream()
 				.collect(Collectors.groupingBy(cma -> cma.getType()));
@@ -264,7 +275,8 @@ public class MoveCreator {
 					List<CinematicMoveAll> sortedQmaList = entry.getValue().stream()
 							.sorted((o1, o2) -> {
 								// movementNoの先頭のVを抜いて並び替える（念のため）
-								return Integer.valueOf(o1.getMovementNo().substring(1)).intValue() - Integer.valueOf(o2.getMovementNo().substring(1)).intValue();
+								return Integer.valueOf(o1.getMovementNo().substring(1)).intValue()
+										- Integer.valueOf(o2.getMovementNo().substring(1)).intValue();
 							})
 							.toList();
 					List<Map.Entry<String, CinematicMoveAll>> moveIdEntryList = new ArrayList<>();
@@ -276,7 +288,8 @@ public class MoveCreator {
 						sb.append(MoveCode.charged_attack.getCode());
 						// タイプごとに3桁の連番
 						sb.append(String.format("%03d", i + 1));
-						Map.Entry<String, CinematicMoveAll> moveIdEntry = Map.entry(sb.toString(), sortedQmaList.get(i));
+						Map.Entry<String, CinematicMoveAll> moveIdEntry = Map.entry(sb.toString(),
+								sortedQmaList.get(i));
 						moveIdEntryList.add(moveIdEntry);
 					}
 					return moveIdEntryList.stream();
@@ -284,22 +297,31 @@ public class MoveCreator {
 				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
 		@SuppressWarnings("unchecked")
-		Map<String, String> masterLinkCinematicMoveMap = ((Map<String, Map<String, String>>) masterLinkMap.get(MasterLinkDataKey.moves.name()))
+		Map<String, String> masterLinkCinematicMoveMap = ((Map<String, Map<String, String>>) masterLinkMap
+				.get(MasterLinkDataKey.moves.name()))
 				.get(MasterLinkDataKey.cinematic_moves.name());
 
 		// ChargedAttackに変換して返却
 		return moveIdMap.entrySet().stream()
 				.map(entry -> {
 					CinematicMoveAll cma = entry.getValue();
-					double dps = BjUtils.round(cma.getGymRaid().getPower(), ((double) cma.getGymRaid().getDurationMs() / 1000.0), 3);
+					String name = masterLinkCinematicMoveMap.get(cma.getMovementId());
+					if (name == null) {
+						log.warn(MessageFormat.format(
+								"master_link_data.ymlに、movementId:{0}(moveId:{1})に対応する日本語名が設定されていません。",
+								cma.getMovementId(), entry.getKey()));
+					}
+					double dps = BjUtils.round(cma.getGymRaid().getPower(),
+							((double) cma.getGymRaid().getDurationMs() / 1000.0), 3);
 					int grEenergyDelta = cma.getGymRaid().getEnergyDelta();
 					// なぜかわるあがき(STRUGGLE)は、マスタデータ上にジム・レイドのenergyDeltaが存在しない。
 					int energyBar = grEenergyDelta == 0 ? 0 : (int) (100 / grEenergyDelta) * -1;
-					double dpe = BjUtils.round(cma.getPvp().getPower(), ((double) cma.getPvp().getEnergyDelta() * -1), 3);
+					double dpe = BjUtils.round(cma.getPvp().getPower(), ((double) cma.getPvp().getEnergyDelta() * -1),
+							3);
 					Optional<Buffs> buffsOp = Optional.ofNullable(cma.getPvp().getBuffs());
 					return new ChargedAttack(
 							entry.getKey(), // moveId
-							masterLinkCinematicMoveMap.get(cma.getMovementId()), // name(日本語名)
+							name, // name(日本語名)
 							cma.getMovementId(), // uniqueId
 							cma.getMovementNo(), // movementNo
 							cma.getType(), // タイプ（英語名）
@@ -329,7 +351,8 @@ public class MoveCreator {
 	 * @param shouldSaveCinematicMove
 	 * @return
 	 */
-	private List<ChargedAttack> filterSaveTargetChargedAttack(List<ChargedAttack> chargedAttackFromMdList, List<ChargedAttack> chargedAttackFromDbList) {
+	private List<ChargedAttack> filterSaveTargetChargedAttack(List<ChargedAttack> chargedAttackFromMdList,
+			List<ChargedAttack> chargedAttackFromDbList) {
 
 		Function<ChargedAttack, String> createIdFunc = (fa) -> {
 			StringBuilder sb = new StringBuilder();
@@ -346,7 +369,8 @@ public class MoveCreator {
 				.map(fadb -> Map.entry(createIdFunc.apply(fadb), fadb))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-		log.info(MessageFormat.format("スペシャル技マスタデータ件数: {0}件, DB件数: {1}件", chargedAttackFromMdList.size(), chargedAttackFromDbList.size()));
+		log.info(MessageFormat.format("スペシャル技マスタデータ件数: {0}件, DB件数: {1}件", chargedAttackFromMdList.size(),
+				chargedAttackFromDbList.size()));
 		log.info("------------【スペシャル技】マスタデータにあるが、DBにないやつ ここから------------");
 		// マスタデータ -> DBの比較
 		List<ChargedAttack> mdYesDbNoList = fromMdMap.entrySet().stream()
@@ -391,13 +415,13 @@ public class MoveCreator {
 				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
 		differentMap.entrySet().stream()
-		.sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
-		.forEach(entry -> {
-			ChargedAttack mdca = entry.getValue();
-			ChargedAttack dbca = fromDbMap.get(entry.getKey());
-			log.info(entry.getKey() + "\t[after]\t" + mdca.toString());
-			log.info(entry.getKey() + "\t[before]\t" + dbca.toString());
-		});
+				.sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+				.forEach(entry -> {
+					ChargedAttack mdca = entry.getValue();
+					ChargedAttack dbca = fromDbMap.get(entry.getKey());
+					log.info(entry.getKey() + "\t[after]\t" + mdca.toString());
+					log.info(entry.getKey() + "\t[before]\t" + dbca.toString());
+				});
 		log.info("------------【スペシャル技】DBとマスタデータで値が異なる ここまで------------");
 
 		return Stream.concat(
