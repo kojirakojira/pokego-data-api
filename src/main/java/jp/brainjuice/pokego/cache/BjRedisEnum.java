@@ -6,5 +6,7 @@ public enum BjRedisEnum {
 	pageTempView,
 	/** ポケモンごとの閲覧数 */
 	pokemonTempViews,
+	/** 種族値比較の検索履歴 */
+	raceDiffSearchTempView,
 
 }

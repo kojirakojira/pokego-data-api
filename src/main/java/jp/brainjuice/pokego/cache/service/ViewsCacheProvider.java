@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Collections;
+import java.util.List;
+
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
@@ -52,7 +55,8 @@ public class ViewsCacheProvider {
 		}
 
 		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
-		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		String uri = req.getRequestURI();
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
@@ -71,12 +75,13 @@ public class ViewsCacheProvider {
 	public void addTempList() {
 
 		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
-		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		String uri = req.getRequestURI();
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
 
-		addTempList(PageNameEnum.valueOf(page), null, ip);
+		addTempList(PageNameEnum.valueOf(page), (String) null, ip);
 
 	}
 
@@ -88,12 +93,31 @@ public class ViewsCacheProvider {
 	public void addTempList(String pokedexId) {
 
 		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
-		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		String uri = req.getRequestURI();
 		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		String ip = req.getRemoteAddr();
 
 		addTempList(PageNameEnum.valueOf(page), pokedexId, ip);
+
+	}
+
+	/**
+	 * 閲覧情報をメモリ上のリストに追加する。<br>
+	 * 複数ポケモンに対する閲覧の場合の呼び出し口。
+	 *
+	 */
+	public void addTempList(List<String> pokedexIds) {
+
+		// HttpServletRequestから、page(SearchPattern)とIPアドレスを取得する。
+		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		String uri = req.getRequestURI();
+		String page = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+		String ip = req.getRemoteAddr();
+
+		addTempList(PageNameEnum.valueOf(page), pokedexIds, ip);
 
 	}
 
@@ -107,12 +131,27 @@ public class ViewsCacheProvider {
 	public void addTempList(PageNameEnum page, String pokedexId, String ip) {
 
 		ViewTempList viewsTempList = viewsCacheManager.getViewsTempList();
-		viewsTempList.add(page, pokedexId, ip);
+		viewsTempList.add(page, pokedexId == null ? null : Collections.singletonList(pokedexId), ip);
+
+	}
+
+	/**
+	 * 閲覧情報をメモリ上のリストに追加する。（複数ポケモン用）
+	 *
+	 * @param page
+	 * @param pokedexIds
+	 * @param ip
+	 */
+	public void addTempList(PageNameEnum page, List<String> pokedexIds, String ip) {
+
+		ViewTempList viewsTempList = viewsCacheManager.getViewsTempList();
+		viewsTempList.add(page, pokedexIds, ip);
 
 	}
 
 	/**
 	 * この{@link ViewsCacheManager#cleanupPageTempView() メソッド}を参照
+	 * 
 	 * @param pid
 	 * @return
 	 */
@@ -122,6 +161,7 @@ public class ViewsCacheProvider {
 
 	/**
 	 * この{@link ViewsCacheManager#cleanupPokemonTempView() メソッド}を参照
+	 * 
 	 * @param pid
 	 * @return
 	 */
@@ -143,6 +183,20 @@ public class ViewsCacheProvider {
 	public void clearPokemonTempView() {
 
 		viewsCacheManager.clearPokemonTempView();
+	}
+
+	/**
+	 * この{@link ViewsCacheManager#cleanupRaceDiffSearchTempView() メソッド}を参照
+	 */
+	public void cleanupRaceDiffSearchTempView() {
+		viewsCacheManager.cleanupRaceDiffSearchTempView();
+	}
+
+	/**
+	 * リリース後、古いキャッシュが残り不備が発生する場合、このAPIを使用する。（種族値比較一時情報用）
+	 */
+	public void clearRaceDiffSearchTempView() {
+		viewsCacheManager.clearRaceDiffSearchTempView();
 	}
 
 }

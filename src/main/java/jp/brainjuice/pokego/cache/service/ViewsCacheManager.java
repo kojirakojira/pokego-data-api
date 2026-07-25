@@ -2,6 +2,7 @@ package jp.brainjuice.pokego.cache.service;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,12 +24,16 @@ import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempInfo;
 import jp.brainjuice.pokego.cache.inmemory.topic.ViewTempList;
 import jp.brainjuice.pokego.dao.jpa.PageViewRepository;
 import jp.brainjuice.pokego.dao.jpa.PokemonViewRepository;
+import jp.brainjuice.pokego.dao.jpa.RaceDiffSearchHistoryRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.PageView;
 import jp.brainjuice.pokego.dao.jpa.entity.PokemonView;
+import jp.brainjuice.pokego.dao.jpa.entity.RaceDiffSearchHistory;
 import jp.brainjuice.pokego.dao.redis.PageTempViewRedisRepository;
 import jp.brainjuice.pokego.dao.redis.PokemonTempViewRedisRepository;
+import jp.brainjuice.pokego.dao.redis.RaceDiffSearchTempViewRedisRepository;
 import jp.brainjuice.pokego.dao.redis.entity.PageTempView;
 import jp.brainjuice.pokego.dao.redis.entity.PokemonTempView;
+import jp.brainjuice.pokego.dao.redis.entity.RaceDiffSearchTempView;
 import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +65,11 @@ public class ViewsCacheManager {
 	private PageTempViewRedisRepository pageTempViewRedisRepository;
 	/** Redis上の一時的なポケモン閲覧情報を管理するためのリポジトリ */
 	private PokemonTempViewRedisRepository pokemonTempViewRedisRepository;
-	
+	/** Redis上の一時的な種族値比較の検索履歴情報を管理するためのリポジトリ */
+	private RaceDiffSearchTempViewRedisRepository raceDiffSearchTempViewRedisRepository;
+
+	private RaceDiffSearchHistoryRepository raceDiffSearchHistoryRepository;
+
 	private SetOperations<String, String> setOperations;
 
 	private static final String START_MSG_SCHEDULE = "Start ViewInfo(page, pokemon) schedule.";
@@ -70,11 +79,11 @@ public class ViewsCacheManager {
 	private static final String END_MSG_INCR_VIEWS_COUNT_INFO = "> End incr ViewsCount. page:{0}, pokemon:{1}";
 
 	private static final String START_MSG_SEND_VIEW_TEMP_INFO = "> Start send ViewTempInfo.(memory -> Redis)";
-	private static final String END_MSG_SEND_VIEW_TEMP_INFO = "> End send ViewTempInfo. page:{0}, pokemon:{1}";
+	private static final String END_MSG_SEND_VIEW_TEMP_INFO = "> End send ViewTempInfo. page:{0}, pokemon:{1}, raceDiff:{2}";
 
 	private static final String DELETE_ALL_TEMP_PAGE_INFO = "Delete All PageTempView.(Redis)";
 	private static final String DELETE_ALL_TEMP_POKEMON_INFO = "Delete All PokemonTempView.(Redis)";
-	
+
 	private static final String CLEANUP_INFO = "CLEANUP {0}.(count = {1})";
 	private static final String CLEANUP_NOTHING_INFO = "CLEANUP {0}. There is nothing to delete.";
 
@@ -82,14 +91,18 @@ public class ViewsCacheManager {
 			ViewTempList viewTempList,
 			PageViewRepository pageViewRepository,
 			PokemonViewRepository pokemonViewRepository,
+			RaceDiffSearchHistoryRepository raceDiffSearchHistoryRepository,
 			PageTempViewRedisRepository pageTempViewRedisRepository,
 			PokemonTempViewRedisRepository pokemonTempViewRedisRepository,
+			RaceDiffSearchTempViewRedisRepository raceDiffSearchTempViewRedisRepository,
 			RedisTemplate<String, String> redisTemplate) {
 		this.viewTempList = viewTempList;
 		this.pokemonViewRepository = pokemonViewRepository;
 		this.pageViewRepository = pageViewRepository;
+		this.raceDiffSearchHistoryRepository = raceDiffSearchHistoryRepository;
 		this.pageTempViewRedisRepository = pageTempViewRedisRepository;
 		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
+		this.raceDiffSearchTempViewRedisRepository = raceDiffSearchTempViewRedisRepository;
 		this.setOperations = redisTemplate.opsForSet();
 	}
 
@@ -142,21 +155,23 @@ public class ViewsCacheManager {
 		// page閲覧情報リスト、pokemon閲覧情報リストに分割する。
 		Map<String, Set<ViewTempInfo>> pageViewMap = new HashMap<>();
 		Map<String, Set<ViewTempInfo>> pokemonViewMap = new HashMap<>();
+		Map<String, Set<ViewTempInfo>> raceDiffSearchMap = new HashMap<>();
 
-		// Mapのvalueに持つSetに閲覧情報を追加する関数。カリー化（引数 => (Map<String, Set<ViewTempInfo>>, String, ViewTempInfo)）
-		Function<Map<String, Set<ViewTempInfo>>, Function<String, Consumer<ViewTempInfo>>> addSetFunc = (map) -> (key) -> (value) -> {
-			if (key != null) {
-				if (map.containsKey(key)) {
-					map.get(key).add(value);
-				} else {
-					Set<ViewTempInfo> viewSet = new HashSet<>();
-					viewSet.add(value);
-					map.put(key, viewSet);
-				}
-			}
-		};
+		// Mapのvalueに持つSetに閲覧情報を追加する関数。カリー化（引数 => (Map<String, Set<ViewTempInfo>>,
+		// String, ViewTempInfo)）
+		Function<Map<String, Set<ViewTempInfo>>, Function<String, Consumer<ViewTempInfo>>> addSetFunc = (
+				map) -> (key) -> (value) -> {
+					if (key != null) {
+						if (map.containsKey(key)) {
+							map.get(key).add(value);
+						} else {
+							Set<ViewTempInfo> viewSet = new HashSet<>();
+							viewSet.add(value);
+							map.put(key, viewSet);
+						}
+					}
+				};
 
-		// 集計対象の閲覧情報をMapに設定する。
 		aggregateTargetList.forEach(vti -> {
 			// ページの日本語名が空文字の場合はページ名はカウントしない。
 			if (!vti.getPage().getJpn().isEmpty()) {
@@ -164,13 +179,24 @@ public class ViewsCacheManager {
 				addSetFunc.apply(pageViewMap).apply(PokemonEditUtils.getStrName(vti.getPage())).accept(vti);
 			}
 			// ポケモンの閲覧情報をMapに追加する。
-			addSetFunc.apply(pokemonViewMap).apply(vti.getPokedexId()).accept(vti);
+			if (vti.getPokedexIds() != null) {
+				vti.getPokedexIds().forEach(id -> {
+					addSetFunc.apply(pokemonViewMap).apply(id).accept(vti);
+				});
+				// 種族値比較の履歴の場合は別途Mapに追加する
+				if (vti.getPage() == jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum.raceDiff
+						&& vti.getPokedexIds().size() >= 2) {
+					List<String> sortedIds = new ArrayList<>(vti.getPokedexIds());
+					sortedIds.sort(PokemonEditUtils.getPokedexIdComparator());
+					String joinedIds = String.join(",", sortedIds);
+					addSetFunc.apply(raceDiffSearchMap).apply(joinedIds).accept(vti);
+				}
+			}
 
 		});
 
-
 		/** 閲覧数を加算する */
-		// 今日の閲覧数を取得する。
+		// 今日の閲覧数をDB側から取得する。
 		Date today = BjUtils.toDate(BjUtils.nowLocalDate());
 		List<PageView> pageViewList = pageViewRepository.findAllByYmd(today);
 		List<PokemonView> pokemonViewList = pokemonViewRepository.findAllByYmd(today);
@@ -178,6 +204,9 @@ public class ViewsCacheManager {
 		// 加算する。
 		pageViewRepository.saveAll(createUpdatePageRecords(pageViewMap, pageViewList, today));
 		pokemonViewRepository.saveAll(createUpdatePokemonRecords(pokemonViewMap, pokemonViewList, today));
+
+		// 種族値比較の検索履歴を更新・登録する
+		saveRaceDiffSearchHistory(raceDiffSearchMap);
 
 		log.debug(MessageFormat.format(END_MSG_INCR_VIEWS_COUNT_INFO, pageViewMap, pokemonViewMap));
 
@@ -201,6 +230,7 @@ public class ViewsCacheManager {
 		// 閲覧情報を設定する。
 		List<PageTempView> pageTempViewList = new ArrayList<>();
 		List<PokemonTempView> pokemonTempViewList = new ArrayList<>();
+		List<RaceDiffSearchTempView> raceDiffTempViewList = new ArrayList<>();
 
 		aggregateTargetList.forEach(vti -> {
 			// キーを一意にする。
@@ -209,15 +239,28 @@ public class ViewsCacheManager {
 				String pageName = vti.getPage().name();
 				pageTempViewList.add(new PageTempView(pageName + uniqueId, pageName, vti.getIp(), vti.getTime()));
 			}
-			if (vti.getPokedexId() != null) {
-				pokemonTempViewList.add(new PokemonTempView(vti.getPokedexId() + uniqueId, vti.getPokedexId(), vti.getIp(), vti.getTime()));
+			if (vti.getPokedexIds() != null) {
+				vti.getPokedexIds().forEach(id -> {
+					pokemonTempViewList.add(new PokemonTempView(id + UUID.randomUUID().toString(), id,
+							vti.getIp(), vti.getTime()));
+				});
+				if (vti.getPage() == jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum.raceDiff
+						&& vti.getPokedexIds().size() >= 2) {
+					List<String> sortedIds = new ArrayList<>(vti.getPokedexIds());
+					sortedIds.sort(PokemonEditUtils.getPokedexIdComparator());
+					String joinedIds = String.join(",", sortedIds);
+					raceDiffTempViewList.add(new RaceDiffSearchTempView(joinedIds + UUID.randomUUID().toString(),
+							joinedIds, vti.getIp(), vti.getTime()));
+				}
 			}
 		});
 
 		pageTempViewRedisRepository.saveAll(pageTempViewList);
 		pokemonTempViewRedisRepository.saveAll(pokemonTempViewList);
+		raceDiffSearchTempViewRedisRepository.saveAll(raceDiffTempViewList);
 
-		log.info(MessageFormat.format(END_MSG_SEND_VIEW_TEMP_INFO, pageTempViewList, pokemonTempViewList));
+		log.info(MessageFormat.format(END_MSG_SEND_VIEW_TEMP_INFO, pageTempViewList, pokemonTempViewList,
+				raceDiffTempViewList));
 	}
 
 	/**
@@ -228,7 +271,8 @@ public class ViewsCacheManager {
 	 * @param today
 	 * @return
 	 */
-	private List<PageView> createUpdatePageRecords(Map<String, Set<ViewTempInfo>> pageViewMap, List<PageView> pageViewList, Date today) {
+	private List<PageView> createUpdatePageRecords(Map<String, Set<ViewTempInfo>> pageViewMap,
+			List<PageView> pageViewList, Date today) {
 
 		return pageViewMap.entrySet().stream()
 				.map(entry -> {
@@ -292,30 +336,91 @@ public class ViewsCacheManager {
 	}
 
 	/**
+	 * 種族値比較の検索履歴を登録・更新する。
+	 * 
+	 * @param raceDiffSearchMap
+	 */
+	private void saveRaceDiffSearchHistory(Map<String, Set<ViewTempInfo>> raceDiffSearchMap) {
+		List<RaceDiffSearchHistory> saveList = new ArrayList<>();
+		LocalDateTime nowDt = LocalDateTime.now();
+
+		raceDiffSearchMap.forEach((joinedIds, vtiSet) -> {
+			int viewCount = vtiSet.size();
+			String[] ids = joinedIds.split(",");
+
+			try {
+				java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+				byte[] hashBytes = digest.digest(joinedIds.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+				StringBuilder sb = new StringBuilder();
+				for (byte b : hashBytes) {
+					sb.append(String.format("%02x", b));
+				}
+				String searchHash = sb.toString();
+
+				Optional<RaceDiffSearchHistory> opt = raceDiffSearchHistoryRepository.findById(searchHash);
+				if (opt.isPresent()) {
+					RaceDiffSearchHistory history = opt.get();
+					history.setSearchCount(history.getSearchCount() + viewCount);
+					history.setLastSearchedAt(nowDt);
+					saveList.add(history);
+				} else {
+					RaceDiffSearchHistory history = new RaceDiffSearchHistory();
+					if (ids.length > 0)
+						history.setPokedexId1(ids[0]);
+					if (ids.length > 1)
+						history.setPokedexId2(ids[1]);
+					if (ids.length > 2)
+						history.setPokedexId3(ids[2]);
+					if (ids.length > 3)
+						history.setPokedexId4(ids[3]);
+					if (ids.length > 4)
+						history.setPokedexId5(ids[4]);
+					if (ids.length > 5)
+						history.setPokedexId6(ids[5]);
+					history.setSearchCount(viewCount);
+					history.setLastSearchedAt(nowDt);
+
+					// set search hash since insertWithHash is a default method creating a new
+					// entity,
+					// but it also saves. We can just set it and add to saveList for bulk insert.
+					history.setSearchHash(searchHash);
+					saveList.add(history);
+				}
+			} catch (java.security.NoSuchAlgorithmException e) {
+				log.error("SHA-256 algorithm not found", e);
+			}
+		});
+
+		if (!saveList.isEmpty()) {
+			raceDiffSearchHistoryRepository.saveAll(saveList);
+		}
+	}
+
+	/**
 	 * SpringRedisは、なぜかtimeToLiveで削除されたキー名をSet型のオブジェクトから削除してくれない。
 	 * これを呼び出すと、それを削除できる。
 	 * 
 	 * @see PageTempViewRedisRepository
 	 */
 	void cleanupPageTempView() {
-		
+
 		String key = "pageTempView";
-		
+
 		List<PageTempView> pageTempViewList = (List<PageTempView>) pageTempViewRedisRepository.findAll();
 		List<String> activeIdList = pageTempViewList.stream()
 				.filter(ptv -> ptv != null)
 				.map(PageTempView::getId)
 				.toList();
-		
+
 		String[] inactiveIdArr = getInActiveIdArr(key, activeIdList);
-		
+
 		if (inactiveIdArr.length == 0) {
 			log.info(MessageFormat.format(CLEANUP_NOTHING_INFO, key));
 			return;
 		}
-		
+
 		Long removeCnt = setOperations.remove(key, (Object[]) inactiveIdArr);
-		
+
 		log.info(MessageFormat.format(CLEANUP_INFO, key, removeCnt.toString()));
 	}
 
@@ -326,27 +431,27 @@ public class ViewsCacheManager {
 	 * @see PokemonTempViewRedisRepository
 	 */
 	void cleanupPokemonTempView() {
-		
+
 		String key = "pokemonTempView";
-		
+
 		List<PokemonTempView> pokemonTempViewList = (List<PokemonTempView>) pokemonTempViewRedisRepository.findAll();
 		List<String> activeIdList = pokemonTempViewList.stream()
 				.filter(ptv -> ptv != null)
 				.map(PokemonTempView::getId)
 				.toList();
-		
+
 		String[] inactiveIdArr = getInActiveIdArr(key, activeIdList);
-		
+
 		if (inactiveIdArr.length == 0) {
 			log.info(MessageFormat.format(CLEANUP_NOTHING_INFO, key));
 			return;
 		}
-		
+
 		Long removeCnt = setOperations.remove(key, (Object[]) inactiveIdArr);
-		
+
 		log.info(MessageFormat.format(CLEANUP_INFO, key, removeCnt.toString()));
 	}
-	
+
 	private String[] getInActiveIdArr(String key, List<String> activeIdList) {
 		Set<String> smembers = setOperations.members(key);
 		String[] inactiveIdArr = smembers.stream()
@@ -373,6 +478,30 @@ public class ViewsCacheManager {
 		pokemonTempViewRedisRepository.deleteAll();
 
 		log.info(DELETE_ALL_TEMP_POKEMON_INFO);
+	}
+
+	void cleanupRaceDiffSearchTempView() {
+		String key = "raceDiffSearchTempView";
+		List<RaceDiffSearchTempView> raceDiffTempViewList = (List<RaceDiffSearchTempView>) raceDiffSearchTempViewRedisRepository
+				.findAll();
+		List<String> activeIdList = raceDiffTempViewList.stream()
+				.filter(ptv -> ptv != null)
+				.map(RaceDiffSearchTempView::getId)
+				.toList();
+
+		String[] inactiveIdArr = getInActiveIdArr(key, activeIdList);
+
+		if (inactiveIdArr.length == 0) {
+			log.info(MessageFormat.format(CLEANUP_NOTHING_INFO, key));
+			return;
+		}
+		Long removeCnt = setOperations.remove(key, (Object[]) inactiveIdArr);
+		log.info(MessageFormat.format(CLEANUP_INFO, key, removeCnt.toString()));
+	}
+
+	void clearRaceDiffSearchTempView() {
+		raceDiffSearchTempViewRedisRepository.deleteAll();
+		log.info("Delete All RaceDiffSearchTempView.(Redis)");
 	}
 
 }

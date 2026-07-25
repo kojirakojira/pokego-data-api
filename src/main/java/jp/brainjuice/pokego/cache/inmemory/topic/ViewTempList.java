@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ViewTempList extends ArrayList<ViewTempInfo> {
 
-	private static final String VIEW_ADD_START_LOG = "Start add ViewTempList.(Add instance on memory.) Page(SearchPattern): {0}, PokedexId: {1}, IP: {2}";
+	private static final String VIEW_ADD_START_LOG = "Start add ViewTempList.(Try to add instance on memory.) Page(SearchPattern): {0}, PokedexId: {1}, IP: {2}";
 	private static final String VIEW_ADD_END_LOG = "End add ViewTempList. ({0})";
 	private static final String VIEW_ADD_END_LOG_ADDED = "Added!!";
 	private static final String VIEW_ADD_END_LOG_NOT_ADDED = "Not added.";
@@ -53,17 +54,22 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 	 * 過去5分以内に同じアクセスがない場合、ViewTempInfoを後ろに追加する。
 	 *
 	 * @param page
-	 * @param pokedexId
+	 * @param pokedexIds
 	 * @param ip
 	 */
-	public synchronized void add(PageNameEnum page, String pokedexId, String ip) {
+	public synchronized void add(PageNameEnum page, List<String> pokedexIds, String ip) {
 
 		// 日本語名が空文字の場合は中断する。
 		if (page.getJpn().isEmpty()) {
 			return;
 		}
 
-		log.info(MessageFormat.format(VIEW_ADD_START_LOG, page, pokedexId, ip));
+		if (pokedexIds != null) {
+			pokedexIds = new ArrayList<>(pokedexIds);
+			Collections.sort(pokedexIds);
+		}
+
+		log.info(MessageFormat.format(VIEW_ADD_START_LOG, page, pokedexIds, ip));
 
 		// 5分前の時間を取得
 		Date before = beforeTime(MINUTE_5);
@@ -75,14 +81,13 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 
 			// 5分前より過去になったらループ中断
 			if (before.after(vti.getTime())) {
-				existsFlg = true;
 				break;
 			}
 
 			// ページ、図鑑№、IPアドレスが一致している場合
 			// ※図鑑Noがnullの場合は照合せずに、図鑑Noは一致しているものとする。
 			if (vti.getPage().equals(page)
-					&& (vti.getPokedexId() == null || pokedexId == null || vti.getPokedexId().equals(pokedexId))
+					&& (vti.getPokedexIds() == null || pokedexIds == null || vti.getPokedexIds().equals(pokedexIds))
 					&& vti.getIp().equals(ip)) {
 				existsFlg = true;
 				break;
@@ -91,10 +96,11 @@ public class ViewTempList extends ArrayList<ViewTempInfo> {
 
 		if (!existsFlg) {
 			// 過去5分以内に対象のユーザが同じページを閲覧していない場合、追加する。
-			add(new ViewTempInfo(page, pokedexId, ip, BjUtils.now()));
+			add(new ViewTempInfo(page, pokedexIds, ip, BjUtils.now()));
 		}
 
-		log.info(MessageFormat.format(VIEW_ADD_END_LOG, existsFlg ? VIEW_ADD_END_LOG_NOT_ADDED : VIEW_ADD_END_LOG_ADDED));
+		log.info(MessageFormat.format(VIEW_ADD_END_LOG,
+				existsFlg ? VIEW_ADD_END_LOG_NOT_ADDED : VIEW_ADD_END_LOG_ADDED));
 	}
 
 	/**

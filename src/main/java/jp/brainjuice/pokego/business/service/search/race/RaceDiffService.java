@@ -2,28 +2,23 @@ package jp.brainjuice.pokego.business.service.search.race;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.business.service.search.general.PokemonSearchService;
-import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.search.utils.PokemonUtils;
+import jp.brainjuice.pokego.business.service.search.utils.RaceDiffUtils;
 import jp.brainjuice.pokego.business.service.search.utils.dto.MultiSearchResult;
 import jp.brainjuice.pokego.business.service.search.utils.dto.PokemonSearchResult;
-import jp.brainjuice.pokego.business.service.search.utils.dto.RaceDiffElem;
-import jp.brainjuice.pokego.cache.inmemory.PokemonStatisticsInfo;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
-import jp.brainjuice.pokego.dao.jpa.PokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.dao.jpa.entity.Pokedex;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.ProgramException;
 import jp.brainjuice.pokego.web.search.form.req.race.RaceDiffRequest;
 import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
 import jp.brainjuice.pokego.web.search.form.res.elem.PidAndName;
-import jp.brainjuice.pokego.web.search.form.res.elem.Race;
 import jp.brainjuice.pokego.web.search.form.res.race.RaceDiffResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,47 +26,33 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RaceDiffService {
 
-	private PokedexRepository pokedexRepository;
-
 	private GoPokedexRepository goPokedexRepository;
 
-	private PokemonStatisticsInfo pokemonStatisticsInfo;
-	
 	private PokemonSearchService pokemonSearchService;
 
-	private PokemonUtils pokemonUtils;
+	private RaceDiffUtils raceDiffUtils;
 
-	private PokemonGoUtils pokemonGoUtils;
-
-	private static final String MSG_NO_RESULTS = "存在しないIDが指定されました。";
-	
 	private static final String MSG_NO_UNIQUE_NAMES = "指定されたポケモンに重複があります。";
-	
+
 	private static final String MSG_NO_UNIQUE_NAME = "重複があります。";
 
 	public RaceDiffService(
-			PokedexRepository pokedexRepository,
 			GoPokedexRepository goPokedexRepository,
-			PokemonStatisticsInfo pokemonStatisticsInfo,
 			PokemonSearchService pokemonSearchService,
-			PokemonUtils pokemonUtils,
-			PokemonGoUtils pokemonGoUtils) {
-		this.pokedexRepository = pokedexRepository;
+			RaceDiffUtils raceDiffUtils) {
 		this.goPokedexRepository = goPokedexRepository;
-		this.pokemonStatisticsInfo = pokemonStatisticsInfo;
 		this.pokemonSearchService = pokemonSearchService;
-		this.pokemonUtils = pokemonUtils;
-		this.pokemonGoUtils = pokemonGoUtils;
+		this.raceDiffUtils = raceDiffUtils;
 	}
 
 	public boolean checkBeforeNameSearch(RaceDiffRequest req, RaceDiffResponse res) throws BadRequestException {
 
 		List<PidAndName> pidAndNameList = req.getPidAndNameArr();
-		
+
 		if (pidAndNameList == null) {
 			throw new BadRequestException();
 		}
-		
+
 		int pidSize = (int) pidAndNameList.stream()
 				.map(PidAndName::getPid)
 				.filter(StringUtils::isNotEmpty)
@@ -111,7 +92,7 @@ public class RaceDiffService {
 
 		List<PidAndName> pidAndNameList = req.getPidAndNameArr();
 
-		//  重複チェック
+		// 重複チェック
 		// id検索とname検索の二軸両方を処理している。正直見にくい…。
 		{
 			List<String> pidList;
@@ -174,11 +155,11 @@ public class RaceDiffService {
 
 		return true;
 	}
-	
+
 	private MultiSearchResult createUniqueMsr(List<PidAndName> pidAndNameList, List<String> pidList) {
 
 		MultiSearchResult msr = new MultiSearchResult();
-		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(pidList);
+		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(Objects.requireNonNull(pidList));
 		List<PokemonSearchResult> psrList = pidAndNameList.stream()
 				.map(PidAndName::getPid)
 				.map(pid -> goPokedexList.stream()
@@ -188,7 +169,7 @@ public class RaceDiffService {
 				.toList();
 		msr.setAllUnique(true);
 		msr.setPsrArr(psrList);
-		
+
 		return msr;
 	}
 
@@ -203,10 +184,10 @@ public class RaceDiffService {
 		List<String> idList = req.getPidAndNameArr().stream()
 				.map(PidAndName::getPid)
 				.toList();
-		
-		List<GoPokedex> goPokedexList = (List<GoPokedex>) goPokedexRepository.findAllById(idList);
 
-		exec(goPokedexList, idList, res);
+		List<GoPokedex> goPokedexList = goPokedexRepository.findAllById(Objects.requireNonNull(idList));
+
+		res.setRaceDiffResult(raceDiffUtils.createRaceDiffResult(goPokedexList, idList, true));
 		res.setSearchedById(true);
 	}
 
@@ -226,53 +207,8 @@ public class RaceDiffService {
 				.map(gp -> gp.getPokedexId())
 				.toList();
 
-		exec(goPokedexList, idList, res);
+		res.setRaceDiffResult(raceDiffUtils.createRaceDiffResult(goPokedexList, idList, true));
 		res.setSearchedById(false);
-	}
-
-	/**
-	 * 主処理
-	 *
-	 * @param goPokedexList
-	 * @param idList
-	 * @param res
-	 */
-	private void exec(List<GoPokedex> goPokedexList, List<String> idList, RaceDiffResponse res) {
-
-		final List<Pokedex> pokedexList = (List<Pokedex>) pokedexRepository.findAllById(idList);
-		
-		if (idList.size() > pokedexList.size()) {
-			res.setMsgLevel(MsgLevelEnum.error);
-			res.setMessage(MSG_NO_RESULTS);
-			res.setSuccess(false);
-			return;
-		}
-		
-		List<RaceDiffElem> raceDiffElemList = idList.stream() // 検索した時のid順で作成
-				.map(pid -> {
-					Pokedex p = pokedexList.stream()
-							.filter(pdx -> pdx.getPokedexId().equals(pid))
-							.findFirst().get();
-					// 原作種族値が存在しない場合は、Pokedexをnullにする。
-					p = pokemonUtils.existsOrigin(p.getPokedexId()) ? p : null;
-					
-					GoPokedex gp = goPokedexList.stream()
-							.filter(gPdx -> gPdx.getPokedexId().equals(pid))
-							.findFirst().get();
-					return new Race(p, gp, pokemonStatisticsInfo);
-				})
-				.map(race -> {
-					GoPokedex gp = race.getGoPokedex();
-					int cp = pokemonGoUtils.calcBaseCp(gp.getAttack(), gp.getDefense(), gp.getHp());
-					return new RaceDiffElem(race, cp);
-				})
-				.toList();
-		res.setRaceDiffElemArr(raceDiffElemList);
-
-		res.setGoTotalCount(pokemonStatisticsInfo.getGoPokedexStats().getGoHpStats().getList().size());
-		res.setOriTotalCount(pokemonStatisticsInfo.getPokedexStats().getHpStats().getList().size());;
-
-		res.setSuccess(true);
 	}
 
 }
