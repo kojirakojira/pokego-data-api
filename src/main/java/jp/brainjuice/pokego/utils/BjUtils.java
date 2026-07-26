@@ -157,6 +157,16 @@ public final class BjUtils {
 	}
 
 	/**
+	 * 現在日付をLocalDateTime型で取得する。日付を扱う場合は必ずこのメソッドもしくは{@link BjUtils#now()}を使用すること。
+	 *
+	 * @return
+	 */
+	public static LocalDateTime nowLocalDateTime() {
+
+		return toLocalDateTime(now());
+	}
+
+	/**
 	 * 現在日付（時間を含まない）を取得する。日付を扱う場合は必ずこのメソッドもしくは{@link BjUtils#now()}を使用すること。
 	 *
 	 * @return

@@ -2,9 +2,6 @@ package jp.brainjuice.pokego.web.manage;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jp.brainjuice.pokego.business.service.manage.LoginService;
 import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.MasterFileAnalyzerService;
-import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
 import jp.brainjuice.pokego.utils.LastUpdateService;
 import jp.brainjuice.pokego.utils.exception.AuthenticationFailedException;
@@ -35,32 +33,15 @@ public class ManageController {
 
 	private MasterFileAnalyzerService masterFileAnalyzerService;
 
-	private ViewsCacheProvider viewsCacheProvider;
-
 	private LastUpdateService lastUpdateService;
 
 	public ManageController(
 			LoginService loginService,
 			MasterFileAnalyzerService masterFileAnalyzerService,
-			LastUpdateService lastUpdateService,
-			ViewsCacheProvider viewsCacheProvider) {
+			LastUpdateService lastUpdateService) {
 		this.loginService = loginService;
 		this.masterFileAnalyzerService = masterFileAnalyzerService;
 		this.lastUpdateService = lastUpdateService;
-		this.viewsCacheProvider = viewsCacheProvider;
-	}
-
-	@PostMapping("/secure/cleanupRedis")
-	public String cleanUpRedis(String userId,
-			HttpServletRequest req) throws Exception {
-		if (!BjJwtUtils.checkUser(req, userId)) {
-			throw new UserUnmatchException();
-		}
-
-		viewsCacheProvider.cleanupPageTempView();
-		viewsCacheProvider.cleanupPokemonTempView();
-
-		return "OK";
 	}
 
 	@PostMapping("/secure/manage")
@@ -72,8 +53,7 @@ public class ManageController {
 		return true;
 	}
 
-	@PostMapping(value = "/secure/masterFileAnalyze",
-			consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/secure/masterFileAnalyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public boolean masterFileAnalyze(
 			MasterFileAnalyzeRequest masterFileAnalyzeRequest,
 			HttpServletRequest req) throws Exception {
@@ -92,6 +72,7 @@ public class ManageController {
 
 		return true;
 	}
+
 	@PostMapping("/secure/manage/lastUpdateGetFormat")
 	public Map<String, String> lastUpdateGetFormat(String userId,
 			HttpServletRequest req) throws Exception {

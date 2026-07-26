@@ -1,29 +1,31 @@
 package jp.brainjuice.pokego.cache.service;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.PageNameEnum;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPage;
 import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPokemon;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.dao.redis.PageTempViewRedisRepository;
-import jp.brainjuice.pokego.dao.redis.PokemonTempViewRedisRepository;
-import jp.brainjuice.pokego.dao.redis.entity.PageTempView;
-import jp.brainjuice.pokego.dao.redis.entity.PokemonTempView;
-import jp.brainjuice.pokego.dao.redis.entity.TempView;
+import jp.brainjuice.pokego.utils.BjUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 /**
  * 話題の○○のリストを管理するクラスです。<br>
@@ -32,173 +34,167 @@ import lombok.extern.slf4j.Slf4j;
  * @author saibabanagchampa
  * @see ViewsCacheProvider
  * @see ViewsCacheManager
- *
  */
 @Component
 @Slf4j
 public class TopicListManager {
 
-	private PageTempViewRedisRepository pageTempViewRedisRepository;
-
-	private PokemonTempViewRedisRepository pokemonTempViewRedisRepository;
-
+	private StringRedisTemplate redisTemplate;
 	private GoPokedexRepository goPokedexRepository;
+	private ObjectMapper objectMapper;
 
-	private TopicPageList topicPageList;
+	// 過去の集計時間
+	public static final int EXPIRE_HOURS = 72;
+	// TopicPageリストの上位表示件数
+	public static final int TOPIC_PAGE_LIMIT = 10;
+	// TopicPokemonリストの上位表示件数
+	public static final int TOPIC_POKEMON_LIMIT = 10;
 
-	private TopicPokemonList topicPokemonList;
-
-	private static final String START_MSG_UPDATE_TOPIC_LIST = "Start update TopicList schedule(Redis -> memory). TopicPageList: {0}, TopicPokemonList: {1}";
-	private static final String END_MSG_UPDATE_TOPIC_LIST = "End update TopicList schedule. TopicPageList: {0}, TopicPokemonList: {1}";
-
-	private static final String MSG_TEMP_VIEW_LIST = "> TempViewList: {0}";
+	private static final String CACHE_TOPIC_PAGE = "cache:topic:page";
+	private static final String CACHE_TOPIC_POKEMON = "cache:topic:pokemon";
+	private static final String TRENDING_PAGE_PREFIX = "trending:page:";
+	private static final String TRENDING_POKEMON_PREFIX = "trending:pokemon:";
+	private static final String TRENDING_PAGE_UNION = "trending:page:union_hours";
+	private static final String TRENDING_POKEMON_UNION = "trending:pokemon:union_hours";
 
 	public TopicListManager(
-			PageTempViewRedisRepository pageTempViewRedisRepository,
-			PokemonTempViewRedisRepository pokemonTempViewRedisRepository,
+			StringRedisTemplate redisTemplate,
 			GoPokedexRepository goPokedexRepository,
-			TopicPokemonList topicPokemonList,
-			TopicPageList topicPageList) {
-		this.pageTempViewRedisRepository = pageTempViewRedisRepository;
-		this.pokemonTempViewRedisRepository = pokemonTempViewRedisRepository;
+			ObjectMapper objectMapper) {
+		this.redisTemplate = redisTemplate;
 		this.goPokedexRepository = goPokedexRepository;
-		this.topicPokemonList = topicPokemonList;
-		this.topicPageList = topicPageList;
+		this.objectMapper = objectMapper;
 	}
 
 	/**
-	 * 話題のページ（検索パターン）を取得する。
+	 * Redisサーバ上の情報から、話題のページ(TopicPage)、話題のポケモン(TopicPokemon)の一覧を更新します。<br>
 	 *
-	 * @return
+	 * 10分おき（毎時0分, 10分, 20分, 30分, 40分, 50分）に実行
 	 */
-	TopicPageList getTopicPageList() {
-		return topicPageList;
-	}
-
-	/**
-	 * 話題のポケモンを取得する。
-	 *
-	 * @return
-	 */
-	TopicPokemonList getTopicPokemonList() {
-		return topicPokemonList;
-	}
-
-	/**
-	 * Redisサーバ上の情報から、メモリ上の話題のページ(TopicPage)、話題のポケモン(TopicPokemon)の一覧を更新します。<br>
-	 *
-	 * 15分おきに実行
-	 * タスク実行完了の15分後
-	 * （サーバ起動30秒後から開始）
-	 * @param <T>
-	 */
-	@Scheduled(initialDelay = 30000, fixedDelay = 900000)
+	@Scheduled(cron = "0 0/10 * * * ?")
+	@SchedulerLock(name = "topic_list_sync_lock", lockAtMostFor = "PT9M", lockAtLeastFor = "PT9M")
 	public void updateTopicList() {
+		log.info("Start update TopicList schedule(Redis -> Redis JSON)");
 
-		log.info(MessageFormat.format(START_MSG_UPDATE_TOPIC_LIST, this.topicPageList.toString(), this.topicPokemonList.toString()));
+		try {
+			// TopicPageを更新する。
+			List<TopicPage> updatedTopicPageList = createTopicPageList();
+			redisTemplate.opsForValue().set(CACHE_TOPIC_PAGE, objectMapper.writeValueAsString(updatedTopicPageList));
 
-		// TopicPageを更新する。
-		List<TopicPage> topicPageList = createTopicPageList();
-		this.topicPageList.setAll(topicPageList);
+			// TopicPokemonを更新する。
+			List<TopicPokemon> updatedTopicPokemonList = createTopicPokemonList();
+			redisTemplate.opsForValue().set(CACHE_TOPIC_POKEMON,
+					objectMapper.writeValueAsString(updatedTopicPokemonList));
 
-		// TopicPokemonを更新する。
-		List<TopicPokemon> topicPokemonList = createTopicPokemonList();
-		this.topicPokemonList.setAll(topicPokemonList);
+		} catch (Exception e) {
+			log.error("Failed to update TopicList to Redis JSON", e);
+		}
 
-		log.info(MessageFormat.format(END_MSG_UPDATE_TOPIC_LIST, this.topicPageList.toString(), this.topicPokemonList.toString()));
+		log.info("End update TopicList schedule.");
 	}
 
+	/**
+	 * 過去${EXPIRE_HOURS}時間の時間別ZSETのキーリストを生成する。
+	 */
+	private List<String> getUntilExpiredHoursKeys(String prefix) {
+		List<String> keys = new ArrayList<>();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+		LocalDateTime now = BjUtils.nowLocalDateTime();
+		for (int i = 0; i < EXPIRE_HOURS; i++) {
+			keys.add(prefix + now.minusHours(i).format(formatter));
+		}
+		return keys;
+	}
 
 	/**
 	 * TopicPageのリストを生成します。<br>
-	 * 閲覧数の降順で取得します。
+	 * 閲覧数の降順で取得します。<br>
+	 * 上位${TOPIC_PAGE_LIMIT}件のみ取得します。
 	 *
 	 * @return
 	 */
 	private List<TopicPage> createTopicPageList() {
+		List<String> keys = getUntilExpiredHoursKeys(TRENDING_PAGE_PREFIX);
+		if (keys.isEmpty())
+			return Collections.emptyList();
 
-		// Redisから検索
-		Iterable<PageTempView> viewsCountMap = pageTempViewRedisRepository.findAll();
+		String unionKey = TRENDING_PAGE_UNION;
+		String firstKey = keys.get(0);
+		List<String> otherKeys = keys.subList(1, keys.size());
 
-		// pageごとの閲覧数をマップで取得
-		Map<String, Integer> pageViewsMap = createViewsCountMap(viewsCountMap);
+		// 過去${EXPIRE_HOURS}時間のスコアを合算し、Redis上にZSetとして保存
+		redisTemplate.opsForZSet().unionAndStore(firstKey, otherKeys, unionKey);
+		// 万が一のクラッシュに備えたフェイルセーフとして5分のTTLを設定
+		redisTemplate.expire(unionKey, 5, TimeUnit.MINUTES);
 
-		// TopicPageのリストを生成
-		return pageViewsMap.entrySet().stream()
-				.map(entry -> {
-					PageNameEnum pageName = PageNameEnum.valueOf(entry.getKey());
-					return new TopicPage(pageName, pageName.getJpn(), entry.getValue());
+		// 降順で並び替え、上位${TOPIC_PAGE_LIMIT}件のみを取得する（0〜9）
+		Set<TypedTuple<String>> topPages = redisTemplate.opsForZSet()
+				.reverseRangeWithScores(unionKey, 0, TOPIC_PAGE_LIMIT - 1);
+
+		// 一時キーを削除してメモリを解放する
+		redisTemplate.delete(unionKey);
+
+		if (topPages == null || topPages.isEmpty())
+			return Collections.emptyList();
+
+		return topPages.stream()
+				.map(tuple -> {
+					PageNameEnum pageName = PageNameEnum.valueOf(tuple.getValue());
+					return new TopicPage(pageName, pageName.getJpn(), tuple.getScore().intValue());
 				})
-				// abundance、homeは検索ページではないため、対象外とする。
-				.filter(tp -> tp.getPage() != PageNameEnum.abundance && tp.getPage() != PageNameEnum.home)
-				.sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount())) // 降順に並び替え
 				.collect(Collectors.toList());
 	}
 
 	/**
 	 * TopicPokemonのリストを生成します。<br>
-	 * 閲覧数の降順で取得します。
+	 * 閲覧数の降順で取得します。<br>
+	 * 上位${TOPIC_POKEMON_LIMIT}件のみ取得します。
 	 *
 	 * @return
 	 */
 	private List<TopicPokemon> createTopicPokemonList() {
+		List<String> keys = getUntilExpiredHoursKeys(TRENDING_POKEMON_PREFIX);
+		if (keys.isEmpty())
+			return Collections.emptyList();
 
-		// Redisから検索
-		Iterable<PokemonTempView> pokemonTempViewList = pokemonTempViewRedisRepository.findAll();
+		String unionKey = TRENDING_POKEMON_UNION;
+		String firstKey = keys.get(0);
+		List<String> otherKeys = keys.subList(1, keys.size());
 
-		// pokemonごとの閲覧数をマップで取得
-		Map<String, Integer> viewsCountMap = createViewsCountMap(pokemonTempViewList);
+		// 過去${EXPIRE_HOURS}時間のスコアを合算し、Redis上にZSetとして保存
+		redisTemplate.opsForZSet().unionAndStore(firstKey, otherKeys, unionKey);
+		// 万が一のクラッシュに備えたフェイルセーフとして5分のTTLを設定
+		redisTemplate.expire(unionKey, 5, TimeUnit.MINUTES);
 
-		// GoPokedexのリストを取得
-		Map<String, GoPokedex> goPokedexMap = goPokedexRepository.findAllById(viewsCountMap.keySet()).stream()
-				.collect(Collectors.toMap(
-						GoPokedex::getPokedexId,
-						gp -> gp));
+		// 降順で並び替え、上位${TOPIC_POKEMON_LIMIT}件のみを取得する（0〜9）
+		Set<TypedTuple<String>> topPokemons = redisTemplate.opsForZSet()
+				.reverseRangeWithScores(unionKey, 0, TOPIC_POKEMON_LIMIT - 1);
 
-		// TopicPokemonのリストを生成
-		return viewsCountMap.entrySet().stream()
-				.map(entry -> {
-					GoPokedex gp = goPokedexMap.get(entry.getKey());
+		// 一時キーを削除してメモリを解放する
+		redisTemplate.delete(unionKey);
+
+		if (topPokemons == null || topPokemons.isEmpty())
+			return Collections.emptyList();
+
+		Set<String> pokedexIds = topPokemons.stream()
+				.map(TypedTuple::getValue)
+				.collect(Collectors.toSet());
+
+		Map<String, GoPokedex> goPokedexMap = goPokedexRepository.findAllById(pokedexIds).stream()
+				.collect(Collectors.toMap(GoPokedex::getPokedexId, gp -> gp));
+
+		return topPokemons.stream()
+				.map(tuple -> {
+					GoPokedex gp = goPokedexMap.get(tuple.getValue());
+					if (gp == null)
+						return null;
 					return new TopicPokemon(
 							gp.getPokedexId(),
 							gp.getImage1(),
 							PokemonEditUtils.appendRemarks(gp),
-							entry.getValue()); // TopicPokemonに変換。
+							tuple.getScore().intValue()); // TopicPokemonに変換
 				})
-				.sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount())) // 降順に並び替え
+				.filter(tp -> tp != null)
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * keyごとの閲覧数を保持したマップを生成します。<br>
-	 * ここでいうkeyは、TempViewのメンバ変数を指します。
-	 *
-	 * @param <S>
-	 * @param tempViewList
-	 * @return
-	 */
-	private <S extends TempView> Map<String, Integer> createViewsCountMap(Iterable<S> tempViewList) {
-
-		log.info(MessageFormat.format(MSG_TEMP_VIEW_LIST, tempViewList.toString()));
-
-		Map<String, Integer> viewsMap = new HashMap<String, Integer>();
-
-		// 閲覧数をインクリメントしていくConsumer
-		BiConsumer<Map<String, Integer>, String> countView = (map, key) -> {
-			if (map.containsKey(key)) {
-				map.put(key, map.get(key) + 1);
-			} else {
-				map.put(key, 1);
-			}
-		};
-
-		tempViewList.forEach(tv -> {
-			// TODO: Spring Data Redisのバグのためnullチェック。（https://techhelpnotes.com/java-spring-boot-redis-crud-repository-findbyid-or-findall-always-returns-optional-empty-null/）
-			if (tv != null) {
-				countView.accept(viewsMap, tv.getKey());
-			}
-		});
-
-		return viewsMap;
 	}
 }

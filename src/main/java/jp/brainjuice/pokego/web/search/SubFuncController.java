@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.brainjuice.pokego.business.service.search.sub.AdminCommentService;
 import jp.brainjuice.pokego.business.service.search.sub.OgpInfoService;
 import jp.brainjuice.pokego.business.service.search.sub.PrevNextPokemonService;
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPage;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPokemon;
 import jp.brainjuice.pokego.cache.service.TopicListProvider;
 import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.web.search.form.req.sub.OgpPokemonRequest;
@@ -69,6 +69,7 @@ public class SubFuncController {
 
 	/**
 	 * 図鑑ID上の1つ前、1つ後のポケモンのGoPokedexを取得するAPI
+	 * 
 	 * @param req
 	 * @return
 	 */
@@ -117,7 +118,6 @@ public class SubFuncController {
 		return ogpTypeRes;
 	}
 
-
 	/**
 	 * 話題の○○一覧を強制的に更新するAPI
 	 *
@@ -135,7 +135,7 @@ public class SubFuncController {
 	 * @return
 	 */
 	@GetMapping("/topicPage")
-	public TopicPageList topicPage() {
+	public List<TopicPage> topicPage() {
 
 		return topicListProvider.getTopicPageList();
 	}
@@ -146,7 +146,7 @@ public class SubFuncController {
 	 * @return
 	 */
 	@GetMapping("/topicPokemon")
-	public TopicPokemonList topicPokemon() {
+	public List<TopicPokemon> topicPokemon() {
 
 		return topicListProvider.getTopicPokemonList();
 	}
@@ -161,19 +161,5 @@ public class SubFuncController {
 
 		topicListProvider.updateTopicList();
 		return "成功！";
-	}
-
-	/**
-	 * Redisサーバ上のポケモンの一時情報をすべて削除する。
-	 * TODO: いずれsecureにしようと思うが、悪影響がないので一旦解放。
-	 *
-	 * @return
-	 */
-	@GetMapping("/clearPokemonTempView")
-	public String clearPokemonTempView() {
-
-		viewsCacheProvider.clearPokemonTempView();
-
-		return "成功";
 	}
 }
