@@ -26,14 +26,17 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	/** indexで扱いたい場合に使用するリスト(ArrayList) */
 	private static List<Map.Entry<String, Double>> cpMultiplierList;
 
-	public CpMultiplierMap(CpMultiplierRepository cpMultiplierRepository) throws PokemonDataInitException {
+	/**
+	 * @throws PokemonDataInitException
+	 */
+	public CpMultiplierMap(CpMultiplierRepository cpMultiplierRepository) {
 		init(cpMultiplierRepository);
 	}
 
 	/**
 	 * @throws PokemonDataInitException
 	 */
-	public void init(CpMultiplierRepository cpMultiplierRepository) throws PokemonDataInitException {
+	public void init(CpMultiplierRepository cpMultiplierRepository) {
 
 		try {
 			List<CpMultiplier> cpMultList = cpMultiplierRepository.findAll();
@@ -63,6 +66,15 @@ public class CpMultiplierMap extends LinkedHashMap<String, Double> {
 	public Double get(Object pl) {
 		DecimalFormat df = new DecimalFormat("00.0");
 		return super.get(df.format(Double.valueOf((String) pl)));
+	}
+
+	/**
+	 * 小数点以下を省略して呼び出された場合の考慮
+	 */
+	@Override
+	public boolean containsKey(Object pl) {
+		DecimalFormat df = new DecimalFormat("00.0");
+		return super.containsKey(df.format(Double.valueOf((String) pl)));
 	}
 
 	/**

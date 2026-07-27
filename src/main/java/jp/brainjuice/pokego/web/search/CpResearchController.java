@@ -2,11 +2,12 @@ package jp.brainjuice.pokego.web.search;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +19,7 @@ import jp.brainjuice.pokego.business.service.search.cp.CpRankListResearchService
 import jp.brainjuice.pokego.business.service.search.cp.CpRankResearchService;
 import jp.brainjuice.pokego.business.service.search.cp.CpResearchService;
 import jp.brainjuice.pokego.business.service.search.cp.ThreeGalarBirdsResearchService;
-import jp.brainjuice.pokego.business.service.search.utils.ValidationService;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.cp.AfterEvoCpRequest;
 import jp.brainjuice.pokego.web.search.form.req.cp.CpIvRequest;
 import jp.brainjuice.pokego.web.search.form.req.cp.CpRankListRequest;
@@ -64,16 +63,13 @@ public class CpResearchController {
 	private ThreeGalarBirdsResearchService threeGalarBirdsResearchService;
 	private ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse;
 
-	private ValidationService validationService;
-
 	public CpResearchController(
 			CpResearchService cpResearchService, ResearchServiceExecutor<CpResponse> cpResRse,
 			CpRankResearchService cpRankResearchService, ResearchServiceExecutor<CpRankResponse> cpRankResRse,
 			CpRankListResearchService cpRankListResearchService, ResearchServiceExecutor<CpRankListResponse> cpRankListResRse,
 			AfterEvoCpResearchService afterEvoCpResearchService, ResearchServiceExecutor<AfterEvoCpResponse> afterEvoCpResRse,
 			CpIvResearchService cpIvResearchService, ResearchServiceExecutor<CpIvResponse> cpIvResRse,
-			ThreeGalarBirdsResearchService threeGalarBirdsResearchService, ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse,
-			ValidationService validationService) {
+			ThreeGalarBirdsResearchService threeGalarBirdsResearchService, ResearchServiceExecutor<ThreeGalarBirdsResponse> threeGalarBirdsResRse) {
 
 		// CP算出
 		this.cpResearchService = cpResearchService;
@@ -93,8 +89,6 @@ public class CpResearchController {
 		// 野生個体値
 		this.threeGalarBirdsResearchService = threeGalarBirdsResearchService;
 		this.threeGalarBirdsResRse = threeGalarBirdsResRse;
-		// 入力チェック
-		this.validationService = validationService;
 	}
 
 	/**
@@ -105,9 +99,7 @@ public class CpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/cp")
-	public CpResponse cp(CpRequest cpReq) throws Exception {
-
-		validationService.validation(cpReq);
+	public CpResponse cp(@Valid CpRequest cpReq) throws Exception {
 
 		CpResponse cpRes = new CpResponse();
 
@@ -128,9 +120,7 @@ public class CpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/cpRank")
-	public CpRankResponse cpRank(CpRankRequest cpRankReq) throws Exception {
-
-		validationService.validation(cpRankReq);
+	public CpRankResponse cpRank(@Valid CpRankRequest cpRankReq) throws Exception {
 
 		CpRankResponse cpRankRes = new CpRankResponse();
 		cpRankResRse.execute(cpRankReq, cpRankRes, cpRankResearchService);
@@ -148,8 +138,6 @@ public class CpResearchController {
 	@GetMapping("/cpRankList")
 	public CpRankListResponse cpRankList(CpRankListRequest cpRankListReq) throws Exception {
 
-		validationService.validation(cpRankListReq);
-
 		CpRankListResponse cpRankListRes = new CpRankListResponse();
 		cpRankListResRse.execute(cpRankListReq, cpRankListRes, cpRankListResearchService);
 		return cpRankListRes;
@@ -163,9 +151,7 @@ public class CpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/afterEvoCp")
-	public AfterEvoCpResponse afterEvoCp(AfterEvoCpRequest afterEvoCpRequest) throws Exception {
-
-		validationService.validation(afterEvoCpRequest);
+	public AfterEvoCpResponse afterEvoCp(@Valid AfterEvoCpRequest afterEvoCpRequest) throws Exception {
 
 		AfterEvoCpResponse afterEvoCpRes = new AfterEvoCpResponse();
 		afterEvoCpResRse.execute(afterEvoCpRequest, afterEvoCpRes, afterEvoCpResearchService);
@@ -222,19 +208,4 @@ public class CpResearchController {
 		cpIvResRse.execute(cpIvReq, cpIvRes, cpIvResearchService);
 		return cpIvRes;
 	}
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 }

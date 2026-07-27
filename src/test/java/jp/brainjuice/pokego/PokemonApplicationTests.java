@@ -92,9 +92,14 @@ class PokemonApplicationTests {
 	@Test
 	public void pokemonGoUtilsTest() {
 
-		Pokedex p = pokedexRepository.findById("0379N01").get();
-		
-		System.out.println(pokemonUtils.convGoAttack(p, false));
+//		{
+//			Pokedex p = pokedexRepository.findById("0108N01").get();
+//			System.out.println(pokemonUtils.convGoDefense(p, false));
+//		}
+		{
+			Pokedex p = pokedexRepository.findById("0176N01").get();
+			System.out.println(pokemonUtils.convGoAttack(p, false));
+		}
 	}
 
 }

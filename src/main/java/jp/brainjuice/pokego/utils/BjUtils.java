@@ -23,6 +23,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
+import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.Transliterator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +36,14 @@ public final class BjUtils {
 	public static final String sdfYmdhme = "yyyy/MM/dd(E) HH:mm";
 	public static final String sdfYmdhms = "yyyy-MM-dd HH:mm:ss";
 	public static final String sdfYmdhm = "yyyy/MM/dd HH:mm";
-	public static final String sdfYmd = "yyyy/MM/dd";
+	public static final String sdfYmdSlash = "yyyy/MM/dd";
+	public static final String sdfYmSlash = "yyyy/MM";
+	public static final String sdfYm = "yyyyMM";
 	public static final String sdfMde = "MM/dd(E)";
 	public static final String sdfHm = "HH:mm";
 	public static final String dirFormat = "yyyyMMddHHmmss";
+	/** yyyyMM形式の正規表現 */
+	public static final String ymRegex = "^\\d{4}(0[1-9]|1[0-2])$";
 
 	private static final String BRAINJUICE_NOW_DATE = "BRAINJUICE_NOW_DATE";
 
@@ -50,6 +55,9 @@ public final class BjUtils {
 
 	/** カタカナ→ひらがな */
 	private static Transliterator transKanaToHira = Transliterator.getInstance("Katakana-Hiragana");
+
+	/** 日本語のソート */
+	private static Collator collator = Collator.getInstance(Locale.JAPAN);
 
 	/**
 	 * 引数に指定された文字が、空文字またはnullでない場合は数値に変換し返却する。
@@ -146,6 +154,16 @@ public final class BjUtils {
 			now = parseDate(env, sdfYmdhms);
 		}
 		return now;
+	}
+
+	/**
+	 * 現在日付をLocalDateTime型で取得する。日付を扱う場合は必ずこのメソッドもしくは{@link BjUtils#now()}を使用すること。
+	 *
+	 * @return
+	 */
+	public static LocalDateTime nowLocalDateTime() {
+
+		return toLocalDateTime(now());
 	}
 
 	/**
@@ -275,10 +293,10 @@ public final class BjUtils {
 			list.add(editFunc.apply(str));
 		}
 	}
-	
+
 	/**
 	 * 部分一致検索用の文字列(%str%)を生成する。
-	 * 
+	 *
 	 * @param str
 	 * @return
 	 */
@@ -288,6 +306,7 @@ public final class BjUtils {
 
 	/**
 	 * resources配下に配置したYamlファイルを読み込み、ファイル内容を返却する。
+	 *
 	 * @param <T>
 	 *
 	 * @param fileName
@@ -329,58 +348,83 @@ public final class BjUtils {
 		return resourceLoader.getResource("classpath:" + fileName);
 	}
 
-    /**
-     * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
-     * @param <T>
-     *
-     * @param original
-     * @return
-     */
-    @SuppressWarnings("unchecked")
+	/**
+	 * Clonableが継承されていないクラスのインスタンスのディープコピーを作成したい時に使用する。
+	 *
+	 * @param <T>
+	 *
+	 * @param original
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> T deepCopy(T original) {
-        try {
-            // 1. オブジェクトをシリアライズしてバイトストリームに変換する
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(original);
+		try {
+			// 1. オブジェクトをシリアライズしてバイトストリームに変換する
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(original);
 
-            // 2. バイトストリームからオブジェクトをデシリアライズする
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object copy = ois.readObject();
+			// 2. バイトストリームからオブジェクトをデシリアライズする
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			Object copy = ois.readObject();
 
-            // 3. 新しいオブジェクトを返す
-            return (T) copy;
-        } catch (IOException | ClassNotFoundException e) {
-            // 例外が発生した場合はnullを返す
-            return null;
-        }
-    }
+			// 3. 新しいオブジェクトを返す
+			return (T) copy;
+		} catch (IOException | ClassNotFoundException e) {
+			// 例外が発生した場合はnullを返す
+			return null;
+		}
+	}
 
-    /**
-     * 四捨五入用メソッド</br>
-     * 例：round(1, 4, 2) -> 0.3
-     *
-     * @param divisor 割られる数
-     * @param divident 割る数
-     * @param roundDigit 四捨五入する小数点以下桁
-     * @return
-     */
-    public static float round(float divisor, float divident, int roundDigit) {
+	/**
+	 * 日本語のソートオブジェクト取得する
+	 *
+	 * @return
+	 */
+	public static Collator getCollator() {
+		return collator;
+	}
 
-    	float num = (float) Math.pow(10.0, roundDigit - 1);
-    	return Math.round((divisor / divident) * num) / num;
-    }
-    
-    /**
-     * double型を比較する用のメソッド
-     * 
-     * @param a
-     * @param b
-     * @param epsilon 許容する精度。double型の有効桁数は約15桁。つまり、一応1e-15まで指定できる。
-     * @return
-     */
-    public static boolean doubleEquals(double a, double b, double epsilon) {
-    	return Math.abs(a - b) < epsilon;
-    }
+	/**
+	 * 四捨五入用メソッド</br>
+	 * 例：round(1, 4, 2) -> 0.3
+	 *
+	 * @param divisor    割られる数
+	 * @param divident   割る数
+	 * @param roundDigit 四捨五入する小数点以下桁
+	 * @return
+	 */
+	public static double round(double divisor, double divident, int roundDigit) {
+
+		double num = Math.pow(10.0, roundDigit - 1);
+		return Math.round((divisor / divident) * num) / num;
+	}
+
+	/**
+	 * 四捨五入用メソッド</br>
+	 * 例：round(1, 4, 2) -> 0.3
+	 *
+	 * @param divisor    割られる数
+	 * @param divident   割る数
+	 * @param roundDigit 四捨五入する小数点以下桁
+	 * @return
+	 */
+	public static float round(float divisor, float divident, int roundDigit) {
+
+		float num = (float) Math.pow(10.0, roundDigit - 1);
+		return Math.round((divisor / divident) * num) / num;
+	}
+
+	/**
+	 * double型を比較する用のメソッド
+	 *
+	 * @param a
+	 * @param b
+	 * @param epsilon 許容する精度。double型の有効桁数は約15桁。つまり、一応1e-15まで指定できる。
+	 * @return
+	 */
+	public static boolean doubleEquals(double a, double b, double epsilon) {
+		return Math.abs(a - b) < epsilon;
+	}
 }

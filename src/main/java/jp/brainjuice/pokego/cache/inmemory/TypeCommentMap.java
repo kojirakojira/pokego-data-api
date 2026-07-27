@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.cache.inmemory;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -35,11 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
+	/**
+	 * @throws PokemonDataInitException
+	 */
 	public TypeCommentMap(
 			TypeChartInfo typeChartInfo,
 			GoPokedexRepository goPokedexRepository,
 			EvolutionRepository evolutionRepository,
-			EvolutionProvider evolutionProvider) throws PokemonDataInitException {
+			EvolutionProvider evolutionProvider) {
 
 		// 全ポケモンのGoPokedexを取得する。
 		List<GoPokedex> goPokedexList = goPokedexRepository.findAll();
@@ -147,6 +151,9 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 					strengthMsgFormat,
 					TypeEffectiveEnum.MIN);
 		}
+
+		// 相殺
+		offset(typeChartInfo, "{0}と{1}の組み合わせは、相殺によって{2}から受けるこうげきの倍率が等倍です。");
 
 	}
 
@@ -569,7 +576,7 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 	}
 
 	/**
-	 * 弱点タイプが最も少ないタイプの組み合わせを洗い出し、メッセージを作成する。。
+	 * 弱点タイプが最も少ないタイプの組み合わせを洗い出し、メッセージを作成する。
 	 *
 	 * @param typeChartInfo
 	 * @param msgFormat
@@ -620,7 +627,41 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 		});
 	}
 
+	private void offset(TypeChartInfo typeChartInfo, String format) {
 
+		Map<TwoTypeKey, List<TypeEnum>> dfAtMap = new HashMap<>();
+		for (TypeEnum df1: TypeEnum.values()) {
+			// ぼうぎょ側が1タイプの場合に、倍率が等倍でないものに絞り込む
+			List<TypeEnum> typeList = Arrays.stream(TypeEnum.values())
+					.filter(at -> {
+						TypeEffectiveEnum effective = typeChartInfo.getEffective(at, df1).orElseThrow();
+						return TypeEffectiveEnum.NORMAL != effective;
+					})
+					.toList();
+
+			for (TypeEnum at: typeList) {
+				Arrays.stream(TypeEnum.values())
+				.map(df2 -> new TwoTypeKey(df1, df2)) // df1と組み合わせてTwoTypeKeyに変換する
+				.filter(df -> df.getType1() != df.getType2()) // タイプ1とタイプ2が一致するものを除去
+				.filter(df -> {
+					TypeEffectiveEnum effective = typeChartInfo.getEffective(at, df).orElseThrow();
+					return TypeEffectiveEnum.NORMAL == effective;
+				})
+				.forEach(df -> {
+					dfAtMap.computeIfAbsent(df, k -> new ArrayList<>()).add(at);
+				});
+			}
+		}
+
+		dfAtMap.entrySet().stream().forEach(entry -> {
+			TwoTypeKey df = entry.getKey();
+			List<TypeEnum> afList = entry.getValue();
+
+			afList.stream().forEach(at -> {
+				putMsg(entry.getKey(), MessageFormat.format(format, df.getType1().getJpn(), df.getType2().getJpn(), at.getJpn()));
+			});
+		});
+	}
 
 	/**
 	 * 助数詞を連結します。
@@ -634,7 +675,6 @@ public class TypeCommentMap extends HashMap<TwoTypeKey, LinkedHashSet<String>> {
 
 	/**
 	 * 第１引数に該当するkeyのvalueにもつListにメッセージを追加する。
-	 *
 	 *
 	 * @param key
 	 * @param msg

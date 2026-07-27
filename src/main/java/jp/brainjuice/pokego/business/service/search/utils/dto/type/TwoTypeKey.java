@@ -1,7 +1,6 @@
 package jp.brainjuice.pokego.business.service.search.utils.dto.type;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -14,16 +13,24 @@ import lombok.Data;
  * @author saibabanagchampa
  *
  */
-@AllArgsConstructor
 @Data
 public class TwoTypeKey {
 
 	private TypeEnum type1;
 	private TypeEnum type2;
 
+	public TwoTypeKey(TypeEnum type1, TypeEnum type2) {
+		TypeEnum t1 = type1;
+		TypeEnum t2 = type2 == null ? null : type2;
+		setType1(t1);
+		setType2(t2 != t1 ? t2 : null);
+	}
+
 	public TwoTypeKey(String type1, String type2) {
-		setType1(TypeEnum.valueOf(type1));
-		setType2(type2 == null ? null : TypeEnum.valueOf(type2));
+		TypeEnum t1 = TypeEnum.valueOf(type1);
+		TypeEnum t2 = type2 == null ? null : TypeEnum.valueOf(type2);
+		setType1(t1);
+		setType2(t2 != t1 ? t2 : null);
 	}
 
 	public String toJpnString() {
@@ -79,60 +86,61 @@ public class TwoTypeKey {
 			// タイプ1 == タイプ2の場合は1タイプとみなす。
 			return type1 != null ? type1.hashCode() : 0;
 		}
-        int result = type1 != null ? type1.hashCode() : 0;
-        result = result + (type2 != null ? type2.hashCode() : 0);
-        return result;
+		// タイプ1とタイプ2は区別しない。
+		int result = type1 != null ? type1.hashCode() : 0;
+		result = result + (type2 != null ? type2.hashCode() : 0);
+		return result;
 	}
 
-    /**
-     * (非 Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-    	if (this == obj) {
-    		return true;
-    	}
+	/**
+	 * (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
 
-    	if (!(obj instanceof TwoTypeKey)) {
-    		return false;
-    	}
+		if (!(obj instanceof TwoTypeKey)) {
+			return false;
+		}
 
-    	// this：A, other：B
-    	TwoTypeKey other = (TwoTypeKey) obj;
+		// this：A, other：B
+		TwoTypeKey other = (TwoTypeKey) obj;
 
-    	boolean typesEqual = (type1 == null && other.type1 == null) || (type1 != null && type1 == other.type1);
-    	typesEqual &= (type2 == null && other.type2 == null) || (type2 != null && type2 == other.type2);
+		boolean typesEqual = (type1 == null && other.type1 == null) || (type1 != null && type1 == other.type1);
+		typesEqual &= (type2 == null && other.type2 == null) || (type2 != null && type2 == other.type2);
 
-    	if (typesEqual) {
-    		// A.t1, B.t1, A.t2, B.t2 -> all null
-    		// A.t1, B.t1 -> all null && A.t2 == B.t2
-    		// A.t1 == B.t1 && A.t2, B.t2 -> all null
-    		// A.t1 == B.t1 && A.t2 == B.t2
-    		return true;
-    	}
+		if (typesEqual) {
+			// A.t1, B.t1, A.t2, B.t2 -> all null
+			// A.t1, B.t1 -> all null && A.t2 == B.t2
+			// A.t1 == B.t1 && A.t2, B.t2 -> all null
+			// A.t1 == B.t1 && A.t2 == B.t2
+			return true;
+		}
 
-    	typesEqual = (type1 == null && other.type2 == null) || (type1 != null && type1 == other.type2);
-    	typesEqual &= (type2 == null && other.type1 == null) || (type2 != null && type2 == other.type1);
+		typesEqual = (type1 == null && other.type2 == null) || (type1 != null && type1 == other.type2);
+		typesEqual &= (type2 == null && other.type1 == null) || (type2 != null && type2 == other.type1);
 
-    	if (typesEqual) {
-        	// A.t1, B.t2, A.t2, B.t1 -> all null
-        	// A.t1, B.t2 -> all null && A.t2 == B.t1
-        	// A.t1 == B.t2 && A.t2, B.t1 -> null
-        	// A.t1 == B.t2 && A.t2 == B.t1
-    		return true;
-    	}
+		if (typesEqual) {
+			// A.t1, B.t2, A.t2, B.t1 -> all null
+			// A.t1, B.t2 -> all null && A.t2 == B.t1
+			// A.t1 == B.t2 && A.t2, B.t1 -> null
+			// A.t1 == B.t2 && A.t2 == B.t1
+			return true;
+		}
 
-    	typesEqual = type1 == null && type2 == type1 && type2 == other.type2
-    			|| type2 == null && type1 == other.type1 && type1 == other.type2
-    			|| other.type1 == null && other.type2 == type1 && other.type2 == type2
-    			|| other.type2 == null && other.type1 == type1 && other.type1 == type2;
-    	// The pattern for true is described below.
-    	// A.t1 == null, A.t2 == B.t1 == B.t2
-    	// A.t2 == null, A.t1 == B.t1 == B.t2
-    	// B.t1 == null, A.t1 == A.t2 == B.t2
-    	// B.t2 == null, A.t1 == A.t2 == B.t1
-    	return typesEqual;
-    }
+		typesEqual = type1 == null && type2 == type1 && type2 == other.type2
+				|| type2 == null && type1 == other.type1 && type1 == other.type2
+				|| other.type1 == null && other.type2 == type1 && other.type2 == type2
+				|| other.type2 == null && other.type1 == type1 && other.type1 == type2;
+		// The pattern for true is described below.
+		// A.t1 == null, A.t2 == B.t1 == B.t2
+		// A.t2 == null, A.t1 == B.t1 == B.t2
+		// B.t1 == null, A.t1 == A.t2 == B.t2
+		// B.t2 == null, A.t1 == A.t2 == B.t1
+		return typesEqual;
+	}
 
 }

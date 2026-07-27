@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
-import jp.brainjuice.pokego.utils.BjUtils;
-import jp.brainjuice.pokego.utils.LastUpdatedMap;
+import jp.brainjuice.pokego.utils.LastUpdateService;
+import jp.brainjuice.pokego.utils.LastUpdateService.Keys;
 import jp.brainjuice.pokego.web.search.form.res.others.DynamaxImplPokemonResponse;
 
 @Service
@@ -16,13 +16,13 @@ public class DynamaxImplPokemonService {
 
 	private GoPokedexRepository goPokedexRepository;
 
-	private LastUpdatedMap lastUpdatedMap;
+	private LastUpdateService lastUpdateService;
 
 	public DynamaxImplPokemonService(
 			GoPokedexRepository goPokedexRepository,
-			LastUpdatedMap lastUpdatedMap) {
+			LastUpdateService lastUpdateService) {
 		this.goPokedexRepository = goPokedexRepository;
-		this.lastUpdatedMap = lastUpdatedMap;
+		this.lastUpdateService = lastUpdateService;
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class DynamaxImplPokemonService {
 		res.setDynamaxList(flatedGpList);
 
 		// 最終更新日
-		String lastUpdated = lastUpdatedMap.get(LastUpdatedMap.Keys.dynamaxImplPokemon, BjUtils.sdfYmd);
+		String lastUpdated = lastUpdateService.getYmd(Keys.dynamaxImplPokemon);
 		res.setLastUpdated(lastUpdated);
 
 	}

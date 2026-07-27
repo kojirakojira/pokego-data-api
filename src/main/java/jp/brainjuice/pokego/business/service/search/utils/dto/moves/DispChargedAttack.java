@@ -12,6 +12,8 @@ import lombok.ToString;
 @ToString
 public class DispChargedAttack {
 
+	private int no;
+
 	/** 技ID(タイプコード2桁 + (ノーマル技(1) or スペシャル技(2))1桁 + 連番3桁) */
 	private String moveId;
 
@@ -21,7 +23,15 @@ public class DispChargedAttack {
 	/** タイプ */
 	private TypeEnum type;
 
-	private ChargedGymParam gym;
+	private ChargedGymParam gymRaid;
 
 	private ChargedPvpParam pvp;
+
+	public DispChargedAttack(String moveId, String name, TypeEnum type, ChargedGymParam gymRaid, ChargedPvpParam pvp) {
+		this.moveId = moveId;
+		this.name = name;
+		this.type = type;
+		this.gymRaid = gymRaid;
+		this.pvp = pvp;
+	}
 }

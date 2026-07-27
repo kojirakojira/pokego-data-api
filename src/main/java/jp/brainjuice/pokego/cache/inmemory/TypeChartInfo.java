@@ -59,12 +59,12 @@ public class TypeChartInfo {
 	private static final double DEF_LOW_WEIGHT = 2.0 + 5.0;
 	private static final double DEF_VERY_LOW_WEIGHT = 3.0 + 5.0;
 	private static final double DEF_MIN_WEIGHT = 4.0 + 5.0;
-	
+
 	// 評価スコアの最大値、最低値（総合評価）
 	private static final int TOTAL_MAX_SCORE = 5;
 	private static final int TOTAL_MIN_SCORE = 2;
 	private static final BiFunction<Double, Double, Function<Double, Double>> totalScoreFunc = (atk1, atk2) -> (def) -> (atk1 + atk2) / 2 + def;
-	
+
 	// 評価スコアの最大値、最低値（こうげき時）
 	private static final int ATK_MAX_SCORE = 5;
 	private static final int ATK_MIN_SCORE = 2;
@@ -510,13 +510,13 @@ public class TypeChartInfo {
 	 */
 	private double getDefenderPoint(TypeEnum type1, TypeEnum type2) {
 		double score = 0d;
-		
+
 		// タイプ1
 		TypeStrength defenderTypeStrength1 = getDefenderTypeStrength(type1);
 		List<TypeEffectiveEnum> effectiveList1 = defenderTypeStrength1.mapping().entrySet().stream()
 				.map(Map.Entry::getValue)
 				.collect(Collectors.toList());
-		
+
 		// タイプ2
 		List<TypeEffectiveEnum> effectiveList2 = null;
 		// タイプ1とタイプ2が一致している時は、type2はないものとする。
@@ -526,20 +526,20 @@ public class TypeChartInfo {
 					.map(Map.Entry::getValue)
 					.collect(Collectors.toList());
 		}
-		
+
 		// タイプ1で初期化
 		List<TypeEffectiveEnum> effectiveList = effectiveList1;
 		if (effectiveList2 != null) {
 			effectiveList = new ArrayList<>();
 			for (int i = 0; i < effectiveList1.size(); i++) {
-				double effective = 
-						effectiveList1.get(i).getDamageMultiplier() * 
+				double effective =
+						effectiveList1.get(i).getDamageMultiplier() *
 						effectiveList2.get(i).getDamageMultiplier();
 
 				effectiveList.add(TypeEffectiveEnum.lookup(effective));
 			}
 		}
-		
+
 		for (TypeEffectiveEnum effective: effectiveList) {
 			double s = switch (effective) {
 			case MAX -> DEF_MAX_WEIGHT; // ×2.56
@@ -585,7 +585,7 @@ public class TypeChartInfo {
 		// keyは攻撃する側のタイプ、valueは倍率。
 		final Map<TypeEnum, Double> strengthMap = typeChartMap.entrySet().stream()
 				.collect(Collectors.toMap(
-						entry -> entry.getKey(), 
+						entry -> entry.getKey(),
 						entry -> {
 							// 各要素を取得し、putする。
 							final double strength = entry.getValue().get(type);
@@ -630,7 +630,7 @@ public class TypeChartInfo {
 	 * @throws PokemonDataInitException
 	 */
 	@PostConstruct
-	public void init() throws PokemonDataInitException {
+	public void init() {
 
 		// CSVファイルの内容をメモリに抱える。
 		try {
@@ -664,7 +664,7 @@ public class TypeChartInfo {
 			if (minAtkScore > atkScore) {
 				minAtkScore = atkScore;
 			}
-			
+
 			for (TypeEnum type2: TypeEnum.values()) {
 				double defScore = getDefenderPoint(type1, type2);
 				if (maxDefScore < defScore) {
@@ -682,7 +682,7 @@ public class TypeChartInfo {
 				if (minTotalScore > totalScore) {
 					minTotalScore = totalScore;
 				}
-				
+
 			}
 		}
 

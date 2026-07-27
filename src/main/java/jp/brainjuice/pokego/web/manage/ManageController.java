@@ -1,22 +1,26 @@
 package jp.brainjuice.pokego.web.manage;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jp.brainjuice.pokego.business.service.manage.LoginService;
-import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
+import jp.brainjuice.pokego.business.service.manage.masterFileAnalyzer.MasterFileAnalyzerService;
 import jp.brainjuice.pokego.filter.jwt.BjJwtUtils;
+import jp.brainjuice.pokego.utils.LastUpdateService;
 import jp.brainjuice.pokego.utils.exception.AuthenticationFailedException;
-import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.utils.exception.UserUnmatchException;
+import jp.brainjuice.pokego.web.manage.req.LastUpdateSaveRequest;
 import jp.brainjuice.pokego.web.manage.req.LoginRequest;
+import jp.brainjuice.pokego.web.manage.req.MasterFileAnalyzeRequest;
 import jp.brainjuice.pokego.web.manage.res.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,29 +28,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 @Slf4j
 public class ManageController {
-	
+
 	private LoginService loginService;
-	
-	private ViewsCacheProvider viewsCacheProvider;
-	
+
+	private MasterFileAnalyzerService masterFileAnalyzerService;
+
+	private LastUpdateService lastUpdateService;
+
 	public ManageController(
 			LoginService loginService,
-			ViewsCacheProvider viewsCacheProvider) {
+			MasterFileAnalyzerService masterFileAnalyzerService,
+			LastUpdateService lastUpdateService) {
 		this.loginService = loginService;
-		this.viewsCacheProvider = viewsCacheProvider;
-	}
-
-	@PostMapping("/secure/cleanupRedis")
-	public String cleanUpRedis(String userId,
-			HttpServletRequest req) throws Exception {
-		if (!BjJwtUtils.checkUser(req, userId)) {
-			throw new UserUnmatchException();
-		}
-
-		viewsCacheProvider.cleanupPageTempView();
-		viewsCacheProvider.cleanupPokemonTempView();
-		
-		return "OK";
+		this.masterFileAnalyzerService = masterFileAnalyzerService;
+		this.lastUpdateService = lastUpdateService;
 	}
 
 	@PostMapping("/secure/manage")
@@ -58,24 +53,63 @@ public class ManageController {
 		return true;
 	}
 
+	@PostMapping(value = "/secure/masterFileAnalyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public boolean masterFileAnalyze(
+			MasterFileAnalyzeRequest masterFileAnalyzeRequest,
+			HttpServletRequest req) throws Exception {
+
+		if (!BjJwtUtils.checkUser(req, masterFileAnalyzeRequest.getUserId())) {
+			throw new UserUnmatchException();
+		}
+
+		masterFileAnalyzerService.analyze(
+				masterFileAnalyzeRequest.getMasterFile(),
+				masterFileAnalyzeRequest.isPrintRequestedQuickMoves(),
+				masterFileAnalyzeRequest.isPrintRequestedCinematicMoves(),
+				masterFileAnalyzeRequest.isPrintRequestedMoveEachPokemon(),
+				masterFileAnalyzeRequest.isShouldSaveFastAttack(),
+				masterFileAnalyzeRequest.isShouldSaveChargedAttack());
+
+		return true;
+	}
+
+	@PostMapping("/secure/manage/lastUpdateGetFormat")
+	public Map<String, String> lastUpdateGetFormat(String userId,
+			HttpServletRequest req) throws Exception {
+
+		if (!BjJwtUtils.checkUser(req, userId)) {
+			throw new UserUnmatchException();
+		}
+
+		String format = lastUpdateService.getFormat();
+
+		return Map.of("format", format);
+	}
+
+	@PostMapping("/secure/manage/lastUpdateSave")
+	public Map<String, String> lastUpdateSave(@Valid LastUpdateSaveRequest lastUpdReq,
+			HttpServletRequest req) throws Exception {
+
+		if (!BjJwtUtils.checkUser(req, lastUpdReq.getUserId())) {
+			throw new UserUnmatchException();
+		}
+
+		String format = lastUpdateService.saveYmd(lastUpdReq.getYmdStr());
+
+		return Map.of("format", format, "result", "OK");
+	}
+
 	@PostMapping("/manage/login")
 	public LoginResponse login(@Valid LoginRequest loginReq,
 			HttpServletRequest req) throws Exception {
-		
+
 		LoginResponse res = loginService.login(
-				loginReq.getUserId(), 
+				loginReq.getUserId(),
 				loginReq.getPassword(),
 				loginReq.getMfaCode(),
 				req);
-		
-		return res;
-	}
 
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+		return res;
 	}
 
 	@ExceptionHandler(AuthenticationFailedException.class)
@@ -83,12 +117,5 @@ public class ManageController {
 		String errMsg = "認証に失敗しました。";
 		log.error(errMsg, e);
 		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -2,8 +2,17 @@ package jp.brainjuice.pokego.cache.service;
 
 import org.springframework.stereotype.Service;
 
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPageList;
-import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPage;
+import jp.brainjuice.pokego.cache.inmemory.topic.data.TopicPokemon;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * TopicListManagerにアクセスするためのプロバイダクラスです。<br>
@@ -13,12 +22,17 @@ import jp.brainjuice.pokego.cache.inmemory.topic.TopicPokemonList;
  * @see TopicListManager
  */
 @Service
+@Slf4j
 public class TopicListProvider {
 
 	private TopicListManager topicListManager;
+	private StringRedisTemplate redisTemplate;
+	private ObjectMapper objectMapper;
 
-	public TopicListProvider(TopicListManager topicListManager) {
+	public TopicListProvider(TopicListManager topicListManager, StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
 		this.topicListManager = topicListManager;
+		this.redisTemplate = redisTemplate;
+		this.objectMapper = objectMapper;
 	}
 
 	/**
@@ -26,8 +40,17 @@ public class TopicListProvider {
 	 *
 	 * @return
 	 */
-	public TopicPageList getTopicPageList() {
-		return topicListManager.getTopicPageList();
+	public List<TopicPage> getTopicPageList() {
+		String json = redisTemplate.opsForValue().get("cache:topic:page");
+		if (json != null) {
+			try {
+				return objectMapper.readValue(json, new TypeReference<List<TopicPage>>() {});
+			} catch (Exception e) {
+				log.error("Failed to parse topic page list from redis", e);
+			}
+		}
+		// キャッシュが無い場合は空リストを返す
+		return Collections.emptyList();
 	}
 
 	/**
@@ -35,8 +58,17 @@ public class TopicListProvider {
 	 *
 	 * @return
 	 */
-	public TopicPokemonList getTopicPokemonList() {
-		return topicListManager.getTopicPokemonList();
+	public List<TopicPokemon> getTopicPokemonList() {
+		String json = redisTemplate.opsForValue().get("cache:topic:pokemon");
+		if (json != null) {
+			try {
+				return objectMapper.readValue(json, new TypeReference<List<TopicPokemon>>() {});
+			} catch (Exception e) {
+				log.error("Failed to parse topic pokemon list from redis", e);
+			}
+		}
+		// キャッシュが無い場合は空リストを返す
+		return Collections.emptyList();
 	}
 
 	/**

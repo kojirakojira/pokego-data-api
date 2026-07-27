@@ -30,32 +30,38 @@ public abstract class ResearchRequestImpl implements ResearchRequest {
 	/** 実装済み */
 	private boolean impled;
 	private boolean negaImpled;
+	/** リリース年月 */
+	private int releaseDateStart;
+	private int releaseDateEnd;
 	/** 強ポケ補正 */
 	private boolean tooStrong;
 	private boolean negaTooStrong;
 	/**
 	 * 地域
+	 * 
 	 * @see RegionEnum
 	 */
 	private List<String> region;
 	private boolean negaRegion;
 	/**
 	 * タイプ１
+	 * 
 	 * @see TypeEnum
 	 */
 	private String type1;
 	/**
 	 * タイプ２
+	 * 
 	 * @see TypeEnum
 	 */
 	private String type2;
 	/**
 	 * 世代
+	 * 
 	 * @see GenNameEnum
-	  */
+	 */
 	private List<String> gen;
 	private boolean negaGen;
-
 
 	/**
 	 * 閲覧数カウントをオフにする

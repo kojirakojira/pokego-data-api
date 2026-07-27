@@ -1,8 +1,5 @@
 package jp.brainjuice.pokego.web.search;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +12,6 @@ import jp.brainjuice.pokego.business.service.search.catchCp.RaidResearchService;
 import jp.brainjuice.pokego.business.service.search.catchCp.RocketResearchService;
 import jp.brainjuice.pokego.business.service.search.catchCp.WildResearchService;
 import jp.brainjuice.pokego.business.service.search.utils.ValidationService;
-import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.catchCp.DynamaxRequest;
 import jp.brainjuice.pokego.web.search.form.req.catchCp.EggsRequest;
 import jp.brainjuice.pokego.web.search.form.req.catchCp.FrTaskRequest;
@@ -102,8 +98,6 @@ public class CatchCpResearchController {
 	@GetMapping("/wild")
 	public WildResponse wild(WildRequest wildReq) throws Exception {
 
-		validationService.validation(wildReq);
-
 		WildResponse wildRes = new WildResponse();
 		wildResRse.execute(wildReq, wildRes, wildResearchService);
 		return wildRes;
@@ -118,8 +112,6 @@ public class CatchCpResearchController {
 	 */
 	@GetMapping("/raid")
 	public RaidResponse raid(RaidRequest raidReq) throws Exception {
-
-		validationService.validation(raidReq);
 
 		RaidResponse raidRes = new RaidResponse();
 		raidResRse.execute(raidReq, raidRes, raidResearchService);
@@ -136,8 +128,6 @@ public class CatchCpResearchController {
 	 */
 	@GetMapping("/frTask")
 	public FrTaskResponse frTask(FrTaskRequest frTaskReq) throws Exception {
-
-		validationService.validation(frTaskReq);
 
 		FrTaskResponse frTaskRes = new FrTaskResponse();
 		frTaskResRse.execute(frTaskReq, frTaskRes, frTaskResearchService);
@@ -156,8 +146,6 @@ public class CatchCpResearchController {
 	@GetMapping("/eggs")
 	public EggsResponse eggs(EggsRequest eggsReq) throws Exception {
 
-		validationService.validation(eggsReq);
-
 		EggsResponse eggsRes = new EggsResponse();
 		eggsResRse.execute(eggsReq, eggsRes, eggsResearchService);
 		return eggsRes;
@@ -173,8 +161,6 @@ public class CatchCpResearchController {
 	 */
 	@GetMapping("/rocket")
 	public RocketResponse shadow(RocketRequest rocketReq) throws Exception {
-
-		validationService.validation(rocketReq);
 
 		RocketResponse shadowRes = new RocketResponse();
 		rocketResRse.execute(rocketReq, shadowRes, rocketResearchService);
@@ -192,24 +178,8 @@ public class CatchCpResearchController {
 	@GetMapping("/dynamax")
 	public DynamaxResponse dynamax(DynamaxRequest dynamaxReq) throws Exception {
 
-		validationService.validation(dynamaxReq);
-
 		DynamaxResponse dynamaxRes = new DynamaxResponse();
 		dynamaxResRse.execute(dynamaxReq, dynamaxRes, dynamaxResearchService);
 		return dynamaxRes;
-	}
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -12,14 +12,14 @@ import lombok.ToString;
 public class ChargedPvpParam {
 
 	/** PvP時のダメージ */
-	private int pvpPower;
+	private double pvpPower;
 
 	/** ゲージ増加量（PvP時） */
 	private int energy;
 
 	/** Power Per Energy. round(pvpPower / abs(energyIncrAmount), 2) */
-	private float dpe;
+	private double dpe;
 
-	/** 技のバフ・デバフ効果。なかったらnull */
+	/** 技のバフ・デバフ効果 */
 	private Buff buff;
 }

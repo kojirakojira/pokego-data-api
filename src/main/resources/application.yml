@@ -21,6 +21,11 @@ spring:
       use_sql_comments: true
     open-in-view: false
   data.redis.url: ${REDIS_URL:redis://localhost:6379}
+  servlet.multipart:
+    max-file-size: 32MB
+    max-request-size: 32MB
+  messages:
+    basename: application-messages
 
 jwt.cryptoKey: ${CRYPTO_KEY:}
 
@@ -64,3 +69,11 @@ aws:
     endpoint: https://s3-us-west-1.amazonaws.com/static.brainjuice.jp/
     s3BacketName: static.brainjuice.jp
     suffix: -test
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  server:
+    port: 8090

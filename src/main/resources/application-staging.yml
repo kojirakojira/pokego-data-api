@@ -21,6 +21,11 @@ spring:
       use_sql_comments: true
     open-in-view: false
   data.redis.url: ${REDIS_URL}
+  servlet.multipart:
+    max-file-size: 32MB
+    max-request-size: 32MB
+  messages:
+    basename: application-messages
 
 jwt.cryptoKey: ${CRYPTO_KEY:}
 

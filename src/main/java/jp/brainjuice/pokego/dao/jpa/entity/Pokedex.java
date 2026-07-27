@@ -33,6 +33,10 @@ public class Pokedex implements Serializable {
 	@Column(nullable = false, length = 20)
 	private String name;
 
+	/** ポケモン英語名 */
+	@Column(name = "name_en", nullable = false, length = 50)
+	private String nameEn;
+
 	/** HP */
 	@Column(nullable = false)
 	private int hp;
@@ -84,11 +88,11 @@ public class Pokedex implements Serializable {
 	@Column(length = 256)
 	private String image2;
 
-	/** 実装フラグ */
-	@Column(name = "impl_flg", nullable = false, length = 20)
-	private boolean implFlg;
+	/** 公式図鑑ID */
+	@Column(name = "official_zukan_id", columnDefinition = "bpchar")
+	private String officialZukanId;
 
-	/** 実装フラグ */
+	/** メガシンカ前の図鑑ID */
 	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
 	private String preMegaPokedexId;
 

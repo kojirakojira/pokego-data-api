@@ -2,10 +2,12 @@ package jp.brainjuice.pokego.business.service.search.pokeFilter;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +19,7 @@ import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonEditUtils;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexSpecifications;
 import jp.brainjuice.pokego.dao.jpa.dto.FilterParam;
+import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.web.search.form.res.elem.DispFilterParam;
 
 /**
@@ -68,6 +71,14 @@ public class PokemonFilterValueUtils {
 		if (fv.isImpled()) {
 			retMap.put(FilterEnum.impled, new FilterParam(fv.isImpled(), fv.isNegaImpled()));
 		}
+		// リリース年月（開始）
+		if (fv.getReleaseDateStart() != null) {
+			retMap.put(FilterEnum.releaseDateStart, new FilterParam(fv.getReleaseDateStart()));
+		}
+		// リリース年月（終了）
+		if (fv.getReleaseDateEnd() != null) {
+			retMap.put(FilterEnum.releaseDateEnd, new FilterParam(fv.getReleaseDateEnd()));
+		}
 		// 強ポケ補正
 		if (fv.isTooStrong()) {
 			retMap.put(FilterEnum.tooStrong, new FilterParam(fv.isTooStrong(), fv.isNegaTooStrong()));
@@ -82,7 +93,6 @@ public class PokemonFilterValueUtils {
 			retMap.put(FilterEnum.gen, new FilterParam(fv.getGenList(), fv.isNegaGen()));
 		}
 
-
 		return retMap;
 	}
 
@@ -94,54 +104,81 @@ public class PokemonFilterValueUtils {
 	 */
 	public static List<DispFilterParam> convDisp(Map<FilterEnum, FilterParam> filterMap) {
 
-		List<DispFilterParam> retList = filterMap.entrySet().stream().map(entry -> {
-			DispFilterParam dfp = new DispFilterParam();
-			FilterEnum key = entry.getKey();
-			Object value = entry.getValue().getFilterValue();
-			boolean negate = entry.getValue().isNegate();
+		return Arrays.stream(FilterEnum.values())
+				.filter(filterMap::containsKey)
+				.flatMap(key -> {
+					if (key == FilterEnum.releaseDateStart || key == FilterEnum.releaseDateEnd) {
+						if (key == FilterEnum.releaseDateEnd && filterMap.containsKey(FilterEnum.releaseDateStart)) {
+							// start処理時にまとめて出力されるため、end単独での出力はスキップ
+							return Stream.empty();
+						}
 
-			// nameのput
-			dfp.setName(key.getJpn());
+						StringBuilder sb = new StringBuilder();
+						if (filterMap.containsKey(FilterEnum.releaseDateStart)) {
+							// リリース年月（開始）
+							Object value = filterMap.get(FilterEnum.releaseDateStart).getFilterValue();
+							sb.append(BjUtils.formatDate((Date) value, BjUtils.sdfYmSlash));
+							sb.append(" ");
+						}
+						sb.append("〜");
+						if (filterMap.containsKey(FilterEnum.releaseDateEnd)) {
+							// リリース年月（終了）
+							sb.append(" ");
+							Object value = filterMap.get(FilterEnum.releaseDateEnd).getFilterValue();
+							sb.append(BjUtils.formatDate((Date) value, BjUtils.sdfYmSlash));
+						}
+						DispFilterParam releaseDate = new DispFilterParam(FilterEnum.releaseDateStart.getJpn(),
+								sb.toString(), "");
+						return Stream.of(releaseDate);
+					}
 
-			// filterValueのput
-			String filterValue = "";
-			switch (key) {
-			case type:
-			case twoType: {
-				// タイプ
-				filterValue = editNegateStr(getStrValue(value, TypeEnum.class), negate);
-				break;
-			}
-			case finEvo:
-			case mega:
-			case dynamax:
-			case gigantamax:
-			case impled:
-			case tooStrong:
-				// 最終進化、メガシンカ、ダイマックス、キョダイマックス、実装済み、強ポケ補正
-				filterValue = (boolean) value && negate ? "否定による絞り込み" : "絞り込む";
-				break;
+					// 以下、リリース年月以外の絞り込み条件
+					DispFilterParam dfp = new DispFilterParam();
+					FilterParam param = filterMap.get(key);
+					Object value = param.getFilterValue();
+					boolean negate = param.isNegate();
 
-			case region: {
-				filterValue = editNegateStr(getStrValue(value, RegionEnum.class), negate);
-				break;
-			}
-			case gen: {
-				filterValue = editNegateStr(getStrValue(value, GenNameEnum.class), negate);
-				break;
-			}
-			}
-			dfp.setFilterValue(filterValue);
+					dfp.setName(key.getJpn());
 
-			// negateのput
-			if (negate) {
-				dfp.setNegate("する");
-			}
+					String filterValue = "";
+					switch (key) {
+						case type:
+						case twoType: {
+							// タイプ
+							filterValue = editNegateStr(getStrValue(value, TypeEnum.class), negate);
+							break;
+						}
+						case finEvo:
+						case mega:
+						case dynamax:
+						case gigantamax:
+						case impled:
+						case tooStrong:
+							// 最終進化、メガシンカ、ダイマックス、キョダイマックス、実装済み、強ポケ補正
+							filterValue = (boolean) value && negate ? "否定による絞り込み" : "絞り込む";
+							break;
+						case region: {
+							filterValue = editNegateStr(getStrValue(value, RegionEnum.class), negate);
+							break;
+						}
+						case gen: {
+							filterValue = editNegateStr(getStrValue(value, GenNameEnum.class), negate);
+							break;
+						}
+						case releaseDateStart:
+						case releaseDateEnd:
+							// 到達しない
+							break;
+					}
+					dfp.setFilterValue(filterValue);
 
-			return dfp;
-		}).collect(Collectors.toList());
+					if (negate) {
+						dfp.setNegate("する");
+					}
 
-		return retList;
+					return Stream.of(dfp);
+				})
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -157,8 +194,9 @@ public class PokemonFilterValueUtils {
 		String ret = "";
 		if (value instanceof List) {
 			// Listの場合
-			List<String> vList = ((List<?>) value).stream().map((v) ->
-			Enum.valueOf(clazz, PokemonEditUtils.getStrName(v)).getJpn()).collect(Collectors.toList());
+			List<String> vList = ((List<?>) value).stream()
+					.map((v) -> Enum.valueOf(clazz, PokemonEditUtils.getStrName(v)).getJpn())
+					.collect(Collectors.toList());
 			ret = StringUtils.join(vList, ", ");
 
 		} else if (value instanceof Enum || value instanceof String) {

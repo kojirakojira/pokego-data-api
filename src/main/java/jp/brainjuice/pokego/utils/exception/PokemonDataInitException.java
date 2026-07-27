@@ -6,7 +6,7 @@ package jp.brainjuice.pokego.utils.exception;
  * @author saibabanagchampa
  *
  */
-public class PokemonDataInitException extends Exception {
+public class PokemonDataInitException extends RuntimeException {
 
 	public PokemonDataInitException() {
 		super();

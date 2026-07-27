@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.dao.jpa.entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,9 +38,13 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Column(name = "pokedex_id", nullable = false, columnDefinition = "bpchar")
 	private String pokedexId;
 
-	/** ポケモン */
+	/** ポケモン日本語名 */
 	@Column(nullable = false, length = 20)
 	private String name;
+
+	/** ポケモン英語名 */
+	@Column(name = "name_en", nullable = false, length = 50)
+	private String nameEn;
 
 	/** こうげき */
 	@Column(nullable = false)
@@ -80,10 +85,6 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Column(length = 256)
 	private String image2;
 
-	/** 実装フラグ */
-	@Column(name = "impl_flg", nullable = false)
-	private boolean implFlg;
-
 	/** リージョン、メガ（図鑑IDの5桁目） */
 	@Column(nullable = false, columnDefinition = "bpchar")
 	private String region;
@@ -96,6 +97,14 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Column(name = "fin_evo", nullable = false)
 	private boolean finEvo;
 
+	/** リリース年月(ポケモンGOのリリース年月) */
+	@Column(name = "release_date", nullable = false)
+	private LocalDate releaseDate;
+
+	/** 実装フラグ */
+	@Column(name = "impl_flg", nullable = false)
+	private boolean implFlg;
+
 	/** ダイマックス実装済みフラグ */
 	@Column(name = "dynamax_impl_flg", nullable = false)
 	private boolean dynamaxImplFlg;
@@ -104,23 +113,29 @@ public class GoPokedex implements Serializable, Cloneable {
 	@Column(name = "gigantamax_impl_flg", nullable = false)
 	private boolean gigantamaxImplFlg;
 
+	/** 公式図鑑ID */
+	@Column(name = "official_zukan_id", columnDefinition = "bpchar")
+	private String officialZukanId;
+
 	/** メガシンカする場合の、メガシンカ前の図鑑ID */
 	@Column(name = "pre_mega_pokedex_id", columnDefinition = "bpchar")
 	private String preMegaPokedexId;
 
 	/**
 	 * (非 Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-        return pokedexId.hashCode();
+		return pokedexId.hashCode();
 	}
 
-    /**
-     * (非 Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+	/**
+	 * (非 Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 

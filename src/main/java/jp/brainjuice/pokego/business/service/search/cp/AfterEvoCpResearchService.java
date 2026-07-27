@@ -1,6 +1,8 @@
 package jp.brainjuice.pokego.business.service.search.cp;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -9,7 +11,7 @@ import jp.brainjuice.pokego.business.service.search.ResearchService;
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue;
 import jp.brainjuice.pokego.business.service.search.pokeFilter.dto.SearchValue.ParamsEnum;
 import jp.brainjuice.pokego.business.service.search.utils.PokemonGoUtils;
-import jp.brainjuice.pokego.business.service.search.utils.dto.GoPokedexAndCp;
+import jp.brainjuice.pokego.business.service.search.utils.dto.GppAndCp;
 import jp.brainjuice.pokego.business.service.search.utils.evo.EvolutionProvider;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.Evolution;
@@ -69,16 +71,13 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 			return;
 		}
 
-
 		res.setPl(pl);
-		
+
 		List<Evolution> lineageList = evolutionProvider.getLineageList(sp);
 		List<GoPokedex> gpList = goPokedexRepository.findAllById(
-				lineageList.stream().map(Evolution::getPokedexId).toList()
-				);
-		
+				Objects.requireNonNull(lineageList.stream().map(Evolution::getPokedexId).toList()));
+
 		List<String> afEvolPidList = evolutionProvider.getAllAfterEvolution(sp.getPokedexId(), lineageList);
-		
 
 		// 進化後のポケモン
 		List<GoPokedex> afEvolGpList = gpList.stream()
@@ -95,7 +94,7 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	}
 
 	/**
-	 * GoPokedexのリストを、GoPokedexAndCpのリストに変換します。
+	 * GoPokedexのリストを、GppAndCpのリストに変換します。
 	 *
 	 * @param pidList
 	 * @param iva
@@ -104,12 +103,13 @@ public class AfterEvoCpResearchService implements ResearchService<AfterEvoCpResp
 	 * @param pl
 	 * @return
 	 */
-	private List<GoPokedexAndCp> convGpAndCpList(List<GoPokedex> pidList, int iva, int ivd, int ivh, String pl) {
+	private List<GppAndCp> convGpAndCpList(List<GoPokedex> pidList, int iva, int ivd, int ivh, String pl) {
 
+		AtomicInteger counter = new AtomicInteger();
 		return pidList.stream()
 				.map(gp -> {
 					int cp = pokemonGoUtils.calcCp(gp, iva, ivd, ivh, pl);
-					return new GoPokedexAndCp(gp, cp);
+					return new GppAndCp(counter.incrementAndGet(), gp, null, cp);
 				})
 				.collect(Collectors.toList());
 	}

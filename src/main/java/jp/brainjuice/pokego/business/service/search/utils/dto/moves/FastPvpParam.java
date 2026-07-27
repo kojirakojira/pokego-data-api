@@ -12,7 +12,7 @@ import lombok.ToString;
 public class FastPvpParam {
 
 	/** PvP時のダメージ */
-	private int pvpPower;
+	private double pvpPower;
 
 	/** ゲージ増加量（PvP時） */
 	private int energy;
@@ -21,8 +21,8 @@ public class FastPvpParam {
 	private int turns;
 
 	/** Damage Per Turns. round(pvpPower / turns, 2) */
-	private float dpt;
+	private double dpt;
 
 	/** Energy Per Turns. round(energy / turns, 2) */
-	private float ept;
+	private double ept;
 }

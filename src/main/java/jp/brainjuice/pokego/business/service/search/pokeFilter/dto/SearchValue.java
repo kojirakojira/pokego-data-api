@@ -83,8 +83,9 @@ public class SearchValue {
 		situation,
 		/** statisticsをレスポンスで返却するかのフラグ */
 		statsRequired,
+		/** 制限数。ある程度汎用的に使おうと思う */
+		limit,
 		;
-
 	}
 
 	/**

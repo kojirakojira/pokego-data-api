@@ -3,15 +3,13 @@ package jp.brainjuice.pokego.web.search;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
 import jp.brainjuice.pokego.business.service.search.general.PokemonSearchService;
+import jp.brainjuice.pokego.business.service.search.race.RaceDiffFrequencyResearchService;
 import jp.brainjuice.pokego.business.service.search.race.RaceDiffService;
 import jp.brainjuice.pokego.business.service.search.race.RaceResearchService;
 import jp.brainjuice.pokego.business.service.search.utils.dto.MultiSearchResult;
@@ -20,6 +18,8 @@ import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.race.RaceDiffRequest;
 import jp.brainjuice.pokego.web.search.form.req.race.RaceRequest;
 import jp.brainjuice.pokego.web.search.form.res.elem.PidAndName;
+import jp.brainjuice.pokego.web.search.form.req.race.RaceDiffFrequencyRequest;
+import jp.brainjuice.pokego.web.search.form.res.race.RaceDiffFrequencyResponse;
 import jp.brainjuice.pokego.web.search.form.res.race.RaceDiffResponse;
 import jp.brainjuice.pokego.web.search.form.res.race.RaceResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +42,16 @@ public class RaceController {
 
 	private RaceDiffService raceDiffService;
 
+	private RaceDiffFrequencyResearchService raceDiffFrequencyResearchService;
+	private ResearchServiceExecutor<RaceDiffFrequencyResponse> raceDiffFrequencyResRse;
+
 	private ViewsCacheProvider viewsCacheProvider;
 
 	public RaceController(
-			RaceDiffService raceDiffService,
 			RaceResearchService raceResearchService, ResearchServiceExecutor<RaceResponse> raceResRse,
+			RaceDiffService raceDiffService,
+			RaceDiffFrequencyResearchService raceDiffFrequencyResearchService,
+			ResearchServiceExecutor<RaceDiffFrequencyResponse> raceDiffFrequencyResRse,
 			PokemonSearchService pokemonSearchService,
 			ViewsCacheProvider viewsCacheProvider) {
 
@@ -59,6 +64,10 @@ public class RaceController {
 
 		// 種族値比較
 		this.raceDiffService = raceDiffService;
+
+		// 種族値比較(単一ポケモンの最も頻繁に検索される比較検索)
+		this.raceDiffFrequencyResearchService = raceDiffFrequencyResearchService;
+		this.raceDiffFrequencyResRse = raceDiffFrequencyResRse;
 
 		this.viewsCacheProvider = viewsCacheProvider;
 
@@ -83,31 +92,32 @@ public class RaceController {
 	 * 種族値比較用API（Content-Type:application/jsonで取得する。）<br>
 	 * 仕様が少し複雑なため、以下に<span style="color:red;">主要な</span>パターンを示す。
 	 * <ol>
-	 *   <li>pid全部揃ってるパターン
-	 *     <ul>
-	 *       <li>→nameの有無に関わらず必ずid検索
-	 *       <li>例：[{ id: "0001N01", name: "フシギダネ" }, { id: "0003N01", name: "" }]</li>
-	 *       <li>idに重複がある場合
-	 *         <ul>
-	 *           <li>入力チェックエラーとして処理する。レスポンスのmsr.psrArr[i].messageでメッセージ内容を確認できる。</li>
-	 *           <li>例：[{ id: "0001N01", name: "フシギダネ" }, { id: "0003N01", name: "" }, { id: "0003N01", name: "" }]</li>
-	 *         </ul>
-	 *       </li>
-	 *     </ul>
-	 *   </li>
-	 *   <li>pid全部は揃ってないパターン
-	 *     <ul>
-	 *       <li>→name検索として処理する
-	 *       <li>例：[{ id: "", name: "フシギダネ" }, { id: "", name: "フシギバナ" }]</li>
-	 *       <li>idが存在している場合
-	 *         <ul>
-	 *           <li>idが存在しているものはname検索しない。以下の例の場合は、フシギバナだけ検索する</li>
-	 *           <li>name検索後、すべて一意にポケモンを特定できたら、その後はid検索として振る舞う</li>
-	 *           <li>例：[{ id: "0001N01", name: "" }, { id: "", name: "フシギバナ" }]</li>
-	 *         </ul>
-	 *       </li>
-	 *     </ul>
-	 *   </li>
+	 * <li>pid全部揃ってるパターン
+	 * <ul>
+	 * <li>→nameの有無に関わらず必ずid検索
+	 * <li>例：[{ id: "0001N01", name: "フシギダネ" }, { id: "0003N01", name: "" }]</li>
+	 * <li>idに重複がある場合
+	 * <ul>
+	 * <li>入力チェックエラーとして処理する。レスポンスのmsr.psrArr[i].messageでメッセージ内容を確認できる。</li>
+	 * <li>例：[{ id: "0001N01", name: "フシギダネ" }, { id: "0003N01", name: "" }, { id:
+	 * "0003N01", name: "" }]</li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </li>
+	 * <li>pid全部は揃ってないパターン
+	 * <ul>
+	 * <li>→name検索として処理する
+	 * <li>例：[{ id: "", name: "フシギダネ" }, { id: "", name: "フシギバナ" }]</li>
+	 * <li>idが存在している場合
+	 * <ul>
+	 * <li>idが存在しているものはname検索しない。以下の例の場合は、フシギバナだけ検索する</li>
+	 * <li>name検索後、すべて一意にポケモンを特定できたら、その後はid検索として振る舞う</li>
+	 * <li>例：[{ id: "0001N01", name: "" }, { id: "", name: "フシギバナ" }]</li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </li>
 	 * </ol>
 	 *
 	 * @param raceReq
@@ -151,24 +161,29 @@ public class RaceController {
 		}
 
 		// 閲覧数を手動で追加。
-		viewsCacheProvider.addTempList();
+		if (raceDiffRes.isSuccess() && raceDiffRes.getRaceDiffElemArr() != null) {
+			List<String> pokedexIds = raceDiffRes.getRaceDiffElemArr().stream()
+					.map(elem -> elem.getRace().getPokedexId())
+					.toList();
+			viewsCacheProvider.addTempList(pokedexIds);
+		}
 
 		return raceDiffRes;
 	}
 
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+	/**
+	 * 種族値比較頻度取得用API
+	 *
+	 * @param req
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/raceDiffFrequency")
+	public RaceDiffFrequencyResponse raceDiffFrequency(RaceDiffFrequencyRequest raceDiffFreqReq)
+			throws BadRequestException {
+		RaceDiffFrequencyResponse res = new RaceDiffFrequencyResponse();
+		raceDiffFrequencyResRse.execute(raceDiffFreqReq, res, raceDiffFrequencyResearchService);
+		return res;
 	}
 
 }

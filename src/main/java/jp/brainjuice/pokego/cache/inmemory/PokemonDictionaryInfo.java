@@ -45,14 +45,17 @@ public class PokemonDictionaryInfo {
 	// １つの単語がポケモンのグループを示す場合の情報
 	private static final String GROUP_FAMILIAR_NAME_FILE_NAME = "pokemon/pokemon-dictionary-group-familiar-name.yml";
 
-	public PokemonDictionaryInfo() throws PokemonDataInitException {
+	/**
+	 * @throws PokemonDataInitException
+	 */
+	public PokemonDictionaryInfo() {
 		init();
 	}
-	
+
 	/**
 	 * Tokenizerを取得する。
 	 * 取得後はgetTokens(String, Tokenizer)を呼び出し、形態素解析をする。
-	 * 
+	 *
 	 * @return
 	 */
 	public Tokenizer getTokenizer() {
@@ -73,7 +76,7 @@ public class PokemonDictionaryInfo {
 	 * @return
 	 */
 	public TokenizeResult search(String words) {
-		
+
 		Tokenizer tokenizer = getTokenizer();
 		return search(words, tokenizer);
 	}
@@ -138,8 +141,11 @@ public class PokemonDictionaryInfo {
 		return new TokenizeResult(pokemonList, otherList, groupList);
 	}
 
+	/**
+	 * @throws PokemonDataInitException
+	 */
 	@SuppressWarnings("unchecked")
-	public void init() throws PokemonDataInitException {
+	public void init() {
 
 		// Tokenizerを初期化
 		try {

@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import jp.brainjuice.pokego.business.service.search.utils.dto.IroiroTypeRankElement;
-import jp.brainjuice.pokego.web.search.form.res.Response;
+import jp.brainjuice.pokego.web.Response;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

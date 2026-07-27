@@ -9,12 +9,11 @@ import jp.brainjuice.pokego.dao.jpa.entity.TooStrong;
 
 public interface TooStrongRepository extends JpaRepository<TooStrong, String> {
 
-
-    /**
-     * MViewの更新
-     */
-    @Query(value = "REFRESH MATERIALIZED VIEW too_strong", nativeQuery = true)
-    @Modifying
-    @Transactional
-    void refresh();
+	/**
+	 * MViewの更新
+	 */
+	@Query(value = "REFRESH MATERIALIZED VIEW too_strong", nativeQuery = true)
+	@Modifying
+	@Transactional
+	void refresh();
 }

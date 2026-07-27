@@ -1,20 +1,24 @@
 package jp.brainjuice.pokego.web.search;
 
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jp.brainjuice.pokego.business.service.search.moves.MoveListService;
-import jp.brainjuice.pokego.business.service.search.moves.MoveListService.MoveListPatternEnum;
+import jp.brainjuice.pokego.business.service.search.ResearchServiceExecutor;
+import jp.brainjuice.pokego.business.service.search.moves.FilterAllMoveService;
+import jp.brainjuice.pokego.business.service.search.moves.GymRaidPokeMoveCombiResearchService;
+import jp.brainjuice.pokego.business.service.search.moves.MoveLookupService;
+import jp.brainjuice.pokego.business.service.search.moves.PokemonAttackResearchService;
+import jp.brainjuice.pokego.cache.service.ViewsCacheProvider;
 import jp.brainjuice.pokego.utils.exception.BadRequestException;
-import jp.brainjuice.pokego.web.search.form.res.moves.MoveListResponse;
+import jp.brainjuice.pokego.web.search.form.req.moves.FilterAllMoveRequest;
+import jp.brainjuice.pokego.web.search.form.req.moves.GymRaidPokeMoveCombiRequest;
+import jp.brainjuice.pokego.web.search.form.req.moves.MoveLookupRequest;
+import jp.brainjuice.pokego.web.search.form.req.moves.PokemonAttackRequest;
+import jp.brainjuice.pokego.web.search.form.res.moves.FilterAllMoveResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.GymRaidPokeMoveCombiResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.MoveLookupResponse;
+import jp.brainjuice.pokego.web.search.form.res.moves.PokemonAttackResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,48 +32,96 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MovesController {
 
-	private MoveListService moveListService;
+	private FilterAllMoveService filterAllMoveService;
 
-	public MovesController(MoveListService moveListService) {
-		this.moveListService = moveListService;
+	private PokemonAttackResearchService pokemonAttackResearchService;
+	private ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse;
+
+	private GymRaidPokeMoveCombiResearchService gymRaidPokeMoveCombiResearchService;
+	private ResearchServiceExecutor<GymRaidPokeMoveCombiResponse> gymRaidPokeMoveCombiResRse;
+
+	private MoveLookupService moveLookupService;
+
+	private ViewsCacheProvider viewsCacheProvider;
+
+	public MovesController(
+			FilterAllMoveService filterAllMoveService,
+			PokemonAttackResearchService pokemonAttackResearchService, ResearchServiceExecutor<PokemonAttackResponse> pokemonAttackResRse,
+			GymRaidPokeMoveCombiResearchService gymRaidPokeMoveCombiResearchService, ResearchServiceExecutor<GymRaidPokeMoveCombiResponse> gymRaidPokeMoveCombiResRse,
+			MoveLookupService moveLookupService,
+			ViewsCacheProvider viewsCacheProvider) {
+		this.filterAllMoveService = filterAllMoveService;
+		this.pokemonAttackResearchService = pokemonAttackResearchService;
+		this.pokemonAttackResRse = pokemonAttackResRse;
+		this.gymRaidPokeMoveCombiResearchService = gymRaidPokeMoveCombiResearchService;
+		this.gymRaidPokeMoveCombiResRse = gymRaidPokeMoveCombiResRse;
+		this.moveLookupService = moveLookupService;
+		this.viewsCacheProvider = viewsCacheProvider;
 	}
 
 	/**
+	 * 全技絞り込み
+	 *
+	 * @param req
 	 * @return
+	 * @throws BadRequestException
 	 */
-	@GetMapping("/moveListPattern")
-	public LinkedHashMap<String, String> moveListPattern() {
+	@GetMapping("/filterAllMove")
+	public FilterAllMoveResponse filterAllMove(FilterAllMoveRequest req) {
 
-		return Stream.of(MoveListPatternEnum.values())
-				.collect(Collectors.toMap(
-						itrs -> itrs.name(),
-						itrs -> itrs.getJpn(),
-						(a, b) -> a,
-						LinkedHashMap::new));
-	}
+		FilterAllMoveResponse res = new FilterAllMoveResponse();
 
-	@GetMapping("/moveList")
-	public MoveListResponse moveList() {
+		filterAllMoveService.exec(req, res);
 
-		MoveListResponse res = new MoveListResponse();
-
-		moveListService.exec(res);
+		viewsCacheProvider.addTempList();
 
 		return res;
 	}
 
+	/**
+	 * そのポケモンが覚える通常技を取得する
+	 *
+	 * @param req
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/pokemonAttack")
+	public PokemonAttackResponse pokemonAttack(PokemonAttackRequest req) throws BadRequestException {
 
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+		PokemonAttackResponse res = new PokemonAttackResponse();
+		pokemonAttackResRse.execute(req, res, pokemonAttackResearchService);
+
+		return res;
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+	@GetMapping("gymRaidPokeMoveCombi")
+	public GymRaidPokeMoveCombiResponse pokemonMoveCombi(GymRaidPokeMoveCombiRequest req) throws BadRequestException {
+
+		GymRaidPokeMoveCombiResponse res = new GymRaidPokeMoveCombiResponse();
+		gymRaidPokeMoveCombiResRse.execute(req, res, gymRaidPokeMoveCombiResearchService);
+
+		return res;
+	}
+
+	/**
+	 * 技の情報を取得する。
+	 *
+	 * @param req
+	 * @return
+	 * @throws BadRequestException
+	 */
+	@GetMapping("/moveLookup")
+	public MoveLookupResponse moveLookup(MoveLookupRequest req) throws BadRequestException {
+
+		MoveLookupResponse res = new MoveLookupResponse();
+		if (!moveLookupService.check(req, res)) {
+			return res;
+		}
+
+		moveLookupService.execute(req, res);
+
+		viewsCacheProvider.addTempList();
+
+		return res;
 	}
 }

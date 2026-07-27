@@ -1,5 +1,6 @@
 package jp.brainjuice.pokego.business.service.search.pokeFilter;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import jp.brainjuice.pokego.business.constant.GenNameEnum;
 import jp.brainjuice.pokego.business.constant.RegionEnum;
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.utils.BjUtils;
 import jp.brainjuice.pokego.web.search.form.req.ResearchRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,10 @@ public class PokemonFilterValue {
 	/** 実装済み */
 	private boolean impled;
 	private boolean negaImpled;
+	/** リリース年月（開始） */
+	private Date releaseDateStart;
+	/** リリース年月（終了） */
+	private Date releaseDateEnd;
 	/** 強ポケ補正 */
 	private boolean tooStrong;
 	private boolean negaTooStrong;
@@ -74,16 +80,28 @@ public class PokemonFilterValue {
 		// 実装済み
 		setImpled(req.isImpled());
 		setNegaImpled(req.isNegaImpled());
+		// リリース年月（開始）
+		if (String.valueOf(req.getReleaseDateStart()).matches(BjUtils.ymRegex)) {
+			Date startDate = BjUtils.parseDate(String.valueOf(req.getReleaseDateStart()), BjUtils.sdfYm);
+			setReleaseDateStart(startDate);
+		}
+		// リリース年月（終了）
+		if (String.valueOf(req.getReleaseDateEnd()).matches(BjUtils.ymRegex)) {
+			Date endDate = BjUtils.parseDate(String.valueOf(req.getReleaseDateEnd()), BjUtils.sdfYm);
+			setReleaseDateEnd(endDate);
+		}
 		// 強ポケ補正
 		setTooStrong(req.isTooStrong());
 		setNegaTooStrong(req.isNegaTooStrong());
 		// 地域
 		setRegionList(
-				req.getRegion() == null ? null : req.getRegion().stream().map(RegionEnum::valueOf).collect(Collectors.toList()));
+				req.getRegion() == null ? null
+						: req.getRegion().stream().map(RegionEnum::valueOf).collect(Collectors.toList()));
 		setNegaRegion(req.isNegaRegion());
 		// 世代
 		setGenList(
-				req.getGen() == null ? null : req.getGen().stream().map(GenNameEnum::valueOf).collect(Collectors.toList()));
+				req.getGen() == null ? null
+						: req.getGen().stream().map(GenNameEnum::valueOf).collect(Collectors.toList()));
 		setNegaGen(req.isNegaGen());
 	}
 }

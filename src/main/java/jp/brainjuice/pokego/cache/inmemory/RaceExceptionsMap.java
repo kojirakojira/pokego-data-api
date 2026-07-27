@@ -20,8 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RaceExceptionsMap extends HashMap<String, Map<RaceEx, Object>> {
 
-
-	public RaceExceptionsMap(RaceExceptionsRepository raceExceptionsRepository) throws PokemonDataInitException {
+	/**
+	 * @throws PokemonDataInitException
+	 */
+	public RaceExceptionsMap(RaceExceptionsRepository raceExceptionsRepository) {
 
 		try {
 			List<RaceExceptions> reList =  raceExceptionsRepository.findAll();

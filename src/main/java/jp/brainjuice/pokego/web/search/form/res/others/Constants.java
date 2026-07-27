@@ -22,4 +22,5 @@ public class Constants {
 	private Map<String, String> filterItemMap;
 	private List<String> plList;
 	private Map<String, String> situationMap;
+	private Map<String, String> weatherMap;
 }

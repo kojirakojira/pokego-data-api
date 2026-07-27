@@ -2,7 +2,7 @@ package jp.brainjuice.pokego.web.search.form.res.cp;
 
 import java.util.List;
 
-import jp.brainjuice.pokego.business.service.search.utils.dto.GoPokedexAndCp;
+import jp.brainjuice.pokego.business.service.search.utils.dto.GppAndCp;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
 import jp.brainjuice.pokego.web.search.form.res.ResearchResponse;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class AfterEvoCpResponse extends ResearchResponse {
 
@@ -20,6 +20,6 @@ public class AfterEvoCpResponse extends ResearchResponse {
 	private int ivh;
 	private int cp;
 	private String pl;
-	private List<GoPokedexAndCp> afEvolCpList;
-	private List<GoPokedexAndCp> anotherFormList;
+	private List<GppAndCp> afEvolCpList;
+	private List<GppAndCp> anotherFormList;
 }

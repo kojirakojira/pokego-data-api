@@ -1,6 +1,7 @@
 package jp.brainjuice.pokego.business.service.search.utils;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,6 @@ public class PokemonUtils {
 
 	private RaceExceptionsMap raceExceptionsMap;
 
-	// 強ポケ補正の基準になるPL
-	private static final String TOO_STRONG_PL = "50.5";
 	// 強ポケ補正の補正値
 	private static final double TOO_STRONG_CORRECTION_VALUE = 0.91;
 	// 強ポケ補正の補正値（メガ）
@@ -65,7 +64,6 @@ public class PokemonUtils {
 		goPokedex.setGen(pokedex.getGen());
 		goPokedex.setImage1(BjUtils.replaceEmpty(pokedex.getImage1()));
 		goPokedex.setImage2(BjUtils.replaceEmpty(pokedex.getImage2()));
-		goPokedex.setImplFlg(pokedex.isImplFlg());
 
 		return goPokedex;
 	}
@@ -79,7 +77,7 @@ public class PokemonUtils {
 	 */
 	public int convGoHp(Pokedex pokedex, boolean correctFlg) {
 
-		String pid = pokedex.getPokedexId();
+		String pid = Objects.requireNonNull(pokedex.getPokedexId());
 		// 例外の固定値が存在する場合はその値を返却する。
 		Map<RaceEx, Object> raceExHpMap = raceExceptionsMap.get(pid);
 		if (raceExHpMap != null && raceExHpMap.containsKey(RaceEx.HP)) {
@@ -90,7 +88,8 @@ public class PokemonUtils {
 
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedex)
-					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
+					? TOO_STRONG_CORRECTION_VALUE_MEGA
+					: TOO_STRONG_CORRECTION_VALUE;
 			// 強ポケ補正後は四捨五入
 			baseHp = tooStrongRepository.existsById(pid) ? Math.round(baseHp * correctionValue) : baseHp;
 		}
@@ -122,7 +121,7 @@ public class PokemonUtils {
 	 */
 	public int convGoAttack(Pokedex pokedex, boolean correctFlg) {
 
-		String pid = pokedex.getPokedexId();
+		String pid = Objects.requireNonNull(pokedex.getPokedexId());
 		// 例外の固定値が存在する場合はその値を返却する。
 		Map<RaceEx, Object> raceExAtMap = raceExceptionsMap.get(pid);
 		if (raceExAtMap != null && raceExAtMap.containsKey(RaceEx.ATTACK)) {
@@ -130,13 +129,15 @@ public class PokemonUtils {
 		}
 
 		double baseAttack = baseAttack(pokedex.getAttack(), pokedex.getSpecialAttack(), pokedex.getSpeed());
-
+		System.out.println(baseAttack);
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedex)
-					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
+					? TOO_STRONG_CORRECTION_VALUE_MEGA
+					: TOO_STRONG_CORRECTION_VALUE;
 			baseAttack = tooStrongRepository.existsById(pid) ? baseAttack * correctionValue : baseAttack;
 		}
 
+		System.out.println(Math.round(baseAttack));
 		return (int) Math.round(baseAttack);
 	}
 
@@ -171,7 +172,7 @@ public class PokemonUtils {
 	 */
 	public int convGoDefense(Pokedex pokedex, boolean correctFlg) {
 
-		String pid = pokedex.getPokedexId();
+		String pid = Objects.requireNonNull(pokedex.getPokedexId());
 		// 例外の固定値が存在する場合はその値を返却する。
 		Map<RaceEx, Object> raceExDfMap = raceExceptionsMap.get(pid);
 		if (raceExDfMap != null && raceExDfMap.containsKey(RaceEx.DEFENSE)) {
@@ -182,7 +183,8 @@ public class PokemonUtils {
 
 		if (correctFlg) {
 			double correctionValue = PokemonEditUtils.isMega(pokedex)
-					? TOO_STRONG_CORRECTION_VALUE_MEGA : TOO_STRONG_CORRECTION_VALUE;
+					? TOO_STRONG_CORRECTION_VALUE_MEGA
+					: TOO_STRONG_CORRECTION_VALUE;
 			baseDefense = tooStrongRepository.existsById(pid) ? baseDefense * correctionValue : baseDefense;
 		}
 
@@ -217,7 +219,7 @@ public class PokemonUtils {
 	 * @return
 	 */
 	private double speedMod(int speed) {
-		double speedD =Integer.valueOf(speed).doubleValue();
+		double speedD = Integer.valueOf(speed).doubleValue();
 		return 1 + (speedD - 75) / 500;
 	}
 
@@ -234,26 +236,6 @@ public class PokemonUtils {
 				convGoDefense(pokedex, true),
 				convGoHp(pokedex, true),
 				pl);
-	}
-
-	/**
-	 * 原作の種族値からポケモンGOのPL50.5の場合のCPを求めます。<br>
-	 * これは、ポケモンGOの基礎となる種族値です。<br>
-	 * （このCPが4000を超えるかどうかが、種族値補正の基準になります。）<br>
-	 * TODO: 個体値ALL0かつ、PL50.5	の時にCP4000以上だと実装に準拠する。が、謎だから正しいか確認したい。
-	 *
-	 * @param attack
-	 * @param defense
-	 * @param hp
-	 * @param cpMultiplierMap
-	 * @return
-	 */
-	public int calcBaseCpFromMain(Pokedex pokedex) {
-
-		return pokemonGoUtils.calcCp(
-				convGoAttack(pokedex, false),
-				convGoDefense(pokedex, false),
-				convGoHp(pokedex, false), TOO_STRONG_PL);
 	}
 
 	/**

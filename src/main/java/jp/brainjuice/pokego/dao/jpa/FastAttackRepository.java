@@ -1,130 +1,82 @@
 package jp.brainjuice.pokego.dao.jpa;
 
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Meta;
+import org.springframework.data.jpa.repository.Query;
 
 import jp.brainjuice.pokego.business.constant.Type.TypeEnum;
+import jp.brainjuice.pokego.dao.jpa.dto.SimpMove;
 import jp.brainjuice.pokego.dao.jpa.entity.FastAttack;
-import jp.brainjuice.pokego.utils.BjCsvMapper;
-import jp.brainjuice.pokego.utils.BjUtils;
-import jp.brainjuice.pokego.utils.exception.PokemonDataInitException;
-import jp.brainjuice.pokego.utils.external.AwsS3Utils;
-import lombok.extern.slf4j.Slf4j;
 
-/**
- * 原作におけるポケモンの情報を取得するRepositoryクラス
- *
- * @author saibabanagchampa
- *
- */
-@Repository
-@Slf4j
-public class FastAttackRepository extends InMemoryRepository<FastAttack, String> {
+public interface FastAttackRepository extends JpaRepository<FastAttack, String> {
 
-	private static final String MSG_FORMAT_ERROR = "{0}の指定に誤りがあります。（技名：{1}, 行：{2}, 値：{3}）";
-
-	/** fast-attacks.csv */
-	private static final String FAST_ATTACKS_CSV_FILE_NAME = "pokemon/moves/fast-attacks.csv";
+	@Meta(comment = "find by type in(fast attack)")
+	List<FastAttack> findByTypeIn(List<TypeEnum> typeList);
 
 	/**
-	 * CSVファイルからFastAttackを生成し、DIに登録する。
+	 * ポケモンが覚えるすべての技を取得する。<br>
+	 * (=ポケモンが覚えない通常技を省いて取得する。)
 	 *
-	 * @param typeMap
-	 * @param genNameMap
-	 * @throws PokemonDataInitException
+	 * @return
 	 */
-	public FastAttackRepository(AwsS3Utils awsS3Utils) throws PokemonDataInitException {
-		init();
-	}
+	@Query(value = "SELECT DISTINCT fa.* "
+			+ "FROM fast_attack fa "
+			+ "INNER JOIN pokemon_fast_attack pfa "
+			+ "ON fa.move_id = pfa.move_id", nativeQuery = true)
+	@Meta(comment = "find fastAttack all can learn")
+	List<FastAttack> findAllCanLearn();
 
 	/**
-	 * 主キーはmoveId
+	 * この{@link FastAttackRepository#findSimpMoveByNameLikeIn() メソッド}を呼び出すこと。<br>
+	 * 処理順
+	 * <ol>
+	 * <li>引数で受け取った値をテーブルに変換し、値の前後に'%'を連結する。</li>
+	 * <li>name列をひらがな→カタカナ変換し、通常技のCTEを作成する。</li>
+	 * <li>name列をひらがな→カタカナ変換し、スペシャル技のCTEを作成する。</li>
+	 * <li>CTEを使用し、NOT EXISTSとNOT LIKEでCTE「patterns」にすべて一致するレコードを特定する。（ド・モルガンの考え方） → 通常技、スペシャル技それぞれで実行する。</li>
+	 * <li>通常技とスペシャル技をUNION ALLで連結する。</li>
+	 * </ol>
+	 *
+	 * @return
 	 */
-	@Override
-	protected String getKey(FastAttack t) {
-		return t.getMoveId();
-	}
+	@Meta(comment = "find simpMove by name like in")
+	@Query(value = "WITH patterns AS ( "
+			+ "  SELECT '%' || hira_to_kata(word) || '%' AS kata_pattern "
+			+ "    FROM unnest(:words) AS t(word)),"
+			+ "fast_attack_tmp AS ( "
+			+ "  SELECT fa.move_id, hira_to_kata(fa.name) AS kata_name, fa.name AS original_name "
+			+ "    FROM fast_attack fa),"
+			+ "charged_attack_tmp AS ( "
+			+ "  SELECT ca.move_id, hira_to_kata(ca.name) AS kata_name, ca.name AS original_name "
+			+ "    FROM charged_attack ca) "
+			+ "SELECT fa_tmp.move_id, fa_tmp.original_name "
+			+ "  FROM fast_attack_tmp fa_tmp "
+			+ "  WHERE NOT EXISTS ("
+			+ "    SELECT 1"
+			+ "      FROM patterns pat"
+			+ "      WHERE fa_tmp.kata_name NOT LIKE pat.kata_pattern) "
+			+ "UNION ALL "
+			+ "SELECT ca_tmp.move_id, ca_tmp.original_name "
+			+ "  FROM charged_attack_tmp ca_tmp "
+			+ "  WHERE NOT EXISTS ("
+			+ "    SELECT 1"
+			+ "      FROM patterns pat"
+			+ "      WHERE ca_tmp.kata_name NOT LIKE pat.kata_pattern)", nativeQuery = true)
+	@Deprecated(forRemoval = true)
+	List<Object[]> findSimpMoveByNameLikeInRow(String[] words);
 
 	/**
-	 * 起動時に実行。CSVファイルの内容をメモリに抱える。
+	 * ひらがな、カタカナを区別せずLIKE検索する。<br>
+	 * 通常技、スペシャル技から取得し、引数の配列に対してはAND演算で取得する。
 	 *
-	 * @throws PokemonDataInitException
+	 * @param words
+	 * @return
 	 */
-	public void init() throws PokemonDataInitException {
-
-		String fileName = FAST_ATTACKS_CSV_FILE_NAME;
-		try {
-//			fileName = MessageFormat.format(S3_POKEMON_CSV_FILE_NAME, awsS3Utils.getSuffix());
-//			S3Object object = awsS3Utils.download(fileName);
-			Resource resource = BjUtils.loadFile(fileName);
-			List<FastAttack> attackList = (List<FastAttack>) saveAll(BjCsvMapper.mapping(resource, FastAttack.class));
-
-			checkFormat(attackList);
-
-		} catch (PokemonDataInitException pde) {
-			log.error(pde.getMessage(), pde);
-			throw pde;
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			throw new PokemonDataInitException(e);
-		}
-
-		log.info(MessageFormat.format("Moves(Fast Attack) table generated!! (Referenced file: {0})", fileName));
-	}
-
-	/*
-	 * ファイルの整合性チェック
-	 *
-	 * @param attackList
-	 * @throws PokemonDataInitException
-	 */
-	private void checkFormat(List<FastAttack> attackList) throws PokemonDataInitException {
-
-		for (FastAttack fa: attackList) {
-
-			// 技ID
-			Pattern pattern = Pattern.compile("^[A-Z]{2}1[0-9]{3}$");
-			if (!pattern.matcher(fa.getMoveId()).find()) {
-				throw new PokemonDataInitException(
-						MessageFormat.format(MSG_FORMAT_ERROR, "技ID", fa.getName(), attackList.indexOf(fa) + 1, fa.getMoveId()));
-			}
-
-			// タイプ
-			if (!TypeEnum.isDefined(fa.getType())) {
-				throw new PokemonDataInitException(
-						MessageFormat.format(MSG_FORMAT_ERROR, "タイプ", fa.getName(), attackList.indexOf(fa) + 1, fa.getType()));
-			}
-
-			// DPS
-			float gymPower = (float) fa.getGymPower();
-			float calcedDps = BjUtils.round(gymPower, fa.getTotalTime(), 3);
-			if (Float.compare(calcedDps, fa.getDps()) != 0) {
-				throw new PokemonDataInitException(
-						MessageFormat.format(MSG_FORMAT_ERROR, "DPS", fa.getName(), attackList.indexOf(fa) + 1, fa.getDps()));
-			}
-
-			// DPT
-			float pvpPower = (float) fa.getPvpPower();
-			float turns = (float) fa.getTurns();
-			float calcedDpt = BjUtils.round(pvpPower, turns, 3);
-			if (Float.compare(calcedDpt, fa.getDpt()) != 0) {
-				throw new PokemonDataInitException(
-						MessageFormat.format(MSG_FORMAT_ERROR, "DPT", fa.getName(), attackList.indexOf(fa) + 1, fa.getDpt()));
-			}
-
-			// EPT
-			float energyIncrAmount = (float) fa.getEnergyIncrAmount();
-			float calcedEpt = BjUtils.round(energyIncrAmount, turns, 3);
-			if (Float.compare(calcedEpt, fa.getEpt()) != 0) {
-				throw new PokemonDataInitException(
-						MessageFormat.format(MSG_FORMAT_ERROR, "EPT", fa.getName(), attackList.indexOf(fa) + 1, fa.getEpt()));
-			}
-
-			log.debug("Check OK. " + fa);
-		}
-	}
+	default List<SimpMove> findSimpMoveByNameLikeIn(String[] words) {
+		return findSimpMoveByNameLikeInRow(words).stream()
+				.map(SimpMove::new)
+				.toList();
+	};
 }

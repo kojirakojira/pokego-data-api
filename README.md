@@ -94,6 +94,12 @@ docker exec -it {コンテナID} ls
 1. HSETでuseIdを登録する。_classはちゃんとパッケージを合わせる
 1. SADD admins #{ユーザID}
 1. HSET admins:#{ユーザID} userId #{ユーザID}
+1. ログイン画面でユーザIDとパスワードを入力してログインする。(ここで入力したパスワードがパスワードになる。)
+
+```
+sadd admins "newuser"
+hset admins:newuser _class "jp.brainjuice.pokego.dao.redis.entity.Admin" userId "newuser"
+```
 
 ### Tips
 

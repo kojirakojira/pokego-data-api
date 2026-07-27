@@ -1,8 +1,7 @@
 package jp.brainjuice.pokego.web.search;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +12,6 @@ import jp.brainjuice.pokego.business.service.search.scp.ScpRankListResearchServi
 import jp.brainjuice.pokego.business.service.search.scp.ScpRankMaxMinResearchService;
 import jp.brainjuice.pokego.business.service.search.scp.ScpRankResearchService;
 import jp.brainjuice.pokego.business.service.search.utils.ValidationService;
-import jp.brainjuice.pokego.utils.exception.BadRequestException;
 import jp.brainjuice.pokego.web.search.form.req.scp.AfterEvoScpRankRequest;
 import jp.brainjuice.pokego.web.search.form.req.scp.ScpRankListRequest;
 import jp.brainjuice.pokego.web.search.form.req.scp.ScpRankMaxMinRequest;
@@ -47,8 +45,6 @@ public class ScpResearchController {
 	private AfterEvoScpRankResearchService afterEvoScpRankResearchService;
 	private ResearchServiceExecutor<AfterEvoScpRankResponse> afterEvoScpRankResRse;
 
-	private ValidationService validationService;
-
 	public ScpResearchController(
 			ScpRankResearchService scpRankResearchService, ResearchServiceExecutor<ScpRankResponse> scpRankResRse,
 			ScpRankMaxMinResearchService scpRankMaxMinResearchService, ResearchServiceExecutor<ScpRankMaxMinResponse> scpRankMaxMinResRse,
@@ -67,8 +63,6 @@ public class ScpResearchController {
 		// 進化後SCPランク
 		this.afterEvoScpRankResearchService = afterEvoScpRankResearchService;
 		this.afterEvoScpRankResRse = afterEvoScpRankResRse;
-		// 入力チェック
-		this.validationService = validationService;
 	}
 
 	/**
@@ -86,8 +80,6 @@ public class ScpResearchController {
 	 */
 	@GetMapping("/scpRank")
 	public ScpRankResponse scpRank(ScpRankRequest scpRankReq) throws Exception {
-
-		validationService.validation(scpRankReq);
 
 		ScpRankResponse scpRankRes = new ScpRankResponse();
 		scpRankResRse.execute(scpRankReq, scpRankRes, scpRankResearchService);
@@ -110,8 +102,6 @@ public class ScpResearchController {
 	@GetMapping("/scpRankMaxMin")
 	public ScpRankMaxMinResponse scpRankMaxMin(ScpRankMaxMinRequest scpMaxMinReq) throws Exception {
 
-		validationService.validation(scpMaxMinReq);
-
 		ScpRankMaxMinResponse scpRankMaxMinRes = new ScpRankMaxMinResponse();
 		scpRankMaxMinResRse.execute(scpMaxMinReq, scpRankMaxMinRes, scpRankMaxMinResearchService);
 		return scpRankMaxMinRes;
@@ -132,9 +122,7 @@ public class ScpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/scpRankList")
-	public ScpRankListResponse scpRankList(ScpRankListRequest scpRankListReq) throws Exception {
-
-		validationService.validation(scpRankListReq);
+	public ScpRankListResponse scpRankList(@Valid ScpRankListRequest scpRankListReq) throws Exception {
 
 		ScpRankListResponse scpRankListRes = new ScpRankListResponse();
 		scpRankListResRse.execute(scpRankListReq, scpRankListRes, scpRankListResearchService);
@@ -149,27 +137,10 @@ public class ScpResearchController {
 	 * @throws Exception
 	 */
 	@GetMapping("/afterEvoScpRank")
-	public AfterEvoScpRankResponse afterEvoScpRank(AfterEvoScpRankRequest afterEvoScpRankListReq) throws Exception {
-
-		validationService.validation(afterEvoScpRankListReq);
+	public AfterEvoScpRankResponse afterEvoScpRank(@Valid AfterEvoScpRankRequest afterEvoScpRankListReq) throws Exception {
 
 		AfterEvoScpRankResponse afterEvoScpRankRes = new AfterEvoScpRankResponse();
 		afterEvoScpRankResRse.execute(afterEvoScpRankListReq, afterEvoScpRankRes, afterEvoScpRankResearchService);
 		return afterEvoScpRankRes;
 	}
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<String> badRequestException(Exception e) {
-		String errMsg = "不正なリクエストです。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> exception(Exception e) {
-		String errMsg = "処理中に想定外の問題が発生しました。";
-		log.error(errMsg, e);
-		return new ResponseEntity<String>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 }

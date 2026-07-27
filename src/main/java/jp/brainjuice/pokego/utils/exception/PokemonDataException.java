@@ -2,7 +2,6 @@ package jp.brainjuice.pokego.utils.exception;
 
 /**
  * データの整合性に問題がある場合にthrowする例外クラス
- * 基本的には発生しないものである。
  * 被検査例外として定義する。
  */
 public class PokemonDataException extends RuntimeException {

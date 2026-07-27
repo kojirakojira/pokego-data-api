@@ -10,8 +10,8 @@ import jp.brainjuice.pokego.business.service.search.utils.dto.cpIv.IvRange;
 import jp.brainjuice.pokego.business.service.search.utils.dto.cpIv.IvRangeCp;
 import jp.brainjuice.pokego.dao.jpa.GoPokedexRepository;
 import jp.brainjuice.pokego.dao.jpa.entity.GoPokedex;
+import jp.brainjuice.pokego.web.Response;
 import jp.brainjuice.pokego.web.search.form.res.MsgLevelEnum;
-import jp.brainjuice.pokego.web.search.form.res.Response;
 
 @Component
 public class CatchCpUtils {
